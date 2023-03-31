@@ -1,20 +1,17 @@
-# Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
+# Introduction
 
-# Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
+This repository contains specifications for the Pipeline API and some 51Degrees services.
 
-# Build and Test
-TODO: Describe and show how to build your code and run the tests. 
+# Specifications
 
-# Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
+| Name                              | Description                                                         |
+|-----------------------------------|---------------------------------------------------------------------|
+| Pipeline Specification            | Specification for the Pipeline API. This covers core functionality. |
+| Device Detection Specification    | Specification for the device detection service                      |
 
-If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+# Notes for implementers
+
+-   These specifications are written to be language agnostic. The precise details of how to implement features is often not specified. This allows implementers to choose the most appropriate mechanism for the target language. For example, Java and .NET developers would be familiar with the use of a fluent builder to create instances. However, a Node.JS developer would not normally use this approach.
+-   Java and .NET are considered the reference implementations. At least one of these should be reviewed by the reader to see what a real-world implementation of the specification looks like.
+-   URLs in these specifications are fixed. Code comments should include references to these URLs in order to avoid re-writing the same descriptions and definitions in multiple places.
+-   CI/CD scripts and the like are out of scope. However, implementers should be mindful of the requirement to have the ability to build and test the software in a non-interactive CI/CD environment.
