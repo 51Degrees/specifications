@@ -10,5 +10,4 @@ This document contains recommendations to help inform these decisions.
 4. Examples and tests should not be included in any published packages.
 
 For examples, see 51Degrees device detection packages on [NuGet](https://www.nuget.org/packages?q=FiftyOne.DeviceDetection), [Maven](https://central.sonatype.com/search?namespace=com.51degrees&q=device-detection) or [NPM](https://www.npmjs.com/search?q=fiftyone.devicedetection)
-  
 

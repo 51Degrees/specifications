@@ -84,6 +84,27 @@ The metadata associated with a **value** is:
 | Description| A description of the **value** explaining what it refers to, and what it means if a **profile** has this **value**. |
 | URL      | A URL where more information on the **value** can be found. |
 
+## Match metric properties
+
+In addition to the 'standard' device detection properties, there are a set of properties that return details about the processing that was performed and the match that was found.
+Meta-data for these properties must be added, as they will not be included in the meta-data exposed by the native code.
+
+All these properties have the following values:
+- Category = "Device Metrics"
+- Available With = "Lite", "Premium", "Enterprise", "TAC" - If possible, this list should be created dynamically from the lists of files included against all other property meta data that is exposed by the native code.
+- Component = "Metrics" - This component must also be added to the list of components returned by the engine.
+
+|Name|Type|Default value|Description|Possible values|
+|---|---|---|---|---|
+|MatchedNodes|int|0|Indicates the number of hash nodes matched within the evidence.|n/a|
+|Difference|int|0|Used when detection method is not Exact or None. The larger the value the less confident the detector is in this result.|n/a|
+|Drift|int|0|Total difference in character positions between where the substring's hashes were found and where they were expected.|n/a|
+|DeviceId|string|"0-0-0-0"|Contains the profile ids of the matching profiles, separated by a hyphen symbol. For example \[HardwareId\]-\[PlatformId\]-\[BrowserId\]-\[CrawlerId\]. By convention, these will be in component Id order. There will often be 4 ids present, but this is not guaranteed.|n/a|
+|UserAgents|string|"n/a"|The matched User-Agents.|n/a|
+|Iterations|int|0|The number of iterations carried out in order to find a match. This is the number of nodes in the graph which have been visited.|n/a|
+|Method|string|"NONE"|The method used to determine the match result.|"NONE", "PERFORMANCE", "COMBINED", "PREDICTIVE"|
+
+
 
 # Performance guidance
 

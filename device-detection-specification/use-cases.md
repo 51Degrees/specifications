@@ -12,11 +12,10 @@ In particular, a cloud pipeline must be a drop-in replacement for an on-premise 
 Creating an on-premise device detection pipeline in code:
 
 ```
-var deviceDetectionEngine = deviceDetectionBuilder()
-  .onPremise()
+var deviceDetectionEngine = deviceDetectionHashEngineBuilder
   .setPerformanceProfile(performanceProfiles.MaxPerformance)
   .build("data file path")
-var pipeline = pipelineBuilder()
+var pipeline = pipelineBuilder
   .addElement(deviceDetectionEngine)
 ```
 
@@ -24,12 +23,11 @@ Creating a pipeline for device detection using the 51Degrees cloud service will
 look slightly different: 
 
 ```
-var cloudEngine = cloudAspectEngineBuilder()
+var cloudEngine = cloudAspectEngineBuilder
   .build(resourceKey)
-var deviceDetectionEngine = deviceDetectionBuilder()
-  .cloud()
+var deviceDetectionEngine = deviceDetectionCloudEngineBuilder
   .build()
-var pipeline = pipelineBuilder()
+var pipeline = pipelineBuilder
   .addElement(cloudEngine)
   .addElement(deviceDetectionEngine)
 ```
@@ -37,7 +35,7 @@ var pipeline = pipelineBuilder()
 Device detection pipelines can also be [created from configuration](/pipeline-specification/features/build-from-configuration.md).
 
 ```
-var pipeline = pipelineBuilder()
+var pipeline = pipelineBuilder
   .buildFromConfiguration(configuration)
 ```
 
@@ -99,12 +97,11 @@ All [data update](/pipeline-specification/features/data-updates.md) functionalit
 This pipeline creation example demonstrates how to configure the pipeline to update the device detection data file when needed:
 
 ```
-var deviceDetectionEngine = deviceDetectionBuilder()
-  .onPremise()
+var deviceDetectionEngine = deviceDetectionHashEngineBuilder
   .setPerformanceProfile(performanceProfiles.MaxPerformance)
   .setLicenseKey(licenseKey)
   .build("data file path")
-var pipeline = pipelineBuilder()
+var pipeline = pipelineBuilder
   .addElement(deviceDetectionEngine)
 ```
 
@@ -143,9 +140,9 @@ foreach (var value in deviceDetectionEngine.Values)
 A user wishes to get details of devices matching a specific [TAC](https://en.wikipedia.org/wiki/Type_Allocation_Code) or native key.
 
 ```
-var cloudEngine = cloudAspectEngineBuilder()
+var cloudEngine = cloudAspectEngineBuilder
   .build(resourceKey)
-var hardwareProfileEngine = hardwareProfileEngineBuilder()
+var hardwareProfileEngine = hardwareProfileCloudEngineBuilder
   .build()
 var pipeline = pipelineBuilder()
   .addElement(cloudEngine)
