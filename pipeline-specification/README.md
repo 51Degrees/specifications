@@ -25,7 +25,7 @@ A Pipeline is a means of managing Flow Elements (for example, a Device Detection
 
 As shown in the diagram below, a user adds evidence to a Flow Data’s evidence collection, passes the Flow Data through a Pipeline, and can then access values of the Flow Data Aspects which have been populated by the Flow Elements within the Pipeline.
 
-![Pipeline diagram](Images/Pipeline.png)
+![Pipeline diagram](images/Pipeline.png)
 
 In this depiction there are two Flow elements in the Pipeline which populate the “Device” and “Network” Aspects of the Flow Data. It should also be noted that the Device Detection Aspect Engine has an extra cache layer. This caches the “Device” Aspect based on what it deems to be relevant evidence, and is an optional performance optimization for a Flow Element.
 
