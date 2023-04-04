@@ -1,13 +1,18 @@
 # Introduction
 
-This document contains descriptions of device detection use-cases along with pseudo-code examples.
+This document contains descriptions of device detection use-cases along with
+pseudo-code examples.
 
-Many of these examples build on the concepts established in the pipeline specification, so it may be helpful to first become familiar with the [use-cases there](/pipeline-specification/use-cases.md).
+Many of these examples build on the concepts established in the pipeline
+specification, so it may be helpful to first become familiar with
+the [use-cases there](/pipeline-specification/use-cases.md).
 
 # Create a device detection pipeline
 
-There are several different ways that a pipeline might be created. However, once created, usage must be as similar as possible.
-In particular, a cloud pipeline must be a drop-in replacement for an on-premise pipeline for performing device detection and querying the results.
+There are several different ways that a pipeline might be created. However, once
+created, usage must be as similar as possible.
+In particular, a cloud pipeline must be a drop-in replacement for an on-premise
+pipeline for performing device detection and querying the results.
 
 Creating an on-premise device detection pipeline in code:
 
@@ -19,8 +24,8 @@ var pipeline = pipelineBuilder
   .addElement(deviceDetectionEngine)
 ```
 
-Creating a pipeline for device detection using the 51Degrees cloud service will 
-look slightly different: 
+Creating a pipeline for device detection using the 51Degrees cloud service will
+look slightly different:
 
 ```
 var cloudEngine = cloudAspectEngineBuilder
@@ -32,7 +37,8 @@ var pipeline = pipelineBuilder
   .addElement(deviceDetectionEngine)
 ```
 
-Device detection pipelines can also be [created from configuration](/pipeline-specification/features/build-from-configuration.md).
+Device detection pipelines can also
+be [created from configuration](/pipeline-specification/features/build-from-configuration.md).
 
 ```
 var pipeline = pipelineBuilder
@@ -41,7 +47,8 @@ var pipeline = pipelineBuilder
 
 # Simple device detection
 
-A user wishes to find out whether a device is a mobile or not, based on the User-Agent header.
+A user wishes to find out whether a device is a mobile or not, based on the
+User-Agent header.
 
 ```
 // The 'with' construct represents some mechanism to ensure that memory is cleaned up after processing is complete. This is very important for the on-premise implementation.
@@ -56,11 +63,17 @@ with(var flowdata = pipeline.createFlowData())
 
 # Property not available
 
-A property might not be available in some scenarios. We need to ensure that the used is informed of why the property cannot be accessed and how to gain access if they want to. This feature is described in more detail in the [pipeline specification](/pipeline-specification/features/properties.md#missing-properties)
+A property might not be available in some scenarios. We need to ensure that the
+used is informed of why the property cannot be accessed and how to gain access
+if they want to. This feature is described in more detail in
+the [pipeline specification](/pipeline-specification/features/properties.md#missing-properties)
 
 Some sample scenarios are:
-1. An on-premise user attempts to access a property that is not available in the data file they are using.
-2. A cloud user attempts to access a property that is not included with their [resource key](TODO link).
+
+1. An on-premise user attempts to access a property that is not available in the
+   data file they are using.
+2. A cloud user attempts to access a property that is not included with
+   their [resource key](TODO link).
 
 ```
 with(var flowdata = pipeline.createFlowData())
@@ -75,26 +88,38 @@ with(var flowdata = pipeline.createFlowData())
 
 # Web integration
 
-The mechanics of this will differ significantly by language. See [pipeline - web integration](../pipeline-specification/features/web-integration.md) for more detail.
-However, the outcome should be the same. It must be simple for the user to create a web application where:
+The mechanics of this will differ significantly by language.
+See [pipeline - web integration](../pipeline-specification/features/web-integration.md)
+for more detail.
+However, the outcome should be the same. It must be simple for the user to
+create a web application where:
 
-1. Each request (following any filtering, etc) will have all relevant evidence values extracted, added to a flow data and processed.
-2. This flow data will be made available in whatever mechanism is common for shared web session data in that environment, allowing other components to easily make use of the device detection results. 
+1. Each request (following any filtering, etc) will have all relevant evidence
+   values extracted, added to a flow data and processed.
+2. This flow data will be made available in whatever mechanism is common for
+   shared web session data in that environment, allowing other components to
+   easily make use of the device detection results.
 
 ## Apple model detection
 
-Modifying the simple web application described above to be able to correctly identify Apple models must also be very easy. For example, by adding a line similar to the following in the HTML:
+Modifying the simple web application described above to be able to correctly
+identify Apple models must also be very easy. For example, by adding a line
+similar to the following in the HTML:
 
 ```
 <script async src='51Degrees.core.js' type='text/javascript'></script>
 ```
 
-For more details on the expected functionality see the [web integration](/pipeline-specification/features/web-integration.md) section of the pipeline specification.
+For more details on the expected functionality see
+the [web integration](/pipeline-specification/features/web-integration.md)
+section of the pipeline specification.
 
 # Automatic data updates
 
-All [data update](/pipeline-specification/features/data-updates.md) functionality should be part of configuration.
-This pipeline creation example demonstrates how to configure the pipeline to update the device detection data file when needed:
+All [data update](/pipeline-specification/features/data-updates.md)
+functionality should be part of configuration.
+This pipeline creation example demonstrates how to configure the pipeline to
+update the device detection data file when needed:
 
 ```
 var deviceDetectionEngine = deviceDetectionHashEngineBuilder
@@ -107,7 +132,8 @@ var pipeline = pipelineBuilder
 
 # Property meta data
 
-[Property meta data](/pipeline-specification/features/properties.md#property-meta-data) must be exposed by the device detection engine:
+[Property meta data](/pipeline-specification/features/properties.md#property-meta-data)
+must be exposed by the device detection engine:
 
 ```
 foreach (var property in deviceDetectionEngine.Properties)
@@ -118,7 +144,8 @@ foreach (var property in deviceDetectionEngine.Properties)
 
 # Extended On-Premise meta data
 
-Additional [device detection meta data](pipeline-elements/device-detection-on-premise.md#meta-data) must be exposed by the on-premise engine:
+Additional [device detection meta data](pipeline-elements/device-detection-on-premise.md#meta-data)
+must be exposed by the on-premise engine:
 
 ```
 foreach (var component in deviceDetectionEngine.Components)
@@ -137,7 +164,9 @@ foreach (var value in deviceDetectionEngine.Values)
 
 # TAC/Native Key lookup
 
-A user wishes to get details of devices matching a specific [TAC](https://en.wikipedia.org/wiki/Type_Allocation_Code) or native key.
+A user wishes to get details of devices matching a
+specific [TAC](https://en.wikipedia.org/wiki/Type_Allocation_Code) or native
+key.
 
 ```
 var cloudEngine = cloudAspectEngineBuilder
