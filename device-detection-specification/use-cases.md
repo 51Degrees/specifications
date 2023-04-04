@@ -23,7 +23,7 @@ Creating a pipeline for device detection using the 51Degrees cloud service will
 look slightly different: 
 
 ```
-var cloudEngine = cloudAspectEngineBuilder
+var cloudEngine = cloudRequestEngineBuilder
   .build(resourceKey)
 var deviceDetectionEngine = deviceDetectionCloudEngineBuilder
   .build()
