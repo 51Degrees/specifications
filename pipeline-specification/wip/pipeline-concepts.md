@@ -22,7 +22,7 @@ within which those properties are found.
 ## Flow Data Lifecycle
 
 Creation of Flow Data is carried out by an application requesting an instance 
-from a pipeline. With a number of important exceptions the creating 
+from a pipeline. With a number of important exceptions, the creating 
 application must destroy the Flow Data once it has completed its processing.
 
 The application carries out the initial population of evidence
@@ -37,7 +37,7 @@ stops [^3].
 
 ## Engine
 
-An `Engine` is a specialisation of a Flow Element, which builds on the basic 
+An `Engine` is a specialization of a Flow Element, which builds on the basic 
 functionality provided by Flow Element to provide higher level functions
 in a consistent way. 
 
@@ -53,7 +53,7 @@ carry out processing by reference to one or more data files, stored locally.
 Facilities are available for update and installation of such data files. 
 
 Where both Cloud and On-Premise variants of an Engine are available, they should
-arrange for the properties and values produced are compatible with each other
+arrange that the properties and values produced are compatible with each other
 so that the engines may be substituted in the pipeline without alteration to
 the consuming application.
 
@@ -67,11 +67,11 @@ such services are *DataUpdateService* which provides for the update of
 data stored on-premise.
 
 
-[^1] Thus Flow Elements may have a dependency on earlier Flow Elements - 
-though at present there is no mechanism by which those dependencies 
-are checked.
+[^1] Thus Flow Elements may have a dependency on earlier Flow Elements. 
+At present there is no mechanism to describe these dependencies, 
+or to check that dependencies are met before runtime.
 
-[^2] In general evidence is created at the start of pipeline processing and is 
+[^2] In general, evidence is created at the start of pipeline processing and is 
 generally unaltered in the course of the processing. Addition to evidence 
 and alteration of existing evidence is, however, possible.
 
