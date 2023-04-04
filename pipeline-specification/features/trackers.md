@@ -1,0 +1,1 @@
+- variation of a cache with a sliding window feature.

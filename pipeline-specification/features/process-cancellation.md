@@ -1,0 +1,2 @@
+- Where the language allows, the pipeline must support a mechanism for the caller to cancel processing. This will stop any engines that are currently processing as soon as possible and not start any new ones.
+  - The processed flowdata may then be missing data that would normally have been populated. 

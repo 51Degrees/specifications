@@ -1,0 +1,6 @@
+- Engines must support the addition of a cache. 
+  - Keyed on one or more evidence key/value pairs. These must be just the evidence keys that will be used by the engine curing processing.  
+  - Value will be the aspect data instance that was returned when the evidence values that make up the key were processed.
+  - Before the engine starts processing, check if the request has evidence values that match an entry already in the cache. If so, it should return the matching entry, rather than performing the usual processing.
+  - Default cache implementation will need to ensure it does not use too much memory. LRU is recommended.
+  - Default cache implementation must be efficient in highly concurrent scenarios. A 'sharded' approach is recommended.
