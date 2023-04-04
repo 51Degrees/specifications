@@ -77,9 +77,46 @@ In strongly typed languages, returning the **Element Data** as the correct type 
 
 ## Element data
 
+**Element Data** is a container for properties. The **Element Data** instance must expose the data that it holds through an accessor requiring a string key. These keys may be stored in whichever case the **Flow Element** deems suitable, however lower case is the preferred format. When a value is requested using a key, a case insensitive comparator should be used. (Meaning that data[“Value”] and data[“value”] would return the same value). Keys may only contain alphanumeric characters, full stop or hyphen.
+
+Note that 51Degrees contains some properties that also use the ‘/’ character. No new properties will be added with this character, but it must be accommodated.
+
+The returned value will be an object (or equivalent root type for the end user’s programming language). As such, property values may be any simple or complex type.
+
+This string-keyed accessor should be used internally and must be exposed to the user. However, it should not be the primary user-facing mechanism for accessing properties. Element specific implementations should be created to provide strongly typed property accessors. For example, [Device Detection Aspect Data](/device-detection-specification/data-model.md)
+
+This functionality is demonstrated with pseudo-code below, showing two ways of accessing the same property:
+
+```
+flowData.getFromElement(deviceDetectionEngine).get(“ismobile”);
+flowData.getFromElement(deviceDetectionEngine).isMobile;
+```
+
+The second line is clearly the preferable one as type safety is maintained, no ‘magic strings’ are required, and the user will get autocomplete hints in the IDE.
+
+**Element Data** instances will be created as needed by **Flow Elements**. They will then be stored within the **Flow Data** object under the appropriate key. Consequently, non-thread safe collections are sufficient and preferred, from a performance point of view.
+
 ## Flow element
 
+A **Flow Element** is a black box which takes a **Flow Data** and performs some operation. This processing may read evidence and/or **Element Data** instances that have been added by previous elements. It may add new evidence values and must add an instance of its own element data, which may or may not have properties populated.
+
+A **Flow Element** can be added to multiple pipelines once it has been built. This means that the processing performed by a flow element must be thread safe and must either have no state that is dependent on a pipeline, or must maintain this state internally for each pipeline it is added to.
+
+By default, resources for **Flow Elements** must automatically be cleaned up by the **Pipeline** they are attached to when it closes. However, this behavior must be overridable in order to support the advanced scenario of adding **Flow Elements** to multiple **Pipelines**.
+
+A **Flow Element** must implement the following:
+
+1.  Process method which accepts a **Flow Data** object.
+2.  EvidenceKeyFilter property which returns an **Evidence Key Filter** instance that can be used to identify the evidence keys that the **Flow Element** can make use of.
+3.  DataKey property that determines the key for this element's **Element Data** within **Flow Data**. For example ‘device’ for the device detection engine.
+
 ## Flow element builder
+
+It is highly recommended that **flow elements** have some associated builder/factory that is used to create **flow element** instances.
+
+The exact specification of this component is less important than having a common mechanism for construction of elements. This provides consistency for users and will assist in the implementation of other parts of the specification.
+
+In most languages, we have found the builder pattern to be the best approach.
 
 ## Pipeline
 
