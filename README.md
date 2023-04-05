@@ -10,7 +10,6 @@ products.
 | Pipeline Specification         | Specification for the Pipeline API and its operation. This covers core functionality. |
 | Device Detection Specification | Specification for the Device Detection service. This builds on the concepts and features defined in the pipeline specification.   |
 
-
 # Notes for implementers
 
 - These specifications are written to be language agnostic. The precise
@@ -21,7 +20,7 @@ products.
   normally use this approach.
 - [Java](https://github.com/51Degrees/pipeline-java) and 
   [.NET](https://github.com/51Degrees/pipeline-dotnet) are considered the reference
-  implementations. At least one of  these should be reviewed by the reader to 
+  implementations. At least one of these should be reviewed by the reader to 
   see what a real-world implementation of the specification looks like.
 - URLs in these specifications are fixed. Code comments should include
   references to these URLs in order to avoid re-writing the same descriptions

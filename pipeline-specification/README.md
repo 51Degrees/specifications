@@ -45,4 +45,4 @@ devicedata = pipeline
 isMobile = devicedata.IsMobile
 ```
 
-More examples can be found in [use-cases](use-cases.md).
+More examples can be found in [usage-examples](usage-examples.md).
