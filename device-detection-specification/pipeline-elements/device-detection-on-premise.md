@@ -7,20 +7,20 @@
 
 # Engine
 
-# Meta-data
+# Metadata
 
 ## Overview
 
-On-premise device detection has two related meta-data structures:
-1. The device detection data file includes meta-data relating to the structure of the values that are stored in the file. This is exposed by the device detection engine in order to allow users to query the data. \*
-2. All flow elements expose a list of meta-data relating to properties populated by that element. In the case of the device detection engine, this list will include property meta-data derived from the data file meta-data mentioned above. 
+On-premise device detection has two related metadata structures:
+1. The device detection data file includes metadata relating to the structure of the values that are stored in the file. This is exposed by the device detection engine in order to allow users to query the data. \*
+2. All flow elements expose a list of metadata relating to properties populated by that element. In the case of the device detection engine, this list will include property metadata derived from the data file metadata mentioned above. 
 
 \* Note that, due to the structure of the data, this is not intended to support high-performance querying scenarios. For that use-case, customers are directed to our 'csv' data file, which can be consumed and stored in a database or whatever other form is required for querying. 
 
 ```mermaid
 erDiagram
     Component ||--|{ Property : has
-    Property ||--|{ Value : has possible
+    Property ||--|{ Value : has
     Component ||--|{ Profile : has
     Profile ||--|{ Value : has
 ```
@@ -44,7 +44,7 @@ The metadata associated with a **component** is:
 
 ## Property
 
-The **properties** exposed by the device detection engine contain more information than that which is defined by the standard **property meta data** interface.
+The **properties** exposed by the device detection engine contain more information than that which is defined by the standard **property metadata** interface.
 In addition to the usual information, the following must be made available:
 
 | Metadata | Description |
@@ -87,11 +87,11 @@ The metadata associated with a **value** is:
 ## Match metric properties
 
 In addition to the 'standard' device detection properties, there are a set of properties that return details about the processing that was performed and the match that was found.
-Meta-data for these properties must be added, as they will not be included in the meta-data exposed by the native code.
+metadata for these properties must be added, as they will not be included in the metadata exposed by the native code.
 
 All these properties have the following values:
 - Category = "Device Metrics"
-- Available With = "Lite", "Premium", "Enterprise", "TAC" - If possible, this list should be created dynamically from the lists of files included against all other property meta data that is exposed by the native code.
+- Available With = "Lite", "Premium", "Enterprise", "TAC" - If possible, this list should be created dynamically from the lists of files included against all other property metadata that is exposed by the native code.
 - Component = "Metrics" - This component must also be added to the list of components returned by the engine.
 
 |Name|Type|Default value|Description|Possible values|

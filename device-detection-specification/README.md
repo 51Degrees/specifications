@@ -10,7 +10,10 @@ most appropriate and familiar for uses of the target language.
 
 # Structure
 
-This specification is broken down into separate markdown files in multiple
-directories.
-If you're not sure where to start, we recommend looking
-at [use cases](use-cases.md) first.
+This specification builds on the concepts and features defined in the 
+[pipeline specification](/pipeline-specification/README.md) the reader should
+at least be familiar with the basics from there before reading this.  
+Structurally, this specification is broken down into separate markdown files 
+in multiple directories.
+If you're not sure where to start, we recommend looking at 
+[use cases](use-cases.md) first.

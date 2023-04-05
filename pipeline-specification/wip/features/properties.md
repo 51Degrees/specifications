@@ -1,4 +1,4 @@
-- Property meta data definition
+- Property metadata definition
 - Nested properties
 - Lazy loading
 # Overview
@@ -41,7 +41,7 @@ Property values must be capable of having 'no value'
 Where 'no value' is used, attempting to access the value should throw an 
 error/exception with a customizable message explaining why the value is not set. 
 
-# Property meta data
+# Property metadata
 
 # Lazy loading
 

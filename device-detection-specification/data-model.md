@@ -40,15 +40,15 @@ in the pipeline specification.
 However, we also want to provide strongly-typed accessors. This could become a
 significant maintenance burden, so a command line utility should be created that
 can generate an interface definition and any required implementations from the
-meta-data embedded in the data files.
+metadata embedded in the data files.
 
 This can be used during development as well as within 51Degrees' CI/CD
 infrastructure to automatically re-generate the code when changes occur, such as
 a new property being added.
 
-Note that there are a few
-additional [match metrics properties](pipeline-elements/device-detection-on-premise.md#match-metric-properties)
-that do not appear in the data file meta data, but will need to be included in
+Note that there are a few additional 
+[match metrics properties](pipeline-elements/device-detection-on-premise.md#match-metric-properties)
+that do not appear in the data file metadata, but will need to be included in
 interfaces, etc.
 
 # Property details
@@ -61,7 +61,7 @@ TODO - finish links once content is available
 Beyond this, there are considerations unique to each engine. Ensure to review
 the details linked below:
 
-- [on-premise](pipeline-elements/device-detection-on-premise.md#meta-data)
+- [on-premise](pipeline-elements/device-detection-on-premise.md#metadata)
 - [cloud](pipeline-elements/device-detection-cloud.md#)
 - [hardware lookup](pipeline-elements/hardware-profile-lookup-cloud.md#)
 

@@ -8,7 +8,8 @@ products.
 | Name                           | Description                                                                                                                 |
 |--------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
 | Pipeline Specification         | Specification for the Pipeline API and its operation. This covers core functionality. |
-| Device Detection Specification | Specification for the Device Detection service     |
+| Device Detection Specification | Specification for the Device Detection service. This builds on the concepts and features defined in the pipeline specification.   |
+
 
 # Notes for implementers
 
