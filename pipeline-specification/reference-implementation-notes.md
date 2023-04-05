@@ -1,4 +1,4 @@
-# Reference Implementation Architecture
+# Reference Implementation Architecture Notes
 
 This section discusses architectural aspects of the reference implementations
 (C# and Java) which were implemented with extensibility in mind and to provide the basis 
@@ -8,7 +8,7 @@ It is not the intention to constrain or limit implementations to follow
 the patterns listed here, indeed, in some languages such patterns are not
 idiomatic or are hard to achieve. In other cases experience says that the 
 desirability of doing so may be in question. 
-However, taking advantage of existing base classes may be expedient, or desirable.
+However, taking advantage of the existing design may be expedient, or desirable.
 
 ## Interfaces, Base Classes, Inheritance
 
@@ -18,9 +18,9 @@ implementations for the majority of features of the system.
 
 Frequently, the default implementation is the only implementation, so the 
 strict separation of concerns represented by this approach doesn't result
-in a useful ability to specialize, and could be said to have been 
-"premature generification". In addition, both Java and C# now provide for default 
-interface methods which provide for a simpler but no less extensible base.
+in a useful ability to specialize. In addition, both Java and C# now provide 
+for default interface methods which provide for a simpler but no less 
+extensible base.
 
 In other cases, specialization is used to provide quite deep hierarchies of 
 classes, for example Flow Element -> Aspect Engine -> Cloud Aspect Engine -> 
@@ -43,16 +43,7 @@ Limited use is made of these techniques. Notably, the concept of shared services
 does allow the injection of caches, data update and other services.
 
 Greater use of dependency injection would allow the simplification of class 
-hierarchies and would allow for the straightforward injection of test
-implementations, rather than resorting to the complex use of mocking frameworks
-for tests. 
-[comment](Partially disagree with this. There are certainly places where 
-greater use of dependency injection would improve separation of concerns and 
-aid maintainability. 
-However, on mocking specifically: Mocking is only possible *because* dependency 
-injection is being used. Using concrete test implementations is simply an 
-alternative to mocking. In .NET, both techniques are in different places based
-on which one makes the most sense.)
+hierarchies. As well as simplifying test configuration and the like.
 
 ## Builders
 
@@ -68,11 +59,9 @@ the target class constructors, of which there are usually several.
 It's not usually very easy to establish the default value of a configuration item that 
 can be set in a builder, since it can be set in the target class, a superclass 
 of that target class, the builder or a superclass of the builder.
-[comment](This is very true. My strong preference is for all defaults to be assigned 
-to the fields in the builder - .NET has some changes in develop to be more consistent 
-in this area - There are some cases where the existing functionality requires that
-the default be set elsewhere. I'm fairly sure this could have been avoided by being
-stricter about defaults in the initial design though.)
+
+This could be resolved by simplifying the constructors and defining a standard  
+approach to default values. 
 
 A pipeline is usually constructed using a fluent builder which accepts flow elements
 being added to it in flow order. Those flow elements are usually created using
@@ -82,28 +71,13 @@ constructed using a builder of its own.
 A special builder is provided to simplify the creation of commonly used pipelines
 such as on-premise or cloud device detection. These hide the complexity
 of pipeline creation by automatically inserting elements, and choosing 
-default values, but the price for that simplification is to limit the 
-flexibility of configuration.
-[comment](I propose we remove this from the spec. The benefit seems almost non 
-existent and the downsides are considerable - More code to maintain, more documentation, 
-very difficult to use this with web integration, more complicated to migrate from 
-this to more advanced scenarios)
+default values, but the price for that simplification is considerable. There is 
+more code to maintain, more creation scenarios, which require explanation in
+documentation and examples. The custom pipeline builder is also difficult or 
+impossible to use with web integrations and cannot be used when building from a
+configuration file. Finally, if the user is using this builder and decides they 
+need some capability that is beyond its scope, they have to migrate to the 
+'standard' pipeline builder.
 
-## Options Files
-
-As an alternative to the use of builders, Pipelines may be configured using 
-XML (Java and C#) or JSON (C# Only) files containing the names and values
-of items to configure in the engines they specify.
-
-## Flow Data Concurrency and Property Values
-
-In most cases Flow Data is used in a single threaded way. However, 
-engine instances are used across threads and may be shared between pipelines, as
-well as possibly participating in parallel flows,
-so engines need to make sure that the data they add to Flow Data is thread safe.
-
-They also need to have regard to sharing of results between different flow data 
-instances and the possible retention of those results beyond the lifetime
-of the flow data and the potential use of the data in caches.
-
-*Not really sure if this is meaningful or actionable*
+On the whole, we prefer solutions that will reduce complexity for users. However,
+care should be taken to try to avoid some of the issues described above.

@@ -1,48 +1,79 @@
 # Introduction
 
-This folder structure contains a language agnostic specification for the 51Degrees v4 Pipeline API. 
-We aim to avoid specific details of classes, interfaces, methods or the like. The focus is on the behaviour rather than the method by which that behaviour is achieved. This allows implementers to choose an architectural approach that is most appropriate for the target language.
+This folder structure contains a language agnostic specification for the 51Degrees 
+v4 Pipeline API. 
+We aim to avoid specific details of classes, interfaces, methods or the like. The 
+focus is on the behaviour rather than the method by which that behaviour is achieved. 
+This allows implementers to choose an architectural approach that is most appropriate 
+for the target language.
 
 # Structure
 
 This specification is broken down into separate markdown files in multiple directories.
-If you're not sure where to start, read through the primer sections below before exploring further.
+If you're not sure where to start, read through the primer section below before 
+exploring further.
 
-# Terminology
+# Description
 
--   Evidence – Data that a web application receives as part of a web request.
--   Aspect – An Aspect refers to a discrete item of interest within the end-to-end context of a web request. E.g. The hardware device used to make the request or the mobile network that the device is currently using.
--   Flow Data – user facing data object containing both the evidence, and the Aspect properties based on the evidence.
--   Flow Element – A black box that accepts Flow Data and performs some operation. It will usually populate the Flow Data with Aspect property values but may also/only update evidence or other values.
--   Pipeline – A collection of Flow Elements to enable the user to do all the processing they require on Flow Data with a single call.
--   Dictionary – A key-value store. Also commonly called a map or hashmap in different languages.
+51Degrees `Pipeline` provides a framework within which input data is transformed
+and enriched to create output data to be consumed by some application.
 
-More details of these terms can be found in the [conceptual overview](conceptual-overview.md).
+Note that more concrete details on the terms defined here can be found in the 
+[conceptual overview](conceptual-overview.md).
 
-# Example Usage
+## Flow
+Processing is performed by a sequence of steps which consume the 
+output of earlier steps and produce output of their own. The sequence of 
+steps is called *flow*: the steps are called `Flow Elements` and the data 
+transferred between them is called `Flow Data`.
 
-A Pipeline is a means of managing Flow Elements (for example, a Device Detection Aspect Engine). Any number of Flow Elements can be added to a Pipeline and can be run in sequence or parallel depending on the configuration.
+Flow is unidirectional and does not provide for branching and looping. Parallel 
+operation of steps or a sequence of steps is possible.
 
-As shown in the diagram below, a user adds evidence to a Flow Data’s evidence collection, passes the Flow Data through a Pipeline, and can then access values of the Flow Data Aspects which have been populated by the Flow Elements within the Pipeline.
+Flow Elements consume `Evidence` and may produce name-value pairs of `Properties`
+which are stored in the Flow Data. Hence, Flow Elements may consume properties
+generated earlier in the flow. Flow Elements "advertise" the evidence
+that they consume, the properties that they produce, a key for accessing
+those properties from the Flow Data and various information about the data types
+within which those properties are found.
 
-![Pipeline diagram](images/pipeline.png)
+## Flow Data Lifecycle
 
-In this depiction there are two Flow Elements in the Pipeline which populate the “Device” and “Network” Aspects of the Flow Data. It should also be noted that the Device Detection Aspect Engine has an extra cache layer. This caches the “Device” Aspect based on what it deems to be relevant evidence, and is an optional performance optimization for a Flow Element.
+Creation of Flow Data is carried out by an application requesting an instance 
+from a pipeline. With a number of important exceptions, the creating 
+application must destroy the Flow Data once it has completed its processing.
 
-The method of obtaining evidence to add to a Flow Data is left up to the user (although this will be handled automatically if using a Web application integration). Once the evidence has been obtained by the user, it can be added to the Flow Data’s evidence using either the dictionary/map interface, or the various helper methods for common pieces of evidence.
+The application carries out the initial population of evidence
+and then requests that the pipeline `process` it - i.e. present the Flow Data
+to the various Flow Elements that comprise it, in sequence. Processing is 
+synchronous by default and the application may consume properties produced
+during processing once it is complete. A Flow Data may only be processed 
+once and belongs to exactly one Pipeline.
 
-In pseudo-code, a basic example would go as follows:
+Flow Data may also be used to report errors that occur during processing.
 
-```
-pipeline = PipelineBuilder
-    .AddFlowElement(deviceDetection)
-    .Build()
-devicedata = pipeline
-    .CreateFlowData()
-    .SetUserAgent(userAgent)
-    .Process()
-    .GetFromElement(deviceDetection)
-isMobile = devicedata.IsMobile
-```
+## Engine
 
-More examples can be found in [usage-examples](usage-examples.md).
+An `Engine` is a specialization of a Flow Element, which builds on the basic 
+functionality provided by Flow Element to provide higher level functions
+in a consistent way. 
+
+An `Aspect Engine` concerns itself with processing evidence to populate
+properties related to some *aspect* related to the received evidence. For example,
+*Device Detection* concerns itself with determining the aspects of *hardware*,
+*browser* and *operating system* determined by analysis of evidence received 
+in an HTTP request, such as HTTP Headers and Cookies.
+
+Engines are classed as `Cloud Engines`, which carry out their processing 
+by delegation to a remote server, and `On-Premise` engines, which typically
+carry out processing by reference to one or more data files, stored locally. 
+Facilities are available for update and installation of such data files. 
+
+Where both Cloud and On-Premise variants of an Engine are available, they should
+arrange that the properties and values produced are compatible with each other
+so that the engines may be substituted in the pipeline without alteration to
+the consuming application.
+
+Engines may be configured with caches and offer the ability to carry out lazy 
+evaluation of property values. Engine instances may be shared between Pipelines.
+

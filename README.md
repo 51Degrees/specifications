@@ -21,10 +21,16 @@ products.
 - [Java](https://github.com/51Degrees/pipeline-java) and 
   [.NET](https://github.com/51Degrees/pipeline-dotnet) are considered the reference
   implementations. At least one of these should be reviewed by the reader to 
-  see what a real-world implementation of the specification looks like.
+  see what a real-world implementation of the specification looks like. There 
+  is also [a section](pipeline-specification/reference-implementation-notes.md) 
+  containing reflections on the architectural choices made when creating the 
+  Java and .NET versions. This may be helpful when designing future implementations. 
 - URLs in these specifications are fixed. Code comments should include
   references to these URLs in order to avoid re-writing the same descriptions
   and definitions in multiple places.
 - CI/CD scripts and the like are out of scope. However, implementers should be
   mindful of the requirement to have the ability to build and test the software
   in a non-interactive CI/CD environment.
+
+
+
