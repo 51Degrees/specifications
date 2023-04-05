@@ -4,7 +4,7 @@ The structure of packages and dependencies is not rigidly enforced. The implemen
 
 This document contains recommendations to help inform these decisions.
 
-1. Consider following the [recommendations](/pipeline-specification/packaging-and-structure.md) set out for pipeline API packages in general.
+1. Consider following the [recommendations](../pipeline-specification/packaging-and-structure.md) set out for pipeline API packages in general.
 2. Device detection packages should all share a common prefix. For example 'FiftyOne.DeviceDetection'
 3. As on-premise device detection requires a native dll, it is usually helpful to split this out into a package that is separate from the more lightweight cloud engine.
 4. Examples and tests should not be included in any published packages.

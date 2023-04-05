@@ -5,7 +5,7 @@ c# examples.
 
 Many of these examples build on the concepts established in the pipeline
 specification, so it may be helpful to first become familiar with
-the [usage examples](/pipeline-specification/usage-examples.md) there.
+the [usage examples](../pipeline-specification/usage-examples.md) there.
 
 # Create a device detection pipeline
 
@@ -34,11 +34,12 @@ var deviceDetectionEngine = deviceDetectionCloudEngineBuilder
   .Build();
 var pipeline = pipelineBuilder
   .AddElement(cloudEngine)
-  .AddElement(deviceDetectionEngine);
+  .AddElement(deviceDetectionEngine)
+  .Build();
 ```
 
 Device detection pipelines can also
-be [created from configuration](/pipeline-specification/features/build-from-configuration.md).
+be [created from configuration](../pipeline-specification/features/build-from-configuration.md).
 
 ```c#
 var pipeline = pipelineBuilder
@@ -68,7 +69,7 @@ using(var flowdata = pipeline.CreateFlowData())
 A property might not be available in some scenarios. We need to ensure that the
 user is informed of why the property cannot be accessed and how to gain access
 if they want to. This feature is described in more detail, covering more scenarios in
-the [pipeline specification](/pipeline-specification/features/properties.md#missing-properties)
+the [pipeline specification](../pipeline-specification/features/properties.md#missing-properties)
 
 ```c#
 using(var flowdata = pipeline.CreateFlowData())
@@ -116,12 +117,12 @@ similar to the following in the HTML:
 ```
 
 For more details on the expected functionality see
-the [web integration](/pipeline-specification/features/web-integration.md)
+the [web integration](../pipeline-specification/features/web-integration.md)
 section of the pipeline specification.
 
 # Automatic data updates
 
-All [data update](/pipeline-specification/features/data-updates.md)
+All [data update](../pipeline-specification/features/data-updates.md)
 functionality should be part of configuration.
 This pipeline creation example demonstrates how to configure the pipeline to
 update the device detection data file when needed:
@@ -144,7 +145,7 @@ For more detailed examples see:
 
 # Property metadata
 
-[Property metadata](/pipeline-specification/features/properties.md#property-metadata)
+[Property metadata](../pipeline-specification/features/properties.md#property-metadata)
 must be exposed by the device detection engine.
 Note that this information should be available for both cloud and on-premise engines:
 
