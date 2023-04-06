@@ -14,12 +14,12 @@ There are multiple ways to access the results of processing.
 Firstly, these are the mechanisms for getting element data:
 
 1. It must be possible to get an element's output data by supplying the string key 
-   for that element. For example:
+   for that element. For example: <span style="color:yellow">show use of getElementDataKey here?</span>
    ```c#
    IElementData deviceData = flowData.Get("device");
    ```
 2. In strongly typed languages, it should be possible to get an element's output 
-   data by supplying the type of the data you want to get. For example:
+   data by supplying the type of the data you want to get. For example:<span style="color:yellow">it would be nice if the engine could tell you its data type</span>
    ```c#
    IDeviceData deviceData = flowData.Get<IDeviceData>();
    ```   
