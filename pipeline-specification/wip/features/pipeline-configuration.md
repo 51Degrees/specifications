@@ -14,6 +14,17 @@ code approach, or a configuration file.
 - Pipelines must have the ability to add multiple elements/engines that will run 
   in parallel (where the language supports this).
 
+For example:
+
+```c#
+var pipeline = pipelineBuilder.Add(s1).AddParallel([p1,p2]).Add(s2).Build()
+```
+
+This would create a pipeline that performs the following processing:
+- execute s1. 
+- When s1 is finished, p1 and p2 are started in parallel.
+- When both p1 and p2 are complete, s2 is started.
+
 # Flow Elements 
 
 - Elements/Engines may or may not have configuration options to customize the 
