@@ -64,7 +64,7 @@ properties related to some *aspect* related to the received evidence. For exampl
 *browser* and *operating system* determined by analysis of evidence received 
 in an HTTP request, such as HTTP Headers and Cookies.
 
-Engines are classed as `Cloud Engines`, which carry out their processing 
+Engines are classed as `Cloud` engines, which carry out their processing 
 by delegation to a remote server, and `On-Premise` engines, which typically
 carry out processing by reference to one or more data files, stored locally. 
 Facilities are available for update and installation of such data files. 
