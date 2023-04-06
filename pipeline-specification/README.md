@@ -78,3 +78,4 @@ the consuming application.
 Engines may be configured with caches and offer the ability to carry out lazy 
 evaluation of property values. Engine instances may be shared between Pipelines.
 
+![Illustration of Pipeline Flow](images/PipelineFlow.png)
