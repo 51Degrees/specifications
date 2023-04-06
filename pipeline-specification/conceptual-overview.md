@@ -43,6 +43,9 @@ for specific elements should also include specific accessors for each
 property. <span style="color:yellow">not clear what the last sentence means</span>
 See [access to results](features/access-to-results.md) for more information.
 
+See [resource cleanup](features/resource-cleanup.md) for details on ensuring 
+**Element Data** resources are cleaned up correctly.
+
 ## Flow element
 
 A **Flow Element** is a black box which takes a **Flow Data** and performs some
@@ -56,20 +59,8 @@ This means that the processing performed by a flow element must be thread safe
 and must either have no state that is dependent on a pipeline, or must maintain
 this state internally for each pipeline it is added to.
 
-By default, **Flow Elements** are automatically cleaned up by
-the **Pipeline** they are attached to when it closes. However, it must be 
-possible to override this behaviour in order to support the 
-advanced scenario of adding **Flow Elements** to multiple **Pipelines**.
-
-A **Flow Element** must implement the following:
-
-1. Process method which accepts a **Flow Data** object.
-2. EvidenceKeyFilter property which returns an **Evidence Key Filter** instance
-   that can be used to identify the evidence keys that the **Flow Element** can
-   make use of.
-3. DataKey property that determines the key for this element's **Element Data**
-   within **Flow Data**. For example ‘device’ for the device detection engine.
-4. <span style="color:yellow">other metadata describing the Element Data??</span>
+See [resource cleanup](features/resource-cleanup.md) for details on ensuring 
+**Flow Element** resources are cleaned up correctly.
 
 ## Flow element builder
 
@@ -84,6 +75,8 @@ mechanism for construction of elements. This provides consistency for users and
 will assist in the implementation of other parts of the specification.
 
 In most languages, we have found the builder pattern to be the best approach.
+
+See [pipeline configuration](features/pipeline-configuration.md) for more information.
 
 ## Pipeline
 

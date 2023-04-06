@@ -28,10 +28,8 @@ Creating a pipeline for device detection using the 51Degrees cloud service will
 look slightly different:
 
 ```c#
-var cloudEngine = cloudRequestEngineBuilder
-  .Build(resourceKey);
-var deviceDetectionEngine = deviceDetectionCloudEngineBuilder
-  .Build();
+var cloudEngine = cloudRequestEngineBuilder.Build(resourceKey);
+var deviceDetectionEngine = deviceDetectionCloudEngineBuilder.Build();
 var pipeline = pipelineBuilder
   .AddElement(cloudEngine)
   .AddElement(deviceDetectionEngine)
@@ -192,10 +190,8 @@ specific [TAC](https://en.wikipedia.org/wiki/Type_Allocation_Code) or native
 key.
 
 ```c#
-var cloudEngine = cloudAspectEngineBuilder
-  .Build(resourceKey);
-var hardwareProfileEngine = hardwareProfileCloudEngineBuilder
-  .Build();
+var cloudEngine = cloudAspectEngineBuilder.Build(resourceKey);
+var hardwareProfileEngine = hardwareProfileCloudEngineBuilder.Build();
 var pipeline = pipelineBuilder()
   .AddElement(cloudEngine)
   .AddElement(hardwareProfileEngine);
