@@ -30,12 +30,13 @@ transferred between them is called `Flow Data`.
 Flow is unidirectional and does not provide for branching and looping. Parallel 
 operation of steps or a sequence of steps is possible.
 
-Flow Elements consume `Evidence` and may produce name-value pairs of `Properties`
-which are stored in the Flow Data. Hence, Flow Elements may consume properties
-generated earlier in the flow. Flow Elements "advertise" the evidence
-that they consume, the properties that they produce, a key for accessing
-those properties from the Flow Data and various information about the data types
-within which those properties are found.
+Flow Elements consume `Evidence` and may produce `Element Data`. This consists
+of name-value pairs of property values which are accessible by property name.
+There `Element Data` instances are then stored in the Flow Data. Hence, Flow 
+Elements may consume also consume `Element Data` generated earlier in the flow. 
+Flow Elements "advertise" the evidence that they consume, the properties that 
+they produce, a key for accessing those properties from the Flow Data and various 
+information about the data types within which those properties are found.
 
 ## Flow Data Lifecycle
 
