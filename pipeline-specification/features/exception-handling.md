@@ -1,3 +1,5 @@
+TODO - Write up these points.
+
 - Elements should throw exceptions/errors freely, unless they specifically want
   to handle them internally.
 - The pipeline should catch exceptions/errors throw by elements and either:

@@ -21,11 +21,7 @@ in the **Pipeline**. These are accessed using the 'data key' string of the
 pipeline by which they were created. The Process method on **Flow Data** 
 initiates pipeline processing.
 
-**Flow Data** must be capable of being thread safe. In other words, it must handle 
-  being accessed and updated by multiple threads simultaneously. However, non-thread 
-  aware data structures are preferred when possible for performance reasons. 
-  The **Pipeline** can decide at creation time if a concurrent structure is required 
-  or not. Also see [thread safety](features/thread-safety.md).
+See [thread safety](features/thread-safety.md) for details on concurrent access requirements.
 
 **Flow Data** must support various different ways of accessing the data it contains. 
 See [access to results](features/access-to-results.md) for more information.
@@ -37,11 +33,8 @@ relating to a particular **Flow Element**. These values are set by
 **Flow Elements** during processing. **Element Data** is retrieved from 
 **Flow Data** using the 'data key' associated with the **Flow Element**.
 
-As a minimum, **Element Data** must support access to property 
-values using a string denoting the property name. Individual implementations 
-for specific elements should also include specific accessors for each 
-property. <span style="color:yellow">not clear what the last sentence means</span>
-See [access to results](features/access-to-results.md) for more information.
+See [access to results](features/access-to-results.md) for more  
+information on how this data should be accessed.
 
 See [resource cleanup](features/resource-cleanup.md) for details on ensuring 
 **Element Data** resources are cleaned up correctly.
@@ -51,8 +44,8 @@ See [resource cleanup](features/resource-cleanup.md) for details on ensuring
 A **Flow Element** is a black box which takes a **Flow Data** and performs some
 processing. This processing may read evidence and/or **Element Data** instances
 that have been added by previous elements. It may add new evidence values and
-must <span style="color:yellow">"may", surely</span> add an instance of its own element data, which may 
-or may not have properties populated.
+may add an instance of its own element data, which may or may not have 
+properties populated.
 
 A **Flow Element** can be added to multiple pipelines once it has been built.
 This means that the processing performed by a flow element must be thread safe
@@ -64,9 +57,6 @@ See [resource cleanup](features/resource-cleanup.md) for details on ensuring
 
 ## Flow element builder
 
-<span style="color:yellow"> suggest rewriting this whole section in view of the reservations
-expressed in [notes](reference-implementation-notes.md)</span>
-
 It is highly recommended that **flow elements** have some associated
 builder/factory that is used to create **flow element** instances.
 
@@ -75,8 +65,20 @@ mechanism for construction of elements. This provides consistency for users and
 will assist in the implementation of other parts of the specification.
 
 In most languages, we have found the builder pattern to be the best approach.
+However, in some languages this pattern is less common. For ease of use, we want 
+users to be familiar with whatever approach is used to create instances.
 
-See [pipeline configuration](features/pipeline-configuration.md) for more information.
+If the pattern to use is uncertain, we recommend looking at multiple high profile 
+and highly regarded libraries for the target language and mirroring the approach 
+used by them.
+
+See [pipeline configuration](features/pipeline-configuration.md) for more 
+information on configuring and creating elements.
+
+Be aware that the way builders were implemented in the reference languages 
+has caused some issues that could be avoided by making different design 
+decisions in future implementations. These are discussed in more detail 
+in [reference implementation notes](reference-implementation-notes.md#builders)
 
 ## Pipeline
 
@@ -92,30 +94,63 @@ changed by adding new elements, removing old ones, etc.
 As with [Flow Elements](#flow-element-builder), we have found that the builder 
 pattern is a good way to control the creation of **pipeline** instances.
 
-See [pipeline configuration](features/pipeline-configuration.md) for more information.
+See [pipeline configuration](features/pipeline-configuration.md) for more information
+on configuring and creating instances.
 
 # Engines
+
+The engines package adds features to **Flow Elements** that are common to
+multiple different 51Degrees element implementations.
+
+## Aspect engine
 
 **Aspect Engines** (often shortened to just '**Engines**') are a specific type 
 of **Flow Element** with additional features and properties.
 
 - [Results caching](features/caching.md)
-- [Request trackers](features/trackers.md)
 - [Data file automatic updates](features/data-updates.md)
 - [Lazy loading](features/properties.md#lazy-loading)
+- [Missing properties](features/properties.md#missing-properties)
 
 ## Aspect data
 
-## Aspect engine
+In the same way that **Aspect Engines** are specific types of **Flow Element**. 
+**Aspect Data** are specific types of **Element Data**.
 
-## Aspect engine builder
+See [Aspect engines](#aspect-engine) for details of the features that 
+**Aspect Engines** / **Aspect Data** have on top of standard **Flow Element** / 
+**Element Data**. 
 
 # Cloud engines
 
+The premise of cloud engines is to offload processing that might otherwise
+be performed by an on-premise **Aspect Engine** to a remote service.
+
 ## Cloud request engine
+
+The cloud request engine is a further specialization of **Aspect Engine** 
+with the task of making requests to a remote service.
+
+In theory, this could be an internally hosted service. In practice, it is
+usually the [51Degrees cloud service](https://cloud.51degrees.com/api-docs/index.html).
+
+This engine outputs a single property, the value of which is the JSON data 
+that is returned by the remote service that it calls.
+
+Note that calls will need to be made to the remote service at construction 
+time in order to establish details the engine must expose, such as the 
+accepted evidence keys.
 
 ## Cloud aspect engine
 
+The cloud aspect engine is also a specialization of **Aspect Engine**.
+It takes the JSON result from the cloud request engine and transforms 
+it into an **Aspect Data** instance that is interface compatible with 
+the data from the equivalent on-premise engine.
 
-
+This engine must also expose the meta-data details for the properties
+that it populates. We recommend having the cloud request engine 
+request this data from the remote service when it is created. The data
+can then be passed to the cloud aspect engine so that it can initialize 
+it's internal data structures at creation time. 
 

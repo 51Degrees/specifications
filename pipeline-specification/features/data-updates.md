@@ -1,3 +1,6 @@
+TODO - Write these points up properly. Consider migrating existing content from old document, 
+including logic flow diagrams or some higher-level variation of them.
+
 - Engines often have one or more associated data files.
 - There must be a feature that allows these data files to be updated
   automatically.
