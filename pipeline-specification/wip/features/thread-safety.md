@@ -1,6 +1,6 @@
 - Engine implementations should be capable of handling multiple concurrent
   requests.
-- In general user-facing data structures do not need to be thread-safe. 
+- In general user-facing data structures do not need to be thread-safe. <span style="color:yellow">well, except if they are being cached, and if the cache is not "copy on read"</span>
 - better performance, user can ensure that they handle the data in a thread safe way if
   they need to.
     - Where the pipeline contains elements running in parallel, some data
