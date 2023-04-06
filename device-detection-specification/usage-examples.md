@@ -21,7 +21,8 @@ var deviceDetectionEngine = deviceDetectionHashEngineBuilder
   .SetPerformanceProfile(PerformanceProfiles.MaxPerformance)
   .Build("data file path");
 var pipeline = pipelineBuilder
-  .AddElement(deviceDetectionEngine);
+  .AddElement(deviceDetectionEngine)
+  .Build();
 ```
 
 Creating a pipeline for device detection using the 51Degrees cloud service will
@@ -194,7 +195,8 @@ var cloudEngine = cloudAspectEngineBuilder.Build(resourceKey);
 var hardwareProfileEngine = hardwareProfileCloudEngineBuilder.Build();
 var pipeline = pipelineBuilder()
   .AddElement(cloudEngine)
-  .AddElement(hardwareProfileEngine);
+  .AddElement(hardwareProfileEngine)
+  .Build();
 
 using(var flowdata = pipeline.CreateFlowData())
 {
