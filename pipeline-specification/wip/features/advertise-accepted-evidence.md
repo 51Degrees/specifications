@@ -23,8 +23,8 @@ request engine)
 # Usage
 
 This feature is used to enable or assist with other features.
-- [caching]() - cache keys will be generated based on the values of the 
+- [caching](caching.md) - cache keys will be generated based on the values of the 
   evidence keys that the engine accepts.
-- [web integration]() - Data from the web request is automatically added to
+- [web integration](web-integration.md) - Data from the web request is automatically added to
   evidence. Limiting this to only evidence that the pipeline will actually 
   make use of is preferable to adding everything.

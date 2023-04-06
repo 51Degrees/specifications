@@ -80,9 +80,29 @@ See [pipeline configuration](features/pipeline-configuration.md) for more inform
 
 ## Pipeline
 
+A **Pipeline** is a method of grouping multiple **Flow Elements** into a single 
+process. By default, elements are always executed sequentially in the order 
+that they are added. See [pipeline builder](#pipeline-builder) for more details.
+
+A **Pipeline** object is immutable. In other words, once created, it cannot be 
+changed by adding new elements, removing old ones, etc.
+
 ## Pipeline builder
 
+As with [Flow Elements](#flow-element-builder), we have found that the builder 
+pattern is a good way to control the creation of **pipeline** instances.
+
+See [pipeline configuration](features/pipeline-configuration.md) for more information.
+
 # Engines
+
+**Aspect Engines** (often shortened to just '**Engines**') are a specific type 
+of **Flow Element** with additional features and properties.
+
+- [Results caching](features/caching.md)
+- [Request trackers](features/trackers.md)
+- [Data file automatic updates](features/data-updates.md)
+- [Lazy loading](features/properties.md#lazy-loading)
 
 ## Aspect data
 
@@ -95,3 +115,7 @@ See [pipeline configuration](features/pipeline-configuration.md) for more inform
 ## Cloud request engine
 
 ## Cloud aspect engine
+
+
+
+

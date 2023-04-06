@@ -7,6 +7,9 @@ In order to make configuration as simple as possible for users, it is required
 that elements and pipelines can be configured and created using either a pure 
 code approach, or a configuration file.
 
+For consistency, configuration files should be as similar as possible between 
+languages.
+
 # Pipelines
 
 - Pipelines must have the ability to add elements/engines. These will run in 
@@ -37,6 +40,21 @@ This would create a pipeline that performs the following processing:
   via a file. The exceptions are usually options that take complex objects, which 
   cannot easily be defined in a text-based file.
 
+# Deserialization
+
+Configuration files must be human-readable and consistent between languages.
+Consequently, we don't want any type information or meta-data appearing in
+these files. This implies some limitations on the types that can be deserialized 
+from values in the files, as additional logic may need to be added for each type.
+
+To date, the following types are supported in configuration files for all languages:
+
+- string
+- boolean
+- numeric (integer or floating point)
+- list of strings (represented as a comma-separated string)
+- enumeration value (represented as the string name of the value)
+
 # Sample configuration files
 
 TODO - these sample files are not yet publicly available, they are in 
@@ -44,3 +62,6 @@ internal `develop` branches.
 
 [.NET](https://github.com/51Degrees/device-detection-dotnet/blob/master/Examples/sample-configuration.json)
 [Java](https://github.com/51Degrees/device-detection-java/blob/master/device-detection.examples/console/src/main/resources/gettingStartedOnPrem.xml)
+
+
+

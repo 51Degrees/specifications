@@ -10,6 +10,9 @@ associated with various instances:
 | Flow Element | Cleanup of large in-memory data items, file handles, etc.                               |
 | Pipeline     | Trigger cleanup of Flow Elements that it contains. This behavior is configurable.       |
 
+Note that the [web integration](web-integration.md) feature should manage cleanup 
+so the user doesn't need to worry about it.
+
 # Detail
 
 ## Element data
@@ -72,4 +75,3 @@ This is needed for scenarios where single elements are added to multiple
 In this case, the user must take responsibility for cleanup of 
 **Flow Element** resources. This should be made clear in comments and 
 documentation around the use of this option.
-
