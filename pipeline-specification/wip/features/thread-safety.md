@@ -6,6 +6,16 @@ such as high traffic web servers.
 Consequently, **Pipeline** and **Flow Element** implementations must be 
 capable of handling multiple concurrent requests to the `Process` function.
 
+TODO - should this capability be included in the spec? It seems to rarely (never?) be used
+and adds non-trivial complexity to several core elements.
+In addition, a **Flow Element** can be added to multiple **Pipelines** once it 
+has been built. This means that the processing performed by a **Flow Element** 
+must also have no state information that is dependent on the **Pipeline** or the 
+**Flow Elements** it contains.
+Where such state information is required, the element must maintain isolated instances 
+of this state internally for each **Pipeline** it is added to and retrieve the correct 
+state for the relevant **Pipeline** during processing.
+
 # Flow Data
 
 In general user-facing data structures linked to **Flow Data** do not need to be 

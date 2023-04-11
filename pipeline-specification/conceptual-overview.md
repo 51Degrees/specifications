@@ -47,11 +47,6 @@ that have been added by previous elements. It may add new evidence values and
 may add an instance of its own element data, which may or may not have 
 properties populated.
 
-A **Flow Element** can be added to multiple pipelines once it has been built.
-This means that the processing performed by a flow element must be thread safe
-and must either have no state that is dependent on a pipeline, or must maintain
-this state internally for each pipeline it is added to.
-
 See [resource cleanup](features/resource-cleanup.md) for details on ensuring 
 **Flow Element** resources are cleaned up correctly.
 
@@ -105,7 +100,7 @@ multiple different 51Degrees element implementations.
 ## Aspect engine
 
 **Aspect Engines** (often shortened to just '**Engines**') are a specific type 
-of **Flow Element** with additional features and properties.
+of **Flow Element** with additional features and properties:
 
 - [Results caching](features/caching.md)
 - [Data file automatic updates](features/data-updates.md)
@@ -137,9 +132,8 @@ usually the [51Degrees cloud service](https://cloud.51degrees.com/api-docs/index
 This engine outputs a single property, the value of which is the JSON data 
 that is returned by the remote service that it calls.
 
-Note that calls will need to be made to the remote service at construction 
-time in order to establish details the engine must expose, such as the 
-accepted evidence keys.
+See [cloud request engine](pipeline-elements/cloud-request-engine.md) 
+for the technical details.
 
 ## Cloud aspect engine
 
@@ -148,9 +142,5 @@ It takes the JSON result from the cloud request engine and transforms
 it into an **Aspect Data** instance that is interface compatible with 
 the data from the equivalent on-premise engine.
 
-This engine must also expose the meta-data details for the properties
-that it populates. We recommend having the cloud request engine 
-request this data from the remote service when it is created. The data
-can then be passed to the cloud aspect engine so that it can initialize 
-it's internal data structures at creation time. 
-
+See [cloud aspect engine](pipeline-elements/cloud-aspect-engine.md) 
+for the technical details.
