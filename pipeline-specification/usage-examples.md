@@ -1,7 +1,63 @@
-- TODO - Add concise examples with links to more detailed examples where needed.
+TODO - is this actually helpful?
+Seems like a mix of rehashing points made elsewhere and just a less useful version
+of the examples from device-detection.
+On the other hand, a brief, top-level introduction to what usage of this API looks
+like in code might be an easier way for some people to get their heads around what 
+is going on.
 
+# Creating Elements and Pipelines
 
+Creating **Flow Elements** should always be done using a consistent mechanism.
+In the case of c#, we use a separate builder class. For more details on this, 
+see the [flow element builder](conceptual-overview.md#flow-element-builder) 
+section in the conceptual overview.
 
+```c#
+var element = myElementBuilder
+  .SetConfigurationFlag(true)
+  .Build()
+```
+
+As with **Flow Elements**, c# also uses separate builder classed when creating 
+**Pipelines**:
+
+```c#
+var pipeline = pipelineBuilder
+  .AddElement(element)
+  .Build()
+```
+
+Note that many users will not create the elements and pipeline in code
+as shown above. 
+Instead, they will use a configuration file which is then used to 
+create the required element and pipeline instances.
+
+See [pipeline configuration](features/pipeline-configuration.md) for more 
+details.
+
+# Processing data
+
+Once the pipeline has been created, processing a request can generally 
+be broken down into 4 steps:
+
+1. Create **Flow Data**:
+    ```c#
+    var flowData = pipeline.createFlowData();
+    ```
+2. Add [evidence](feature/evidence.md):
+    ```c#
+    flowData.AddEvidence("query.evidence-key", "evidence value");
+    ```
+3. Command the **Pipeline** to process the data:
+    ```c#
+    flowData.Process();
+    ```
+4. Access the results:
+    ```c#
+    var result = flowData.GetFromElement(element);
+    ```
+    See [access to results](feature/access-to-results.md) for more detail on
+    the different ways to access results.
 
 For the most part, the pipeline specification is describing the pieces of an 
 empty data processing system. Many use-cases only make sense in the context 
