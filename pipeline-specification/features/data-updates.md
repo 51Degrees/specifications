@@ -24,4 +24,6 @@ including logic flow diagrams or some higher-level variation of them.
   should they want it.
 - Events, callbacks, etc should be used to allow users to act on updates
   starting/completing.
-
+- Requirement for engines to support multiple data files (TODO - is this really needed? 
+  Only engine that used this was geomprint cloud engine and it is no longer maintained.
+  We could remove a bit of complexity by dropping the requirement)

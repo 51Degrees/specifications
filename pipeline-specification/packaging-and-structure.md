@@ -23,9 +23,9 @@ be used.
 allowing for a single build cycle. Specific features, such as Device Detection,
 use separate repos.
 
-Pipeline itself is modularised as follows:
+Pipeline itself is modularized as follows:
 
-- **Common** base utilities potentially of wider application than Pipleine
+- **Common** base utilities potentially of wider application than Pipeline
 - **Core** features essential to Pipeline, Flow Data, Flow Elements etc.
 - **Engines** base classes providing features that are beyond what is provided in Flow Elements
 - **Web** Adaptors and features to assist with use of Pipeline in a Web environment
@@ -45,18 +45,18 @@ items, such as test data, between languages using Git modules.
 
 ## Versioning
 
-We distribute pipeline with a single version number for all modules/artefacts.
+We distribute pipeline with a single version number for all modules/artifacts.
 In principle, using an aggregator module would allow both simple update
 and multiple distinct module versions, but we have considered that there
 are insufficient advantages to this approach.
 
 ## Examples
 
-We do not distribute examples as compiled artefacts. 
+We do not distribute examples as compiled artifacts. 
 
 There would be advantages to distributing examples using a separate repository 
 to the code they exemplify in order to
-ensure that distributed library artefacts are used. However, this would make 
+ensure that distributed library artifacts are used. However, this would make 
 regression testing of the examples more complicated during the release cycle.
 
 ## Test Data

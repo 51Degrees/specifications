@@ -3,7 +3,7 @@
 This folder structure contains a language agnostic specification for the 51Degrees 
 v4 Pipeline API. 
 We aim to avoid specific details of classes, interfaces, methods or the like. The 
-focus is on the behaviour rather than the method by which that behaviour is achieved. 
+focus is on the behavior rather than the method by which that behavior is achieved. 
 This allows implementers to choose an architectural approach that is most appropriate 
 for the target language.
 
