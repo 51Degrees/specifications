@@ -3,22 +3,32 @@
 The Pipeline API is designed to be used in highly concurrent environments 
 such as high traffic web servers.
 
-Consequently, pipeline and flow element implementations must be capable 
-of handling multiple concurrent requests to the `Process` function.
+Consequently, **Pipeline** and **Flow Element** implementations must be 
+capable of handling multiple concurrent requests to the `Process` function.
 
 # Flow Data
 
-In general user-facing data structures linked to Flow Data do not need to be 
+In general user-facing data structures linked to **Flow Data** do not need to be 
 thread-safe as the most common use-case is that they will be accessed and 
 updated only on the current thread.
 This ensures users get the best performance by default.
 
 Where the Pipeline contains elements running in parallel, element data instances 
 will be added to the Pipeline in parallel.
-We typically solve this by having the Pipeline be involved with flow data 
+We typically solve this by having the Pipeline be involved with **Flow Data** 
 creation. Since the Pipeline knows whether it has any elements running in parallel,
 we can decide at that point whether to create thread-safe or non thread-safe 
 collection.
+
+## Evidence
+
+The evidence collection stored within **Flow Data** does not need to be thread safe, 
+as it may be read concurrently but should not be written to concurrently. (Note 
+this is not technically true. It is valid for elements to write to the evidence 
+collection, so a pipeline could be constructed with parallel elements that both 
+write to evidence at the same time. Nevertheless, avoiding making the collection 
+thread safe results in a performance gain and, given that there is currently only 
+one element that writes to evidence, this is not seen as an area of concern).
 
 # Element Data
 

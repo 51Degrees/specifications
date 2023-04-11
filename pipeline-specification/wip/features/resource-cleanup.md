@@ -1,6 +1,6 @@
 # Summary
 
-There must be some mechanism for instances to clean up system resources 
+There must be some mechanism to clean up system resources 
 associated with various instances:
 
 | Type | Description |
@@ -75,3 +75,4 @@ This is needed for scenarios where single elements are added to multiple
 In this case, the user must take responsibility for cleanup of 
 **Flow Element** resources. This should be made clear in comments and 
 documentation around the use of this option.
+

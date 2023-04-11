@@ -31,12 +31,4 @@ evidence value is available with two different prefixes (For example,
 `header.user-agent` and `query.user-agent`), then the entry with the higher prefix 
 in the list above should be used.
 
-The evidence collection does not need to be thread safe, as it may be read 
-concurrently but should not be written to concurrently. (Note this is not technically 
-true. It is valid for elements to write to the evidence collection, so a pipeline 
-could be constructed with parallel elements that both write to evidence at the same 
-time. Nevertheless, avoiding making the collection thread safe results in a 
-performance gain and, given that there is currently only one element that writes to 
-evidence, this is not seen as an area of concern).
-
 

@@ -42,7 +42,5 @@ Below are the mechanisms for getting properties:
    ```c#
    IAspectPropertyValue<bool> propertyValue = deviceData.IsMobile;
    ```
-3. get property directly from flow data by string (Remove from spec? It's not demonstrated, 
-   doesn't work if there are properties with the same name, isn't type-safe and isn't used 
-   internally.)
+
 

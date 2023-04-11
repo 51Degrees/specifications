@@ -1,11 +1,11 @@
 # Summary
 
-All Flow Elements and Pipelines must be capable of programmatically describing 
-the evidence keys that they can make use of.
+All **Flow Elements** and **Pipelines** must be capable of programmatically 
+describing the evidence keys that they can make use of.
 
 # Flow Elements
 
-For the majority of Flow Elements, simply returning a list of evidence values
+For the majority of **Flow Elements**, simply returning a list of evidence values
 they can use would be sufficient.
 For example, the device detection engine will accept `query.user-agent`, 
 `header.user-agent`, `query.sec-ch-ua`, `header.sec-ch-ua`, etc.
