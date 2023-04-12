@@ -44,7 +44,7 @@ be broken down into 4 steps:
     ```c#
     var flowData = pipeline.createFlowData();
     ```
-2. Add [evidence](feature/evidence.md):
+2. Add [evidence](features/evidence.md):
     ```c#
     flowData.AddEvidence("query.evidence-key", "evidence value");
     ```
@@ -56,7 +56,7 @@ be broken down into 4 steps:
     ```c#
     var result = flowData.GetFromElement(element);
     ```
-    See [access to results](feature/access-to-results.md) for more detail on
+    See [access to results](features/access-to-results.md) for more detail on
     the different ways to access results.
 
 For the most part, the pipeline specification is describing the pieces of an 

@@ -40,7 +40,7 @@ The javascript type is a custom type that simply represents a string.
 It is used to identify values that contain JavaScript snippets that are intended 
 to be executed on the client device.
 
-See [web integration](../features/web-integration.md) for more detail.
+See [web integration](web-integration.md) for more detail.
 
 # Null values
 
@@ -67,13 +67,13 @@ The table below describes the metadata that is available.
 
 | Property | Type | Description |
 |---|---|---|
-| Name | string | The name of the property. This is the string name used to access the property value in the [Element Data](../../conceptual-overview.md#element-data) |
+| Name | string | The name of the property. This is the string name used to access the property value in the [Element Data](../conceptual-overview.md#element-data) |
 | Element | IFlowElement | The **Flow Element** that will populate the value for this property. |
 | Category | string | A string name of the category that this property belongs to. This is used to help organize properties for elements that populate large numbers of them. |
 | Type | Type | The type of the value returned by the property |
 | Available | bool | Flag used to store whether this property is currently available to the caller or not. If not, then the property value will not be present in **Element Data** |
-| Delay Execution | bool | Flag used to control execution of [JavaScript](#the-javascript-type) properties. See [web integration](../features/web-integration.md) for more detail. |
-| Evidence Properties | List\<string\> | A list of the string names of any [JavaScript](#the-javascript-type) properties that can be executed to help determine the value of this property. See [web integration](../features/web-integration.md) for more detail. |
+| Delay Execution | bool | Flag used to control execution of [JavaScript](#the-javascript-type) properties. See [web integration](web-integration.md) for more detail. |
+| Evidence Properties | List\<string\> | A list of the string names of any [JavaScript](#the-javascript-type) properties that can be executed to help determine the value of this property. See [web integration](web-integration.md) for more detail. |
 | Item Properties | List\<IPropertyMetaData\> | Some property values will be a collection of complex objects. In that scenario, this contains the meta data for the properties on that complex object. Currently, this is only used by the [Hardware profile lookup engine](../../device-detection-specification/pipeline-elements/hardware-profile-lookup-cloud.md) |
 | Item Property Dictionary | Dictionary\<string, IPropertyMetaData\> | The same data returned by 'Item Properties', but keyed on property name. |
 
