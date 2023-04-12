@@ -6,8 +6,7 @@ such as high traffic web servers.
 Consequently, **Pipeline** and **Flow Element** implementations must be 
 capable of handling multiple concurrent requests to the `Process` function.
 
-<span style="color:yellow">TODO - should this capability be included in the spec? It seems to rarely (never?) be used
-and adds non-trivial complexity to several core elements.</span>
+<span style="color:yellow">TODO - add to discussion of "Advanced Fetures".</span>
 In addition, a **Flow Element** may be added to multiple **Pipelines** once it 
 has been built. This means that the processing performed by a **Flow Element** 
 should have no state information that is dependent on a **Pipeline** to which it has been added.
@@ -34,15 +33,10 @@ Flow Data or not.
 ## Evidence
 
 Evidence collection stored within **Flow Data** needs to be thread safe for
-concurrent read access. (Note 
-this is not technically true. It is valid for elements to write to the evidence 
-collection, so a pipeline could be constructed with parallel elements that both 
-write to evidence at the same time. Nevertheless, avoiding making the collection 
-thread safe results in a performance gain and, given that there is currently only 
-one element that writes to evidence, this is not seen as an area of concern).
-<span style="color:yellow">hmmm, I think we should say that evidence should
-be implemented as immutable and I think it should be a nit that we record,
-which points out that we do write to it, somewhere? where, btw?
+concurrent read access and immutable once created. 
+<span style="color:yellow">TODO: This is to be replaced by a small rewrite
+saying that this is the case and providing for retrieval of key/value
+from anywhere in the flow data is required, last entry written takes priority.
 </span>
 
 # Element Data

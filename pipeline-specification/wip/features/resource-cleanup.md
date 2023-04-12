@@ -10,11 +10,9 @@ associated with various instances:
 | Flow Element | Clean up large in-memory data items, file handles, etc.                                                                                  |
 | Pipeline     | Trigger clean up of Flow Elements that it contains. This behaviour is configurable to accommodate sharing of elements between pipelines. |
 
-Note that the [web integration](web-integration.md) feature should manage cleanup 
-so the user doesn't need to worry about it 
-<span style="color:yellow">"user doesn't need to worry about it" is 
-not really a good enough reason. The rhetoric of MUST dispose flow data should
-be universal, surely</span>.
+Note: In most scenarios the user application is responsible for creating Flow Data from the Pipeline and for its later disposal.
+However, see [web integration](web-integration.md) for further notes
+on where this is not the case.
 
 # Detail
 

@@ -128,8 +128,9 @@ value used by the element is configured for lazy loading, then the engine's
 process function will return immediately, but the element that makes use of its 
 property value will just need to wait for the background task to finish anyway.
 
-<span style="color:yellow">TODO - Should we even be including this feature? What's the point if it doesn't 
-actually work in most real world situations? It would probably make more sense if this
+<span style="color:yellow">TODO - Move to advanced features and 
+refer to as deferred execution. Also discuss in context of evidence values.
+It would probably make more sense if this
 were referred to as deferred execution, which could be useful if some expensive
 transformation is required to get results which it would be better
 to defer until tit is known that the value is needed. Weighed against this are
