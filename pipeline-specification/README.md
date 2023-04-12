@@ -10,6 +10,13 @@ for the target language.
 # Structure
 
 This specification is broken down into separate markdown files in multiple directories.
+
+| Directory | Description |
+|---|---|
+| features | Descriptions of Pipeline API features |
+| advanced-features | Descriptions of Pipeline API features that are not implemented in all languages and/or do not have strong enough justifications for the complexity they add |
+| pipeline-elements | Specifications for **Flow Elements** that are needed to provide core functionality  |
+
 If you're not sure where to start, read through the primer section below before 
 exploring further.
 

@@ -38,6 +38,10 @@ Pipeline itself is modularized as follows:
     - **JavaScript**
     - **CloudRequest**
 
+This diagram illustrates the structure of .NET NuGet packages:
+
+![Illustration of package structure](images/v4%20Packages.png)
+
 ## Cross-language modularity
 
 We use Git for our repository management and this allows us to share certain

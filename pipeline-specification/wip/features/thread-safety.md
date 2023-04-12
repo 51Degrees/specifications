@@ -34,10 +34,6 @@ Flow Data or not.
 
 Evidence collection stored within **Flow Data** needs to be thread safe for
 concurrent read access and immutable once created. 
-<span style="color:yellow">TODO: This is to be replaced by a small rewrite
-saying that this is the case and providing for retrieval of key/value
-from anywhere in the flow data is required, last entry written takes priority.
-</span>
 
 # Element Data
 

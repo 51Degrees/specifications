@@ -8,7 +8,7 @@ associated with various instances:
 | Element Data | If the instance contains any native (C/C++) resources, it must clean them up when triggered.                                             |
 | Flow Data    | Trigger clean up of contained Element Data instances.                                                                                    |
 | Flow Element | Clean up large in-memory data items, file handles, etc.                                                                                  |
-| Pipeline     | Trigger clean up of Flow Elements that it contains. This behaviour is configurable to accommodate sharing of elements between pipelines. |
+| Pipeline     | Trigger clean up of Flow Elements that it contains. This behavior is configurable to accommodate sharing of elements between pipelines. |
 
 Note: In most scenarios the user application is responsible for creating Flow Data from the Pipeline and for its later disposal.
 However, see [web integration](web-integration.md) for further notes

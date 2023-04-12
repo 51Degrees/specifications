@@ -1,9 +1,10 @@
 # Overview
 
 Evidence is the name for the input values added to a **Flow Data** instance.
+
 It is stored as key-value pairs and is used by **Flow Elements** within the 
-**Pipeline**. Keys should be case-insensitive and will usually be split into 
-\<prefix\>.\<field\>.
+**Pipeline** and is immutable once created. 
+Keys should be case-insensitive and will usually be split into \<prefix\>.\<field\>.
 
 Currently, defined examples of keys are:
 
@@ -31,4 +32,19 @@ evidence value is available with two different prefixes (For example,
 `header.user-agent` and `query.user-agent`), then the entry whose prefix is earlier 
 in the list above should be used.
 
+# Adding evidence values
 
+Evidence is immutable. However, it may be desireable for some **Flow Elements** 
+to add new values to evidence for later elements to use.
+
+In order to allow for this scenario, we suggest creating a helper function
+that will pull a value from an existing **Element Data** if available, or 
+fallback to pulling it from evidence if needed.
+
+For example, if device detection requests `query.sec-ch-ua-platform` from this
+function, it would return a property value from any **Element Data** with
+that property name.
+It there were no such property, if would return the value from evidence entry 
+that matched that name.
+If multiple **Element Data** instances include properties with this name, 
+an exception/error should be thrown.
