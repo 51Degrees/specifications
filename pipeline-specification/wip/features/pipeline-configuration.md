@@ -1,7 +1,7 @@
 # Summary
 
 Many Flow Elements have numerous configuration options, it is also possible
-to configure Pipelines in many different ways.
+to configure Pipelines in many ways.
 
 In order to make configuration as simple as possible for users, it is required 
 that elements and pipelines can be configured and created using either a pure 
@@ -12,9 +12,9 @@ languages.
 
 # Pipelines
 
-- Pipelines must have the ability to add elements/engines. These will run in 
+- During construction, Pipelines must have the ability to add elements/engines. These will run in 
   sequence in the order they are added.
-- Pipelines must have the ability to add multiple elements/engines that will run 
+- During construction, Pipelines must have the ability to add multiple elements/engines that will run 
   in parallel (where the language supports this).
 
 For example:

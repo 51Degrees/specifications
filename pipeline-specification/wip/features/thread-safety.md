@@ -6,15 +6,13 @@ such as high traffic web servers.
 Consequently, **Pipeline** and **Flow Element** implementations must be 
 capable of handling multiple concurrent requests to the `Process` function.
 
-TODO - should this capability be included in the spec? It seems to rarely (never?) be used
-and adds non-trivial complexity to several core elements.
-In addition, a **Flow Element** can be added to multiple **Pipelines** once it 
+<span style="color:yellow">TODO - should this capability be included in the spec? It seems to rarely (never?) be used
+and adds non-trivial complexity to several core elements.</span>
+In addition, a **Flow Element** may be added to multiple **Pipelines** once it 
 has been built. This means that the processing performed by a **Flow Element** 
-must also have no state information that is dependent on the **Pipeline** or the 
-**Flow Elements** it contains.
+should have no state information that is dependent on a **Pipeline** to which it has been added.
 Where such state information is required, the element must maintain isolated instances 
-of this state internally for each **Pipeline** it is added to and retrieve the correct 
-state for the relevant **Pipeline** during processing.
+of this state for each **Pipeline** to which it has been added.
 
 # Flow Data
 
@@ -23,22 +21,29 @@ thread-safe as the most common use-case is that they will be accessed and
 updated only on the current thread.
 This ensures users get the best performance by default.
 
-Where the Pipeline contains elements running in parallel, element data instances 
-will be added to the Pipeline in parallel.
-We typically solve this by having the Pipeline be involved with **Flow Data** 
-creation. Since the Pipeline knows whether it has any elements running in parallel,
-we can decide at that point whether to create thread-safe or non thread-safe 
-collection.
+Where the Pipeline contains elements running in parallel, Element Data instances 
+will be added to the Pipeline in parallel. However, it is a useful optimization
+to allow Flow Data to be non-thread safe in contexts where no parallel execution 
+is required.
+
+**Flow Data** instances are created by the Pipeline instance on which they 
+will be processed. The Pipeline can determine whether any Flow Elements are
+to be processed in parallel and thus can determine whether to create thread-safe 
+Flow Data or not.
 
 ## Evidence
 
-The evidence collection stored within **Flow Data** does not need to be thread safe, 
-as it may be read concurrently but should not be written to concurrently. (Note 
+Evidence collection stored within **Flow Data** needs to be thread safe for
+concurrent read access. (Note 
 this is not technically true. It is valid for elements to write to the evidence 
 collection, so a pipeline could be constructed with parallel elements that both 
 write to evidence at the same time. Nevertheless, avoiding making the collection 
 thread safe results in a performance gain and, given that there is currently only 
 one element that writes to evidence, this is not seen as an area of concern).
+<span style="color:yellow">hmmm, I think we should say that evidence should
+be implemented as immutable and I think it should be a nit that we record,
+which points out that we do write to it, somewhere? where, btw?
+</span>
 
 # Element Data
 

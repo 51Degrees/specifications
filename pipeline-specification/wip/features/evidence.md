@@ -5,7 +5,7 @@ It is stored as key-value pairs and is used by **Flow Elements** within the
 **Pipeline**. Keys should be case-insensitive and will usually be split into 
 \<prefix\>.\<field\>.
 
-Currently defined examples of keys are:
+Currently, defined examples of keys are:
 
 - `header.user-agent`
 - `header.[header-name]`
@@ -15,7 +15,7 @@ Currently defined examples of keys are:
 
 Any new evidence should be defined in a similar manner.
 
-The prefix indicates where the value has come from. Currently defined prefixes are:
+The prefix indicates where the value has come from. Currently, defined prefixes are:
 
 - `query` – Used for evidence specifically set by the application, or values supplied 
   in a query string or the body of a post request. The suffix is the parameter name.
@@ -28,7 +28,7 @@ The prefix indicates where the value has come from. Currently defined prefixes a
 
 The prefixes above are in order from highest to lowest precedence. I.e. if the same 
 evidence value is available with two different prefixes (For example, 
-`header.user-agent` and `query.user-agent`), then the entry with the higher prefix 
+`header.user-agent` and `query.user-agent`), then the entry whose prefix is earlier 
 in the list above should be used.
 
 

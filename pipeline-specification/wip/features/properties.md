@@ -1,13 +1,12 @@
-- Lazy loading
 # Overview
 
 This document contains details on the features associated with the properties that 
 are populated by **Flow Elements**.
 
 In this case, a 'property' refers to a specific, named data field that can be
-set to many different values.
+set to different values.
 
-The property value will determined during the 'process' step that is performed 
+The property value will be determined during the 'process' step that is performed 
 by each **Flow Element**. This value will be stored within the **Element Data**, 
 which is in turn stored within **Flow Data**.
 
@@ -57,14 +56,14 @@ chosen not to set its value for some reason.
 
 # Property metadata
 
-All [Flow Elements](../conceptual-overview.md#flow-element) must expose meta data 
+All [Flow Elements](../conceptual-overview.md#flow-element) must expose metadata 
 describing details of the properties that they can populate.
 
-In addition, it must be possible to get property meta data at the **Pipeline**
+In addition, it must be possible to get property metadata at the **Pipeline**
 level for all properties that can be populated by all **Flow Elements** in the 
 **Pipeline**.
 
-The table below describes the meta data that is available.
+The table below describes the metadata that is available.
 
 | Property | Type | Description |
 |---|---|---|
@@ -81,9 +80,9 @@ The table below describes the meta data that is available.
 ## Aspect property metadata
 
 [Aspect Engines](../conceptual-overview.md#aspect-engine) are required to populate 
-some additional meta data values beyond those required for **Flow Elements**.
+some additional metadata values beyond those required for **Flow Elements**.
 
-The table below describes the additional meta data that is available.
+The table below describes the additional metadata that is available.
 
 | Property | Type | Description |
 |---|---|---|
@@ -101,7 +100,7 @@ error/exception with a message explaining why the property is not available.
 
 This may be any of the following reasons:
 
-|Reason|Notes|Message|Parameters
+|Reason|Notes|Message|Parameters|
 |---|---|---|---|
 | Not available in the current data file | On-premise only | Property '{0}' not found in data for element '{1}'. This is because your license and/or data file does not include this property. The property is available with the {2} license/data. | 0. property name<br/>1. element name<br/>2. comma-separated list of data file/license types |
 | Property excluded in configuration | On-premise only | Property '{0}' not found in data for element '{1}'. This is because the property has been excluded when configuring the engine. | 0. property name<br/>1. element name |
@@ -129,8 +128,13 @@ value used by the element is configured for lazy loading, then the engine's
 process function will return immediately, but the element that makes use of its 
 property value will just need to wait for the background task to finish anyway.
 
-TODO - Should we even be including this feature? What's the point if it doesn't 
-actually work in most real world situations?
+<span style="color:yellow">TODO - Should we even be including this feature? What's the point if it doesn't 
+actually work in most real world situations? It would probably make more sense if this
+were referred to as deferred execution, which could be useful if some expensive
+transformation is required to get results which it would be better
+to defer until tit is known that the value is needed. Weighed against this are
+scenarios where data needs to be wrangled from native objects and the 
+native object released as soon as possible ...</span>
 
 
 

@@ -2,8 +2,9 @@
 
 Where the language allows, the pipeline must support a mechanism for the 
 caller to cancel processing. This will:
-1. Skip processing for any elements that have not yet started.
-2. Where possible - Cancel processing for any elements that are currently executing.
+
+1. Where possible - cancel processing for any elements that are currently executing.
+2. Skip processing for any elements that have not yet started.
 
 Note that a flowdata instance that has had processing cancelled may be 
 missing data that would normally have been populated. 

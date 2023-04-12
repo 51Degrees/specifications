@@ -26,5 +26,8 @@ This feature is used to enable or assist with other features.
 - [caching](caching.md) - cache keys will be generated based on the values of the 
   evidence keys that the engine accepts.
 - [web integration](web-integration.md) - Data from the web request is automatically added to
-  evidence. Limiting this to only evidence that the pipeline will actually 
-  make use of is preferable to adding everything.
+  evidence. Limiting this to evidence that the pipeline will actually 
+  use is preferable to adding everything.
+  <span style="color:yellow">well is it? surely adding a reference to the whole
+  request could end up being more efficient in both processing time and memory
+  as the flow element would extract what it needs on an as needed basis?</span>
