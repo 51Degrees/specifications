@@ -108,35 +108,3 @@ This may be any of the following reasons:
 | Property not included with resource key | Cloud only | Property '{0}' not found in data for element '{1}'. This is because your resource key does not include access to this property. Properties that are included for this key under '{2}' are {3}. For more details on resource keys, see our explainer: https://51degrees.com/documentation/_info__resource_keys.html | 0. property name<br/>1. element name<br/>2. product name<br/>3. comma-separated list of property names |
 
 
-# Lazy loading
-
-This feature is specific to properties populated by **Engines** (rather than all 
-**Flow Elements**).
-
-Lazy loading allows the user to specify that the engine's 'process' functionality
-should be executed as a background task.
-
-This means that 'process' will return immediately. When the user attempts to access
-the value of a property that is populated by this engine, the call must block until 
-the background task is complete.
-
-Note that there are many scenarios where lazy loading will be ineffective. This 
-is because several core flow elements make use of properties populated by previous 
-elements. (For example, cloud aspect engines, json builder, set response headers.)
-If one of these elements is in a pipeline and the engine that is populating the 
-value used by the element is configured for lazy loading, then the engine's 
-process function will return immediately, but the element that makes use of its 
-property value will just need to wait for the background task to finish anyway.
-
-<span style="color:yellow">TODO - Move to advanced features and 
-refer to as deferred execution. Also discuss in context of evidence values.
-It would probably make more sense if this
-were referred to as deferred execution, which could be useful if some expensive
-transformation is required to get results which it would be better
-to defer until tit is known that the value is needed. Weighed against this are
-scenarios where data needs to be wrangled from native objects and the 
-native object released as soon as possible ...</span>
-
-
-
-
