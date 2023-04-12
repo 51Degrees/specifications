@@ -12,10 +12,12 @@ languages.
 
 # Pipelines
 
-- During construction, Pipelines must have the ability to add elements/engines. These will run in 
-  sequence in the order they are added.
-- During construction, Pipelines must have the ability to add multiple elements/engines that will run 
-  in parallel (where the language supports this).
+- During construction, Pipelines must have the ability to add elements/engines. 
+  These will run in sequence in the order they are added.
+- During construction, Pipelines may have the ability to add multiple 
+  elements/engines that will run in parallel (where the language supports this - 
+  See [parallel processing](../advanced-features/parallel-processing.md) for a
+  discussion of the complexities this adds).
 
 For example:
 
@@ -24,7 +26,7 @@ var pipeline = pipelineBuilder.Add(s1).AddParallel([p1,p2]).Add(s2).Build()
 ```
 
 This would create a pipeline that performs the following processing:
-- execute s1. 
+- Execute s1. 
 - When s1 is finished, p1 and p2 are started in parallel.
 - When both p1 and p2 are complete, s2 is started.
 

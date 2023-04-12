@@ -6,13 +6,6 @@ such as high traffic web servers.
 Consequently, **Pipeline** and **Flow Element** implementations must be 
 capable of handling multiple concurrent requests to the `Process` function.
 
-<span style="color:yellow">TODO - add to discussion of "Advanced Fetures".</span>
-In addition, a **Flow Element** may be added to multiple **Pipelines** once it 
-has been built. This means that the processing performed by a **Flow Element** 
-should have no state information that is dependent on a **Pipeline** to which it has been added.
-Where such state information is required, the element must maintain isolated instances 
-of this state for each **Pipeline** to which it has been added.
-
 # Flow Data
 
 In general user-facing data structures linked to **Flow Data** do not need to be 

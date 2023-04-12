@@ -1,6 +1,6 @@
 # Overview
 
-Where the language allows, the pipeline must support a mechanism for the 
+Where the language allows, the pipeline should support a mechanism for the 
 caller to cancel processing. This will:
 
 1. Where possible - cancel processing for any elements that are currently executing.
