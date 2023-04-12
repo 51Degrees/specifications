@@ -1,7 +1,7 @@
 # Reference Implementation Architecture Notes
 
 This section discusses architectural aspects of the reference implementations
-(C# and Java) which were implemented with extensibility in mind and to provide the basis 
+(C# and Java) which were designed with extensibility in mind and to provide the basis 
 for possible re-use in the creation of Flow Elements and Engines.
 
 It is not the intention to constrain or limit implementations to follow 
@@ -12,14 +12,14 @@ However, taking advantage of the existing design may be expedient, or desirable.
 
 ## Interfaces, Base Classes, Inheritance
 
-The reference implementations follow "classic" OO approach of defining 
+The reference implementations follow "classic" Object-Oriented approach of defining 
 interfaces, implementing abstract base classes and creating default
 implementations for the majority of features of the system.
 
 Frequently, the default implementation is the only implementation, so the 
 strict separation of concerns represented by this approach doesn't result
 in a useful ability to specialize. In addition, both Java and C# now provide 
-for default interface methods which provide for a simpler but no less 
+a language feature allowing default interface methods which provide for a simpler but no less 
 extensible base.
 
 In other cases, specialization is used to provide quite deep hierarchies of 
@@ -69,15 +69,15 @@ fluent builders of their own, which may in turn accept features, such as a cache
 constructed using a builder of its own.
 
 A special builder is provided to simplify the creation of commonly used pipelines
-such as on-premise or cloud device detection. These hide the complexity
+for on-premise or cloud device detection. This hides the complexity
 of pipeline creation by automatically inserting elements, and choosing 
 default values, but the price for that simplification is considerable. There is 
 more code to maintain, more creation scenarios, which require explanation in
-documentation and examples. The custom pipeline builder is also difficult or 
+documentation and examples. The special pipeline builder is also difficult or 
 impossible to use with web integrations and cannot be used when building from a
 configuration file. Finally, if the user is using this builder and decides they 
 need some capability that is beyond its scope, they have to migrate to the 
 'standard' pipeline builder.
 
 On the whole, we prefer solutions that will reduce complexity for users. However,
-care should be taken to try to avoid some of the issues described above.
+care should be taken to try to avoid the issues described above.

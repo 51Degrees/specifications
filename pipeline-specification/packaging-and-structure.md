@@ -5,7 +5,7 @@ Some general guidance as to how to structure an implementation based on
 
 ## Modularity
 
-Using language provided modularity features to provide separation
+Using language-provided modularity features to provide separation
 of concerns and to provide for applications being able selectively to
 use features  without having to import unused features.
 
@@ -14,7 +14,7 @@ Excessive modularity, of course, makes the libraries hard to use.
 Use of transitive dependencies can be very helpful and allow definition
 of a single library aggregation. Most of the dependencies in pipeline
 are required for most use cases. However, if it is of concern that various
-feature are not included then features such as Maven's optional dependency can 
+features are not included then facilities such as Maven's optional dependency can 
 be used.
 
 ## Reference Modularity
@@ -41,7 +41,7 @@ Pipeline itself is modularized as follows:
 ## Cross-language modularity
 
 We use Git for our repository management and this allows us to share certain
-items, such as test data, between languages using Git modules.
+items, such as test data, between languages using Git [submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules).
 
 ## Versioning
 
@@ -61,6 +61,6 @@ regression testing of the examples more complicated during the release cycle.
 
 ## Test Data
 
-We recommend that for convenience test data of some kind is distributed with 
+We recommend that for convenience, test data of some kind is distributed with 
 library code and examples. We also recommend that alternative means of updating
 test data are provided.

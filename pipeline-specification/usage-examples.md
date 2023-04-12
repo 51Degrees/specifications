@@ -8,7 +8,7 @@ is going on.
 # Creating Elements and Pipelines
 
 Creating **Flow Elements** should always be done using a consistent mechanism.
-In the case of c#, we use a separate builder class. For more details on this, 
+In the case of C#, we use a separate builder class. For more details on this, 
 see the [flow element builder](conceptual-overview.md#flow-element-builder) 
 section in the conceptual overview.
 
@@ -18,7 +18,7 @@ var element = myElementBuilder
   .Build()
 ```
 
-As with **Flow Elements**, c# also uses separate builder classed when creating 
+As with **Flow Elements**, C# also uses separate builder class when creating 
 **Pipelines**:
 
 ```c#
@@ -48,7 +48,7 @@ be broken down into 4 steps:
     ```c#
     flowData.AddEvidence("query.evidence-key", "evidence value");
     ```
-3. Command the **Pipeline** to process the data:
+3. Request the **Pipeline** to process the data:
     ```c#
     flowData.Process();
     ```

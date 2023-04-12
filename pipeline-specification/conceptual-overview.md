@@ -81,7 +81,7 @@ A **Pipeline** is a method of grouping multiple **Flow Elements** into a single
 process. By default, elements are always executed sequentially in the order 
 that they are added. See [pipeline builder](#pipeline-builder) for more details.
 
-A **Pipeline** object is immutable. In other words, once created, it cannot be 
+A **Pipeline** object is intended to be immutable. In other words, once created, it cannot be 
 changed by adding new elements, removing old ones, etc.
 
 ## Pipeline builder
