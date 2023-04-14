@@ -10,11 +10,16 @@ Currently, defined examples of keys are:
 
 - `header.user-agent`
 - `header.[header-name]`
-- `cookie.[cookie-name]`
+- `cookie.[cookie-name]`\*
 - `server.client-ip`
 - `server.host-ip`
 
 Any new evidence should be defined in a similar manner.
+
+\* Note that the 'cookie' prefix is a bit of a special case as cookies are supplied
+to the web server using an HTTP header. Generally, 51Degrees engines will not make
+use of `header.cookie`. Cookie values must be under `cookie.` keys in order to be 
+used.
 
 The prefix indicates where the value has come from. Currently, defined prefixes are:
 
@@ -41,10 +46,14 @@ In order to allow for this scenario, we suggest creating a helper function
 that will pull a value from an existing **Element Data** if available, or 
 fallback to pulling it from evidence if needed.
 
-For example, if device detection requests `query.sec-ch-ua-platform` from this
-function, it would return a property value from any **Element Data** with
-that property name.
+For example, if device detection engine requests `query.sec-ch-ua-platform` 
+from this function, it would return a property value from any **Element Data** 
+with that property name.
 It there were no such property, if would return the value from evidence entry 
 that matched that name.
 If multiple **Element Data** instances include properties with this name, 
 an exception/error should be thrown.
+
+This function may be defined on **Flow Data** itself, as a separate helper, or
+both. That is an implementation detail that may depend on the language and 
+design patterns being used.

@@ -146,6 +146,8 @@ need to include logic to set HTTP cache control headers when responding to
 requests to these intercepted endpoints.
 
 #### Storing results of POST requests
+<span style="color:yellow">TODO - move this detail to javascript builder. 
+Just link to it from here</span>
 
 Requests to the JSON endpoint will be be POST requests, as opposed to the GET 
 requests made to the JavaScript endpoint.

@@ -29,7 +29,7 @@ Pipeline itself is modularized as follows:
 - **Core** features essential to Pipeline, Flow Data, Flow Elements etc.
 - **Engines** base classes providing features that are beyond what is provided in Flow Elements
 - **Web** Adaptors and features to assist with use of Pipeline in a Web environment
-- **51Engines** features specific to 51 degrees that are specific to 51Degrees and 51Degrees Engines:
+- **51Engines** features specific to 51Degrees and 51Degrees Engines:
   - **ShareUsage**
   - **SetHeaders**
   - **Sequence**
@@ -63,8 +63,17 @@ to the code they exemplify in order to
 ensure that distributed library artifacts are used. However, this would make 
 regression testing of the examples more complicated during the release cycle.
 
-## Test Data
+For more details, see [required examples](required-examples.md).
+
+## Tests
+
+Automated tests and expected to be present in the same repository as the
+API code and will be run as part of CI/CD workflows.
+For more details, see [automated testing](automated-testing.md).
+
+### Test Data
 
 We recommend that for convenience, test data of some kind is distributed with 
 library code and examples. We also recommend that alternative means of updating
 test data are provided.
+

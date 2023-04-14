@@ -13,9 +13,9 @@ thread-safe as the most common use-case is that they will be accessed and
 updated only on the current thread.
 This ensures users get the best performance by default.
 
-Where the Pipeline contains elements running in parallel, Element Data instances 
-will be added to the Pipeline in parallel. However, it is a useful optimization
-to allow Flow Data to be non-thread safe in contexts where no parallel execution 
+Where the **Pipeline** contains elements running in parallel, **Element Data** instances 
+will be added to the **Flow Data** in parallel. However, it is a useful optimization
+to allow **Flow Data** to be non-thread safe in contexts where no parallel execution 
 is required.
 
 **Flow Data** instances are created by the Pipeline instance on which they 
@@ -30,7 +30,7 @@ concurrent read access and immutable once created.
 
 # Element Data
 
-In general, Element Data instances do not need to be thread safe, as they
+In general, **Element Data** instances do not need to be thread safe, as they
 should only be accessed and updated from a single thread.
 
 While it is certainly possible for a user to engineer a scenario where an 
@@ -45,3 +45,9 @@ same instance may be used for multiple different calls to `Process` when
 the [caching](caching.md) feature is enabled.
 If this is not possible for some reason then the engine must not allow a cache 
 to be added.
+
+<span style="color:yellow">This is interesting, so `.Process()` method can not 
+	be called more than once on the same `Flow Data` object, so it will be called on 
+	different `Flow Data` objects, but each of them
+	may hold a reference to the same cached `Aspect Data` object? 
+</span>

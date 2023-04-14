@@ -6,9 +6,9 @@ a Flow Data object.
 
 ## Flow data
 
-The **Flow Data** object is primarily a container for various data sets. It is the 
-mechanism by which inputs are provided to the pipeline and outputs are returned to 
-the user.
+The **Flow Data** object is the fundamental unit of work within the Pipeline API.
+It is primarily a container for various data sets, and is the mechanism by which 
+inputs are provided to the pipeline and outputs are returned to the user.
 
 The input data, or 'evidence' is a set of key-value pairs. For more details, 
 see the [evidence](features/evidence.md) section.
@@ -17,9 +17,19 @@ The output data consists of one **Element Data** instance for each **Flow Elemen
 in the **Pipeline**. These are accessed using the 'data key' string of the
  **Flow Element** that created each entry.
 
-**Flow Data** objects are created by the pipeline and can only be used within the 
+**Flow Data** objects are created by a Pipeline and can only be used within the 
 pipeline by which they were created. The Process method on **Flow Data** 
 initiates pipeline processing.
+
+A **Flow Data** belongs to exactly one **Pipeline**. 
+While a **Pipeline** may have many **Flow Data** instances. 
+The standard usage pattern is to create a singleton Pipeline instance that will
+be used in environments such as web servers. As such, it is expected that many 
+**Flow Data** instances will be created and processed in parallel from a single 
+**Pipeline**.
+
+A **Pipeline** does not maintain references to **Flow Data** instances that it 
+has created, but they maintain references to it.
 
 See [thread safety](features/thread-safety.md) for details on concurrent access requirements.
 
@@ -52,8 +62,8 @@ See [resource cleanup](features/resource-cleanup.md) for details on ensuring
 
 ## Flow element builder
 
-It is highly recommended that **flow elements** have some associated
-builder/factory that is used to create **flow element** instances.
+It is highly recommended that **Flow Elements** have some associated
+builder/factory that is used to create **Flow Element** instances.
 
 The exact specification of this component is less important than having a common
 mechanism for construction of elements. This provides consistency for users and
@@ -87,7 +97,7 @@ changed by adding new elements, removing old ones, etc.
 ## Pipeline builder
 
 As with [Flow Elements](#flow-element-builder), we have found that the builder 
-pattern is a good way to control the creation of **pipeline** instances.
+pattern is a good way to control the creation of **Pipeline** instances.
 
 See [pipeline configuration](features/pipeline-configuration.md) for more information
 on configuring and creating instances.
@@ -98,6 +108,8 @@ The engines package adds features to **Flow Elements** that are common to
 multiple different 51Degrees element implementations.
 
 ## Aspect engine
+
+See the [readme](README.md#engine) for a definition of 'aspect'.
 
 **Aspect Engines** (often shortened to just '**Engines**') are a specific type 
 of **Flow Element** with additional features and properties:
