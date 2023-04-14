@@ -16,6 +16,32 @@ on where this is not the case.
 
 # Detail
 
+## Pipeline
+
+By default, **Pipeline** will clean up the **Flow Elements** it contains. 
+However, there must be an option to disable this behavior.
+
+This is needed for scenarios where single elements are added to multiple
+**Pipelines**.
+In this case, the user must take responsibility for cleanup of 
+**Flow Element** resources. This should be made clear in comments and 
+documentation around the use of this option.
+
+## Flow Element
+
+**Flow Elements** can be very light-weight, but can also maintain significant 
+internal resources.
+
+Similar to **Element Data** we have found native resources to be 
+the primary problem area.
+
+There must be some mechanism to ensure that such resources are cleaned up 
+when the **Flow Element** is no longer needed. 
+
+Whether other **Flow Elements** need any specific cleanup logic is 
+left up to implementers.
+
+
 ## Element data
 
 In general, we have found that specific clean up of resources associated with 
@@ -53,28 +79,10 @@ it holds that require cleanup are taken care of.
 **Element Data** instances that do not require cleanup must be left alone
 in order for [result caching](caching.md) to work correctly.
 
-## Flow Element
+Note that **Flow Data** holds a reference to the **Pipeline** that created
+it. However, **Flow Data** instances are not cleaned up when the **Pipeline** 
+is cleaned up. As such, it is possible to have active references to 
+**Flow Data** instances that reference disposed **Pipeline** instances and 
+would fail if processed.
 
-**Flow Elements** can be very light-weight, but can also maintain significant 
-internal resources.
-
-Similar to **Element Data** we have found native resources to be 
-the primary problem area.
-
-There must be some mechanism to ensure that such resources are cleaned up 
-when the **Flow Element** is no longer needed. 
-
-Whether other **Flow Elements** need any specific cleanup logic is 
-left up to implementers.
-
-## Pipeline
-
-By default, **Pipeline** will clean up the **Flow Elements** it contains. 
-However, there must be an option to disable this behavior.
-
-This is needed for scenarios where single elements are added to multiple
-**Pipelines**.
-In this case, the user must take responsibility for cleanup of 
-**Flow Element** resources. This should be made clear in comments and 
-documentation around the use of this option.
-
+Ideally, a helpful error message should be thrown in this scenario.

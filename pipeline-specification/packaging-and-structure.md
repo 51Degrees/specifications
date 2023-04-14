@@ -63,11 +63,17 @@ to the code they exemplify in order to
 ensure that distributed library artifacts are used. However, this would make 
 regression testing of the examples more complicated during the release cycle.
 
-## Test Data
+For more details, see [required examples](required-examples.md).
+
+## Tests
+
+Automated tests and expected to be present in the same repository as the
+API code and will be run as part of CI/CD workflows.
+For more details, see [automated testing](automated-testing.md).
+
+### Test Data
 
 We recommend that for convenience, test data of some kind is distributed with 
 library code and examples. We also recommend that alternative means of updating
 test data are provided.
 
-<span style="color:yellow">Maybe also worth to mention that unit tests are expected to reside in library code repository 
-and be run as part of the CI / build workflow. </span>

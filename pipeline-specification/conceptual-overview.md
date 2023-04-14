@@ -6,9 +6,9 @@ a Flow Data object.
 
 ## Flow data
 
-The **Flow Data** object is primarily a container for various data sets. It is the 
-mechanism by which inputs are provided to the pipeline and outputs are returned to 
-the user.
+The **Flow Data** object is the fundamental unit of work within the Pipeline API.
+It is primarily a container for various data sets, and is the mechanism by which 
+inputs are provided to the pipeline and outputs are returned to the user.
 
 The input data, or 'evidence' is a set of key-value pairs. For more details, 
 see the [evidence](features/evidence.md) section.
@@ -17,24 +17,19 @@ The output data consists of one **Element Data** instance for each **Flow Elemen
 in the **Pipeline**. These are accessed using the 'data key' string of the
  **Flow Element** that created each entry.
 
-**Flow Data** objects are created by the pipeline and can only be used within the 
+**Flow Data** objects are created by a Pipeline and can only be used within the 
 pipeline by which they were created. The Process method on **Flow Data** 
 initiates pipeline processing.
 
-<span style="color:yellow">
-The README also mentions that "A Flow Data may only be processed 
-once and belongs to exactly one Pipeline."  I think it makes sense to mention it here too, 
-perhaps we also want implementers to enforce this with raising an error if `Process()` method was called multiple times on the same `Flow Data`.
+A **Flow Data** belongs to exactly one **Pipeline**. 
+While a **Pipeline** may have many **Flow Data** instances. 
+The standard usage pattern is to create a singleton Pipeline instance that will
+be used in environments such as web servers. As such, it is expected that many 
+**Flow Data** instances will be created and processed in parallel from a single 
+**Pipeline**.
 
-Also is implementer able to retrieve the current `Flow Data` object from the pipeline after processing is complete if they somehow do not
-hold on to the reference to this object?  If I understand correctly `Pipeline` holds on to an instance of `Flow Data` and just gives user
-a reference to this object.  The user controls `Pipeline` thru the reference to `Flow Data`, but they can keep it in a temporary variable 
-that might go out of scope, while they have to hold on to `Pipeline` object for the duration of processing at least.  Should they be able to get back
-the reference to the existing `Flow Data` object that Pipeline is holding again without instantiating a new one? 
-
-Also am I correct that users can instantiate new / multiple `Flow Data` objects from the existing pipeline?  (I am sure it is mentioned somewhere down the road, 
-but I just haven't got there yet).
-</span>
+A **Pipeline** does not maintain references to **Flow Data** instances that it 
+has created, but they maintain references to it.
 
 See [thread safety](features/thread-safety.md) for details on concurrent access requirements.
 
@@ -114,10 +109,7 @@ multiple different 51Degrees element implementations.
 
 ## Aspect engine
 
-<span style="color:yellow">
-I think the previous version of the conceptual overview also contained an explanation of an Aspect term and examples of it.
-I think it was a useful concept and I can't seem to find it in the docs now.
-</span>
+See the [readme](README.md#engine) for a definition of 'aspect'.
 
 **Aspect Engines** (often shortened to just '**Engines**') are a specific type 
 of **Flow Element** with additional features and properties:

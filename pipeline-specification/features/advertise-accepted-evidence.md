@@ -26,11 +26,6 @@ request engine)
 This feature is used to enable or assist with other features.
 
 - [caching](caching.md) - cache keys will be generated based on the values of
-  the
-  evidence keys that the engine accepts.
-- [web integration](web-integration.md) - Data from a web request is
-  automatically added to
-  evidence. Limiting this to evidence that the pipeline will actually
-  use may be preferable to adding everything. However, wrapping the Web request
-  structure as evidence, and hence deferring processing till the evidence is
-  actually used, may have performance and memory benefits.
+  the evidence keys that the engine accepts.
+- [web integration](web-integration.md#populating-evidence) - Data from a web 
+  request is automatically added to evidence.
