@@ -17,4 +17,6 @@ To make it clear that the function is non-blocking when a cancellation token
 is supplied, we suggest considering a differently named function for that scenario.
 (For example, 'ProcessAsync').
 
-
+<span style="color:yellow">
+	Agree with this idea to return Cancellable from either eager background or lazy execution call.
+</span>
