@@ -15,6 +15,7 @@ This ensures users get the best performance by default.
 
 Where the Pipeline contains elements running in parallel, Element Data instances 
 will be added to the Pipeline in parallel. However, it is a useful optimization
+<span style="color:yellow"> Perhaps Element Data are to be added to the Flow Data, not Pipeline in the line above?</span>
 to allow Flow Data to be non-thread safe in contexts where no parallel execution 
 is required.
 
@@ -45,3 +46,9 @@ same instance may be used for multiple different calls to `Process` when
 the [caching](caching.md) feature is enabled.
 If this is not possible for some reason then the engine must not allow a cache 
 to be added.
+
+<span style="color:yellow">This is interesting, so `.Process()` method can not 
+	be called more than once on the same `Flow Data` object, so it will be called on 
+	different `Flow Data` objects, but each of them
+	may hold a reference to the same cached `Aspect Data` object? 
+</span>
