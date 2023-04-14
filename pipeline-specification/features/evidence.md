@@ -32,6 +32,11 @@ evidence value is available with two different prefixes (For example,
 `header.user-agent` and `query.user-agent`), then the entry whose prefix is earlier 
 in the list above should be used.
 
+<span style="color:yellow">Another interesting and seemingly conflicting case is `header.cookies` and `cookie.name1`, 
+`cookie.name2` - individual cookies listed as individual keys in the evidence vs. raw HTTP Cookies header.  Should individual cookies from
+the `header.cookies` override those with a prefix `cookie`?  Should we just ignore 
+all the items prefixed with `cookie` and use the `header.cookies` if it is present? </span>
+
 # Adding evidence values
 
 Evidence is immutable. However, it may be desireable for some **Flow Elements** 
@@ -40,8 +45,11 @@ to add new values to evidence for later elements to use.
 In order to allow for this scenario, we suggest creating a helper function
 that will pull a value from an existing **Element Data** if available, or 
 fallback to pulling it from evidence if needed.
+<span style="color:yellow"> Should this helper function/method be added to the **Flow Data** 
+  object interface?</span>
 
 For example, if device detection requests `query.sec-ch-ua-platform` from this
+<span style="color:yellow">assuming device detection engine is meant? </span> 
 function, it would return a property value from any **Element Data** with
 that property name.
 It there were no such property, if would return the value from evidence entry 

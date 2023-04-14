@@ -21,6 +21,21 @@ in the **Pipeline**. These are accessed using the 'data key' string of the
 pipeline by which they were created. The Process method on **Flow Data** 
 initiates pipeline processing.
 
+<span style="color:yellow">
+The README also mentions that "A Flow Data may only be processed 
+once and belongs to exactly one Pipeline."  I think it makes sense to mention it here too, 
+perhaps we also want implementers to enforce this with raising an error if `Process()` method was called multiple times on the same `Flow Data`.
+
+Also is implementer able to retrieve the current `Flow Data` object from the pipeline after processing is complete if they somehow do not
+hold on to the reference to this object?  If I understand correctly `Pipeline` holds on to an instance of `Flow Data` and just gives user
+a reference to this object.  The user controls `Pipeline` thru the reference to `Flow Data`, but they can keep it in a temporary variable 
+that might go out of scope, while they have to hold on to `Pipeline` object for the duration of processing at least.  Should they be able to get back
+the reference to the existing `Flow Data` object that Pipeline is holding again without instantiating a new one? 
+
+Also am I correct that users can instantiate new / multiple `Flow Data` objects from the existing pipeline?  (I am sure it is mentioned somewhere down the road, 
+but I just haven't got there yet).
+</span>
+
 See [thread safety](features/thread-safety.md) for details on concurrent access requirements.
 
 **Flow Data** must support various different ways of accessing the data it contains. 
@@ -52,8 +67,8 @@ See [resource cleanup](features/resource-cleanup.md) for details on ensuring
 
 ## Flow element builder
 
-It is highly recommended that **flow elements** have some associated
-builder/factory that is used to create **flow element** instances.
+It is highly recommended that **Flow Elements** have some associated
+builder/factory that is used to create **Flow Element** instances.
 
 The exact specification of this component is less important than having a common
 mechanism for construction of elements. This provides consistency for users and
@@ -87,7 +102,7 @@ changed by adding new elements, removing old ones, etc.
 ## Pipeline builder
 
 As with [Flow Elements](#flow-element-builder), we have found that the builder 
-pattern is a good way to control the creation of **pipeline** instances.
+pattern is a good way to control the creation of **Pipeline** instances.
 
 See [pipeline configuration](features/pipeline-configuration.md) for more information
 on configuring and creating instances.
@@ -98,6 +113,11 @@ The engines package adds features to **Flow Elements** that are common to
 multiple different 51Degrees element implementations.
 
 ## Aspect engine
+
+<span style="color:yellow">
+I think the previous version of the conceptual overview also contained an explanation of an Aspect term and examples of it.
+I think it was a useful concept and I can't seem to find it in the docs now.
+</span>
 
 **Aspect Engines** (often shortened to just '**Engines**') are a specific type 
 of **Flow Element** with additional features and properties:
