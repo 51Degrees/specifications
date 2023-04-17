@@ -124,3 +124,156 @@ Each **Aspect Engine** will need to provide two data refresh functions:
    data.
 
 # Checking for updates
+
+The reference implementations use a singleton background service to
+manage updates.
+
+When **Aspect Engines** are created, the configuration details for 
+any data files that they use are registered with this service. It can 
+then automatically download any updates and inform the engines by using 
+the [data refresh](#engine-data-refresh) functionality.
+
+The following section describes the logic that is used for registered 
+data files.
+The names in *italics* correspond to 
+[configuration options](#data-file-update-configuration) mentioned 
+previously.
+
+The service waits until the *next expected update* date/time + 
+a random time based on *update time maximum randomization* has passed.
+
+Note that if *next expected update* is not available from the data file, 
+*polling interval* should be added to the current date/time instead.
+
+Once the relevant time period has passed, the following checks made:
+
+1. Check the *data file location* to see if the file there is newer than 
+   the one in the *temp data file location*.
+2. If the file was not newer and the *auto updates enabled* flag is set, 
+   send a request to the *data update URL* to check if there is a newer data 
+   file available. If there is then it will be downloaded, checked for 
+   integrity against an MD5 hash and extracted to the *data file location*.
+   
+Note that where the engine has been built from a byte[], there is no data 
+file in the file system. 
+Consequently, we just go straight to option 2 above and the file content will 
+only exist in memory, rather than being copied to the *data file location*.
+
+If either check found new data, the [data refresh](#engine-data-refresh) 
+function is then called on the engine.
+
+Once the refresh is complete, the data update service can then start 
+checking for updates using the newly refreshed *next expected update* 
+date/time.
+
+If no update was found then the service should repeat the same checks 
+after the *polling interval* + a random time based on  
+*update time maximum randomization* has passed.
+
+## HTTP request
+
+This section describes the detail of making an HTTP request to check for 
+a new data file and handling the response.
+
+51Degrees device detection data files are supplied by the 
+[Distributor](http://51degrees.com/documentation/4.4/_info__distributor.html) 
+web API. The capabilities of the data update service align with those of
+the Distributor. However, the service must be capable of using other sources
+as well. For example, a simple static URL that just supplies a file.
+
+When sending a request to the *data update URL*, the `If-Modified-Since` 
+header should be set to the publish date of the existing data file.
+If the data file does not have a publish date then the file system last modified
+date/time can be used instead. This ensures that if a new data file has not 
+been published yet, we won't waste bandwidth downloading it.
+
+There must be some mechanism for the update service to add query parameters
+to the data update URL when needed. 
+The reference implementations use a 'URL formatter' class. Below are the 
+implementations used for calls made to the Distributor.
+
+- [.NET FiftyOneUrlFormatter](https://github.com/51Degrees/pipeline-dotnet/blob/master/FiftyOne.Pipeline.Engines.FiftyOne/Data/FiftyOneUrlFormatter.cs)
+- [Java FiftyOneUrlFormatter](https://github.com/51Degrees/pipeline-java/blob/master/pipeline.engines.fiftyone/src/main/java/fiftyone/pipeline/engines/fiftyone/data/FiftyOneUrlFormatter.java)
+
+## File system watcher
+
+The process described in [checking for updates](#checking-for-updates)
+allows the user to copy a new file into a location and have the system 
+refresh the engine using that new file when it next checks for updates.
+
+However, some languages have file system watcher functionality that
+can be used to refresh the engine using the new file immediately after
+it is copied into position.
+
+This functionality can be enabled using the *file system watcher* flag.
+
+## Manual update
+
+In addition to the automatic triggered update process, there must be a 
+mechanism to manually update engines as well.
+
+`CheckForUpdate(engine, dataFileIdentifier)` should immediately check 
+for updates using exactly the same process as the 
+[automated check](#checking-for-updates). A boolean return value can 
+indicate if an update has been applied or not.
+
+`UpdateFromMemory(engine, dataFileIdentifier, byte[])` is a way to 
+push updates to the engine. This can be used regardless of how the 
+engine was created:
+
+- Engine created data file from the file system - The update service must 
+  use the data from the supplied byte array to replace the original data 
+  file in *data file location*. The [data refresh](#engine-data-refresh) 
+  function is then called on the engine.
+- Engine created using a byte[] - The update service simply needs to call 
+  the [data refresh](#engine-data-refresh) function on the engine, passing 
+  the supplied byte[].
+
+# Logging
+
+The data update service is a complex background process. As such, it is 
+essential that the user, and 51Degrees support, has detailed logging 
+available to help diagnose issues that might arise.
+
+All major actions should be logged at the appropriate level along with
+relevant details (e.g. which engine + data file the update is for)
+
+## Startup events
+
+| **Action** | **Message** |
+|---|---|
+| Running the update on startup process | Updating on startup |
+| [File system watcher](#file-system-watcher) created | Creating file system watcher |
+
+## Update events
+
+| **Action** | **Message** |
+|---|---|
+| Starting the [check for update process](#checking-for-updates) | Checking for update |
+| Call [refresh](#engine-data-refresh) on an engine | Attempting to refresh engine '\<engine type\>' with new data |
+| Send HTTP request to check for new data file | Checking for update from '\<url\>' for engine '\<engine type\>' |
+| Successfully downloaded new data file | Downloaded new data from '\<url\>' for engine '\<engine type\>' |
+| 304 (Not modified) response from HTTP request | No data newer than \<datetime\> found at '\<url\>' for engine '\<engine type\>' |
+
+## Errors 
+
+There are several possible causes of errors within the data update service. 
+As this is a background service, we must ensure that any failures are 
+caught and logged, rather than being lost or causing process failures.
+
+These messages must also be consistent across languages to make life easier 
+for 51Degrees support.
+
+The red text should only be present if this is an automated check rather 
+than a manual one triggered by the CheckForUpdate method.
+
+| **Error**                                                                                                                       | **Log level** | **Message**                                                                                                                                                                     |
+|---------------------------------------------------------------------------------------------------------------------------------|---------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Could not connect to remote server for data file update                                                                         | Warning       | An error occurred when connecting to \<url\> in order to check for data file updates for \<engine type name\>. <span style="color:red">Update will be attempted again later.</span> Error detail: \<error message\> |
+| Error downloading file                                                                                                          | Warning       | An error occurred while downloading a data file update for \<engine name\> from \<url\>. <span style="color:red">Update will be attempted again later.</span> Error detail: \<error from distributor\>         |
+| Error validating data file                                                                                                      | Warning       | An error occurred during the integrity check of new data file for \<engine name\>. <span style="color:red">Update will be attempted again later.</span> Error detail: \<error\>                                |
+| Error writing to *data file location* or *temp file location*                                                               | Error         | An error occurred when writing to \<file path\>. Error detail: \<error\>                                                                                                        |
+| Engine was built from a file with the ‘use temp file’ flag disabled. And the file at *data file location* is currently locked | Error         | Unable to update data file. This is probably because the engine was built with the ‘use temp file’ option disabled.                                                             |
+| Error when calling RefreshData on engine                                                                                        | Error         | An error occurred while applying a data file update to \<engine type name\>. Error detail: \<error\>                                                                                 |
+| Attempting to update a data file that has no configured temporary file path                                                     | Error         | The data file '\<data file identifier\>' is checking for updates but does not have a temporary file path configured.                                                        |
+| Some file system error occurs while copying a new data file                                                                     | Error         | An error occurred when copying a data file to replace the existing one at '\<path\>'.                                                                          |
