@@ -309,14 +309,14 @@ relevant details (e.g. which engine + data file the update is for)
 | **Action** | **Message** |
 |---|---|
 | Running the update on startup process | Updating on startup |
-| [File system watcher](#file-system-watcher) created | Creating file system watcher |
+| File system watcher created | Creating file system watcher |
 
 ### Messages during operation
 
 | **Action** | **Message** |
 |---|---|
-| Starting the [check for update process](#checking-for-updates) | Checking for update |
-| Call [refresh](#engine-data-refresh) on an engine | Attempting to refresh engine '\<engine type\>' with new data |
+| Starting the check for update process | Checking for update |
+| Call [refresh](#aspect-engine-features) on an engine | Attempting to refresh engine '\<engine type\>' with new data |
 | Send HTTP request to check for new data file | Checking for update from '\<url\>' for engine '\<engine type\>' |
 | Successfully downloaded new data file | Downloaded new data from '\<url\>' for engine '\<engine type\>' |
 | 304 (Not modified) response from HTTP request | No data newer than \<datetime\> found at '\<url\>' for engine '\<engine type\>' |

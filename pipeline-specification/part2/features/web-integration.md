@@ -178,7 +178,7 @@ the same site (in blue).
 See the descriptions below for a detailed walkthrough of what is happening 
 on each line.
 
-![JavaScript Properties Request Response](images/JavascriptProperties-RequestResponse.png)
+![JavaScript Properties Request Response](../../images/JavascriptProperties-RequestResponse.png)
 
 ##### Line 1 - First request to JavaScript endpoint:
 
