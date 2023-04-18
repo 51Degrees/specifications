@@ -1,251 +1,316 @@
-TODO - Write these points up properly. Consider migrating existing content from old document, 
-including logic flow diagrams or some higher-level variation of them.
+# Data Update
 
-- Engines often have one or more associated data files.
-- There must be a feature that allows these data files to be updated
-  automatically.
-- The engine should take all steps to minimize blocking of process requests
-  during the data update process. (a small amount of blocking is generally
-  unavoidable)
-- Support for filesystem-less environments. I.e. the file data only ever exists
-  in memory.
-- Requirement for engines to support multiple data files (TODO - is this really needed? 
-  Only engine that used this was geomprint cloud engine and it is no longer maintained.
-  We could remove a bit of complexity by dropping the requirement)
+## Overview
 
-- Support Update on startup
-- Allow randomization of update time
-- Support MD5 <span style="color:yellow">validation of downloaded files</span>
-- Support decompression of downloaded file
-- Support if-modified-since header - using values from the data file that are
-  exposed by the engine <span style="color:yellow">or some other mechanism if the data file doesn't contain its own update time</span>
-- Support for customizable flat or parameterized URLs (where parameters based on
-  values in the data file and exposed by the engine)
-- Support for the user updating the file on disk, causing the engine to reload
-  its in-memory data.
-- Support for manually forcing a refresh of the data file from code.
-- logging should be used to give users a clear picture of what is happening
-  should they want it.
-- Events, callbacks, etc should be used to allow users to act on updates
-  starting/completing.
+An on-premise **Aspect Engine** may require data that is independent of the 
+logic of the engine and that is periodically refreshed. For example,
+when new phones or browser versions are released, the device detection
+engine will require a new data file in order to detect and populate
+property values for those new cases. The Data Update Service 
+provides functionality for this.
 
+The Data Update Service assumes that the data is available from an HTTP
+endpoint or that it can be provided by means of file store that is accessible
+to an instance of the Aspect Engine.
 
-# Overview
+It is possible that an Aspect Engine requires more than one data source [^1] and
+implementers may choose either to provide the data in a single unified way
+or to implement the Data Update service to allow for multiple file sources.
 
-Automatic data updates is a feature for on-premise **Aspect Engines**
-that use one or more data files.
+[^1] data sources are referred to as data files in the reference implementations
 
-By 'data file' we mean some external resource that is used as part of 
-the processing that the engine performs.
+### Aspect Engine Features
 
-Such data files are typically separated out from the actual processing 
-logic of the engine because they need to change over time. For example, 
-when new phones or browser versions are released, the device detection 
-engine will require a new data file in order to detect and populate 
-property values for those new cases.
+In order to support this feature, **Aspect Engines** must have a
+some additional abilities:
 
-The data updates feature provides various mechanisms to support and
-simplify the refreshing of these data files as new ones become available.
-
-Note that there are two primary mechanisms that support different use-cases:
-
-1. Use the file system to store data file content. Each data file will 
-   have two locations in the file system. One for the 'user-facing' data 
-   file. Another for a temporary location that contains a copy of the file 
-   for use during processing.
-   This ensures that the user-facing location can be updated in various 
-   ways without impacting the operation of the engine.
-2. In order to support environments without a file system, we allow data 
-   file content to be supplied entirely in memory.
-
-# Aspect Engine logic
-
-In order to support this feature, **Aspect Engines** need to have a 
-couple of additional abilities:
-
-1. At build time, there must be a mechanism for supplying details about 
-   the data file(s) that the engine needs along with any information 
+1. At configuration time, there must be a mechanism for supplying details about
+   the data sources that the engine needs along with any information
    and configuration options associated with updating it.
-2. The engine must provide a mechanism to allow callers to tell it to
-   refresh its internal data structures.
+2. The engine must provide a mechanism to allow it to refresh, 
+   (use an updated data source) on demand.
+3. The mechanism must be thread safe.
 
-## Data file update configuration
-
-The table below shows the parameters associated with data updates for each 
-data file. Some come from the data file itself, others are configured by 
-the user.
-
-| **Parameter**                     | **User configurable** | **Optional**                                      | **Default**                             | **Notes**                                                                                                                                                                                                                                                                                            |
-|-----------------------------------|-----------------------|---------------------------------------------------|-----------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Data publish date/time            | N                     | N/A                                               | Read from data file                     | The time that the current data file was created.                                                                                                                                                                                                                                                     |
-| Next expected update date/time    | N                     | N/A                                               | Read from data file                     | The time that a new data file is expected to be available.                                                                                                                                                                                                                                           |
-| Data file location                | Y                     | N (not required if engine is built from a byte[]) | N/A                                     | The location of the data file that the service will update and check for updates. The engine will copy this file to the temp data file location before using it.                                                                                                                                     |
-| Temp data file location           | N                     | N/A                                               | Machine-specific temp location          | The location of the data file that the engine will actively read data from.                                                                                                                                                                                                                          |
-| Auto update enabled flag          | Y                     | Y                                                 | True                                    | If false then the service should not do any checks for updates from the URL or to the file. Manually calling the update methods must still work though.                                                                                                                                              |
-| Data update URL                   | Y                     | Y                                                 | Read from data file                     | Default will initially be hard coded in the engine rather than actually stored in the data file.                                                                                                                                                                                                     |
-| Data update URL formatter         | Y                     | Y                                                 | null, or FiftyOneDataUpdateUrlFormatter | The default is automatically set for all 51Degrees engines that use the Distributor service for data file updates. Otherwise, it will default to 'null', which means the Data Update URL will be used un-modified when checking for updates.                                                         |
-| Data update use URL formatter     | Y                     | Y                                                 | True                                    | If set to true, the URL formatter will be used to format the update URL. If set to false, the formatter will be ignored and the data update URL will be used un-modified. This is the same as setting URL formatter to null. This setting exists to allow this to be done from a configuration file. |
-| File system watcher enabled flag  | Y                     | Y                                                 | True                                    | May not be available for all languages. If set to true then the update service will watch the data file location and notify the engine if the file changes. (The file system watcher should be disabled while downloading a new file, etc)                                                           |
-| Polling interval                  | Y                     | Y                                                 | 30 minutes                              | If the expected time has passed with no update available then the polling interval gives the time to wait between checking for updates from the URL or to the file (if file system watcher is available then checking the file is not necessary).                                                    |
-| Update time maximum randomization | Y                     | Y                                                 | 10 minutes                              | This setting is the maximum random additional time period that is added to the next expected update date/time and the polling interval. It should be specified in seconds or, if available, some TimeSpan object.                                                                                       |
-| VerifyMd5                         | Y                     | Y                                                 | True                                    | If true then the service will expect a ‘content-md5’ HTTP header to be populated in the response. It will check this against the content to ensure its integrity.                                                                                                                                   |
-| Decompress                        | Y                     | Y                                                 | True                                    | If true then the service will automatically decompress the content returned from the data update URL.        |                                                               
-
-### Data file configuration builder
-
-We have found that separating the data file configuration options into 
-a builder that is separate from the 
-[engine builder](../../conceptual-overview.md#flow-element-builder) is 
-helpful.
-
-Engines that only need one data file may have builders that hide this 
-complexity from the user and just appear to have the options available 
-on the engine builder directly.                                                  
-
-## Engine data refresh
-
-Data refresh is the process of loading data from an external source into 
-the in-memory data structures that will be used during processing.
-
-The Pipeline must still be capable of serving requests with minimal 
+The Pipeline that contains the Aspect Engine must still be capable of
+processing Flow Data with minimal
 performance impact while data refresh is happening.
 
-Each **Aspect Engine** will need to provide two data refresh functions:
+## Data Refresh Availability
 
-1. Take some data file configuration identifier, access the associated 
-   configuration object that was supplied at construction time to find
-   the location of the file on disk.
-   The temp data file will need to be updated with the new one from the 
-   'real' data file location and in-memory data structures refreshed.
-2. Take some sort of in-memory data structure containing a byte 
-   representation of the data file. This could be something simple like 
-   a `byte[]` or something more complex like a c\# `MemoryStream`.
-   The engine's in-memory data structures must be refreshed from this 
-   data.
+A data source may contain a timestamp that specifies when it was created and may
+contain a timestamp that indicates when refreshed data will be available. This
+information can be used to optimise polling, or to provide information as to 
+how up-to-date the current data is.
 
-# Checking for updates
+## Operational Modes
 
-The reference implementations use a singleton background service to
-manage updates.
+From the point of view of the Data Update Service, Aspect Engines have several 
+operational modes:
 
-When **Aspect Engines** are created, the configuration details for 
-any data files that they use are registered with this service. It can 
-then automatically download any updates and inform the engines by using 
-the [data refresh](#engine-data-refresh) functionality.
+- File Data Source, File Based Operation
+- File Data Source, Memory Based Operation
+- Memory Data Source, Memory Based Operation
 
-The following section describes the logic that is used for registered 
-data files.
-The names in *italics* correspond to 
-[configuration options](#data-file-update-configuration) mentioned 
-previously.
+Other operational modes may be possible, such as an Aspect Engine's data residing
+in a relational database.
 
-The service waits until the *next expected update* date/time + 
-a random time based on *update time maximum randomization* has passed.
+### File Data Source, File Based Operation
+In this operational mode an Aspect Engine the Aspect Engine uses data that
+resides in the file system to support its operation. This may be because the 
+data is too extensive to be loaded into memory or because of memory limitations
+in the system.
 
-Note that if *next expected update* is not available from the data file, 
-*polling interval* should be added to the current date/time instead.
+### File Data Source, Memory Based Operation
 
-Once the relevant time period has passed, the following checks made:
+In many cases, for reasons of access speed, it is desirable for the data, which
+is provided in a file, to be loaded into memory on start-up and on refresh.
 
-1. Check the *data file location* to see if the file there is newer than 
-   the one in the *temp data file location*.
-2. If the file was not newer and the *auto updates enabled* flag is set, 
-   send a request to the *data update URL* to check if there is a newer data 
-   file available. If there is then it will be downloaded, checked for 
-   integrity against an MD5 hash and extracted to the *data file location*.
-   
-Note that where the engine has been built from a byte[], there is no data 
-file in the file system. 
-Consequently, we just go straight to option 2 above and the file content will 
-only exist in memory, rather than being copied to the *data file location*.
+### Memory Data Source
 
-If either check found new data, the [data refresh](#engine-data-refresh) 
-function is then called on the engine.
+In some cases, to provide for fully diskless operation,  it may be desirable 
+for an Aspect Engine to obtain its data 
+as a memory buffer on start-up and on refresh.
 
-Once the refresh is complete, the data update service can then start 
-checking for updates using the newly refreshed *next expected update* 
-date/time.
+## Operational Options
 
-If no update was found then the service should repeat the same checks 
-after the *polling interval* + a random time based on  
-*update time maximum randomization* has passed.
+A number of options control the operation of the Data Update Service. Not all
+options are available in every mode and some combinations of options are
+either mutually exclusive or unlikely to be useful. For example, it's unlikely
+that an Aspect Engine will be configured with both the ability to update 
+from a disk based data file and update from HTTP. 
+Providing for both being active at the same time adds complexity to the 
+implementation.
 
-## HTTP request
+Implementations may choose to report an error when inconsistent configuration 
+options are chosen.
 
-This section describes the detail of making an HTTP request to check for 
-a new data file and handling the response.
+### Update on Startup
 
-51Degrees device detection data files are supplied by the 
-[Distributor](http://51degrees.com/documentation/4.4/_info__distributor.html) 
+This option provides for checking for data from an HTTP server on startup 
+as a blocking operation. 
+
+This option is available both for memory data source mode and for file data
+source modes. If the data source provides a timestamp then the remote timestamp
+is compared with the local timestamp, and the remote data is used if it is more
+recent than the current data.
+
+This option can be used to bootstrap an aspect engine that does not yet have
+any local data. In the case of file data source, the data is stored once
+obtained via HTTP.
+
+Configuration Groups:
+- *HTTP config*
+
+### Automatic Update via HTTP
+
+This option provides for periodic ongoing checking of an HTTP server
+for the availability of an updated data source.
+
+If the current data contains a *data update expected* timestamp, then polling 
+should start after that time. Options include the ability to control the remote
+endpoint and the polling frequency.
+
+As an optimisation, the request for data may contain an *if modified since* HTTP
+header, containing the date of the current data file.
+
+If data is received that is newer than the current data, then the aspect engine
+is refreshed with the newly available data. In the case of
+file data source operation, the new data replaces
+the existing data, at the location configured for data files.
+
+51Degrees download servers have a request rate limiting feature which provides
+for a 429 HTTP Status (Too many requests) with a *Retry After* HTTP header 
+whose value should be used to reset polling.
+
+Rate limiting may be triggered
+in the event that a single user has multiple servers each of which is set to
+auto update. It is recommended that users with multiple servers do not use
+this feature and that they obtain updated data once and distribute it to their
+various servers by other means.
+
+Configuration Groups:
+- *HTTP config*
+- *Polling config*
+- *Operational file config*
+
+### Automatic Update from File
+
+This option allows users to obtain new data files by whatever means they choose,
+and have the Aspect Engine refresh by detection of a new file in the file system
+at the location configured for the data file.
+
+Any timestamp contained in the data source is not taken into consideration, 
+operation depends on the operational environment reporting file system changes
+and whatever file is found is used as the data source for the restarted 
+Aspect Engine.
+
+If the operational environment does not support file system watching events,
+implementors may need to use polling to determine changes and should have
+due regard to file system load when setting polling frequency.
+
+### Programmatic Update
+
+The option allows for programmatic triggering of an update. The effect of a 
+programmatic update is to initiate
+immediate polling of the remote HTTP server, where this option is enabled.
+
+If it is automatic update via HTTP is not enabled, for file data sources
+it causes immediate update, irrespective of whether Automatic Update
+from File is enabled. 
+
+For memory data sources programmatic update must allow provision of the new memory data source.
+
+Implementations may choose to provide options of Programmatic Update that 
+distinguish a request for HTTP update as opposed to file update.
+
+Configuration Groups:
+- *HTTP config*
+- *Polling config*
+- *Operational file config*
+
+## Configuration Groups
+### HTTP config
+
+  Configuration of the remote endpoint for download:
+  - **dataUpdateUrl** - the remote URL
+  - **urlFormatter** - URL customization
+  - **useIfModifiedSince** - request data using if modified since HTTP header
+  - **decompressContent** - deprecated - always decompress content if it is compressed
+  - **verifyMD5** - deprecated - always verify MD5 if an MD5 value is provided
+ 
+### Polling config
+
+  Configuration of the frequency for checking of new content:
+  - **pollingInterval** - frequency of polling of server
+  - **randomization** - provide a variation of polling frequency to avoid synchronised requests from more than one server
+
+### Operational File config
+  
+  Configuration of the locations that disk based operation is done from:
+  - **dataSourceFileLocation** - where to load the data source fom
+  - **createOperationalDataCopy** - create a copy of the data source, for operation
+  - **operationalDataFileDirectory** - the directory for the data file copy
+
+For disk based operation it is necessary to create an Operational Data Copy [^1] if
+auto update via HTTP is enabled or if auto update from file is enabled. This is 
+to allow continued operation of the Aspect Engine with its present data file
+while a new data file is made available.
+
+[^1] This is called *tempDataFile* in current reference implementations.
+
+Since creating a data file copy is required for disk based operation 
+implementations may choose not to provide control over 
+**createOperationalDataCopy** since disallowing it when either update option
+is enabled and disk based operation is enabled is an error.
+
+Implementations may choose to report an error if any item
+in this configuration is set for memory data source operation.
+
+## Update Processes
+
+### Update on Startup
+- for disk data source, check operational data configuration consistency
+- check HTTP server for new file
+    - on fail, fall back to local file if any
+        - no local file, fail
+- compare date with local 
+    - if newer, 
+      - save new file
+    - load file
+- if disk data source, configure file watcher, if requested
+- configure HTTP update polling, if requested
+- continue
+
+### Other Startup
+- check operational data configuration consistency
+- load data from memory or file
+- if disk data source, configure file watcher, if requested
+- configure HTTP update polling, if requested
+- continue
+
+### newBufferAvailable (from memory, via remote)
+
+Probably can't compare dates so load whatever we have:
+- load buffer
+
+### newFileAvailable (via remote or file watcher)
+
+The file will be in **dataFilePath** from watcher or from download, if the 
+downloaded file is newer than the current file
+- pause file watcher, if any
+- pause update polling, if any
+- load file
+- resume polling, if any
+- resume file watcher, if any
+- trigger onUpdateCallbacks
+
+### Programmatic Update
+
+- poll remote, if polling is configured
+  - check if file is newer
+    - if so, process as per newFile above
+  - return
+- if newer file in **dataFilePath**
+  - process as per newFile above
+  - return
+
+## Update Polling
+
+This section making an HTTP request to check for 
+ updated data and handling the response.
+
+51Degrees device detection data files are supplied by the
+[Distributor](http://51degrees.com/documentation/4.4/_info__distributor.html)
 web API. The capabilities of the data update service align with those of
 the Distributor. However, the service must be capable of using other sources
 as well. For example, a simple static URL that just supplies a file.
 
-When sending a request to the *data update URL*, the `If-Modified-Since` 
-header should be set to the publish date of the existing data file.
-If the data file does not have a publish date then the file system last modified
-date/time can be used instead. This ensures that if a new data file has not 
+When sending a request to the *data update URL*, the `If-Modified-Since`
+header should be set to the publication date of the existing data file.
+If the data file does not have a publication date then the file system last modified
+date/time can be used instead. This ensures that if a new data file has not
 been published yet, we won't waste bandwidth downloading it.
 
 There must be some mechanism for the update service to add query parameters
-to the data update URL when needed. 
-The reference implementations use a 'URL formatter' class. Below are the 
+to the data update URL when needed.
+The reference implementations use a 'URL formatter' class. Below are the
 implementations used for calls made to the Distributor.
 
 - [.NET FiftyOneUrlFormatter](https://github.com/51Degrees/pipeline-dotnet/blob/master/FiftyOne.Pipeline.Engines.FiftyOne/Data/FiftyOneUrlFormatter.cs)
 - [Java FiftyOneUrlFormatter](https://github.com/51Degrees/pipeline-java/blob/master/pipeline.engines.fiftyone/src/main/java/fiftyone/pipeline/engines/fiftyone/data/FiftyOneUrlFormatter.java)
 
-## File system watcher
+If a new data file is downloaded, the date of the downloaded data must be 
+compared with the current file data source, if file data source mode is active.
+If the downloaded file is more recent, it replaces the current file data source.
 
-The process described in [checking for updates](#checking-for-updates)
-allows the user to copy a new file into a location and have the system 
-refresh the engine using that new file when it next checks for updates.
+If the data downloaded is more recent or if memory data source mode is in
+operation the **Aspect Engine** is refreshed with the new data.
 
-However, some languages have file system watcher functionality that
-can be used to refresh the engine using the new file immediately after
-it is copied into position.
+Once the refresh is complete, the data update service can start
+checking for updates using the newly refreshed *next expected update*
+date/time.
 
-This functionality can be enabled using the *file system watcher* flag.
+If no update was found then the service should repeat the same checks
+after the *polling interval* + a random time based on  
+*update time maximum randomization* has passed.
 
-## Manual update
+## Logging
 
-In addition to the automatic triggered update process, there must be a 
-mechanism to manually update engines as well.
-
-`CheckForUpdate(engine, dataFileIdentifier)` should immediately check 
-for updates using exactly the same process as the 
-[automated check](#checking-for-updates). A boolean return value can 
-indicate if an update has been applied or not.
-
-`UpdateFromMemory(engine, dataFileIdentifier, byte[])` is a way to 
-push updates to the engine. This can be used regardless of how the 
-engine was created:
-
-- Engine created data file from the file system - The update service must 
-  use the data from the supplied byte array to replace the original data 
-  file in *data file location*. The [data refresh](#engine-data-refresh) 
-  function is then called on the engine.
-- Engine created using a byte[] - The update service simply needs to call 
-  the [data refresh](#engine-data-refresh) function on the engine, passing 
-  the supplied byte[].
-
-# Logging
-
-The data update service is a complex background process. As such, it is 
-essential that the user, and 51Degrees support, has detailed logging 
+The data update service is a complex process. As such, it is 
+essential that detailed logging is
 available to help diagnose issues that might arise.
 
 All major actions should be logged at the appropriate level along with
 relevant details (e.g. which engine + data file the update is for)
 
-## Startup events
+### Startup events
 
 | **Action** | **Message** |
 |---|---|
 | Running the update on startup process | Updating on startup |
 | [File system watcher](#file-system-watcher) created | Creating file system watcher |
 
-## Update events
+### Update events
 
 | **Action** | **Message** |
 |---|---|
@@ -255,25 +320,25 @@ relevant details (e.g. which engine + data file the update is for)
 | Successfully downloaded new data file | Downloaded new data from '\<url\>' for engine '\<engine type\>' |
 | 304 (Not modified) response from HTTP request | No data newer than \<datetime\> found at '\<url\>' for engine '\<engine type\>' |
 
-## Errors 
+### Errors
 
-There are several possible causes of errors within the data update service. 
-As this is a background service, we must ensure that any failures are 
+There are several possible causes of errors within the data update service.
+As this is a background service, we must ensure that any failures are
 caught and logged, rather than being lost or causing process failures.
 
-These messages must also be consistent across languages to make life easier 
+These messages must also be consistent across languages to make life easier
 for 51Degrees support.
 
-The red text should only be present if this is an automated check rather 
-than a manual one triggered by the CheckForUpdate method.
+[***Highlighted***] text should only be present if this is an automated update rather
+than a procedural update.
 
-| **Error**                                                                                                                       | **Log level** | **Message**                                                                                                                                                                     |
-|---------------------------------------------------------------------------------------------------------------------------------|---------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Could not connect to remote server for data file update                                                                         | Warning       | An error occurred when connecting to \<url\> in order to check for data file updates for \<engine type name\>. <span style="color:red">Update will be attempted again later.</span> Error detail: \<error message\> |
-| Error downloading file                                                                                                          | Warning       | An error occurred while downloading a data file update for \<engine name\> from \<url\>. <span style="color:red">Update will be attempted again later.</span> Error detail: \<error from distributor\>         |
-| Error validating data file                                                                                                      | Warning       | An error occurred during the integrity check of new data file for \<engine name\>. <span style="color:red">Update will be attempted again later.</span> Error detail: \<error\>                                |
-| Error writing to *data file location* or *temp file location*                                                               | Error         | An error occurred when writing to \<file path\>. Error detail: \<error\>                                                                                                        |
-| Engine was built from a file with the ‘use temp file’ flag disabled. And the file at *data file location* is currently locked | Error         | Unable to update data file. This is probably because the engine was built with the ‘use temp file’ option disabled.                                                             |
-| Error when calling RefreshData on engine                                                                                        | Error         | An error occurred while applying a data file update to \<engine type name\>. Error detail: \<error\>                                                                                 |
-| Attempting to update a data file that has no configured temporary file path                                                     | Error         | The data file '\<data file identifier\>' is checking for updates but does not have a temporary file path configured.                                                        |
-| Some file system error occurs while copying a new data file                                                                     | Error         | An error occurred when copying a data file to replace the existing one at '\<path\>'.                                                                          |
+| **Error**                                                                                                                       | **Log level** | **Message**                                                                                                                                                                                  |
+|---------------------------------------------------------------------------------------------------------------------------------|---------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Could not connect to remote server for data file update                                                                         | Warning       | An error occurred when connecting to \<url\> in order to check for data file updates for \<engine type name\>. [***Update will be attempted again later.***] Error detail: \<error message\> |
+| Error downloading file                                                                                                          | Warning       | An error occurred while downloading a data file update for \<engine name\> from \<url\>. [***Update will be attempted again later.***] Error detail: \<error from distributor\>             |
+| Error validating data file                                                                                                      | Warning       | An error occurred during the integrity check of new data file for \<engine name\>. [***Update will be attempted again later.***] Error detail: \<error\>                                     |
+| Error writing to *data file location* or *temp file location*                                                               | Error         | An error occurred when writing to \<file path\>. Error detail: \<error\>                                                                                                                     |
+| Engine was built from a file with the ‘use temp file’ flag disabled. And the file at *data file location* is currently locked | Error         | Unable to update data file. This is probably because the engine was built with the ‘use temp file’ option disabled.                                                                          |
+| Error when calling RefreshData on engine                                                                                        | Error         | An error occurred while applying a data file update to \<engine type name\>. Error detail: \<error\>                                                                                         |
+| Attempting to update a data file that has no configured temporary file path                                                     | Error         | The data file '\<data file identifier\>' is checking for updates but does not have a temporary file path configured.                                                                         |
+| Some file system error occurs while copying a new data file                                                                     | Error         | An error occurred when copying a data file to replace the existing one at '\<path\>'.                                                                                                        |
