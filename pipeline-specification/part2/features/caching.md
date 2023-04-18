@@ -2,7 +2,7 @@
 
 **Aspect Engines** may support the addition of a cache. 
 This is intended to improve performance when the engine receives a process 
-request containing evidence values that are identical to a previous request.
+request containing evidence values that are sufficiently similar to a previous request.
 
 As with any caching strategy, the implications for memory use and 
 performance should be investigated by profiling in the target environment.
@@ -43,7 +43,7 @@ endif
 flowData.Add(engineDataKey, result);
 ```
 
-Warning - don't take the pseudo-code above as a template. Real production code 
+Warning - don't take the pseudocode above as a template. Real production code 
 is likely to vary significantly from this in order to account for concurrency 
 concerns, error handling, other features, etc.
 
@@ -57,22 +57,22 @@ and values that are present in the **Flow Data**.
 Other considerations when creating keys:
 - Evidence values must always be added in the same evidence key order.
   For example, `query.user-agent` first, then `header.user-agent`, etc
-- Comparison of evidence keys must be case insensitive. For example, 
-  the following keys would be considered matching:
+- Comparison of evidence keys must be case-insensitive. For example, 
+  the following keys are considered the same:
   ```
   "query.user-agent" = "abc"
   ```
   ```
   "query.User-Agent" = "abc"
   ```
-- Comparison of evidence values must be case sensitive.
+- Comparison of evidence values must be case-sensitive.
 
 # Cache implementation
 
 The system should allow any cache conforming to a simple interface to be 
 used.
 However, the default implementation should be a sharded LRU cache.
-This will ensure that memory use is always well defined and that the cache
+This will ensure that memory use is always well-defined and that the cache
 can cope with concurrent requests reasonably well.
 
 The cache must be configurable:
@@ -110,6 +110,6 @@ then the engine must not allow a cache to be added.
 
 Design note - There are various routes we could potentially take to allow
 caches to still work in the scenarios described above. (Creating a duplicate 
-of the instance, reference counting to ensure cleanup happens, etc)
+of the instance, reference counting to ensure cleanup happens, etc.)
 51Degrees has decided not to pursue these at present, so the current 
 implementations simply do not support adding a cache in these cases.

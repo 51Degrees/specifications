@@ -1,6 +1,6 @@
 # Overview
 
-Exceptions and errors may occur at many different places within the Pipeline 
+Exceptions and errors may occur at many places within the Pipeline 
 API. It is vital that these are presented and handled consistently.
 
 In general, we aim to follow these principles:
@@ -59,11 +59,11 @@ their code.
 
 The [web integration](web-integration.md) feature will be hooking into 
 the web request handling logic of the target language/framework. As such,
-it will be executing code outside of the easily handled areas.
+it will be executing code outside easily handled areas.
 
 We must ensure that exceptions/errors that happen in these areas are
 handled correctly in order to avoid the API taking down the customer's 
-production web site.
+production website.
 
 # Data updates
 

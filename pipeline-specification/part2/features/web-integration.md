@@ -1,7 +1,7 @@
 # Overview
 
 The web integration feature is intended to simplify usage of the Pipeline API
-in web sites/applications that are built using a particular web framework.
+in websites/applications that are built using a particular web framework.
 
 The exact details may vary significantly based on the web framework that 
 is being used. The capabilities and common usage of the target web framework 
@@ -149,7 +149,7 @@ requests to these intercepted endpoints.
 <span style="color:yellow">TODO - move this detail to javascript builder. 
 Just link to it from here</span>
 
-Requests to the JSON endpoint will be be POST requests, as opposed to the GET 
+Requests to the JSON endpoint will be POST requests, as opposed to the GET 
 requests made to the JavaScript endpoint.
 
 This is a problem because most browsers do not consider POST requests to be 
@@ -216,7 +216,7 @@ This time, the sequence number in the request body will be 2 and new evidence
 will have been provided. The session storage will be invalid as the parameters have
 changed. The request to the call-back URL is made with the new evidence and any
 existing evidence to get an updated JSON payload. The JavaScript will again
-update its’ internal JSON data with the one from the response and store it in
+update its internal JSON data with the one from the response and store it in
 session storage along with all the JavaScript properties that have been run.
 
 ##### Line 3 - Skipping second request to JavaScript endpoint:
@@ -253,11 +253,11 @@ are:
 | Content-Length  | [Content length in bytes]                                                              | Indicate the expected length of the content                                                      |
 
 In order to validate the ETag, the JSON and JavaScript endpoints must check for
-an ‘If-None-Match' header in the request. This will be sent when a cached item’s
+an 'If-None-Match' header in the request. This will be sent when a cached item’s
 lifetime has expired and the cache needs to check if what it holds is still
 valid.
 
-If the value in the ‘If-None-Match' header matches the calculated ETag value for
+If the value in the 'If-None-Match' header matches the calculated ETag value for
 the current request, then the content in the cache is still valid and the
 endpoint can just return a 304 status code. (Not modified)
 
