@@ -219,7 +219,7 @@ existing evidence to get an updated JSON payload. The JavaScript will again
 update its internal JSON data with the one from the response and store it in
 session storage along with all the JavaScript properties that have been run.
 
-##### Line 3 - Skipping second request to JavaScript endpoint:
+##### Line 4 - Skipping second request to JavaScript endpoint:
 
 We now assume that the user moves to another page on the same website. This page
 also includes the directive to download 51Degrees.core.js. This time, the local
