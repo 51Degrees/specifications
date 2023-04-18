@@ -39,7 +39,7 @@ performance impact while data refresh is happening.
 
 A data source may contain a timestamp that specifies when it was created and may
 contain a timestamp that indicates when refreshed data will be available. This
-information can be used to optimise polling, or to provide information as to 
+information can be used to optimize polling, or to provide information as to 
 how up-to-date the current data is.
 
 ## Operational Modes
@@ -67,7 +67,7 @@ is provided in a file, to be loaded into memory on start-up and on refresh.
 
 ### Memory Data Source
 
-In some cases, to provide for fully diskless operation,  it may be desirable 
+In some cases, to provide for fully disk-less operation, it may be desirable 
 for an Aspect Engine to obtain its data 
 as a memory buffer on start-up and on refresh.
 
@@ -110,7 +110,7 @@ If the current data contains a *data update expected* timestamp, then polling
 should start after that time. Options include the ability to control the remote
 endpoint and the polling frequency.
 
-As an optimisation, the request for data may contain an *if modified since* HTTP
+As an optimization, the request for data may contain an *if modified since* HTTP
 header, containing the date of the current data file.
 
 If data is received that is newer than the current data, then the aspect engine
@@ -171,25 +171,26 @@ Configuration Groups:
 ## Configuration Groups
 ### HTTP config
 
-  Configuration of the remote endpoint for download:
-  - **dataUpdateUrl** - the remote URL
-  - **urlFormatter** - URL customization
-  - **useIfModifiedSince** - request data using if modified since HTTP header
-  - **decompressContent** - deprecated - always decompress content if it is compressed
-  - **verifyMD5** - deprecated - always verify MD5 if an MD5 value is provided
+Configuration of the remote endpoint for download:
+- **dataUpdateUrl** - the remote URL
+- **urlFormatter** - URL customization
+- **useIfModifiedSince** - request data using if modified since HTTP header
+- **decompressContent** - deprecated - always decompress content if it is compressed
+- **verifyMD5** - deprecated - always verify MD5 if an MD5 value is provided
  
 ### Polling config
 
-  Configuration of the frequency for checking of new content:
-  - **pollingInterval** - frequency of polling of server
-  - **randomization** - provide a variation of polling frequency to avoid synchronised requests from more than one server
+Configuration of the frequency for checking of new content:
+- **pollingInterval** - frequency of polling of server
+- **randomization** - provide a variation of polling frequency to avoid 
+  synchronized requests from more than one server
 
 ### Operational File config
   
-  Configuration of the locations that disk based operation is done from:
-  - **dataSourceFileLocation** - where to load the data source fom
-  - **createOperationalDataCopy** - create a copy of the data source, for operation
-  - **operationalDataFileDirectory** - the directory for the data file copy
+Configuration of the locations that disk based operation is done from:
+- **dataSourceFileLocation** - where to load the data source fom
+- **createOperationalDataCopy** - create a copy of the data source, for operation
+- **operationalDataFileDirectory** - the directory for the data file copy
 
 For disk based operation it is necessary to create an Operational Data Copy [^1] if
 auto update via HTTP is enabled or if auto update from file is enabled. This is 
@@ -303,14 +304,14 @@ available to help diagnose issues that might arise.
 All major actions should be logged at the appropriate level along with
 relevant details (e.g. which engine + data file the update is for)
 
-### Startup events
+### Messages at startup 
 
 | **Action** | **Message** |
 |---|---|
 | Running the update on startup process | Updating on startup |
 | [File system watcher](#file-system-watcher) created | Creating file system watcher |
 
-### Update events
+### Messages during operation
 
 | **Action** | **Message** |
 |---|---|
