@@ -1,21 +1,106 @@
+# Overview
+
+This engine provides device detection capabilities using a high performance 
+on-premise algorithm we refer to as the 
+[hash](http://51degrees.com/documentation/4.4/_device_detection__hash.html)
+algorithm.
+
+This engine also requires a hash data file, which comes in 3 variations:
+
+- **Lite** - Freely available from [GitHub](https://github.com/51Degrees/device-detection-data).
+  Updated around once per month. Only other limitation is in the properties
+  that will be populated.
+- **Enterprise** - Downloaded from 
+  [Distributor](http://51degrees.com/documentation/4.4/_info__distributor.html). 
+  Requires a license key and is updated each day Monday-Thursday each week.
+  Includes all properties except TAC.
+- **TAC** - Same as enterprise except that TAC is included in the result.
 
 # Native component
 
-# Builder
+In all languages, the on-premise device detection engine passes the actual
+detection processing to a native dll/so library that is written in C/C++.
 
-## Sample configuration
+This ensures the best performance for the most computationally complex part
+of the process. It also reduces the time required to add support for device 
+detection in a new language.
 
-# Engine
+The code for this component is available on GitHub:
+
+- [common-cxx](https://github.com/51Degrees/common-cxx)
+- [device-detection-cxx](https://github.com/51Degrees/device-detection-cxx)
+
+Unfortunately, while calling a native dll is possible in many languages, it
+is often fiddly and may come with unexpected difficulties. As such, we generally 
+use [SWIG](https://www.swig.org/) to help produce a wrapper for the target 
+language.
+
+## Selecting the correct binary
+
+While the implementor is not expected to produce the CI/CD scripts that 
+will create the final packages, attention must be given to how the final
+package will determine the correct native binary to use based on the current
+operating system.
+
+In some cases, this capability is built into the packaging infrastructure 
+(For example, .NET/NuGet). Some require additional code to be written to 
+determine the correct binary at runtime (Java/Maven and Node/NPM). Others 
+do not allow native binaries in packages at all (PHP/Composer).
+
+## Reference implementation notes
+
+The reference implementations bundle the cxx code in with the Java/.NET 
+code and build it all together. This works well enough, but does come
+with the downside of adding significant complexity to the build process 
+for customers who may just be able to consume pre-built native binaries.
+
+For future implementations, we recommend exploring the possibility of
+moving the native binary and target language wrapper to a separate 
+repository and package from the target language device detection engine 
+logic.
+
+# Accepted evidence 
+
+This engine has a dynamic set of accepted evidence keys that comes from
+the data file.
+
+After loading the data file into the native code, call the `getKeys` 
+function to return a list of the accepted evidence keys.
+These values should then be stored to prevent repeated calls to the
+native code.
+
+This must be done at startup and any time the data is refreshed.
+
+Note that the list of accepted evidence keys is not case sensitive.
+I.e. `header.user-agent` and `header.User-Agent` should both be 
+accepted.
+
+# Element data
+
+# Startup activity
+
+# Processing
+
+# Refresh data
+
+# Events
 
 # Metadata
 
 ## Overview
 
 On-premise device detection has two related metadata structures:
-1. The device detection data file includes metadata relating to the structure of the values that are stored in the file. This is exposed by the device detection engine in order to allow users to query the data. \*
-2. All flow elements expose a list of metadata relating to properties populated by that element. In the case of the device detection engine, this list will include property metadata derived from the data file metadata mentioned above. 
+1. The device detection data file includes metadata relating to the structure of the 
+   values that are stored in the file. This is exposed by the device detection engine 
+   in order to allow users to query the data. \*
+2. All flow elements expose a list of metadata relating to properties populated by 
+   that element. In the case of the device detection engine, this list will include 
+   property metadata derived from the data file metadata mentioned above. 
 
-\* Note that, due to the structure of the data, this is not intended to support high-performance querying scenarios. For that use-case, customers are directed to our 'csv' data file, which can be consumed and stored in a database or whatever other form is required for querying. 
+\* Note that, due to the structure of the data, this is not intended to support 
+high-performance querying scenarios. For that use-case, customers are directed to our 
+'csv' data file, which can be consumed and stored in a database or whatever other form 
+is required for querying. 
 
 ```mermaid
 erDiagram
@@ -29,9 +114,9 @@ erDiagram
 
 A **component** defines a group of **properties** that are related.
 
-In a 51Degrees data set, each **property** can only be related to one **component**. For example, the `Browser Name`
-**property** is part of the `Software` **component**, whereas the `Model Name` **property** is part of
-the `Hardware` **component**.
+In a 51Degrees data set, each **property** can only be related to one **component**. 
+For example, the `Browser Name` **property** is part of the `Software` **component**, 
+whereas the `Model Name` **property** is part of the `Hardware` **component**.
 
 The metadata associated with a **component** is:
 
@@ -44,7 +129,8 @@ The metadata associated with a **component** is:
 
 ## Property
 
-The **properties** exposed by the device detection engine contain more information than that which is defined by the standard **property metadata** interface.
+The **properties** exposed by the device detection engine contain more information 
+than that which is defined by the standard **property metadata** interface.
 In addition to the usual information, the following must be made available:
 
 | Metadata | Description |
@@ -63,7 +149,8 @@ In addition to the usual information, the following must be made available:
 
 ## Profile
 
-A **profile** defines a unique set of **values** for all **properties** of a single **component**. 
+A **profile** defines a unique set of **values** for all **properties** of 
+a single **component**. 
 
 | Metadata | Description |
 | -------- | ----------- |
@@ -86,13 +173,18 @@ The metadata associated with a **value** is:
 
 ## Match metric properties
 
-In addition to the 'standard' device detection properties, there are a set of properties that return details about the processing that was performed and the match that was found.
-metadata for these properties must be added, as they will not be included in the metadata exposed by the native code.
+In addition to the 'standard' device detection properties, there are a set of 
+properties that return details about the processing that was performed and 
+the match that was found. Metadata for these properties must be added, as they 
+will not be included in the metadata exposed by the native code.
 
 All these properties have the following values:
 - Category = "Device Metrics"
-- Available With = "Lite", "Premium", "Enterprise", "TAC" - If possible, this list should be created dynamically from the lists of files included against all other property metadata that is exposed by the native code.
-- Component = "Metrics" - This component must also be added to the list of components returned by the engine.
+- Available With = "Lite", "Premium", "Enterprise", "TAC" - If possible, this 
+  list should be created dynamically from the lists of files included against 
+  all other property metadata that is exposed by the native code.
+- Component = "Metrics" - This component must also be added to the list of 
+  components returned by the engine.
 
 |Name|Type|Default value|Description|Possible values|
 |---|---|---|---|---|
@@ -104,6 +196,8 @@ All these properties have the following values:
 |Iterations|int|0|The number of iterations carried out in order to find a match. This is the number of nodes in the graph which have been visited.|n/a|
 |Method|string|"NONE"|The method used to determine the match result.|"NONE", "PERFORMANCE", "COMBINED", "PREDICTIVE"|
 
+
+# Configuration options
 
 
 # Performance guidance
