@@ -5,15 +5,15 @@ on-premise algorithm we refer to as the
 [hash](http://51degrees.com/documentation/4.4/_device_detection__hash.html)
 algorithm.
 
-This engine also requires a hash data file, which comes in 3 variations:
+This engine also requires a hash data file, which comes in three variations:
 
 - **Lite** - Freely available from [GitHub](https://github.com/51Degrees/device-detection-data).
-  Updated around once per month. Only other limitation is in the properties
-  that will be populated.
+  Contains a highly restricted set of properties and will only be updated 
+  around once per month.
 - **Enterprise** - Downloaded from 
   [Distributor](http://51degrees.com/documentation/4.4/_info__distributor.html). 
-  Requires a license key and is updated each day Monday-Thursday each week.
-  Includes all properties except TAC.
+  Requires a license key and is usually updated Monday-Thursday. Includes all 
+  properties except TAC.
 - **TAC** - Same as enterprise except that TAC is included in the result.
 
 # Native component
@@ -21,9 +21,10 @@ This engine also requires a hash data file, which comes in 3 variations:
 In all languages, the on-premise device detection engine passes the actual
 detection processing to a native dll/so library that is written in C/C++.
 
-This ensures the best performance for the most computationally complex part
-of the process. It also reduces the time required to add support for device 
-detection in a new language.
+The intention was that this will ensure the best performance for the most 
+computationally complex part of the process and reduce maintenance overhead,
+as well as the time required to add support for device detection in a new 
+language.
 
 The code for this component is available on GitHub:
 
@@ -61,17 +62,17 @@ logic.
 
 # Accepted evidence 
 
-This engine has a dynamic set of accepted evidence keys that comes from
-the data file.
+This engine determines the accepted evidence keys on data refresh based
+on the values in the data source.
 
-After loading the data file into the native code, call the `getKeys` 
+After loading the data source into the native code, call the `getKeys` 
 function to return a list of the accepted evidence keys.
 These values should then be stored to prevent repeated calls to the
 native code.
 
 This must be done at startup and any time the data is refreshed.
 
-Note that the list of accepted evidence keys is not case sensitive.
+Note that the list of accepted evidence keys is not case-sensitive.
 I.e. `header.user-agent` and `header.User-Agent` should both be 
 accepted.
 
