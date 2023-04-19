@@ -5,15 +5,15 @@ on-premise algorithm we refer to as the
 [hash](http://51degrees.com/documentation/4.4/_device_detection__hash.html)
 algorithm.
 
-This engine also requires a hash data file, which comes in 3 variations:
+This engine also requires a hash data file, which comes in three variations:
 
 - **Lite** - Freely available from [GitHub](https://github.com/51Degrees/device-detection-data).
-  Updated around once per month. Only other limitation is in the properties
-  that will be populated.
+  Contains a highly restricted set of properties and will only be updated 
+  around once per month.
 - **Enterprise** - Downloaded from 
   [Distributor](http://51degrees.com/documentation/4.4/_info__distributor.html). 
-  Requires a license key and is updated each day Monday-Thursday each week.
-  Includes all properties except TAC.
+  Requires a license key and is usually updated Monday-Thursday. Includes all 
+  properties except TAC.
 - **TAC** - Same as enterprise except that TAC is included in the result.
 
 # Native component
@@ -21,9 +21,10 @@ This engine also requires a hash data file, which comes in 3 variations:
 In all languages, the on-premise device detection engine passes the actual
 detection processing to a native dll/so library that is written in C/C++.
 
-This ensures the best performance for the most computationally complex part
-of the process. It also reduces the time required to add support for device 
-detection in a new language.
+The intention was that this will ensure the best performance for the most 
+computationally complex part of the process and reduce maintenance overhead,
+as well as the time required to add support for device detection in a new 
+language.
 
 The code for this component is available on GitHub:
 
@@ -61,23 +62,57 @@ logic.
 
 # Accepted evidence 
 
-This engine has a dynamic set of accepted evidence keys that comes from
-the data file.
+This engine determines the accepted evidence keys on data refresh based
+on the values in the data source.
 
-After loading the data file into the native code, call the `getKeys` 
+After loading the data source into the native code, call the `getKeys` 
 function to return a list of the accepted evidence keys.
 These values should then be stored to prevent repeated calls to the
 native code.
 
 This must be done at startup and any time the data is refreshed.
 
-Note that the list of accepted evidence keys is not case sensitive.
+Note that the list of accepted evidence keys is not case-sensitive.
 I.e. `header.user-agent` and `header.User-Agent` should both be 
 accepted.
 
 # Element data
 
+The list of properties that can be populated by this engine is determined 
+on data refresh based on the properties that are available in the data 
+source that is used.
+
+In addition, several additional [match metrics](#match-metric-properties) 
+properties must be added as well. The table below shows the native 
+function to call to get the value for each property.
+
+| Name         | Function on result object to call to get value \* |
+|--------------|---------------------------------------------------|
+| MatchedNodes | getMatchedNodes                                   |
+| Difference   | getDifference                                     |
+| Drift        | getDrift                                          |
+| DeviceId     | getDeviceId                                       |
+| UserAgents   | getUserAgents                                     |
+| Iterations   | getIterations                                     |
+| Method       | getMethod                                         |
+
+\* Note that the native implementations have some additional complexity
+in their code due to a old plan to split device detection into 4 
+separate engines. This is not necessary in new implementations.
+
+It is essential that the **Element Data** instance populated by this 
+on-premise engine is interface compatible with the **Element Data** 
+populated by the [cloud device detection engine](device-detection-cloud.md) 
+as well as the individual devices populated in the **Element Data** from 
+the [hardware profile lookup engine](hardware-profile-lookup-cloud.md).
+
 # Startup activity
+
+On startup, the native engine needs to be created using the data file.
+Several functions must then be called to get the data that will be needed 
+by other engine features.
+
+See [refresh data](#refresh-data) for details on this process.
 
 # Processing
 
@@ -120,12 +155,12 @@ whereas the `Model Name` **property** is part of the `Hardware` **component**.
 
 The metadata associated with a **component** is:
 
-| Metadata | Description |
-| -------- | ----------- |
-| Id       | The unique id of the **component**. This is a number and will remain the same when a data file is updated. |
-| Name     | The name of the **component** that gives a more 'human' identifier than id. By convention, this is unique within the data file. |
-| Default profile| The default **profile** for the **component**. This is used to provide **values** for the **component's** **properties** when a **profile** matching the @evidence cannot be found. |
-| Properties| The **properties** associated with this **component**. |
+| Metadata        | Description                                                                                                                                                                         |
+|-----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Id              | The unique id of the **component**. This is a number and will remain the same when a data file is updated.                                                                          |
+| Name            | The name of the **component** that gives a more 'human' identifier than id. By convention, this is unique within the data file.                                                     |
+| Default profile | The default **profile** for the **component**. This is used to provide **values** for the **component's** **properties** when a **profile** matching the @evidence cannot be found. |
+| Properties      | The **properties** associated with this **component**.                                                                                                                              |
 
 ## Property
 
@@ -133,43 +168,43 @@ The **properties** exposed by the device detection engine contain more informati
 than that which is defined by the standard **property metadata** interface.
 In addition to the usual information, the following must be made available:
 
-| Metadata | Description |
-| -------- | ----------- |
-| Description| A description of the **property** explaining what it refers to, and what significance its values have. |
-| URL      | A URL where more information on the **property** can be found. |
-| Component| The **component** to which the **property** belongs. This is subtly different from the category, in that a **profile** defines the values for all the **properties** of a single **component**, which likely contains multiple categories of **properties**. |
-| Values   | The **values** that the **property** can have. As a simple example, a **property** named ``'IsSmartPhone'`` might have three values: ``true``, ``false``, and ``unknown``.|
-| Default Value| The default **value** for the **property** if it is not otherwise known. In the above example, the **property** named ``'IsSmartPhone'`` would probably have ``unknown`` as the default value. |
-| List     | Whether or not the **property** may have multiple values. For example, the connectivity types a device supports would be a list, as a single device might support Bluetooth, HSDPA, LTE, Wi-Fi, etc. |
-| Obsolete | Whether the **property** is obsolete and only exists to maintain backward compatibility. |
-| Display Order| The suggested order in which to display the **property** when listing **properties**. |
-| Mandatory| Whether the **property** is mandatory or not. If a **property** is mandatory, a **profile** must have a non-default value for it to be classed as valid. |
-| Show     | Whether the **property** should be displayed in situations such as a page listing **properties**. Less important **properties** may not be displayed. |
-| Show Values| Whether values of the **property** should be displayed in situations such as a page listing the **property's** values. Showing all the values can make a very long list. |
+| Metadata      | Description                                                                                                                                                                                                                                                  |
+|---------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Description   | A description of the **property** explaining what it refers to, and what significance its values have.                                                                                                                                                       |
+| URL           | A URL where more information on the **property** can be found.                                                                                                                                                                                               |
+| Component     | The **component** to which the **property** belongs. This is subtly different from the category, in that a **profile** defines the values for all the **properties** of a single **component**, which likely contains multiple categories of **properties**. |
+| Values        | The **values** that the **property** can have. As a simple example, a **property** named ``'IsSmartPhone'`` might have three values: ``true``, ``false``, and ``unknown``.                                                                                   |
+| Default Value | The default **value** for the **property** if it is not otherwise known. In the above example, the **property** named ``'IsSmartPhone'`` would probably have ``unknown`` as the default value.                                                               |
+| List          | Whether or not the **property** may have multiple values. For example, the connectivity types a device supports would be a list, as a single device might support Bluetooth, HSDPA, LTE, Wi-Fi, etc.                                                         |
+| Obsolete      | Whether the **property** is obsolete and only exists to maintain backward compatibility.                                                                                                                                                                     |
+| Display Order | The suggested order in which to display the **property** when listing **properties**.                                                                                                                                                                        |
+| Mandatory     | Whether the **property** is mandatory or not. If a **property** is mandatory, a **profile** must have a non-default value for it to be classed as valid.                                                                                                     |
+| Show          | Whether the **property** should be displayed in situations such as a page listing **properties**. Less important **properties** may not be displayed.                                                                                                        |
+| Show Values   | Whether values of the **property** should be displayed in situations such as a page listing the **property's** values. Showing all the values can make a very long list.                                                                                     |
 
 ## Profile
 
 A **profile** defines a unique set of **values** for all **properties** of 
 a single **component**. 
 
-| Metadata | Description |
-| -------- | ----------- |
-| Id       | The unique id of the **profile**. This is usually a number and will remain the same when a data file is updated. |
-| Name     | The name of the **profile** that gives a more 'human' identifier than id, usually describing what the **values** it contains are. By convention, this is unique within the data file. |
-| Component| The **component** to which the **profile** relates. This is the **component** which the **profile** contains **values** for. |
-| Values   | The **values** that define the **profile**. |
+| Metadata  | Description                                                                                                                                                                           |
+|-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Id        | The unique id of the **profile**. This is usually a number and will remain the same when a data file is updated.                                                                      |
+| Name      | The name of the **profile** that gives a more 'human' identifier than id, usually describing what the **values** it contains are. By convention, this is unique within the data file. |
+| Component | The **component** to which the **profile** relates. This is the **component** which the **profile** contains **values** for.                                                          |
+| Values    | The **values** that define the **profile**.                                                                                                                                           |
 
 ## Value
 
 Each **property** has a set of possible **values** that it can return.
 The metadata associated with a **value** is:
 
-| Metadata | Description |
-| -------- | ----------- |
-| Name     | The **value** as a string. This uniquely identifies the **value** only within the **values** relating to the same **property**. |
-| Property | The **property** to which the **value** relates. This, in combination with the name, uniquely identifies the **value** within the device detection data file. |
-| Description| A description of the **value** explaining what it refers to, and what it means if a **profile** has this **value**. |
-| URL      | A URL where more information on the **value** can be found. |
+| Metadata    | Description                                                                                                                                                   |
+|-------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Name        | The **value** as a string. This uniquely identifies the **value** only within the **values** relating to the same **property**.                               |
+| Property    | The **property** to which the **value** relates. This, in combination with the name, uniquely identifies the **value** within the device detection data file. |
+| Description | A description of the **value** explaining what it refers to, and what it means if a **profile** has this **value**.                                           |
+| URL         | A URL where more information on the **value** can be found.                                                                                                   |
 
 ## Match metric properties
 
@@ -186,16 +221,15 @@ All these properties have the following values:
 - Component = "Metrics" - This component must also be added to the list of 
   components returned by the engine.
 
-|Name|Type|Default value|Description|Possible values|
-|---|---|---|---|---|
-|MatchedNodes|int|0|Indicates the number of hash nodes matched within the evidence.|n/a|
-|Difference|int|0|Used when detection method is not Exact or None. The larger the value the less confident the detector is in this result.|n/a|
-|Drift|int|0|Total difference in character positions between where the substring's hashes were found and where they were expected.|n/a|
-|DeviceId|string|"0-0-0-0"|Contains the profile ids of the matching profiles, separated by a hyphen symbol. For example \[HardwareId\]-\[PlatformId\]-\[BrowserId\]-\[CrawlerId\]. By convention, these will be in component Id order. There will often be 4 ids present, but this is not guaranteed.|n/a|
-|UserAgents|string|"n/a"|The matched User-Agents.|n/a|
-|Iterations|int|0|The number of iterations carried out in order to find a match. This is the number of nodes in the graph which have been visited.|n/a|
-|Method|string|"NONE"|The method used to determine the match result.|"NONE", "PERFORMANCE", "COMBINED", "PREDICTIVE"|
-
+| Name             | Type   | Default value | Description                                                                                                                                                                                                                                                                | Possible values                                 |
+|------------------|--------|---------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------|
+| MatchedNodes     | int    | 0             | Indicates the number of hash nodes matched within the evidence.                                                                                                                                                                                                            | n/a                                             |
+| Difference       | int    | 0             | Used when detection method is not Exact or None. The larger the value the less confident the detector is in this result.                                                                                                                                                   | n/a                                             |
+| Drift            | int    | 0             | Total difference in character positions between where the substring's hashes were found and where they were expected.                                                                                                                                                      | n/a                                             |
+| DeviceId         | string | "0-0-0-0"     | Contains the profile ids of the matching profiles, separated by a hyphen symbol. For example \[HardwareId\]-\[PlatformId\]-\[BrowserId\]-\[CrawlerId\]. By convention, these will be in component Id order. There will often be 4 ids present, but this is not guaranteed. | n/a                                             |
+| MatchingEvidence | string | "n/a"         | The matched User-Agents.                                                                                                                                                                                                                                                   | n/a                                             |
+| Iterations       | int    | 0             | The number of iterations carried out in order to find a match. This is the number of nodes in the graph which have been visited.                                                                                                                                           | n/a                                             |
+| Method           | string | "NONE"        | The method used to determine the match result.                                                                                                                                                                                                                             | "NONE", "PERFORMANCE", "COMBINED", "PREDICTIVE" |
 
 # Configuration options
 
