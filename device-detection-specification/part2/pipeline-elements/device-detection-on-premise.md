@@ -199,6 +199,10 @@ All these properties have the following values:
 
 # Configuration options
 
+| **Parameter** | **User configurable** | **Optional** | **Default** | **Notes** |
+|---|---|---|---|---|
+|  |  |  |  | |
+
 
 # Performance guidance
 
