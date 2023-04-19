@@ -16,34 +16,49 @@ a Device Detection Cloud Engine, later in the Pipeline. Since the detection
 engine depends on the request having been processed in advance, it checks that
 ElementData from the cloud request is present in Pipeline before processing.
 
-This check takes place on processing of the FlowData, implementors may choose 
-to implement checks at the point of pipeline construction, and report a
-configuration error if it is determined that a Cloud Request Engine does not 
-precede it in the pipeline. <span style="color:yellow">actually, this would be
-difficult, probably</span>
+## Device Detection Cloud Engine Configuration
+
+There are no configuration options associated with this engine.
+
+## Device Detection Cloud Engine Processing
+ 
+When it is added to a pipeline, Device Detection Cloud Engine initialises
+itself from a Cloud Request Engine, which must have been added to the pipeline
+before it. The Cloud Request Engine determines which properties are available
+on start-up and the Device Detection Cloud engine determines those properties
+from the Cloud Request Engine. The properties that are available are
+determined by the Resource Key with which the Cloud Request Engine was 
+initialised. 
+
+See [Cloud Request Engine]() for more details of this engine.
+<span style="color:yellow">move the remainder of text here to pipeline spec 
+to create that document</span>
 
 ## Resource Key
 
 A Resource Key is a token that serves both to authenticate a request to the 
 51Degrees server and to specify which properties are requested as part of the 
 device detection. Resource Keys are created using the 
-[51Degrees Configurator](todo reference). Using Resource Keys the 51Degrees 
+[51Degrees Configurator](https://51degrees.com/documentation/4.4/_concepts__configurator.html). Using Resource Keys the 51Degrees 
 server populates responses with configured properties and implements service
-level tiering (number of requests).
-
-<span style="color:yellow">We should discuss relationship between resource key 
-and license key here. </span>
+level tiering (number of requests). 
+See [Resource Keys Documentation](https://51degrees.com/documentation/4.4/_info__resource_keys.html)
+for more information.
 
 ## Cloud Request Engine Processing
 
 On creation, the Cloud Request Engine accesses the 51Degrees server to 
 configure which evidence keys are needed and also retrieves a list of properties
 that can be accessed following a request to the server. This list is 
-available to downstream FlowElements.
+available to downstream FlowElements, in particular to the Device Detection 
+Cloud Engine (q.v.)
 
 The engine processes FlowData by filtering the evidence and making an HTTP 
-request to the server. The HTTP API used for access to the server
-is defined at https://cloud.51degrees.com/api-docs/index.html.
+request to the server containing that evidence. The HTTP API used for access to 
+the server is defined at https://cloud.51degrees.com/api-docs/index.html.
+
+The JSON received from the server is added to the FlowData as ElementData 
+for the Cloud Request Engine and hence is available to downstream Flow Elements.
 
 An example of the JSON response received from the server:
 
@@ -83,17 +98,5 @@ configured with:
 - a timeout value for requests (by default 100 seconds)
 - a cache - (by default, no cache, however it is strongly recommended that 
     the engine is configured with a cache)
-- properties of interest - note that it is the resource key that controls
-   what the 51Degrees server populates in its response. Configuration
-   restricts what is copied from the response into FlowData.
-- other values may be configured a discussed in <span style="color:yellow">if 
-- not here, where?</span>
-
-## Device Detection Cloud Engine Configuration
-
-There are no configuration options associated with this engine.
-
-
-## Sample configuration
-
-# Engine
+- other values may be configured as discussed in <span style="color:yellow">if 
+not here, where?</span>
