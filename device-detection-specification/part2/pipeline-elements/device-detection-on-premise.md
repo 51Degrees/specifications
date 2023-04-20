@@ -304,7 +304,7 @@ the match that was found. Metadata for these properties must be added, as they
 will not be included in the metadata exposed by the native code.
 
 All these properties have the following values:
-- Category = "Device Metrics" <span style="color:yellow">Match Metrics, surely?</span>
+- Category = "Device Metrics" (sic)
 - Available With = "Lite", "Premium", "Enterprise", "TAC" - If possible, this 
   list should be created dynamically from the lists of files included against 
   all other property metadata that is exposed by the native code.
