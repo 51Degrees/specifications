@@ -116,6 +116,47 @@ See [refresh data](#refresh-data) for details on this process.
 
 # Processing
 
+This section describes the core steps this engine executes to process 
+**Flow Data**. This is on top of any common processing defined for 
+other Pipeline API features.
+
+- Create and populate the native evidence object
+  - The evidence values will typically need to be converted to a memory 
+    format that can be used by the native Cxx code.
+  - First, create a new `EvidenceDeviceDetection` C++ instance.
+  - Next, add items from the **Flow Data** evidence to the C++ instance.
+    - Only need to add entries that the engine will make use of.
+- Call the `process` function on the native engine, passing the native
+  evidence instance.
+- This will return a `ResultsHash` instance, which contains references to
+  the resulting property values.
+- Create a new instance of the implementation of the `IDeviceData` interface
+  that is being used for the on-premise engine.
+  - Pass the `ResultsHash` instance so it can be used when property values 
+    are requested.
+  - Do not immediately copy all the property values from `ResultsHash`. By 
+    default, around 200 properties will be populated, meaning 200+ calls to 
+    the native code marshalling values back and forth.
+
+## Performance guidance
+
+We have found that the main performance bottleneck is usually the process
+of marshalling data values to/from the native representations.
+
+As such, this should be minimized as much as possible:
+
+- Languages often have many different mechanisms for passing data in calls
+  to native binaries, some more efficient than others. SWIG code will 
+  sometimes use the most flexible approach, rather than the most performant.
+  It is worth checking the generated code for relatively easy performance 
+  wins.
+- Whenever making a call to native code, be aware of the data that is being
+  passed and check if there is anything that can be done to reduce it.  
+- Finally, do not call native code at all if it can be avoided. For example, any 
+  values that will only change after a [data refresh](#refresh-data) should 
+  be stored in the engine instance to avoid native calls for that value until 
+  a refresh occurs.
+
 # Refresh data
 
 # Events
