@@ -2,12 +2,12 @@
 
 ## Overview
 
-Cloud Device Detection presents Evidence <span style="color:yellow">link to 
-discussion of detection evidence</span> to the 51Degrees Cloud Detection server, 
-which carries out the detection and returns a JSON data structure, 
-from which device detection properties are populated in the **FlowData**.
+Cloud Device Detection presents [Evidence](../../pipeline-specification/features/evidence.md) 
+to the 51Degrees Cloud Detection server, which carries out the detection 
+and returns a JSON data structure, from which device detection properties 
+are populated in the **FlowData**.
 
-This process is implemented as a two-step process: a Cloud Request Engine
+This is implemented as a two-step process: a Cloud Request Engine
 presents the Evidence to the 51Degrees server with an HTTP request
 and copies the JSON response into ElementData in the FlowData.
 
@@ -16,21 +16,30 @@ a Device Detection Cloud Engine, later in the Pipeline. Since the detection
 engine depends on the request having been processed in advance, it checks that
 ElementData from the cloud request is present in Pipeline before processing.
 
+![Cloud engine flow](../../../pipeline-specification/images/Device%20Detection%20Cloud%20Engine.png)
+
+The majority of the logic that must be performed by the Device Detection Cloud
+Engine is common to all cloud engines and is described in the 
+[Cloud Aspect Engine](../../pipeline-specification/pipeline-elements/cloud-aspect-engine.md) 
+document.
+
 ## Device Detection Cloud Engine Configuration
 
 There are no configuration options associated with this engine.
 
 ## Device Detection Cloud Engine Processing
- 
-When it is added to a pipeline, Device Detection Cloud Engine initialises
-itself from a Cloud Request Engine, which must have been added to the pipeline
-before it. The Cloud Request Engine determines which properties are available
-on start-up and the Device Detection Cloud engine determines those properties
-from the Cloud Request Engine. The properties that are available are
-determined by the Resource Key with which the Cloud Request Engine was 
-initialised. 
 
-See [Cloud Request Engine]() for more details of this engine.
+When it is added to a pipeline, Device Detection Cloud Engine initializes
+itself from a Cloud Request Engine, which must have been added to the pipeline
+before it. 
+
+The Cloud Request Engine determines which properties are available
+based on the resource key supplied on start-up. The Device Detection Cloud engine 
+then takes the details of the subset of those properties that are relevant to 
+device detection.
+
+See [Cloud Request Engine](../../pipeline-specification/pipeline-elements/cloud-request-engine.md) 
+for more details of this engine.
 <span style="color:yellow">move the remainder of text here to pipeline spec 
 to create that document</span>
 
