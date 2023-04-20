@@ -62,6 +62,9 @@ required quantity of data.
 The complete XML document must contain a `<Devices>` root element with 
 each `<Device>` element containing the details related to a request. 
 
+<span style="color:yellow">A question on the format: in what case there will be multiple Device elements
+within Devices?  Is it for the batch request to report multiple requests?</span>
+
 ```xml
 <Device>
   <SessionId>SESSION_ID</SessionId> 
@@ -101,14 +104,18 @@ For example:
   example, “Pipeline” 
 - **FlowElement** – An xml element exists for each FlowElement in the 
   pipeline. The text contains the fully qualified name of the FlowElement.  
+<span style="color:yellow">Should it be a class name or is there a separate 
+name attribute defined for each FlowElement?</span>
 - **Language** - The name of the language/framework within which the 
   pipeline is running. 
 - **LanguageVersion** - The version number of the language/framework 
   within which the pipeline is running. 
+<span style="color:yellow">Assuming the version of the compiler or the interpreter</span>
 - **ClientIP** - Public IP address of the client that sent the request to 
   this server. 
 - **ServerIP** - IP address of the server where the xml is being generated. 
 - **Platform** - The platform name, version and service pack. 
+<span style="color:yellow">Service pack might be Windows-specific</span>
 - **Evidence** – The evidence that is shared will be determined by its 
   evidence key filter as defined below. 
 
@@ -122,7 +129,16 @@ to let the reader know the value was modified.
 See the [ReplacedString](https://github.com/51Degrees/pipeline-java/blob/master/pipeline.engines.fiftyone/src/main/java/fiftyone/pipeline/engines/fiftyone/flowelements/ShareUsageElement.java#L485) 
 function in Java for an example of this.
 
+<span style="color:yellow"> Should there be added a bit more specific about the URL of the service to send this data to
+and request forming?  I.e. should it be a POST request with the XML as a body?  What about authorization? Perhaps there could 
+be a mention about request forming and a reference to an existing implementation like for the ReplacedString above.</span>
+
 ## Session tracking 
+
+<span style="color:yellow">The implementers might have a question on how to define a session boundary - i.e. 
+how do we know that the client has started a new session of requests? This has to be initiated by the client then, 
+or otherwise the sessionId must be associated with the clientIP and all requests of a particular client would belong
+to the same session... with sequence number incremented for each request</span>
 
 When a user is browsing a website, they may typically make many HTTP 
 requests to access different resources, visit different pages, etc.
@@ -135,6 +151,8 @@ The usage sharing element must maintain a data structure containing
 recently shared evidence values. If the data entry being processed 
 already has a matching entry in this data structure, it should not 
 be shared.
+<span style="color:yellow"> Perhaps could just be a hash of the evidence that would be unique per client - 
+i.e. include hashed ClientIP, host and other client-specific evidence</span>
 
 By default, entries will have a lifetime of 20 minutes within this 
 data structure. This is reset each time an entry with matching 
@@ -163,6 +181,9 @@ becomes full additional data should simply be discarded until there
 is room to add entries again. 
 However, it is important that these actions are logged so that users
 can identify potential issues with their usage sharing.
+
+<span style="color:yellow">One other implementation detail is concerning how to deal with the non-empty queue and destruction of the pipeline and flow elements. 
+Should the destructor of the Usage Sharing Element be blocking? i.e. joining the thread that is processing the queue until it is finished?</span>
 
 # Configuration options
 

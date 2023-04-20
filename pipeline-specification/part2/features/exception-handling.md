@@ -34,6 +34,16 @@ be available when the
 [Pipeline is created](../conceptual-overview.md#pipeline-builder) and be 
 called `SuppressProcessExceptions` or similar.
 
+<span style="color:yellow">So Process()function should be able to propagate the exception of some Flow Element
+and throw it to the outer context, but if SuppressProcessExceptions = true (which is set by default?) then it just
+adds them to the Flow Data and logs? 
+
+Another suggestion on naming: I think this pattern goes under the name graceful degradation in other places - 
+so perhaps we should name the flag `GracefulDegradationOnErrors` to indicate that Pipeline and its parts must perform 
+the function to the extent possible, and not crash the outer context in any case, 
+and likely this behavior should be on by default - f.e. for the web integration.
+</span>
+
 ## Flow Elements
 
 **Flow Elements** should throw exceptions/errors freely, unless it makes
