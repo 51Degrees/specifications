@@ -159,7 +159,41 @@ As such, this should be minimized as much as possible:
 
 # Refresh data
 
+The [refresh data function](../../pipeline-specification/features/data-updates.md#aspect-engine-features)
+for this engine must perform the following tasks:
+- Create a new instance of the C++ `EngineHashSwig` type using either the 
+  filename or byte[] constructor.
+- Call `refreshData` on the C++ engine in order to load data into the 
+  relevant data structures.
+- Call the necessary functions on the C++ engine in order to acquire 
+  meta data about the engine that is dependant on the data file:
+  - [accepted evidence](#accepted-evidence)
+  - [properties](#property)
+  - [additional device detection metadata](#metadata)
+  - data file publish date
+  - expected publish date of next data file
+  - data file type
+  - data file temp path 
+
+The following table lists the C++ engine functions to call to get the data 
+mentioned above:
+
+| Function name            | Notes                                                                                                                                                                                              |
+|--------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `getKeys`                | Get a list of the evidence keys that the data file will make use of                                                                                                                                |
+| `getMetaData`            | Get [meta data](#metadata) from the data file                                                                                                                                                      |
+| `getPublishedTime`       | Get the date/time that the data file was created                                                                                                                                                   |
+| `getUpdateAvailableTime` | Get the data/time that a new data file is expected to be available                                                                                                                                 |
+| `getProduct`             | Get the string type of the data file. This is used by the [data update](../../pipeline-specification/features/data-updates.md) functionality when calling Distributor to check for a new data file |
+| `getDataFileTempPath`    | Get the path to the temporary working copy of the data file (This is the full path to the copy of the data file that the C code makes before reading it.)                                          |
+
 # Events
+
+This engine should implement the following events/callbacks/hooks:
+
+| Name             | Notes                                                                       |
+|------------------|-----------------------------------------------------------------------------|
+| Refresh complete | Used by client to perform some action after a new data file has been loaded |
 
 # Metadata
 
@@ -274,12 +308,25 @@ All these properties have the following values:
 
 # Configuration options
 
-| **Parameter** | **User configurable** | **Optional** | **Default** | **Notes** |
-|---|---|---|---|---|
-|  |  |  |  | |
+These are the configuration options that are unique to this engine. They are in 
+addition to all the configuration options defined for other features. For example,
+[data updates](../../../pipeline-specification/part2/features/data-updates.md#configuration-groups)
 
+| **Parameter**             | **Optional** | **Default**                                                                                                                      | **Notes**                                                                                                                                                                                                                                                                                                                                                                                                   |
+|---------------------------|--------------|----------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Difference                | Yes          | Native code [^1]                                                                                                                 | Used to set the maximum [difference](https://51degrees.com/documentation/4.4/_device_detection__hash.html#difference) in hash value to allow when processing HTTP headers.                                                                                                                                                                                                                                  |
+| Drift                     | Yes          | Native code [^1]                                                                                                                 | Used to set the maximum [drift](https://51degrees.com/documentation/4.4/_device_detection__hash.html#drift) in hash position to allow when processing HTTP headers.                                                                                                                                                                                                                                         |
+| Allow Unmatched           | Yes          | Native code [^1]                                                                                                                 | If no match is found for the evidence value then this controls how the property values will be populated in the result.</br>If set to false, properties will not have set values.</br>If set to true, property values will be set from the default [profile](#profile) for that component. This means that properties will always have values (i.e. no need to check .HasValue) but some may be inaccurate. |
+| Reuse Operational File    | Yes          | Native code [^1]                                                                                                                 | Set whether or not an existing operational file should be used if one is found in the temp directory.                                                                                                                                                                                                                                                                                                       |
+| Update Matched User Agent | Yes          | Native code [^1]                                                                                                                 | Set whether or not the result should include the characters from the evidence values that were used to find a match. If set, this will be available from the 'MatchingEvidence' [match metric](#match-metric-properties) property. This is optional because it adds some overhead that is not necessary in normal operation.                                                                                |
+| Use Performance Graph     | Yes          | Native code [^1]                                                                                                                 | Set whether or not to use the [performance](https://51degrees.com/documentation/4.4/_device_detection__hash.html#performance-graphs) graph when attempting to match evidence values.                                                                                                                                                                                                                        |
+| Use Predictive Graph      | Yes          | Native code [^1]                                                                                                                 | Set whether or not to use the [predictive](https://51degrees.com/documentation/4.4/_device_detection__hash.html#predictive-graphs) graph when attempting to match evidence values.                                                                                                                                                                                                                          |
+| Performance Profile       | Yes          | Balanced. See [native code](https://github.com/51Degrees/device-detection-cxx/blob/master/src/hash/hash.c#L175) for definitions. | Set the performance profile to use when creating the engine. Each profile has default values for various internal configuration options, as well as things like the use of predictive/performance graphs.                                                                                                                                                                                                   |
+| Concurrency               | Yes          | System processor count                                                                                                           | Set the expected number of concurrent operations using the engine. This is used to configure internal caches to avoid excessive locking. It has no effect if these internal caches are not used. (For example, when using the 'MaxPerformance' profile)                                                                                                                                                     |
 
-# Performance guidance
-
+[^1]: The default values for many configuration options comes from the native 
+C/C++ code. You can find these defaults in the following files: 
+- https://github.com/51Degrees/common-cxx/blob/master/config.h
+- https://github.com/51Degrees/device-detection-cxx/blob/master/src/config-dd.h
 
 
