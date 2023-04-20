@@ -8,11 +8,11 @@ algorithm.
 This engine also requires a hash data file, which comes in three variations:
 
 - **Lite** - Freely available from [GitHub](https://github.com/51Degrees/device-detection-data).
-  Contains a highly restricted set of properties and will only be updated 
+  Contains a highly restricted set of properties and is updated 
   around once per month.
 - **Enterprise** - Downloaded from 
   [Distributor](http://51degrees.com/documentation/4.4/_info__distributor.html). 
-  Requires a license key and is usually updated Monday-Thursday. Includes all 
+  Requires a license key for download and is usually updated Monday-Thursday. Includes all 
   properties except TAC.
 - **TAC** - Same as enterprise except that TAC is included in the result.
 
@@ -31,10 +31,17 @@ The code for this component is available on GitHub:
 - [common-cxx](https://github.com/51Degrees/common-cxx)
 - [device-detection-cxx](https://github.com/51Degrees/device-detection-cxx)
 
-Unfortunately, while calling a native dll is possible in many languages, it
+Unfortunately, while calling a native library is possible in many languages, it
 is often fiddly and may come with unexpected difficulties. As such, we generally 
 use [SWIG](https://www.swig.org/) to help produce a wrapper for the target 
-language.
+language. This takes care of the marshalling of data structures to and from 
+C data structures but represents a performance overhead - see 
+[Performance Guidance](#performance-guidance) below.
+
+The C library is distributed in binary form for a restricted set of target
+environments [tested versions](https://51degrees.com/documentation/4.4/_info__tested_versions.html), 
+with a number of assumptions about the availability 
+of [dependencies](https://51degrees.com/documentation/4.4/_info__dependencies.html).
 
 ## Selecting the correct binary
 
@@ -63,7 +70,7 @@ logic.
 # Accepted evidence 
 
 This engine determines the accepted evidence keys on data refresh based
-on the values in the data source.
+on values in the data source.
 
 After loading the data source into the native code, call the `getKeys` 
 function to return a list of the accepted evidence keys.
@@ -72,8 +79,8 @@ native code.
 
 This must be done at startup and any time the data is refreshed.
 
-Note that the list of accepted evidence keys is not case-sensitive.
-I.e. `header.user-agent` and `header.User-Agent` should both be 
+Note that the list of accepted evidence keys is not case-sensitive -
+i.e. `header.user-agent` and `header.User-Agent` should both be 
 accepted.
 
 # Element data
@@ -86,18 +93,18 @@ In addition, several additional [match metrics](#match-metric-properties)
 properties must be added as well. The table below shows the native 
 function to call to get the value for each property.
 
-| Name         | Function on result object to call to get value \* |
-|--------------|---------------------------------------------------|
-| MatchedNodes | getMatchedNodes                                   |
-| Difference   | getDifference                                     |
-| Drift        | getDrift                                          |
-| DeviceId     | getDeviceId                                       |
-| UserAgents   | getUserAgents                                     |
-| Iterations   | getIterations                                     |
-| Method       | getMethod                                         |
+| Name         | Function on result object to call to get value [^nb] |
+|--------------|------------------------------------------------------|
+| MatchedNodes | getMatchedNodes                                      |
+| Difference   | getDifference                                        |
+| Drift        | getDrift                                             |
+| DeviceId     | getDeviceId                                          |
+| UserAgents   | getUserAgents                                        |
+| Iterations   | getIterations                                        |
+| Method       | getMethod                                            |
 
-\* Note that the native implementations have some additional complexity
-in their code due to a old plan to split device detection into 4 
+[^nb] Note that the native implementations have some additional complexity
+in their code because of a plan to split device detection into 4 
 separate engines. This is not necessary in new implementations.
 
 It is essential that the **Element Data** instance populated by this 
@@ -136,16 +143,24 @@ other Pipeline API features.
     are requested.
   - Do not immediately copy all the property values from `ResultsHash`. By 
     default, around 200 properties will be populated, meaning 200+ calls to 
-    the native code marshalling values back and forth.
+    the native code marshalling values back and forth [^caching]. 
+
+[^caching] Note the effect that 
+    holding the "unmanaged" memory references (i.e. memory references that
+    are not handled by language garbage collection) has on 
+    [caching](features/caching.md) and [resource cleanup](resource-cleanup.md). 
+    The reference implementations don't allow a cache to be
+    added to this engine because of the complexity this introduces, however
+    end-users may be tempted to create their own cache of results.
 
 ## Performance guidance
 
 We have found that the main performance bottleneck is usually the process
-of marshalling data values to/from the native representations.
+of marshalling data values to and from native representations.
 
 As such, this should be minimized as much as possible:
 
-- Languages often have many different mechanisms for passing data in calls
+- Languages often have many mechanisms for passing data in calls
   to native binaries, some more efficient than others. SWIG code will 
   sometimes use the most flexible approach, rather than the most performant.
   It is worth checking the generated code for relatively easy performance 
@@ -155,7 +170,7 @@ As such, this should be minimized as much as possible:
 - Finally, do not call native code at all if it can be avoided. For example, any 
   values that will only change after a [data refresh](#refresh-data) should 
   be stored in the engine instance to avoid native calls for that value until 
-  a refresh occurs.
+  a refresh occurs. Not the possible clean-up consequences that this implies.
 
 # Refresh data
 
@@ -166,7 +181,7 @@ for this engine must perform the following tasks:
 - Call `refreshData` on the C++ engine in order to load data into the 
   relevant data structures.
 - Call the necessary functions on the C++ engine in order to acquire 
-  meta data about the engine that is dependant on the data file:
+  metadata about the engine that is dependent on the data file:
   - [accepted evidence](#accepted-evidence)
   - [properties](#property)
   - [additional device detection metadata](#metadata)
@@ -202,12 +217,12 @@ This engine should implement the following events/callbacks/hooks:
 On-premise device detection has two related metadata structures:
 1. The device detection data file includes metadata relating to the structure of the 
    values that are stored in the file. This is exposed by the device detection engine 
-   in order to allow users to query the data. \*
+   in order to allow users to query the data. [^performance]
 2. All flow elements expose a list of metadata relating to properties populated by 
    that element. In the case of the device detection engine, this list will include 
    property metadata derived from the data file metadata mentioned above. 
 
-\* Note that, due to the structure of the data, this is not intended to support 
+[^performance] Note that, due to the structure of the data, this is not intended to support 
 high-performance querying scenarios. For that use-case, customers are directed to our 
 'csv' data file, which can be consumed and stored in a database or whatever other form 
 is required for querying. 
@@ -289,7 +304,7 @@ the match that was found. Metadata for these properties must be added, as they
 will not be included in the metadata exposed by the native code.
 
 All these properties have the following values:
-- Category = "Device Metrics"
+- Category = "Device Metrics" <span style="color:yellow">Match Metrics, surely?</span>
 - Available With = "Lite", "Premium", "Enterprise", "TAC" - If possible, this 
   list should be created dynamically from the lists of files included against 
   all other property metadata that is exposed by the native code.
