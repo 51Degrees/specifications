@@ -37,6 +37,10 @@ evidence value is available with two different prefixes (For example,
 `header.user-agent` and `query.user-agent`), then the entry whose prefix is earlier 
 in the list above should be used.
 
+If any other prefixes are present then their order of precedence is alphabetical. 
+This rule just ensures that any conflicts are resolved deterministically.
+For example the [Cloud Request Engine](../pipeline-elements/cloud-request-engine.md#processing)
+
 # Adding evidence values
 
 Evidence is immutable. However, it may be desireable for some **Flow Elements** 
