@@ -56,8 +56,16 @@ mocks can be a lot harder than debugging test implementations.
 This section itemises key required tests, by module of the reference 
 implementation they are found in.
 
-Numerous additional tests exist in the reference implementations and the code
-of those implementation should be consulted.
+In all cases all methods of all classes must be tested for correct operation
+when valid data is supplied, and correct exceptional operation is taken for
+incorrect data. The cases listed here are mostly concerned with testing that
+underlying functionality is correctly implemented where internal state of 
+the object can vary. For example a FlowData can only be processed once, so
+there must be a test to check that an attempt to process it twice, fails.
+
+Numerous additional tests exist (to a total of around 500, running to 100s of 
+thousands of lines of code) in the reference implementations and the code of 
+those implementations should be consulted.
 
 ### Core
 
@@ -65,29 +73,77 @@ TypedKeyMap :
 - (ThreadSafe and non-ThreadSafe) test each of the methods.
 
 Pipeline: 
-**not all of these in Java** ++
-**existing implementation mock elements**
+
 - Test for correct processing of FlowData with one, two and three Flow Elements.
 - Test of correct operation of parallel flow.
-- Test that FlowData.stop() works correctly
+- Test that FlowData.stop() works correctly.
 - Test that throwing exceptions while processing terminates processing, or doesn't
 depending on configuration. Test that flow data contains correct errors at end.
 
+PipelineBuilder and PipelineOptions:
+- Check exceptional operation such as adding closed flow element
+- Check build from Options
+- Check Build from Serialised Options with abbreviated names
+  - check for serialised options containing wrong option and values
+  - check for constructor values
+- Check build from fluent builder
+
 FlowData:
 
-**pipeline is mocked**
-
-- check that flowdata is processed once and only once on call of process
+- check that flowdata is processed exactly once on call of process
 - check that attempt to process twice fails
-- check that adding evidence as a value and as a map works
-- check that adding data works
-- check that getting typed data works
-- ...
+- check that access to flowdata when pipeline closed fails
+- check that access to flowdata results before processing fails
+
+Flow Element:
+
+Create a Test Element and associated data
+- check correct process() logic
+- check for correct creation of associated data type
+- check for correct access following processing
 
 Java Only: 
 
 Lookup: The Java reference implementation allows interpolation of values
 (environment variables etc.) in pipeline options files. Test for correct 
 operation of the various items that can be interpolated.
+
+### Engines
+
+Pipeline Overhead:
+
+Create a test pipeline and check that the processing costs is within 
+reasonable bound for the cases:
+- repeated execution of pipeline
+- repeated execution of pipeline with caching enabled on engine
+- repeated execution of pipeline with parallel flowdata
+
+AspectEngine:
+- check aspect engine uses cache correctly
+- if lazy loading is implemented, check that it fires only at the right 
+time and only once
+
+DataUpdateService:
+
+DataUpdate is a complex process with many options.
+- check that the options cannot be set inconsistently
+- check that the callbacks are fired on update completion successfully
+- check that engine refresh is triggered on file update if configured
+- check that programmatic update works correctly and resets remote update properly
+- check that remote update triggers correctly and resets correctly in the event
+   of both successful and unsuccessful download, with various failure scenarios
+    such as HTTP timeout, HTTP 429, 400, MD5 check failure etc.
+- check that engine refreshes with correct data and that any data associated
+  with earlier copy is freed correctly
+- carry out a repeated refresh test to look for memory leaks
+
+MissingPropertyService:
+
+- check that "upgrade required" is returned for a property that is available in a different tier
+- check that "unknown" is return for a property that is not known
+- check that "not in resource" is returned for cloud engine
+- check unknown returned otherwise
+
+### Engines.Fiftyone
 
 
