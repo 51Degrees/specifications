@@ -214,8 +214,8 @@ in this configuration is set for memory data source operation.
 - check HTTP server for new file
     - on fail, fall back to local file if any
         - no local file, fail
-- compare date with local (if there is one)
-    - if newer, 
+- compare date with local
+    - if newer or there is no local file, 
       - save new file
     - load file
 - if disk data source, configure file watcher, if requested
