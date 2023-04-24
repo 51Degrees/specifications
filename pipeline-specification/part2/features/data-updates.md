@@ -209,17 +209,12 @@ in this configuration is set for memory data source operation.
 
 ## Update Processes
 
-<span style="color:yellow">
-  Can this same mechanism be used for data initialization - download data on the first launch?
-  Perhaps there should be a check that if there is no data file - download it?
-</span>
-
 ### Update on Startup
 - for disk data source, check operational data configuration consistency
 - check HTTP server for new file
     - on fail, fall back to local file if any
         - no local file, fail
-- compare date with local 
+- compare date with local (if there is one)
     - if newer, 
       - save new file
     - load file

@@ -29,20 +29,10 @@ collection. Once all **Flow Elements** have completed processing, throw an
 exception/error with all the stored errors included as sub-errors.
 
 There must be an option to modify this behavior to just add these errors 
-to the errors collection and [log](logging.md) them. This option should 
-be available when the 
-[Pipeline is created](../conceptual-overview.md#pipeline-builder) and be 
-called `SuppressProcessExceptions` or similar.
-
-<span style="color:yellow">So Process()function should be able to propagate the exception of some Flow Element
-and throw it to the outer context, but if SuppressProcessExceptions = true (which is set by default?) then it just
-adds them to the Flow Data and logs? 
-
-Another suggestion on naming: I think this pattern goes under the name graceful degradation in other places - 
-so perhaps we should name the flag `GracefulDegradationOnErrors` to indicate that Pipeline and its parts must perform 
-the function to the extent possible, and not crash the outer context in any case, 
-and likely this behavior should be on by default - f.e. for the web integration.
-</span>
+to the errors collection and [log](logging.md) them (I.e. don't throw an 
+exception/error at the end of processing). This option should be available 
+when the [Pipeline is created](../conceptual-overview.md#pipeline-builder) 
+and be called `SuppressProcessExceptions` or similar.
 
 ## Flow Elements
 
