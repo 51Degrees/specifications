@@ -29,10 +29,10 @@ collection. Once all **Flow Elements** have completed processing, throw an
 exception/error with all the stored errors included as sub-errors.
 
 There must be an option to modify this behavior to just add these errors 
-to the errors collection and [log](logging.md) them. This option should 
-be available when the 
-[Pipeline is created](../conceptual-overview.md#pipeline-builder) and be 
-called `SuppressProcessExceptions` or similar.
+to the errors collection and [log](logging.md) them (I.e. don't throw an 
+exception/error at the end of processing). This option should be available 
+when the [Pipeline is created](../conceptual-overview.md#pipeline-builder) 
+and be called `SuppressProcessExceptions` or similar.
 
 ## Flow Elements
 

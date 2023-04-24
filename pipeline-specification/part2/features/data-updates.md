@@ -21,7 +21,7 @@ or to implement the Data Update service to allow for multiple file sources.
 
 ### Aspect Engine Features
 
-In order to support this feature, **Aspect Engines** must have a
+In order to support this feature, **Aspect Engines** must have 
 some additional abilities:
 
 1. At configuration time, there must be a mechanism for supplying details about
@@ -55,7 +55,7 @@ Other operational modes may be possible, such as an Aspect Engine's data residin
 in a relational database.
 
 ### File Data Source, File Based Operation
-In this operational mode an Aspect Engine the Aspect Engine uses data that
+In this operational mode an Aspect Engine uses data that
 resides in the file system to support its operation. This may be because the 
 data is too extensive to be loaded into memory or because of memory limitations
 in the system.
@@ -214,8 +214,8 @@ in this configuration is set for memory data source operation.
 - check HTTP server for new file
     - on fail, fall back to local file if any
         - no local file, fail
-- compare date with local 
-    - if newer, 
+- compare date with local
+    - if newer or there is no local file, 
       - save new file
     - load file
 - if disk data source, configure file watcher, if requested
