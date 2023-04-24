@@ -1,4 +1,6 @@
-# Introduction
+# Usage examples
+
+## Introduction
 
 This document contains descriptions of device detection use-cases along with
 c# examples.
@@ -7,7 +9,7 @@ Many of these examples build on the concepts established in the pipeline
 specification, so it may be helpful to first become familiar with
 the [usage examples](../pipeline-specification/usage-examples.md) there.
 
-# Create a device detection pipeline
+## Create a device detection pipeline
 
 There are several different ways that a pipeline might be created. However, once
 created, usage must be as similar as possible.
@@ -45,7 +47,7 @@ var pipeline = pipelineBuilder
   .BuildFromConfiguration(configuration);
 ```
 
-# Simple device detection
+## Simple device detection
 
 A user wishes to find out whether a device is a mobile or not, based on the
 User-Agent header.
@@ -63,7 +65,7 @@ using(var flowdata = pipeline.CreateFlowData())
 }
 ```
 
-# Property not available
+## Property not available
 
 A property might not be available in some scenarios. We need to ensure that the
 user is informed of why the property cannot be accessed and how to gain access
@@ -85,7 +87,7 @@ using(var flowdata = pipeline.CreateFlowData())
 }
 ```
 
-# Web integration
+## Web integration
 
 The mechanics of this will differ significantly by language.
 See [pipeline - web integration](../pipeline-specification/features/web-integration.md)
@@ -105,7 +107,7 @@ For detailed examples see:
 - [.NET getting started web - cloud](https://github.com/51Degrees/device-detection-dotnet/tree/master/Examples/Cloud/GettingStarted-Web) 
 - [.NET getting started web - on premise](https://github.com/51Degrees/device-detection-dotnet/tree/master/Examples/OnPremise/GettingStarted-Web) 
 
-## Apple model detection
+### Apple model detection
 
 Modifying the simple web application described above to be able to correctly
 identify Apple models must also be very easy. For example, by adding a line
@@ -119,7 +121,7 @@ For more details on the expected functionality see
 the [web integration](../pipeline-specification/features/web-integration.md)
 section of the pipeline specification.
 
-# Automatic data updates
+## Automatic data updates
 
 All [data update](../pipeline-specification/features/data-updates.md)
 functionality should be part of configuration.
@@ -142,7 +144,7 @@ For more detailed examples see:
 - [Java data file updates](https://github.com/51Degrees/device-detection-java/blob/master/device-detection.examples/console/src/main/java/fiftyone/devicedetection/examples/console/UpdateDataFile.java) 
 - [.NET data file updates](https://github.com/51Degrees/device-detection-dotnet/blob/master/Examples/OnPremise/UpdateDataFile-Console/Program.cs) 
 
-# Property metadata
+## Property metadata
 
 [Property metadata](../pipeline-specification/features/properties.md#property-metadata)
 must be exposed by the device detection engine.
@@ -159,7 +161,7 @@ For more detailed examples see:
 - [Java cloud metadata](https://github.com/51Degrees/device-detection-java/blob/master/device-detection.examples/console/src/main/java/fiftyone/devicedetection/examples/console/MetadataCloud.java#L113) 
 - [.NET cloud metadata](https://github.com/51Degrees/device-detection-dotnet/blob/master/Examples/Cloud/Metadata-Console/Program.cs#L111) 
 
-# Extended On-Premise metadata
+## Extended on-premise metadata
 
 Additional [device detection metadata](pipeline-elements/device-detection-on-premise.md#metadata)
 must be exposed by the on-premise engine.
@@ -184,7 +186,7 @@ For more detailed examples see:
 - [.NET on-premise metadata](https://github.com/51Degrees/device-detection-dotnet/blob/master/Examples/OnPremise/Metadata-Console/Program.cs#L126) 
 
 
-# TAC/Native Key lookup
+## TAC/Native key lookup
 
 A user wishes to get details of devices matching a
 specific [TAC](https://en.wikipedia.org/wiki/Type_Allocation_Code) or native

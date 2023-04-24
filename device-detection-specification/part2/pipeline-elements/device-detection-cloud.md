@@ -1,4 +1,4 @@
-# Device Detection Cloud
+# Device detection cloud
 
 ## Overview
 
@@ -23,11 +23,11 @@ Engine is common to all cloud engines and is described in the
 [Cloud Aspect Engine](../../pipeline-specification/pipeline-elements/cloud-aspect-engine.md) 
 document.
 
-## Device Detection Cloud Engine Configuration
+## Device detection cloud engine configuration
 
 There are no configuration options associated with this engine.
 
-## Device Detection Cloud Engine Processing
+## Device detection cloud engine processing
 
 When it is added to a pipeline, Device Detection Cloud Engine initializes
 itself from a Cloud Request Engine, which must have been added to the pipeline
@@ -40,5 +40,3 @@ device detection.
 
 See [Cloud Request Engine](../../pipeline-specification/pipeline-elements/cloud-request-engine.md) 
 for more details of this engine.
-<span style="color:yellow">move the remainder of text here to pipeline spec 
-to create that document</span>

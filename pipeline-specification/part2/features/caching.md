@@ -1,4 +1,6 @@
-# Overview
+# Caching
+
+## Overview
 
 **Aspect Engines** may support the addition of a cache. 
 This is intended to improve performance when the engine receives a process 
@@ -16,9 +18,8 @@ This works well when cloud requests are being made for one product.
 (For example, device detection.) However, it becomes significantly less 
 effective when the cloud request is being made for multiple products.
 At present, there are no plans to address this.
-TODO - do we want to say anything else on this?
 
-# Process flow
+## Process flow
 
 With a cache added, the logical execution of the process function within
 the engine will be something like this:
@@ -47,7 +48,7 @@ Warning - don't take the pseudocode above as a template. Real production code
 is likely to vary significantly from this in order to account for concurrency 
 concerns, error handling, other features, etc.
 
-# Generation of keys
+## Generation of keys
 
 All **Flow Elements** must [advertise](advertise-accepted-evidence.md) the 
 evidence keys that they make use of.
@@ -67,7 +68,7 @@ Other considerations when creating keys:
   ```
 - Comparison of evidence values must be case-sensitive.
 
-# Cache implementation
+## Cache implementation
 
 The system should allow any cache conforming to a simple interface to be 
 used.
@@ -77,10 +78,10 @@ can cope with concurrent requests reasonably well.
 
 The cache must be configurable:
 
-| Configuration option | Default | Description |
-|---|---|---|
-| Size | 1000 | Number of items stored in the cache before it starts evicting things. |
-| Concurrency | Number of CPU cores | Number of shards in the cache. |
+| Configuration option | Default             | Description                                                           |
+|----------------------|---------------------|-----------------------------------------------------------------------|
+| Size                 | 1000                | Number of items stored in the cache before it starts evicting things. |
+| Concurrency          | Number of CPU cores | Number of shards in the cache.                                        |
 
 [This article](https://medium.com/@yewang2018/lru-cache-design-8257850a69fe) 
 describes the internals of such a cache. You can also review the 
@@ -88,7 +89,7 @@ describes the internals of such a cache. You can also review the
 and [.NET](https://github.com/51Degrees/caching-dotnet/blob/master/FiftyOne.Caching/LruCacheBase.cs)
 reference implementations.
 
-# Data lifetime and concurrency issues
+## Data lifetime and concurrency issues
 
 The cache stores the instance of **Aspect Data** that was generated based 
 on the evidence values in the key.

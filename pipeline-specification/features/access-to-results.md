@@ -1,14 +1,16 @@
-# General guidance
+# Access to results
+
+## General guidance
 
 Where string keys are used, the following rules apply:
 
-- strings should only contain alphanumeric characters, full stop or hyphen.
+- Strings should only contain alphanumeric characters, full stop or hyphen.
 - Some 51Degrees properties also use the ‘/’ character. No new properties will
   be added with this character, but it must be accommodated.
-- lower-case is preferred but not required.
-- string comparisons must be case insensitive.
+- Lower-case is preferred but not required.
+- String comparisons must be case insensitive.
 
-# Accessing results
+## Accessing results
 
 There are multiple ways to access the results of processing.
 

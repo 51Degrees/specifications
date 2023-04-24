@@ -1,3 +1,5 @@
+# Logging
+
 The Pipeline API must implement logging, ideally using a popular third-party 
 logging library. Whichever library is used, the system should be configurable
 without rebuilding binaries and capable of outputting to a log target at a

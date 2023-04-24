@@ -1,4 +1,6 @@
-# Overview
+# Device detection on-premise
+
+## Overview
 
 This engine provides device detection capabilities using a high performance 
 on-premise algorithm we refer to as the 
@@ -16,7 +18,7 @@ This engine also requires a hash data file, which comes in three variations:
   properties except TAC.
 - **TAC** - Same as enterprise except that TAC is included in the result.
 
-# Native component
+## Native component
 
 In all languages, the on-premise device detection engine passes the actual
 detection processing to a native dll/so library that is written in C/C++.
@@ -43,7 +45,7 @@ environments [tested versions](https://51degrees.com/documentation/4.4/_info__te
 with a number of assumptions about the availability 
 of [dependencies](https://51degrees.com/documentation/4.4/_info__dependencies.html).
 
-## Selecting the correct binary
+### Selecting the correct binary
 
 While the implementor is not expected to produce the CI/CD scripts that 
 will create the final packages, attention must be given to how the final
@@ -55,7 +57,7 @@ In some cases, this capability is built into the packaging infrastructure
 determine the correct binary at runtime (Java/Maven and Node/NPM). Others 
 do not allow native binaries in packages at all (PHP/Composer).
 
-## Reference implementation notes
+### Reference implementation notes
 
 The reference implementations bundle the cxx code in with the Java/.NET 
 code and build it all together. This works well enough, but does come
@@ -67,7 +69,7 @@ moving the native binary and target language wrapper to a separate
 repository and package from the target language device detection engine 
 logic.
 
-# Accepted evidence 
+## Accepted evidence 
 
 This engine determines the accepted evidence keys on data refresh based
 on values in the data source.
@@ -83,7 +85,7 @@ Note that the list of accepted evidence keys is not case-sensitive -
 i.e. `header.user-agent` and `header.User-Agent` should both be 
 accepted.
 
-# Element data
+## Element data
 
 The list of properties that can be populated by this engine is determined 
 on data refresh based on the properties that are available in the data 
@@ -113,7 +115,7 @@ populated by the [cloud device detection engine](device-detection-cloud.md)
 as well as the individual devices populated in the **Element Data** from 
 the [hardware profile lookup engine](hardware-profile-lookup-cloud.md).
 
-# Startup activity
+## Startup activity
 
 On startup, the native engine needs to be created using the data file.
 Several functions must then be called to get the data that will be needed 
@@ -121,7 +123,7 @@ by other engine features.
 
 See [refresh data](#refresh-data) for details on this process.
 
-# Processing
+## Processing
 
 This section describes the core steps this engine executes to process 
 **Flow Data**. This is on top of any common processing defined for 
@@ -153,7 +155,7 @@ other Pipeline API features.
     added to this engine because of the complexity this introduces, however
     end-users may be tempted to create their own cache of results.
 
-## Performance guidance
+### Performance guidance
 
 We have found that the main performance bottleneck is usually the process
 of marshalling data values to and from native representations.
@@ -172,7 +174,7 @@ As such, this should be minimized as much as possible:
   be stored in the engine instance to avoid native calls for that value until 
   a refresh occurs. Not the possible clean-up consequences that this implies.
 
-# Refresh data
+## Refresh data
 
 The [refresh data function](../../pipeline-specification/features/data-updates.md#aspect-engine-features)
 for this engine must perform the following tasks:
@@ -202,7 +204,7 @@ mentioned above:
 | `getProduct`             | Get the string type of the data file. This is used by the [data update](../../pipeline-specification/features/data-updates.md) functionality when calling Distributor to check for a new data file |
 | `getDataFileTempPath`    | Get the path to the temporary working copy of the data file (This is the full path to the copy of the data file that the C code makes before reading it.)                                          |
 
-# Events
+## Events
 
 This engine should implement the following events/callbacks/hooks:
 
@@ -210,9 +212,9 @@ This engine should implement the following events/callbacks/hooks:
 |------------------|-----------------------------------------------------------------------------|
 | Refresh complete | Used by client to perform some action after a new data file has been loaded |
 
-# Metadata
+## Metadata
 
-## Overview
+### Overview
 
 On-premise device detection has two related metadata structures:
 1. The device detection data file includes metadata relating to the structure of the 
@@ -235,7 +237,7 @@ erDiagram
     Profile ||--|{ Value : has
 ```
 
-## Component
+### Component
 
 A **component** defines a group of **properties** that are related.
 
@@ -252,7 +254,7 @@ The metadata associated with a **component** is:
 | Default profile | The default **profile** for the **component**. This is used to provide **values** for the **component's** **properties** when a **profile** matching the @evidence cannot be found. |
 | Properties      | The **properties** associated with this **component**.                                                                                                                              |
 
-## Property
+### Property
 
 The **properties** exposed by the device detection engine contain more information 
 than that which is defined by the standard **property metadata** interface.
@@ -272,7 +274,7 @@ In addition to the usual information, the following must be made available:
 | Show          | Whether the **property** should be displayed in situations such as a page listing **properties**. Less important **properties** may not be displayed.                                                                                                        |
 | Show Values   | Whether values of the **property** should be displayed in situations such as a page listing the **property's** values. Showing all the values can make a very long list.                                                                                     |
 
-## Profile
+### Profile
 
 A **profile** defines a unique set of **values** for all **properties** of 
 a single **component**. 
@@ -284,7 +286,7 @@ a single **component**.
 | Component | The **component** to which the **profile** relates. This is the **component** which the **profile** contains **values** for.                                                          |
 | Values    | The **values** that define the **profile**.                                                                                                                                           |
 
-## Value
+### Value
 
 Each **property** has a set of possible **values** that it can return.
 The metadata associated with a **value** is:
@@ -296,7 +298,7 @@ The metadata associated with a **value** is:
 | Description | A description of the **value** explaining what it refers to, and what it means if a **profile** has this **value**.                                           |
 | URL         | A URL where more information on the **value** can be found.                                                                                                   |
 
-## Match metric properties
+### Match metric properties
 
 In addition to the 'standard' device detection properties, there are a set of 
 properties that return details about the processing that was performed and 
@@ -321,7 +323,7 @@ All these properties have the following values:
 | Iterations       | int    | 0             | The number of iterations carried out in order to find a match. This is the number of nodes in the graph which have been visited.                                                                                                                                           | n/a                                             |
 | Method           | string | "NONE"        | The method used to determine the match result.                                                                                                                                                                                                                             | "NONE", "PERFORMANCE", "COMBINED", "PREDICTIVE" |
 
-# Configuration options
+## Configuration options
 
 These are the configuration options that are unique to this engine. They are in 
 addition to all the configuration options defined for other features. For example,

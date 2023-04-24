@@ -1,9 +1,11 @@
-# Overview
+# Usage sharing element
+
+## Overview
 
 This **Flow Element** implements the [usage-sharing](../features/usage-sharing.md) 
 feature.
 
-# Accepted evidence 
+## Accepted evidence 
 
 The EvidenceKeyFilter for share usage is unusual as it cannot simply be a 
 list of accepted keys like most **Flow Elements**.
@@ -23,11 +25,11 @@ Anything else should return true. (i.e. it will be shared)
 See [configuration options](#configuration-options) for more detail on the
 configuration parameters that can affect this filter function.
 
-# Element data
+## Element data
 
 This **Flow Element** does not add an **Element Data** instance to **Flow Data**.
 
-# Startup activity
+## Startup activity
 
 A static XML snippet can be generated for values that will be invariant 
 for the lifetime of the current **Pipeline**.
@@ -48,7 +50,7 @@ every `device` element.
 Implementing this will be a future enhancement as changes will first be required
 to 51Degrees' data collection infrastructure.
 
-# Processing
+## Processing
 
 The process function must get the data it needs and complete as soon as 
 possible.
@@ -126,7 +128,7 @@ to let the reader know the value was modified.
 See the [ReplacedString](https://github.com/51Degrees/pipeline-java/blob/master/pipeline.engines.fiftyone/src/main/java/fiftyone/pipeline/engines/fiftyone/flowelements/ShareUsageElement.java#L485) 
 function in Java for an example of this.
 
-## Request detail
+### Request detail
 
 When sending the data, use the following details:
 - URL configurable using the [share usage URL](#configuration-options) option.
@@ -177,7 +179,7 @@ We also include various [configuration options](#configuration-options)
 for users to exclude any keys that may be identified to cause 
 oversharing of data.
 
-# Error handling 
+## Error handling 
 
 As a general principle, share usage should be considered an expendable 
 activity. If errors occur then they should be handled and 
@@ -189,7 +191,7 @@ is room to add entries again.
 However, it is important that these actions are logged so that users
 can identify potential issues with their usage sharing.
 
-# Cleanup
+## Cleanup
 
 As this element uses a producer/consumer queue and background processing,
 it will need to handle cleanup a little more carefully than other elements.
@@ -199,22 +201,22 @@ it will need to handle cleanup a little more carefully than other elements.
    less than the configured minimum batch size)
 3. Free any resources associated with the queue and background processing.
 
-# Configuration options
+## Configuration options
 
-| **Parameter** | **User configurable** | **Optional** | **Default** | **Notes** |
-|---|---|---|---|---|
-| Included query string parameters  | yes | yes | All query string and HTTP form parameters starting with `51D_` are shared. | Allows the user to include specific query string or HTTP form parameters in the usage data that is shared. |
-| Share all query string parameters | yes | yes | false | If this flag is set, all query string and HTTP form parameters will be shared. |
-| Share all evidence | yes | yes | false | If this flag is set, all evidence values will be shared. |
-| Blocked HTTP headers | yes | yes | All HTTP headers are shared except for cookies that do not start with `51D_` | Allows the user to exclude specific HTTP headers that they do not want to share. |
-| Ignore flow data evidence filter | yes | yes | not set | Allows the user to block a request from being shared if the specified criteria are met. |
-| Share percentage | yes | yes | 1.0 | Used to set the approximate proportion of requests that should be shared. A value of 1 means that 100% of requests are shared. |
-| Minimum entries per message | yes | yes | 50 | The number of requests that must be added to a usage sharing payload before it is sent. |
-| Maximum queue size | yes | yes | 1000 | The size of the queue that is used to buffer requests to be added to a usage sharing payload. |
-| Add timeout milliseconds | yes | yes | 5 | The timeout to use when trying to add items to the usage sharing queue. If the request times out, the data should be discarded |
-| Take timeout milliseconds | yes | yes | 100 | The timeout to use when getting items from the usage sharing queue to add to the next payload. |
-| Share usage URL | yes | yes | https://devices-v4.51degrees.com/new.ashx | The URL to send data to |
-| Repeat evidence interval minutes | yes | yes | 20 | The size of the sliding window during which identical usage data will not be sent if it is seen second or subsequent times. |
+| **Parameter**                     | **User configurable** | **Optional** | **Default**                                                                  | **Notes**                                                                                                                      |
+|-----------------------------------|-----------------------|--------------|------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------|
+| Included query string parameters  | yes                   | yes          | All query string and HTTP form parameters starting with `51D_` are shared.   | Allows the user to include specific query string or HTTP form parameters in the usage data that is shared.                     |
+| Share all query string parameters | yes                   | yes          | false                                                                        | If this flag is set, all query string and HTTP form parameters will be shared.                                                 |
+| Share all evidence                | yes                   | yes          | false                                                                        | If this flag is set, all evidence values will be shared.                                                                       |
+| Blocked HTTP headers              | yes                   | yes          | All HTTP headers are shared except for cookies that do not start with `51D_` | Allows the user to exclude specific HTTP headers that they do not want to share.                                               |
+| Ignore flow data evidence filter  | yes                   | yes          | not set                                                                      | Allows the user to block a request from being shared if the specified criteria are met.                                        |
+| Share percentage                  | yes                   | yes          | 1.0                                                                          | Used to set the approximate proportion of requests that should be shared. A value of 1 means that 100% of requests are shared. |
+| Minimum entries per message       | yes                   | yes          | 50                                                                           | The number of requests that must be added to a usage sharing payload before it is sent.                                        |
+| Maximum queue size                | yes                   | yes          | 1000                                                                         | The size of the queue that is used to buffer requests to be added to a usage sharing payload.                                  |
+| Add timeout milliseconds          | yes                   | yes          | 5                                                                            | The timeout to use when trying to add items to the usage sharing queue. If the request times out, the data should be discarded |
+| Take timeout milliseconds         | yes                   | yes          | 100                                                                          | The timeout to use when getting items from the usage sharing queue to add to the next payload.                                 |
+| Share usage URL                   | yes                   | yes          | https://devices-v4.51degrees.com/new.ashx                                    | The URL to send data to                                                                                                        |
+| Repeat evidence interval minutes  | yes                   | yes          | 20                                                                           | The size of the sliding window during which identical usage data will not be sent if it is seen second or subsequent times.    |
 
 
 

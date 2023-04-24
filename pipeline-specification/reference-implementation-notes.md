@@ -1,4 +1,4 @@
-# Reference Implementation Architecture Notes
+# Reference implementation architecture notes
 
 This section discusses architectural aspects of the reference implementations
 (C# and Java) which were designed with extensibility in mind and to provide the basis 
@@ -10,7 +10,7 @@ idiomatic or are hard to achieve. In other cases experience says that the
 desirability of doing so may be in question. 
 However, taking advantage of the existing design may be expedient, or desirable.
 
-## Interfaces, Base Classes, Inheritance
+## Interfaces, base classes, inheritance
 
 The reference implementations follow "classic" Object-Oriented approach of defining 
 interfaces, implementing abstract base classes and creating default
@@ -29,7 +29,7 @@ but means that for any resulting Engine, it can be quite difficult to find
 out at what level of the inheritance hierarchy a desired inherited feature 
 is implemented.
 
-## Parameterized Types and CRTP
+## Parameterized types and CRTP
 
 Generics are used throughout the reference implementations and serve, for 
 example, to bind functionality to data structures and metadata. 
@@ -37,7 +37,7 @@ This pattern is used effectively
 but the limited number of top level classes makes it harder to find what 
 data structure is being used at what level of the parameterized class.
 
-## Dependency Injection and Inversion of Control
+## Dependency injection and inversion of control
 
 Limited use is made of these techniques. Notably, the concept of shared services
 does allow the injection of caches, data update and other services.

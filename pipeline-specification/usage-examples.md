@@ -1,11 +1,12 @@
-TODO - is this actually helpful?
-Seems like a mix of rehashing points made elsewhere and just a less useful version
-of the examples from device-detection.
-On the other hand, a brief, top-level introduction to what usage of this API looks
-like in code might be an easier way for some people to get their heads around what 
-is going on.
+# Usage examples
 
-# Creating Elements and Pipelines
+For the most part, the pipeline specification is describing the pieces of an 
+empty data processing system. Many use-cases only make sense in the context 
+of some concrete usage of that system. As such, it may be helpful to look at 
+other use-case documents such as 
+[device detection](../device-detection-specification/usage-examples.md)
+
+## Creating elements and pipelines
 
 Creating **Flow Elements** should always be done using a consistent mechanism.
 In the case of C#, we use a separate builder class. For more details on this, 
@@ -35,7 +36,7 @@ create the required element and pipeline instances.
 See [pipeline configuration](features/pipeline-configuration.md) for more 
 details.
 
-# Processing data
+## Processing data
 
 Once the pipeline has been created, processing a request can generally 
 be broken down into 4 steps:
@@ -58,9 +59,3 @@ be broken down into 4 steps:
     ```
     See [access to results](features/access-to-results.md) for more detail on
     the different ways to access results.
-
-For the most part, the pipeline specification is describing the pieces of an 
-empty data processing system. Many use-cases only make sense in the context 
-of some concrete usage of that system. As such, it may be helpful to look at 
-other use-case documents such as 
-[device detection](../device-detection-specification/usage-examples.md)
