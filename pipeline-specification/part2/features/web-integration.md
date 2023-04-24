@@ -19,7 +19,7 @@ Some common tasks that the web integration may perform are:
     application so the results can be used.
   - Handle [resource cleanup](resource-cleanup.md) once request handling is 
     completed. 
-- Handling requests for [client-side](TODO - add link) functionality.
+- Handling requests for [client-side](#client-side-features) functionality.
 - Set HTTP response headers to request additional information.
 
 # Pipeline configuration
@@ -43,6 +43,9 @@ set HTTP response headers.
 
 - The [SetHeadersElement](../pipeline-elements/set-headers-element.md) must
   be present. If not, it should be added after all other elements.
+
+For all of these elements, there must be configuration options to allow
+users to prevent them being added if they wish to do so.
 
 # Populating evidence
 

@@ -44,7 +44,8 @@ See [web integration](web-integration.md) for more detail.
 
 # Null values
 
-Property values must be capable of having 'no value'
+Property values populated by **Engines** (as opposed to all **Flow Elements**)
+must be capable of having 'no value'.
 
 Where 'no value' is used, attempting to access the value should throw an 
 error/exception with a customizable message explaining why the value is not set.
