@@ -62,6 +62,10 @@ required quantity of data.
 The complete XML document must contain a `<Devices>` root element with 
 each `<Device>` element containing the details related to a request. 
 
+Multiple `<Device>` elements will be batched up as part of each message.
+The number of items per batch is configurable using the 
+[minimum entries per message](#configuration-options) setting.
+
 ```xml
 <Device>
   <SessionId>SESSION_ID</SessionId> 
@@ -100,7 +104,7 @@ For example:
 - **Product** - The name of the product that is generating the xml. For 
   example, “Pipeline” 
 - **FlowElement** – An xml element exists for each FlowElement in the 
-  pipeline. The text contains the fully qualified name of the FlowElement.  
+  pipeline. The text contains the fully qualified class name of the FlowElement.
 - **Language** - The name of the language/framework within which the 
   pipeline is running. 
 - **LanguageVersion** - The version number of the language/framework 
@@ -108,7 +112,7 @@ For example:
 - **ClientIP** - Public IP address of the client that sent the request to 
   this server. 
 - **ServerIP** - IP address of the server where the xml is being generated. 
-- **Platform** - The platform name, version and service pack. 
+- **Platform** - The platform name, version and service pack if available.
 - **Evidence** – The evidence that is shared will be determined by its 
   evidence key filter as defined below. 
 
@@ -122,7 +126,26 @@ to let the reader know the value was modified.
 See the [ReplacedString](https://github.com/51Degrees/pipeline-java/blob/master/pipeline.engines.fiftyone/src/main/java/fiftyone/pipeline/engines/fiftyone/flowelements/ShareUsageElement.java#L485) 
 function in Java for an example of this.
 
+## Request detail
+
+When sending the data, use the following details:
+- URL configurable using the [share usage URL](#configuration-options) option.
+- POST request
+- XML content written to the body of the request using GZip compression
+- HTTP Headers:
+  - content-encoding = gzip
+  - content-type = text/xml 
+
+Response will be a 200 on success. Anything else is a failure.
+When failures occur, the status code and content of the response should be logged.
+
+See the [BuildAndSendXml](https://github.com/51Degrees/pipeline-dotnet/blob/master/FiftyOne.Pipeline.Engines.FiftyOne/FlowElements/ShareUsageElement.cs#L104) method in c# for an example of this.
+
 ## Session tracking 
+
+Note that this section is not concerned with actually identifying
+the precise boundaries of user sessions. Just with reducing the volume 
+of unnecessary data that is shared.
 
 When a user is browsing a website, they may typically make many HTTP 
 requests to access different resources, visit different pages, etc.
@@ -134,7 +157,9 @@ early as possible.
 The usage sharing element must maintain a data structure containing 
 recently shared evidence values. If the data entry being processed 
 already has a matching entry in this data structure, it should not 
-be shared.
+be shared. For example, the c# implementation generates a hash of the 
+evidence values using the same logic as the [caching](../features/caching.md)
+feature.
 
 By default, entries will have a lifetime of 20 minutes within this 
 data structure. This is reset each time an entry with matching 
@@ -163,6 +188,16 @@ becomes full additional data should simply be discarded until there
 is room to add entries again. 
 However, it is important that these actions are logged so that users
 can identify potential issues with their usage sharing.
+
+# Cleanup
+
+As this element uses a producer/consumer queue and background processing,
+it will need to handle cleanup a little more carefully than other elements.
+
+1. If needed, block while the consumer sends data waiting in the queue.
+2. Send a final message with any data remaining in the queue (even if it is 
+   less than the configured minimum batch size)
+3. Free any resources associated with the queue and background processing.
 
 # Configuration options
 
