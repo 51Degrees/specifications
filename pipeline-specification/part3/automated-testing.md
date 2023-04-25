@@ -146,4 +146,46 @@ MissingPropertyService:
 
 ### Engines.Fiftyone
 
+ShareUsage:
 
+- check that ShareUsage substitutes illegal XML characters correctly and truncates calues
+- check that ShareUsage operates correctly, retrying failed data etc.
+- check that sending stops when queue is full and resumes when it is no longer so
+- check that all data in the queue are sent
+- check minimum batch size and maximum batch size
+- check operation of tracker
+- check operation of filtering of headers
+- check operation of SessionID
+- check operation on shut down
+
+- check that ShareUsage does not impose an undue burden on performance
+
+SetHeaders
+
+- check that headers are set correctly, where multiple attempts to set same header, for example
+
+### JSONBuilder
+
+- check that the output is valid
+- check that the maximum iterations is observed
+- check that disallowed elements are not put in the output
+- check that the serialization is correct
+- 
+
+### JavaScriptBuilder
+
+- Check for normal, empty, invalid and delayed execution properties
+
+### Web
+
+Tests in this area will vary by the Web support features of the language and platform.
+
+Some aspects of these tests look rather like integration tests and ideally will
+require a [headless browser](https://en.wikipedia.org/wiki/Headless_browser) for execution.
+
+Things to check:
+- operation of the setHeaders engine
+- operation of the JSON and Javascript engines
+- operation of the sequence element
+
+<span style="color:yellow">hard to know what else to say?</span>
