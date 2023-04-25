@@ -1,4 +1,6 @@
-# Overview
+# Exception handling
+
+## Overview
 
 Exceptions and errors may occur at many places within the Pipeline 
 API. It is vital that these are presented and handled consistently.
@@ -16,7 +18,7 @@ In all cases, we must use standard language features where available to
 let IDEs and users know what exceptions/errors a particular function can 
 throw.
 
-# Process function
+## Process function
 
 One of the key points that failures can occur is in the 'Process' function.
 There may be any combination of **Flow Elements**, including custom 
@@ -29,19 +31,19 @@ collection. Once all **Flow Elements** have completed processing, throw an
 exception/error with all the stored errors included as sub-errors.
 
 There must be an option to modify this behavior to just add these errors 
-to the errors collection and [log](logging.md) them. This option should 
-be available when the 
-[Pipeline is created](../conceptual-overview.md#pipeline-builder) and be 
-called `SuppressProcessExceptions` or similar.
+to the errors collection and [log](logging.md) them (I.e. don't throw an 
+exception/error at the end of processing). This option should be available 
+when the [Pipeline is created](../conceptual-overview.md#pipeline-builder) 
+and be called `SuppressProcessExceptions` or similar.
 
-## Flow Elements
+### Flow Elements
 
 **Flow Elements** should throw exceptions/errors freely, unless it makes
 sense for an element to handle a specific error internally.
 In general, it is the responsibility of the **Pipeline** to handle these for
 the user as described above.
 
-# Flow data and derived accessors
+## Flow data and derived accessors
 
 Apart from the 'Process' function, almost all user interaction is handled 
 through **Flow Data**.
@@ -55,7 +57,7 @@ attempting to access result data before 'Process' has been called.
 These are both things that the user should correct by making changes to
 their code. 
 
-# Web integration
+## Web integration
 
 The [web integration](web-integration.md) feature will be hooking into 
 the web request handling logic of the target language/framework. As such,
@@ -65,7 +67,7 @@ We must ensure that exceptions/errors that happen in these areas are
 handled correctly in order to avoid the API taking down the customer's 
 production website.
 
-# Data updates
+## Data updates
 
 The [data update](data-updates.md) process runs on a background thread.
 Consequently, it is outside any other error handling mechanisms and 
@@ -74,25 +76,25 @@ must handle all its errors internally.
 When errors do occur, they must be [logged](logging.md) and must not 
 cause the process to crash.
 
-# Custom exceptions/errors
+## Custom exceptions/errors
 
 There are several types of error that can be thrown by the Pipeline API.
 The precise naming will be language-dependant, but in C#, these are:
 
-## Property Missing Exception
+### Property Missing Exception
 
 A property missing exception is thrown if an attempt is made to access a 
 property that does not exist in the **Flow Data**.
 
 See [missing properties](properties.md#missing-properties) for more details.
 
-## Pipeline Configuration Exception
+### Pipeline Configuration Exception
 
 Can be thrown by any Pipeline, Element or Pipeline/Element builder. This
 exception is used to indicate that something in the provided configuration is
 preventing the creation or execution of the pipeline.
 
-## Cloud Request Exception
+### Cloud Request Exception
 
 Can be thrown by the [CloudRequestEngine](../pipeline-elements/cloud-request-engine.md) 
 following requests to a cloud service. Must be populated with details 

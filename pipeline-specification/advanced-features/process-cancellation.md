@@ -1,4 +1,4 @@
-# Overview
+# Process cancellation
 
 Where the language allows, the pipeline should support a mechanism for the 
 caller to cancel processing. This will:

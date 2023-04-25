@@ -1,4 +1,4 @@
-# Overview
+# Usage sharing
 
 Users of 51Degrees products have the option to send usage data to us.
 

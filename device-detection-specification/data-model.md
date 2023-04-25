@@ -1,9 +1,11 @@
-# Introduction
+# Data model
+
+## Introduction
 
 This document contains the details of the data values returned by 51Degrees
 device detection.
 
-# Overview
+## Overview
 
 All engines must populate data objects that
 implement [Aspect Data](../pipeline-specification/conceptual-overview.md#aspect-data)
@@ -21,7 +23,7 @@ populated by each engine:
 | Cloud           | IDeviceData              |
 | Hardware lookup | IList&lt;IDeviceData&gt; |
 
-# Dynamic property recommendations
+## Dynamic property recommendations
 
 The properties that can be populated by device detection are defined within the
 data file. As such, they are subject to change over time.
@@ -51,7 +53,7 @@ Note that there are a few additional
 that do not appear in the data file metadata, but will need to be included in
 interfaces, etc.
 
-# Property details
+## Property details
 
 Each property should return
 an [aspect property value](../pipeline-specification/features/properties.md#null-values)

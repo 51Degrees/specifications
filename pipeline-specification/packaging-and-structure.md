@@ -1,4 +1,4 @@
-# Packaging and Structure
+# Packaging and structure
 
 Some general guidance as to how to structure an implementation based on 
 51Degrees experience.
@@ -17,7 +17,7 @@ are required for most use cases. However, if it is of concern that various
 features are not included then facilities such as Maven's optional dependency can 
 be used.
 
-## Reference Modularity
+## Reference modularity
 
 51Degrees pipeline reference implementations are developed in a single repository
 allowing for a single build cycle. Specific features, such as Device Detection,
@@ -71,7 +71,7 @@ Automated tests and expected to be present in the same repository as the
 API code and will be run as part of CI/CD workflows.
 For more details, see [automated testing](automated-testing.md).
 
-### Test Data
+### Test data
 
 We recommend that for convenience, test data of some kind is distributed with 
 library code and examples. We also recommend that alternative means of updating

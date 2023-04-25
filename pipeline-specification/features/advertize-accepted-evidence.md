@@ -1,9 +1,11 @@
-# Summary
+# Advertize accepted evidence
+
+## Summary
 
 All **Flow Elements** and **Pipelines** must be capable of programmatically
 describing the evidence keys that they can make use of.
 
-# Flow Elements
+## Flow Elements
 
 For the majority of **Flow Elements**, simply returning a list of evidence
 values
@@ -21,7 +23,7 @@ It is valid for an element not to make use of any evidence values at all
 (for example, cloud aspect engines - which use the output from the cloud
 request engine)
 
-# Usage
+## Usage
 
 This feature is used to enable or assist with other features.
 

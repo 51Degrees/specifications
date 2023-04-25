@@ -1,4 +1,6 @@
-# Flow Elements
+# Thread safety
+
+## Flow elements
 
 The Pipeline API is designed to be used in highly concurrent environments 
 such as high traffic web servers.
@@ -6,7 +8,7 @@ such as high traffic web servers.
 Consequently, **Pipeline** and **Flow Element** implementations must be 
 capable of handling multiple concurrent requests to the `Process` function.
 
-# Flow Data
+## Flow data
 
 In general user-facing data structures linked to **Flow Data** do not need to be 
 thread-safe as the most common use-case is that they will be accessed and 
@@ -23,12 +25,12 @@ will be processed. The Pipeline can determine whether any Flow Elements are
 to be processed in parallel and thus can determine whether to create thread-safe 
 Flow Data or not.
 
-## Evidence
+### Evidence
 
 Evidence collection stored within **Flow Data** needs to be thread safe for
 concurrent read access and immutable once created. 
 
-# Element Data
+## Element data
 
 In general, **Element Data** instances do not need to be thread safe, as they
 should only be accessed and updated from a single thread.
@@ -38,16 +40,10 @@ instance is accessed from multiple threads. We do not consider it worthwhile
 to cater for this scenario given the decreased performance and increased
 complexity that it would require.
 
-# Aspect Data
+## Aspect data
 
 In contrast to Element Data, Aspect Data instances must be thread-safe as the 
 same instance may be used for multiple different calls to `Process` when
 the [caching](caching.md) feature is enabled.
 If this is not possible for some reason then the engine must not allow a cache 
 to be added.
-
-<span style="color:yellow">This is interesting, so `.Process()` method can not 
-	be called more than once on the same `Flow Data` object, so it will be called on 
-	different `Flow Data` objects, but each of them
-	may hold a reference to the same cached `Aspect Data` object? 
-</span>

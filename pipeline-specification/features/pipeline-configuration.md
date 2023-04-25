@@ -1,4 +1,6 @@
-# Summary
+# Pipeline configuration
+
+## Summary
 
 Many Flow Elements have numerous configuration options, it is also possible
 to configure Pipelines in many ways.
@@ -10,7 +12,7 @@ code approach, or a configuration file.
 For consistency, configuration files should be as similar as possible between 
 languages.
 
-# Pipelines
+## Pipelines
 
 - During construction, Pipelines must have the ability to add elements/engines. 
   These will run in sequence in the order they are added.
@@ -30,7 +32,7 @@ This would create a pipeline that performs the following processing:
 - When s1 is finished, p1 and p2 are started in parallel.
 - When both p1 and p2 are complete, s2 is started.
 
-# Flow Elements 
+## Flow Elements 
 
 - Elements/Engines may or may not have configuration options to customize the 
   processing that they perform.
@@ -42,7 +44,7 @@ This would create a pipeline that performs the following processing:
   via a file. The exceptions are usually options that take complex objects, which 
   cannot easily be defined in a text-based file.
 
-# Deserialization
+## Deserialization
 
 Configuration files must be human-readable and consistent between languages.
 Consequently, we don't want any type information or meta-data appearing in
@@ -57,7 +59,7 @@ To date, the following types are supported in configuration files for all langua
 - list of strings (represented as a comma-separated string)
 - enumeration value (represented as the string name of the value)
 
-# Sample configuration files
+## Sample configuration files
 
 TODO - these sample files are not yet publicly available, they are in 
 internal `develop` branches.

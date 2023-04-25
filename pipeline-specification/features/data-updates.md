@@ -1,4 +1,4 @@
-# Data Update
+# Data update
 
 ## Overview
 
@@ -19,9 +19,9 @@ or to implement the Data Update service to allow for multiple file sources.
 
 [^1] data sources are referred to as data files in the reference implementations
 
-### Aspect Engine Features
+### Aspect engine features
 
-In order to support this feature, **Aspect Engines** must have a
+In order to support this feature, **Aspect Engines** must have 
 some additional abilities:
 
 1. At configuration time, there must be a mechanism for supplying details about
@@ -35,14 +35,14 @@ The Pipeline that contains the Aspect Engine must still be capable of
 processing Flow Data with minimal
 performance impact while data refresh is happening.
 
-## Data Refresh Availability
+## Data refresh availability
 
 A data source may contain a timestamp that specifies when it was created and may
 contain a timestamp that indicates when refreshed data will be available. This
 information can be used to optimize polling, or to provide information as to 
 how up-to-date the current data is.
 
-## Operational Modes
+## Operational modes
 
 From the point of view of the Data Update Service, Aspect Engines have several 
 operational modes:
@@ -54,24 +54,24 @@ operational modes:
 Other operational modes may be possible, such as an Aspect Engine's data residing
 in a relational database.
 
-### File Data Source, File Based Operation
-In this operational mode an Aspect Engine the Aspect Engine uses data that
+### File data source, file based operation
+In this operational mode an Aspect Engine uses data that
 resides in the file system to support its operation. This may be because the 
 data is too extensive to be loaded into memory or because of memory limitations
 in the system.
 
-### File Data Source, Memory Based Operation
+### File data source, memory based operation
 
 In many cases, for reasons of access speed, it is desirable for the data, which
 is provided in a file, to be loaded into memory on start-up and on refresh.
 
-### Memory Data Source
+### Memory data source
 
 In some cases, to provide for fully disk-less operation, it may be desirable 
 for an Aspect Engine to obtain its data 
 as a memory buffer on start-up and on refresh.
 
-## Operational Options
+## Operational options
 
 A number of options control the operation of the Data Update Service. Not all
 options are available in every mode and some combinations of options are
@@ -84,7 +84,7 @@ implementation.
 Implementations may choose to report an error when inconsistent configuration 
 options are chosen.
 
-### Update on Startup
+### Update on startup
 
 This option provides for checking for data from an HTTP server on startup 
 as a blocking operation. 
@@ -101,7 +101,7 @@ obtained via HTTP.
 Configuration Groups:
 - *HTTP config*
 
-### Automatic Update via HTTP
+### Automatic update via HTTP
 
 This option provides for periodic ongoing checking of an HTTP server
 for the availability of an updated data source.
@@ -133,7 +133,7 @@ Configuration Groups:
 - *Polling config*
 - *Operational file config*
 
-### Automatic Update from File
+### Automatic update from File
 
 This option allows users to obtain new data files by whatever means they choose,
 and have the Aspect Engine refresh by detection of a new file in the file system
@@ -148,7 +148,7 @@ If the operational environment does not support file system watching events,
 implementors may need to use polling to determine changes and should have
 due regard to file system load when setting polling frequency.
 
-### Programmatic Update
+### Programmatic update
 
 The option allows for programmatic triggering of an update. The effect of a 
 programmatic update is to initiate
@@ -168,7 +168,7 @@ Configuration Groups:
 - *Polling config*
 - *Operational file config*
 
-## Configuration Groups
+## Configuration groups
 ### HTTP config
 
 Configuration of the remote endpoint for download:
@@ -185,7 +185,7 @@ Configuration of the frequency for checking of new content:
 - **randomization** - provide a variation of polling frequency to avoid 
   synchronized requests from more than one server
 
-### Operational File config
+### Operational file config
   
 Configuration of the locations that disk based operation is done from:
 - **dataSourceFileLocation** - where to load the data source fom
@@ -207,22 +207,22 @@ is enabled and disk based operation is enabled is an error.
 Implementations may choose to report an error if any item
 in this configuration is set for memory data source operation.
 
-## Update Processes
+## Update processes
 
-### Update on Startup
+### Update on startup
 - for disk data source, check operational data configuration consistency
 - check HTTP server for new file
     - on fail, fall back to local file if any
         - no local file, fail
-- compare date with local 
-    - if newer, 
+- compare date with local
+    - if newer or there is no local file, 
       - save new file
     - load file
 - if disk data source, configure file watcher, if requested
 - configure HTTP update polling, if requested
 - continue
 
-### Other Startup
+### Other startup
 - check operational data configuration consistency
 - load data from memory or file
 - if disk data source, configure file watcher, if requested
@@ -245,7 +245,7 @@ downloaded file is newer than the current file
 - resume file watcher, if any
 - trigger onUpdateCallbacks
 
-### Programmatic Update
+### Programmatic update
 
 - poll remote, if polling is configured
   - check if file is newer
@@ -255,7 +255,7 @@ downloaded file is newer than the current file
   - process as per newFile above
   - return
 
-## Update Polling
+## Update polling
 
 This section making an HTTP request to check for 
  updated data and handling the response.
@@ -306,20 +306,20 @@ relevant details (e.g. which engine + data file the update is for)
 
 ### Messages at startup 
 
-| **Action** | **Message** |
-|---|---|
-| Running the update on startup process | Updating on startup |
-| File system watcher created | Creating file system watcher |
+| **Action**                            | **Message**                  |
+|---------------------------------------|------------------------------|
+| Running the update on startup process | Updating on startup          |
+| File system watcher created           | Creating file system watcher |
 
 ### Messages during operation
 
-| **Action** | **Message** |
-|---|---|
-| Starting the check for update process | Checking for update |
-| Call [refresh](#aspect-engine-features) on an engine | Attempting to refresh engine '\<engine type\>' with new data |
-| Send HTTP request to check for new data file | Checking for update from '\<url\>' for engine '\<engine type\>' |
-| Successfully downloaded new data file | Downloaded new data from '\<url\>' for engine '\<engine type\>' |
-| 304 (Not modified) response from HTTP request | No data newer than \<datetime\> found at '\<url\>' for engine '\<engine type\>' |
+| **Action**                                           | **Message**                                                                     |
+|------------------------------------------------------|---------------------------------------------------------------------------------|
+| Starting the check for update process                | Checking for update                                                             |
+| Call [refresh](#aspect-engine-features) on an engine | Attempting to refresh engine '\<engine type\>' with new data                    |
+| Send HTTP request to check for new data file         | Checking for update from '\<url\>' for engine '\<engine type\>'                 |
+| Successfully downloaded new data file                | Downloaded new data from '\<url\>' for engine '\<engine type\>'                 |
+| 304 (Not modified) response from HTTP request        | No data newer than \<datetime\> found at '\<url\>' for engine '\<engine type\>' |
 
 ### Errors
 

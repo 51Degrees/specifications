@@ -1,3 +1,5 @@
+# Multi-pipeline elements
+
 It should be possible for a **Flow Element** to be added to multiple 
 **Pipelines** once it has been created. 
 
@@ -16,3 +18,7 @@ such state information must ensure that they have the means to keep track of
 isolated instances of this state for each **Pipeline** to which they are 
 added and use the correct state information when processing.
 
+Note that is may be preferable for some elements to throw an error if added 
+to a second pipeline, rather than implement the logic that would be required 
+to allow operation in multiple pipelines. This approach should ideally only 
+be taken if the element has a very low memory footprint.
