@@ -44,13 +44,13 @@ endif
 flowData.Add(engineDataKey, result);
 ```
 
-Warning - don't take the pseudocode above as a template. Real production code 
+Warning - don't take the pseudo code above as a template. Real production code 
 is likely to vary significantly from this in order to account for concurrency 
 concerns, error handling, other features, etc.
 
 ## Generation of keys
 
-All **Flow Elements** must [advertise](advertise-accepted-evidence.md) the 
+All **Flow Elements** must [advertise](advertize-accepted-evidence.md) the 
 evidence keys that they make use of.
 You will need to use this to build a list of the relevant evidence keys 
 and values that are present in the **Flow Data**.
