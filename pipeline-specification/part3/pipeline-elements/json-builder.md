@@ -1,102 +1,158 @@
-TODO - Taken from old spec. Needs review and refactor
+# Json builder element
 
+## Overview
 
----
-### JsonBuilderElement
+The json builder element creates a JSON representation of most of the values 
+in the Flow Data.
 
-The json builder element creates a JSON representation with most of the values in the
-flowdata.
+This is used along with the [JavaScript builder element](javascript-builder.md)
+and [Sequence element](sequence-element.md) to enable client-side features of 
+the Pipeline [web integration](../../features/web-integration.md).
 
-The **ElementDataKey** is ‘json-builder’  
-The **ElementData** contains a single string property called ‘Json’  
-The **EvidenceKeyFilter** is empty
+## Accepted evidence
 
----
-*Configuration Options*
+This element uses no evidence, its only input is the current set of 
+Element Data instances in the Flow Data.
 
-| Builder method name | Type | Default | Description |
-|---|---|---|------|
-| SetProperties | List of strings | [Empty list] | A list of the properties to include in the JSON. By default, all properties will be included. Also note that some properties, such as JavaScript properties, will always be included, regardless of this setting. Property names must be fully qualified. (e.g. ‘device.ismobile’ or ‘devices.profiles.hardwarename’) |
+## Startup activity
 
-Configuration Example:
+For performance reasons, it may be important to create lists of property meta 
+data that meet certain criteria on startup.
 
-**Incorrect**
-```
-"PipelineOptions": {
-  "Elements": [
-    {
-      "BuilderName": "JsonBuilderElement",
-      "BuildParameters": {
-        "Properties": [ "ismobile", "city", "hardwarename" ]
-      }
-    }
+For example, a list of all properties that have the 'delay execution' flag set.
+Or, for each property, a list of the JavaScript properties that can cause their
+value to be updated due to new evidence.
+
+See the [PopulateMetaDataCollections](https://github.com/51Degrees/pipeline-dotnet/blob/master/FiftyOne.Pipeline.Elements/FiftyOne.Pipeline.JsonBuilderElement/FlowElement/JsonBuilderElement.cs#L715)
+method in c# for an example of this.
+
+## Element data
+
+The output from this element is a single string property called 'Json'.
+This will be populated with the raw JSON that is generated.
+
+## Process
+
+The element needs to produce a JSON representation of the Flow Data. 
+There should be a top-level entry for each element containing sub-entries 
+for each property and its value (set to 'null' if there is no value).
+
+There are also several meta-data properties with different suffixes that may 
+be added for each property:
+
+| **Suffix** | **Description** |
+|---|---|
+| nullreason | Where the property value is null, this meta-property must be added with a string message that explains why this property does not have a value. |
+| delayexecution | This meta-property must be added with the value 'true' for all properties where the [meta-data](../../features/properties.md#property-metadata) delay execution flag is true. |
+| evidenceproperties | Where the JSON includes other properties that are in the [meta-data](../../features/properties.md#property-metadata) evidence properties list for this property and those properties have the delayed execution flag set to true, this meta-property must be added to list those properties. |
+
+Some elements should be excluded from having their properties added to the JSON. 
+By default, these are:
+- [Set headers element](set-headers-element.md)
+- [Cloud request engine](cloud-request-engine.md) 
+- [Usage sharing element](usage-sharing-element.md) 
+
+There are also a couple of extra top-level entries that may be populated in the 
+final JSON output:
+- If the sequence number set by the [sequence element](sequence-element.md) is less 
+  than the maximum (specified by a constant set to 10 in the reference implementations) 
+  then get a list of the complete names of all JavaScript properties. Add this to the 
+  result under the top-level key `javascriptProperties`.
+- Add any errors from the Flow Data errors collection to the result. This is structured
+  as a string array of the error messages under the top-level key `errors`.
+
+### Examples
+
+Device detection result including a couple of javascript properties.
+Note the `screenpixelswidth` property is currently zero because device
+detection does not know how wide the screen is.
+The `screenpixelswidthjavascript` contains the JavaScript snippet that
+can be executed to gather this information.
+
+```json
+{
+  "device": {
+    "ismobile": false,
+    "screenpixelswidth": 0,
+    "screenpixelswidthjavascript": "//Set screen pixels width cookie.\r\ndocument.cookie = \"51D_ScreenPixelsWidth=\" + screen.width;"
+  },
+  "javascriptProperties": [
+    "device.screenpixelswidthjavascript",
   ]
 }
 ```
 
-**Correct**
-```
-"PipelineOptions": {
-  "Elements": [
-    {
-      "BuilderName": "JsonBuilderElement",
-      "BuildParameters": {
-        "Properties": [ "device.ismobile", "location.city", "devices.profiles.hardwarename" ]
-      }
-    }
+Result from a location lookup before any coordinates have been supplied.
+- The `javascript` property contains the script to be executed to get the 
+  coordinate values.
+- The `javascriptdelayexecution` property indicates that we don't want the
+  `javascript` snippet to be executed immediately because it will prompt 
+  the user to allow their location to be read.
+- The `zipcode` property is null because we haven't yet supplied coordinates
+- The `zipcodenullreason` property contains a description of why `zipcode` 
+  is null
+- The `zipcodeevidenceproperties` property contains a list of the delayed 
+  execution properties that could be executed in order to get a value for 
+  this property.
+
+```json
+{
+  "location": {
+    "javascript": "\r\nif (navigator.geolocation) {\r\n\tnavigator.geolocation.getCurrentPosition(function(pos) {\r\n        for (var key in pos.coords) {\r\n            document.cookie = \"51D_Pos_\" + key + \"=\" + pos.coords[key];\r\n        }\r\n        // 51D replace this comment with callback function.\r\n\t}, function(e) {\r\n        document.cookie =\"51D_Pos_Error=\" + encodeURIComponent(e.message);\r\n        // 51D replace this comment with callback function.\r\n    });\r\n}\r\n",
+    "javascriptdelayexecution": true,
+    "zipcode": null,
+    "zipcodenullreason": "This property requires evidence values from JavaScript running on the client. It cannot be populated until a future request is made that contains this additional data.",
+    "zipcodeevidenceproperties": ["location.javascript"],
+  },
+  "javascriptProperties": [
+    "location.javascript"
   ]
+}
+
+```
+
+Partial result from a TAC lookup that returns multiple devices.
+
+```json
+{
+  "hardware": {
+    "profiles": [
+      {
+        "hardwaremodel": "5217",
+        "hardwarename": [
+          "5217"
+        ],
+        "hardwarevendor": "Coolpad",
+      },
+      {      
+        "hardwaremodel": "5200",
+        "hardwarename": [
+          "5200"
+        ],
+        "hardwarevendor": "Coolpad",
+      },
+      {
+        "hardwaremodel": "5310",
+        "hardwarename": [
+          "5310"
+        ],
+        "hardwarevendor": "Coolpad",
+      }
+    ]
+  }
 }
 ```
 
----
-*Startup*
+JSON with an error value set.
 
-This element needs to build some helper collections when it first starts up:
+```json
+{ 
+  "errors": [ "'abc' is not a valid Resource Key. See http://51degrees.com/documentation/_info__error_messages.html#Resource_key_not_valid for more information." ]
+}
+```
 
+## Configuration options
 
-1.  A list, DelayedExecutionProperties, of the complete names of all properties that have delay execution = true.
-    1.  This can be determined by looking at the ‘DelayExecution’ flag on
-        property meta data for each element in the pipeline.
-    2.  Ensure that the complete name is stored. I.e. [element data
-        key].[property name] For example, device.ismobile.
-    3.  Ensure properties with nested sub-properties are handled correctly. For example, hardware.devices.ismobile.
-
-2.  A collection, DelayedEvidenceProperties, of key value pairs when the key is the complete name of the property and the value is the list of complete property names that, when executed, can help determine the value of that property.  
-This must be populated for all properties for which a value cannot be determined until the delayed execution properties are executed. For example, the location.javascript property must be executed before location.country can be populated. The key would be location.country and the value would be a list containing one element: location.javascript.
-    1.  This can be determined by using the list of delayed execution properties generated above, in combination with the ‘EvidenceProperties’ list on property meta data.
-        1.  EvidenceProperties contains only the property name. For example, ‘country’. These must be converted into complete names before they can be compared with the names in the list of delayed execution properties.
-    2.  As above, complete names must be used, and sub-properties handled
-        correctly.
-
----
-*Process*
-
-Get sequence number from evidence key ‘query.sequence’. If not present, throw an
-error “Sequence number not present in evidence. This is mandatory. Check that
-the SequenceElement exists in the pipeline before this JsonBuilderElement”
-
-Create a nested collection C1 of string =\> object key value pairs to hold the
-values that will end up in the JSON
-
-For each property each element (except the json-builder element itself), perform
-the following:
-
-
--   Get the complete name by combining the element name with the property name. Full stop separators are used and the result MUST be all lowercase. For example, the IsMobile property on the device detection engine becomes ‘device.ismobile’
--   Get the property value as a variable - V1.
--   If the V1 is **AspectPropertyValue** and it has a value, set V1 to the
-    value. If it does not have a value, add two items to the nested collection C1:
-    -   [complete name], null
-    -   [complete name]+”nullreason”, [no value message from aspect property value]
--   If V1 is not null:
-    -   If V1 is a list of other element data items, repeat this process for each item in the list. Set V1 = the result C1 from that call. Naming is important here, the current ‘complete name’ will become the ‘element name’ in the next level down. For example, when performing a TAC lookup, multiple profiles can be returned. In JSON, the ismobile property would then be represented as ‘hardware.profiles.ismobile’. ‘hardware’ is the **ElementDataKey** and ‘profiles’ is the name of the property, which contains the list of profile objects.
-    -   Add to C1: [complete name], V1
-    -   If DelayedExecutionProperties contains this property then Add to C1: [complete name]+”delayexecution”, true
--   If the complete name is in DelayedEvidenceProperties then add to C1:
-    [complete name]+”evidenceproperties”, [value from DelayedEvidenceProperties]
-
-If sequence number \< 10, get a list of the complete names of all JavaScript
-properties. Add this to the result under the key ‘javascriptProperties’.
-
-Add any errors from the flowdata Errors collection to the result. This must be a
-simple string list of the error messages under the key ‘errors’.
+| **Name**      | **Type**        | **Default**  | **Description**                                                                                                                                                                                                                                                                                                       |
+|---------------|-----------------|--------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| SetProperties | List of strings | [Empty list] | A list of the properties to include in the JSON. By default, all properties will be included. Also note that some properties, such as JavaScript properties, will always be included, regardless of this setting. Property names must be fully qualified. (e.g. `device.ismobile` or `devices.profiles.hardwarename`) |
