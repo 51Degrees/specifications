@@ -33,7 +33,7 @@ evidence.
 
 Reference implementations also contain the following examples:
 
-- Create a pipeline that shares usage with 51degrees from options file, 
+- Create a pipeline that shares usage with 51degrees configured from options file, 
   although this example is runnable you can't actually "see" that it is working.
 
 
