@@ -23,6 +23,9 @@ Engine is common to all cloud engines and is described in the
 [Cloud Aspect Engine](../../pipeline-specification/pipeline-elements/cloud-aspect-engine.md) 
 document.
 
+<span style="color:yellow">Sounds like Cloud Aspect Engine acts as a results filter once they are obtained
+from the Cloud Request Engine</span>
+
 ## Device detection cloud engine configuration
 
 There are no configuration options associated with this engine.

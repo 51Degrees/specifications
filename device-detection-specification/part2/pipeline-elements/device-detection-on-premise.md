@@ -325,6 +325,9 @@ All these properties have the following values:
 
 ## Configuration options
 
+<span style="color:yellow">The parameter names below are human readable, but maybe it also makes sense to add a column with code-level name equivalents 
+as specified in the cxx/.h files - or simply refer to these files not only when mentioning default values, but also parameter names</span>
+
 These are the configuration options that are unique to this engine. They are in 
 addition to all the configuration options defined for other features. For example,
 [data updates](../../../pipeline-specification/part2/features/data-updates.md#configuration-groups)
