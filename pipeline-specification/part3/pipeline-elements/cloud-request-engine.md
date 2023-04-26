@@ -51,8 +51,9 @@ to get this information.
 
 ## Element data
 
-This engine populates a single property - json-response. This will contain 
-the raw JSON response from the cloud HTTP request.
+| **Name**      | **Type** | **Description**                                   |
+|---------------|----------|---------------------------------------------------|
+| json-response | string   | The raw json response body from the HTTP request. |
 
 An example of the JSON response received from the server:
 

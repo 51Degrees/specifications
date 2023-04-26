@@ -28,8 +28,9 @@ operate as efficiently as possible.
 
 ## Element data
 
-The output from this element is a single string property called 'JavaScript'.
-This will be populated with the raw JavaScript that is generated.
+| **Name**   | **Type** | **Description**                              |
+|------------|----------|----------------------------------------------|
+| javascript | string   | The raw JavaScript produced by this element. |
 
 ## Process
 

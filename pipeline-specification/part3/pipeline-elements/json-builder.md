@@ -28,8 +28,9 @@ method in c# for an example of this.
 
 ## Element data
 
-The output from this element is a single string property called 'Json'.
-This will be populated with the raw JSON that is generated.
+| **Name** | **Type** | **Description**                        |
+|----------|----------|----------------------------------------|
+| json     | string   | The raw JSON produced by this element. |
 
 ## Process
 
@@ -40,10 +41,10 @@ for each property and its value (set to 'null' if there is no value).
 There are also several meta-data properties with different suffixes that may 
 be added for each property:
 
-| **Suffix** | **Description** |
-|---|---|
-| nullreason | Where the property value is null, this meta-property must be added with a string message that explains why this property does not have a value. |
-| delayexecution | This meta-property must be added with the value 'true' for all properties where the [meta-data](../../features/properties.md#property-metadata) delay execution flag is true. |
+| **Suffix**         | **Description**                                                                                                                                                                                                                                                                              |
+|--------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| nullreason         | Where the property value is null, this meta-property must be added with a string message that explains why this property does not have a value.                                                                                                                                              |
+| delayexecution     | This meta-property must be added with the value 'true' for all properties where the [meta-data](../../features/properties.md#property-metadata) delay execution flag is true.                                                                                                                |
 | evidenceproperties | Where the JSON includes other properties that are in the [meta-data](../../features/properties.md#property-metadata) evidence properties list for this property and those properties have the delayed execution flag set to true, this meta-property must be added to list those properties. |
 
 Some elements should be excluded from having their properties added to the JSON. 
