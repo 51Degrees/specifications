@@ -150,7 +150,8 @@ other Pipeline API features.
 [^caching] Note the effect that 
     holding the "unmanaged" memory references (i.e. memory references that
     are not handled by language garbage collection) has on 
-    [caching](features/caching.md) and [resource cleanup](resource-cleanup.md). 
+    [caching](../../pipeline-specification/features/caching.md) and 
+    [resource cleanup](../../pipeline-specification/features/resource-cleanup.md). 
     The reference implementations don't allow a cache to be
     added to this engine because of the complexity this introduces, however
     end-users may be tempted to create their own cache of results.
@@ -327,7 +328,7 @@ All these properties have the following values:
 
 These are the configuration options that are unique to this engine. They are in 
 addition to all the configuration options defined for other features. For example,
-[data updates](../../../pipeline-specification/part2/features/data-updates.md#configuration-groups)
+[data updates](../../pipeline-specification/features/data-updates.md#configuration-groups)
 
 | **Parameter**             | **Native code location**                                                                                                                            | **Optional** | **Default**                                                                                                                      | **Notes**                                                                                                                                                                                                                                                                                                                                                                                                   |
 |---------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|--------------|----------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
