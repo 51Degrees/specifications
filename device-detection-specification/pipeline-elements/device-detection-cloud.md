@@ -16,7 +16,7 @@ a Device Detection Cloud Engine, later in the Pipeline. Since the detection
 engine depends on the request having been processed in advance, it checks that
 ElementData from the cloud request is present in Pipeline before processing.
 
-![Cloud engine flow](../../../pipeline-specification/images/Device%20Detection%20Cloud%20Engine.png)
+![Cloud engine flow](../../pipeline-specification/images/Device%20Detection%20Cloud%20Engine.png)
 
 The majority of the logic that must be performed by the Device Detection Cloud
 Engine is common to all cloud engines and is described in the 

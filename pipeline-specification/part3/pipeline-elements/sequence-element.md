@@ -1,31 +1,40 @@
+# SequenceElement
 
-TODO - Taken from old spec. Needs review and refactor
+## Overview
 
-### SequenceElement
+The sequence element is used to keep track of the number of times that 
+the script produced by the [JavaScript builder](javascript-builder.md) 
+makes callbacks to the server.
 
-The sequence element does not have any configuration parameters.
+The generated 'session id' is also used as a key in various places.
 
-The **ElementDataKey** is ‘sequence’
+Note that in this context, 'session' is not necessarily a one to one 
+mapping to an HTTP session.   
 
-The **ElementData** contains no properties.
+## Accepted evidence
 
----
-*EvidenceKeyFilter*
+- query.session-id
+- query.sequence
 
--   query.session-id
+## Element data
 
--   query.sequence
+| **Name**   | **Type** | **Description**                                                                       |
+|------------|----------|---------------------------------------------------------------------------------------|
+| session-id | string   | An identifier for this session.                                                       |
+| sequence   | int      | A counter that records how many consecutive callbacks have been made in this session. |
 
----
-*Process*
+## Process
 
-If the evidence contains no session id, then create one and add it to the
-evidence. This is usually the string representation of a Guid. However, it could
-be any string that is (nearly) guaranteed to be unique.
+If `query.session-id` is not present in Evidence then generate a new id and 
+add it to the output. We generally use GUIDs, but this is up to the implementor.
 
-If the evidence contains no sequence number, then add one to the evidence
-initialized to 1. Otherwise, parse the value and increment it, assigning the new
-value back to the evidence collection.
+If `query.sequence` is present in Evidence then add one to it and add it to
+the output. If it is not present, the the output value for sequence to one.
 
-If the value cannot be parsed, then set it to 1 and log an error. “Failed to
-increment usage sequence number”
+Note that the reference implementations currently write these output values 
+back to the Evidence collection as evidence was not originally implemented as 
+immutable.
+
+## Configuration options
+
+None
