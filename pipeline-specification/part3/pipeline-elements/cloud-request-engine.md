@@ -2,51 +2,53 @@
 
 ## Overview
 
-Cloud engines offload the processing to a remote system. This reduces 
+Cloud Engines offload their processing to a remote system. This reduces 
 resource requirements and avoids the complexities of some local 
-engines (For example, 
+Engines (For example, 
 [device detection on premise](../../device-detection-specification/pipeline-elements/device-detection-on-premise.md) 
 has a native component that requires additional dependencies) 
 
 The Pipeline API splits this cloud processing over two separate types of 
-engine:
-- Cloud Request Engine - (Specified in this document) Makes the HTTP 
-  call to the remote service and  makes the raw JSON response available 
+Engine:
+- Cloud Request Engine - The subject of this section, makes an HTTP 
+  call to a remote service and makes a raw JSON response available 
   by adding it to its Aspect Data.
 - [Cloud Aspect Engine](cloud-aspect-engine.md) - Designed to be swapped 
   out with an equivalent on-premise engine. Takes the raw JSON response 
   from the Cloud Request Engine's Aspect Data and deserializes it to 
-  populate its own Aspect Data instance, which is interface compatible 
-  with the Aspect Data from the on-premise engine.
+  populate its own Aspect Data, which is interface compatible 
+  with the Aspect Data from the on-premise Engine.
 
-The following diagram illustrates this process with a device detection
-cloud engine:
+The following diagram illustrates this process with a Device Detection
+Cloud Engine:
 
-![Cloud engine flow](../../../pipeline-specification/images/Device%20Detection%20Cloud%20Engine.png)
+![Cloud Engine flow](../../../pipeline-specification/images/Device%20Detection%20Cloud%20Engine.png)
 
-A Pipeline should only have one Cloud Request Engine, but may have 
-multiple Cloud Aspect Engines - For example, a location cloud engine, 
-device detection cloud engine, etc.
+A Pipeline will usually have a single Cloud Request Engine, but may have 
+multiple Cloud Aspect Engines - for example, a Location Cloud Engine, 
+Device Detection Cloud Engine, etc.
 
-This approach is taken in order to allow cloud engines to behave as 
-similar as possible to on-premise engines from the user point of view, 
-while limiting the number of HTTP requests to one per Flow Data, regardless
-of the number of different aspects the user wishes to get information on.
+This approach is taken in order to allow Cloud Engines to behave as 
+similarly as possible to On-premise Engines from the user point of view, 
+while limiting the number of HTTP requests to the same remote 
+server to one per Flow Data, regardless
+of the number of different Aspects required.
 
 ### Resource Key
 
 A Resource Key is a token that serves both to authenticate a request to the 
-51Degrees server and to specify which property values are returned in the 
+remote server and to specify which Property values are returned in the 
 result. Resource Keys are created using the 
 [51Degrees Configurator](https://51degrees.com/documentation/4.4/_concepts__configurator.html). 
-See [Resource Keys Documentation](https://51degrees.com/documentation/4.4/_info__resource_keys.html)
+See [Resource Key Documentation](https://51degrees.com/documentation/4.4/_info__resource_keys.html)
 for more information.
 
-## Accepted evidence
+## Accepted Evidence
 
-Accepted evidence is dependent on the supplied Resource Key.
+Accepted Evidence is dependent on the supplied Resource Key.
 
-[On startup](#startup-activity), the engine must make a request to cloud 
+[On startup](#startup-activity), the Engine must make a request to its 
+remote server
 to get this information.
 
 ## Element data
@@ -85,77 +87,79 @@ An example of the JSON response received from the server:
 }
 ```
 
-## Startup activity
+## Start-up activity
 
-On startup, the engine must call the `accessibleproperties` and `evidencekeys` 
+On start-up, the engine must call its configured `accessibleproperties` 
+and `evidencekeys` 
 endpoints, using the configured Resource Key.
 
 The result from `accessibleproperties` will be used to populate a publicly 
 accessible (read only) dictionary containing details of the data and 
-properties that are expected to be returned by the cloud service for this 
-**resource key**.
+Properties that are expected to be returned by the cloud service for this 
+Resource Key.
 
 This information will then be used by [Cloud Aspect Engines](cloud-aspect-engine.md) 
-to populate their property meta data collections.
+to populate their Property metadata collections.
 
 The result from `evidencekeys` will be used to populate the 
-[accepted evidence](#accepted-evidence) for this engine.
+[accepted Evidence](#accepted-evidence) for this engine.
 
-If either of these requests fail, the engine should throw a critical 
-error. as the Pipeline will be unable to function correctly.
+If either of these requests fails, the engine MUST throw a critical 
+error as the Pipeline will be unable to function correctly.
 
-See the [HTTP requests](#http-requests) section for details on general 
+See [HTTP requests](#http-requests) for details on general 
 HTTP request handling.
 
 ## Processing
 
-The engine processes FlowData by filtering the evidence and making an HTTP 
-request to the server containing that evidence. The HTTP API used for access to 
-the server is defined at https://cloud.51degrees.com/api-docs/index.html.
+The Engine processes FlowData by filtering the Evidence provided to that
+required by the server, and makes an HTTP 
+request to the server using the filtered evidence. The HTTP API used for access to 
+51Degrees servers is defined at https://cloud.51degrees.com/api-docs/index.html.
 
-The cloud service can handle evidence in several different forms, but where 
-possible, URL-encoded form data should be used. This should be constructed 
+The server can handle evidence in several different forms, but where 
+possible, URL-encoded form data should be used. This is constructed 
 by adding the resource key value using the key `resource`, then adding
 all the values from the Flow Data Evidence.
 
-When evidence is added, the prefix MUST be removed. 
+When Evidence is added, its prefix MUST be removed. 
 For example, `query.user-agent` becomes `user-agent`.
-This means that conflicts can occur when there are evidence values for the same
+This means that conflicts can occur when there are Evidence values for the same
 key with different prefixes. Where there are conflicts, the precedence order 
-defined in the [Evidence](../features/evidence.md) document must be used to
-decide which value to use.
+defined in [Evidence](../features/evidence.md) must be used to
+determine which value to use.
 
-See the [HTTP requests](#http-requests) section for details on general 
+See [HTTP requests](#http-requests) for details on general 
 HTTP request handling.
 
 ## HTTP requests
 
-When making requests to the cloud service during startup or processing, some
+When making requests to the cloud service during start-up or processing, some
 common steps must be followed.
 
 Firstly, the `Origin` HTTP Header must be set using the configured 
 [CloudRequestOrigin](#configuration-options).
 
-Second, there are several scenarios that must cause an error to be thrown:
+Second, there are several scenarios that MUST cause an error to be thrown:
 
-- The response will usually be a json object, where this is the case, the 
-  code must check for an array under a property called `errors` at the top 
-  level. If this contains an entry then it must be extracted and the text 
+- The response will be a JSON object. A check must be made for an array under a 
+  top-level property called `errors`. If this contains an entry then it must be 
+  extracted and the text 
   used as the message for the thrown error. (If there are multiple entries 
-  then a language-appropriate structure, such as the c\# AggregateException 
-  should be used)
+  then a language-appropriate structure, such as the C# AggregateException 
+  SHOULD be used)
 - If the response is empty then the message must be 
   `No data in response from cloud service at '[url]'`
-- If the HTTP status code indicates failure (i.e. not 2xx) AND there are no 
+- If the HTTP status code indicates failure (i.e. not 200) AND there are no 
   error messages for the reasons mentioned above, the message must be 
   `Cloud service at '[url]' returned status code '[code]' with content [raw response]`
 
 Similarly to the `errors` array, any entries in the `warnings` array in the 
-response should be logged as warnings.
+response SHOULD be logged as warnings.
 
 ## Configuration options
 
-These are the configuration options that are unique to this engine. They 
+These are the configuration options that are unique to this Engine. They 
 are in addition to all the configuration options defined for other features. 
 For example,
 [caching](../../../pipeline-specification/part2/features/caching.md)
