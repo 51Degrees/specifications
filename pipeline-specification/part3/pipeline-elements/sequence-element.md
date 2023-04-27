@@ -1,9 +1,9 @@
-# SequenceElement
+# Sequence Element
 
 ## Overview
 
-The sequence element is used to keep track of the number of times that 
-the script produced by the [JavaScript builder](javascript-builder.md) 
+The sequence Element is used to keep track of the number of times that 
+the script produced by the [JavaScript Builder Element](javascript-builder.md) 
 makes callbacks to the server.
 
 The generated 'session id' is also used as a key in various places.
@@ -11,12 +11,12 @@ The generated 'session id' is also used as a key in various places.
 Note that in this context, 'session' is not necessarily a one to one 
 mapping to an HTTP session.   
 
-## Accepted evidence
+## Accepted Evidence
 
 - query.session-id
 - query.sequence
 
-## Element data
+## Element Data
 
 | **Name**   | **Type** | **Description**                                                                       |
 |------------|----------|---------------------------------------------------------------------------------------|
@@ -26,14 +26,14 @@ mapping to an HTTP session.
 ## Process
 
 If `query.session-id` is not present in Evidence then generate a new id and 
-add it to the output. We generally use GUIDs, but this is up to the implementor.
+add it to the output. The reference implementations use a GUID.
 
 If `query.sequence` is present in Evidence then add one to it and add it to
-the output. If it is not present, the the output value for sequence to one.
+the output. If it is not present, set the output value for sequence to one.
 
 Note that the reference implementations currently write these output values 
-back to the Evidence collection as evidence was not originally implemented as 
-immutable.
+back to the Evidence collection as evidence is not implemented as 
+immutable in the reference implementations.
 
 ## Configuration options
 

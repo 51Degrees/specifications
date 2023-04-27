@@ -1,5 +1,9 @@
 # Stylistic Conventions
 
+
+Write in third person. The 51Degrees implementation etc. 
+It is recommended rather than we recommend.
+
 ## Spelling
 
 US English
@@ -14,6 +18,7 @@ start-up - as in "does x on start-up"
 
 on-premise
 
+remote server - not cloud or remote service
 JSON uppercase
 
 ## Capitalization

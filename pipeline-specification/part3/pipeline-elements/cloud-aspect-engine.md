@@ -29,13 +29,13 @@ Cloud Aspect Engines do not intrinsically contain Property metadata, they
 derive that from the Cloud Request Engine that precedes them in 
 the Pipeline.
 
-The Cloud Request Engine [requests](cloud-request-engine.md#startup-activity) 
+The Cloud Request Engine [requests](cloud-request-engine.md#start-up-activity) 
 this information on start-up. Each Cloud Aspect Engine accesses that 
 data to obtain Property metadata relating to the Properties that it populates. 
 
 ## Processing
 
-The precise processing that occurs depends on the aspect this 
+The precise processing that occurs depends on the Aspect this 
 Engine relates to.
 
 In outline, the process is:

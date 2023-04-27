@@ -117,7 +117,7 @@ required by the server, and makes an HTTP
 request to the server using the filtered evidence. The HTTP API used for access to 
 51Degrees servers is defined at https://cloud.51degrees.com/api-docs/index.html.
 
-The server can handle evidence in several different forms, but where 
+The server can handle evidence in a number of different forms, but where 
 possible, URL-encoded form data should be used. This is constructed 
 by adding the resource key value using the key `resource`, then adding
 all the values from the Flow Data Evidence.

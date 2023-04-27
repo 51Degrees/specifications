@@ -42,7 +42,7 @@ implementations of those interfaces without considering test implementations
 of those interfaces, and use of those test implementations, rather than
 using a mocking tool on the default implementation.
 
-Note that in particular mocking a logger can't be considered
+Note in particular that mocking a logger can't be considered
 good practice since the logging frameworks concerned provide no-op loggers
 for such purposes.
 
@@ -74,26 +74,27 @@ TypedKeyMap :
 
 Pipeline: 
 
-- Test for correct processing of FlowData with one, two and three Flow Elements.
-- Test of correct operation of parallel flow.
-- Test that FlowData.stop() works correctly.
-- Test that throwing exceptions while processing terminates processing, or doesn't
-depending on configuration. Test that flow data contains correct errors at end.
+- test for correct processing of Flow Data with one, two and three Flow Elements.
+- test of correct operation of parallel flow.
+- test that `FlowData.stop()` works correctly.
+- test that throwing exceptions while processing terminates processing, or doesn't
+depending on configuration. 
+- test that Flow Data contains correct errors at end.
 
 PipelineBuilder and PipelineOptions:
-- Check exceptional operation such as adding closed flow element
-- Check build from Options
-- Check Build from Serialised Options with abbreviated names
-  - check for serialised options containing wrong option and values
+- check exceptional operation such as adding a closed Flow Element
+- check build from options
+- check Build from serialized options with abbreviated names
+  - check for serialized options containing wrong option and values
   - check for constructor values
-- Check build from fluent builder
+- check build from fluent builder
 
 FlowData:
 
-- check that flowdata is processed exactly once on call of process
+- check that Flow Data is processed exactly once on call of process
 - check that attempt to process twice fails
-- check that access to flowdata when pipeline closed fails
-- check that access to flowdata results before processing fails
+- check that access to Flow Data when Pipeline closed fails
+- check that access to Flow Data results before processing fails
 
 Flow Element:
 
@@ -105,21 +106,21 @@ Create a Test Element and associated data
 Java Only: 
 
 Lookup: The Java reference implementation allows interpolation of values
-(environment variables etc.) in pipeline options files. Test for correct 
+(environment variables etc.) in Pipeline options files. Test for correct 
 operation of the various items that can be interpolated.
 
 ### Engines
 
 Pipeline Overhead:
 
-Create a test pipeline and check that the processing costs is within 
+Create a test Pipeline and check that the processing costs is within 
 reasonable bound for the cases:
-- repeated execution of pipeline
-- repeated execution of pipeline with caching enabled on engine
-- repeated execution of pipeline with parallel flowdata
+- repeated execution of Pipeline
+- repeated execution of Pipeline with caching enabled on Engine
+- repeated execution of Pipeline with parallel Flow Data
 
 AspectEngine:
-- check aspect engine uses cache correctly
+- check Aspect Engine uses cache correctly
 - if lazy loading is implemented, check that it fires only at the right 
 time and only once
 
@@ -128,12 +129,12 @@ DataUpdateService:
 DataUpdate is a complex process with many options.
 - check that the options cannot be set inconsistently
 - check that the callbacks are fired on update completion successfully
-- check that engine refresh is triggered on file update if configured
+- check that Engine refresh is triggered on file update if configured
 - check that programmatic update works correctly and resets remote update properly
 - check that remote update triggers correctly and resets correctly in the event
    of both successful and unsuccessful download, with various failure scenarios
     such as HTTP timeout, HTTP 429, 400, MD5 check failure etc.
-- check that engine refreshes with correct data and that any data associated
+- check that Engine refreshes with correct data and that any data associated
   with earlier copy is freed correctly
 - carry out a repeated refresh test to look for memory leaks
 
@@ -141,14 +142,14 @@ MissingPropertyService:
 
 - check that "upgrade required" is returned for a property that is available in a different tier
 - check that "unknown" is return for a property that is not known
-- check that "not in resource" is returned for cloud engine
+- check that "not in resource" is returned for Cloud Engine
 - check unknown returned otherwise
 
 ### Engines.Fiftyone
 
 ShareUsage:
 
-- check that ShareUsage substitutes illegal XML characters correctly and truncates calues
+- check that ShareUsage substitutes illegal XML characters correctly and truncates values
 - check that ShareUsage operates correctly, retrying failed data etc.
 - check that sending stops when queue is full and resumes when it is no longer so
 - check that all data in the queue are sent
@@ -174,7 +175,7 @@ SetHeaders
 
 ### JavaScriptBuilder
 
-- Check for normal, empty, invalid and delayed execution properties
+- check for normal, empty, invalid and delayed execution properties
 
 ### Web
 
@@ -184,8 +185,8 @@ Some aspects of these tests look rather like integration tests and ideally will
 require a [headless browser](https://en.wikipedia.org/wiki/Headless_browser) for execution.
 
 Things to check:
-- operation of the setHeaders engine
-- operation of the JSON and Javascript engines
+- operation of the SetHeaders Engine
+- operation of the JSON and Javascript Engines
 - operation of the sequence element
 
 <span style="color:yellow">hard to know what else to say?</span>

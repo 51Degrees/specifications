@@ -1,30 +1,31 @@
-# Json builder element
+# JSON Builder Element
 
 ## Overview
 
-The json builder element creates a JSON representation of most of the values 
+The JSON Builder Element creates a JSON representation of most of the values 
 in the Flow Data.
 
 This is used along with the [JavaScript builder element](javascript-builder.md)
 and [Sequence element](sequence-element.md) to enable client-side features of 
 the Pipeline [web integration](../../features/web-integration.md).
 
-## Accepted evidence
+## Accepted Evidence
 
-This element uses no evidence, its only input is the current set of 
+This Element uses no evidence, its only input is the current set of 
 Element Data instances in the Flow Data.
 
-## Startup activity
+## Start-up activity
 
-For performance reasons, it may be important to create lists of property meta 
-data that meet certain criteria on startup.
+For performance reasons, on start-up it may be important to create lists of 
+Property metadata that meet certain criteria.
 
-For example, a list of all properties that have the 'delay execution' flag set.
-Or, for each property, a list of the JavaScript properties that can cause their
-value to be updated due to new evidence.
+For example, a list of all Properties that have the 'delay execution' flag set.
+Or, for each property, a list of the JavaScript Properties that can cause their
+value to be updated due to new Evidence.
+<span style="color:yellow">not clear what this means, if evidence is immutable???</span>
 
-See the [PopulateMetaDataCollections](https://github.com/51Degrees/pipeline-dotnet/blob/master/FiftyOne.Pipeline.Elements/FiftyOne.Pipeline.JsonBuilderElement/FlowElement/JsonBuilderElement.cs#L715)
-method in c# for an example of this.
+See the [`PopulateMetaDataCollections`](https://github.com/51Degrees/pipeline-dotnet/blob/master/FiftyOne.Pipeline.Elements/FiftyOne.Pipeline.JsonBuilderElement/FlowElement/JsonBuilderElement.cs#L715)
+method in C# for an example of this.
 
 ## Element data
 
@@ -34,11 +35,11 @@ method in c# for an example of this.
 
 ## Process
 
-The element needs to produce a JSON representation of the Flow Data. 
-There should be a top-level entry for each element containing sub-entries 
+The Element needs to produce a JSON representation of the Flow Data. 
+There should be a top-level entry for each Element Data containing sub-entries 
 for each property and its value (set to 'null' if there is no value).
 
-There are also several meta-data properties with different suffixes that may 
+There are also several meta-data Properties with different suffixes that may 
 be added for each property:
 
 | **Suffix**         | **Description**                                                                                                                                                                                                                                                                              |
@@ -47,13 +48,15 @@ be added for each property:
 | delayexecution     | This meta-property must be added with the value 'true' for all properties where the [meta-data](../../features/properties.md#property-metadata) delay execution flag is true.                                                                                                                |
 | evidenceproperties | Where the JSON includes other properties that are in the [meta-data](../../features/properties.md#property-metadata) evidence properties list for this property and those properties have the delayed execution flag set to true, this meta-property must be added to list those properties. |
 
-Some elements should be excluded from having their properties added to the JSON. 
+Some Elements should be excluded from having their properties added to the JSON. 
 By default, these are:
 - [Set headers element](set-headers-element.md)
 - [Cloud request engine](cloud-request-engine.md) 
 - [Usage sharing element](usage-sharing-element.md) 
 
-There are also a couple of extra top-level entries that may be populated in the 
+<span style="color:yellow">how do you change the default???</span>
+
+The following top-level entries that may be populated in the 
 final JSON output:
 - If the sequence number set by the [sequence element](sequence-element.md) is less 
   than the maximum (specified by a constant set to 10 in the reference implementations) 
@@ -64,10 +67,10 @@ final JSON output:
 
 ### Examples
 
-Device detection result including a couple of javascript properties.
-Note the `screenpixelswidth` property is currently zero because device
+Device detection result including some javascript properties.
+Note the `screenpixelswidth` Property is currently zero because device
 detection does not know how wide the screen is.
-The `screenpixelswidthjavascript` contains the JavaScript snippet that
+The `screenpixelswidthjavascript` Property contains the JavaScript snippet that
 can be executed to gather this information.
 
 ```json
@@ -78,21 +81,21 @@ can be executed to gather this information.
     "screenpixelswidthjavascript": "//Set screen pixels width cookie.\r\ndocument.cookie = \"51D_ScreenPixelsWidth=\" + screen.width;"
   },
   "javascriptProperties": [
-    "device.screenpixelswidthjavascript",
+    "device.screenpixelswidthjavascript"
   ]
 }
 ```
 
 Result from a location lookup before any coordinates have been supplied.
-- The `javascript` property contains the script to be executed to get the 
+- The `javascript` Property contains the script to be executed to get the 
   coordinate values.
-- The `javascriptdelayexecution` property indicates that we don't want the
+- The `javascriptdelayexecution` Property indicates that we don't want the
   `javascript` snippet to be executed immediately because it will prompt 
   the user to allow their location to be read.
-- The `zipcode` property is null because we haven't yet supplied coordinates
-- The `zipcodenullreason` property contains a description of why `zipcode` 
+- The `zipcode` Property is null because we haven't yet supplied coordinates
+- The `zipcodenullreason` Property contains a description of why `zipcode` 
   is null
-- The `zipcodeevidenceproperties` property contains a list of the delayed 
+- The `zipcodeevidenceproperties` Property contains a list of the delayed 
   execution properties that could be executed in order to get a value for 
   this property.
 
@@ -103,7 +106,7 @@ Result from a location lookup before any coordinates have been supplied.
     "javascriptdelayexecution": true,
     "zipcode": null,
     "zipcodenullreason": "This property requires evidence values from JavaScript running on the client. It cannot be populated until a future request is made that contains this additional data.",
-    "zipcodeevidenceproperties": ["location.javascript"],
+    "zipcodeevidenceproperties": ["location.javascript"]
   },
   "javascriptProperties": [
     "location.javascript"
@@ -123,21 +126,21 @@ Partial result from a TAC lookup that returns multiple devices.
         "hardwarename": [
           "5217"
         ],
-        "hardwarevendor": "Coolpad",
+        "hardwarevendor": "Coolpad"
       },
       {      
         "hardwaremodel": "5200",
         "hardwarename": [
           "5200"
         ],
-        "hardwarevendor": "Coolpad",
+        "hardwarevendor": "Coolpad"
       },
       {
         "hardwaremodel": "5310",
         "hardwarename": [
           "5310"
         ],
-        "hardwarevendor": "Coolpad",
+        "hardwarevendor": "Coolpad"
       }
     ]
   }

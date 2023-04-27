@@ -39,17 +39,8 @@ example, and it is likely to be sufficient for a test to show that the example
 runs and completes without failure.
 
 The need for examples to be runnable as an application and as a test suggests
-that they are written with the common code to be executed from either
-environment, and a pattern may be established across examples.
-
-<span style="color:yellow">It's been discussed that the existing examples 
-should be modified to make it possible to simply copy the example code from 
-the web documentation, paste it into a project and run it.
-
-This goal is fundamentally at odds with using an common/helper code from
-examples. I'm not quite sure where this will land, so maybe we leave this
-as an open question to be clarified in future?
-</span>
+that they are written with example code to be executed as a public method, and 
+a pattern may be established across examples.
 
 ### Legibility
 
@@ -79,12 +70,6 @@ the code of examples.
 from reference implementation examples, using Doxygen. For the sake of 
 readability of the source of the examples text intended for Doxygen
 generation is placed at the bottom of source files.
-
-<span style="color:yellow">Would be nice to include links to the documentation on 
-documenting ([here](https://51degrees.visualstudio.com/Pipeline/_git/documentation?path=/Documenting.md&_a=preview) 
-and [here](https://51degrees.visualstudio.com/Pipeline/_git/documentation?path=/Documenting%20Code.md&_a=preview).)
-However, this repo isn't on GitHub so we can't really do that at the moment.
-</span>
 
 ### File References
 
@@ -120,14 +105,7 @@ See [File References](#file-references) for a discussion of locating files.
 
 In the reference implementations it is stressed in comments as well as 
 in the output of examples that
-the Lite data file has a small number of properties and limited accuracy as it 
-contains only a relatively small subset of detection data.
-<span style="color:yellow">In v4, the same detection graph is used in all 
-data files, so accuracy and size of training data is actually identical.
-It's only the properties that change.
-(v3 data files do use a smaller data set for lite, but I don't think that's 
-worth talking about.)
-</span>
+the Lite data file has a small number of properties.
 
 The production date of the file in use is noted and a warning reported
 if it is more than 28 days old. This serves also to illustrate how to
@@ -149,11 +127,11 @@ a test environment.
 ### Fluent Builders
 
 Reference implementation examples demonstrate the use of the simplified
-top-level builder for cloud and on-premise. <span style="color:yellow">
-The spec recommends that this simplified builder is not implemented
-(Or, if it is implemented, there will need to be effort on reducing 
-the issues that arrise from it's use)</span>
- Assuming default values are needed
+top-level builder for cloud and on-premise. Noting that [elsewhere](../../pipeline-specification/reference-implementation-notes.md)
+we recommend considering the trade-off between the apparent simplicity of this 
+approach and some disadvantages. 
+
+Additionally, assuming default values are needed
 this does simplify the examples. However, it has the disadvantage that users
 may not understand how to use the pipeline builder and the various engine 
 builders in concert, and hence may not be aware of how they can configure
