@@ -42,6 +42,15 @@ The need for examples to be runnable as an application and as a test suggests
 that they are written with the common code to be executed from either
 environment, and a pattern may be established across examples.
 
+<span style="color:yellow">It's been discussed that the existing examples 
+should be modified to make it possible to simply copy the example code from 
+the web documentation, paste it into a project and run it.
+
+This goal is fundamentally at odds with using an common/helper code from
+examples. I'm not quite sure where this will land, so maybe we leave this
+as an open question to be clarified in future?
+</span>
+
 ### Legibility
 
 It is of importance for examples to illustrate key features of the APIs
@@ -66,10 +75,16 @@ that a value may not exist or that it may be a list.
 We recommend extremely verbose and pedagogic comments as a module header and in 
 the code of examples. 
 
-51Degrees generates Web documentation ([for example](https://51degrees.com/documentation/4.4/_examples__device_detection__getting_started__console__on_premise.html)) 
+51Degrees generates Web documentation ([for example](https://51degrees.com/documentation/_examples__device_detection__getting_started__console__on_premise.html)) 
 from reference implementation examples, using Doxygen. For the sake of 
 readability of the source of the examples text intended for Doxygen
 generation is placed at the bottom of source files.
+
+<span style="color:yellow">Would be nice to include links to the documentation on 
+documenting ([here](https://51degrees.visualstudio.com/Pipeline/_git/documentation?path=/Documenting.md&_a=preview) 
+and [here](https://51degrees.visualstudio.com/Pipeline/_git/documentation?path=/Documenting%20Code.md&_a=preview).)
+However, this repo isn't on GitHub so we can't really do that at the moment.
+</span>
 
 ### File References
 
@@ -107,6 +122,12 @@ In the reference implementations it is stressed in comments as well as
 in the output of examples that
 the Lite data file has a small number of properties and limited accuracy as it 
 contains only a relatively small subset of detection data.
+<span style="color:yellow">In v4, the same detection graph is used in all 
+data files, so accuracy and size of training data is actually identical.
+It's only the properties that change.
+(v3 data files do use a smaller data set for lite, but I don't think that's 
+worth talking about.)
+</span>
 
 The production date of the file in use is noted and a warning reported
 if it is more than 28 days old. This serves also to illustrate how to
@@ -128,7 +149,11 @@ a test environment.
 ### Fluent Builders
 
 Reference implementation examples demonstrate the use of the simplified
-top-level builder for cloud and on-premise. Assuming default values are needed
+top-level builder for cloud and on-premise. <span style="color:yellow">
+The spec recommends that this simplified builder is not implemented
+(Or, if it is implemented, there will need to be effort on reducing 
+the issues that arrise from it's use)</span>
+ Assuming default values are needed
 this does simplify the examples. However, it has the disadvantage that users
 may not understand how to use the pipeline builder and the various engine 
 builders in concert, and hence may not be aware of how they can configure
@@ -201,14 +226,16 @@ correct [lifecycle management](#pipeline-and-flowdata-lifecycle) of Pipeline
 and FlowData instances.
 
 See documentation
-[cloud](https://51degrees.com/documentation/4.4/_examples__device_detection__getting_started__console__cloud.html), 
-[on-premise](https://51degrees.com/documentation/4.4/_examples__device_detection__getting_started__console__on_premise.html)
+[cloud](https://51degrees.com/documentation/_examples__device_detection__getting_started__console__cloud.html), 
+[on-premise](https://51degrees.com/documentation/_examples__device_detection__getting_started__console__on_premise.html)
 
 ### Getting Started Web
 
-These examples illustrate use of Web integration for both Cloud and On-Premise
-by creating a Web page that can be accessed from a webserver running in
-the example environment that created during execution of the example.
+These examples illustrate use of 
+[Web integration](../../pipeline-specification/features/web-integration.md) 
+for both Cloud and On-Premise
+by creating a Web page that can be accessed from a web server running in
+the example environment that is created during execution of the example.
 
 The example also illustrates the availability of device detection properties
 from client-side JavaScript as well as illustrating use of JavaScript
@@ -223,8 +250,8 @@ implementations illustrate basic ASP.NET Core and ASP.NET Framework usage for
 C# and basic Servlet usage in Java.
 
 See documentation
-[cloud](https://51degrees.com/documentation/4.4/_examples__device_detection__getting_started__web__cloud.html),
-[on-premise](https://51degrees.com/documentation/4.4/_examples__device_detection__getting_started__web__on_premise.html)
+[cloud](https://51degrees.com/documentation/_examples__device_detection__getting_started__web__cloud.html),
+[on-premise](https://51degrees.com/documentation/_examples__device_detection__getting_started__web__on_premise.html)
 
 
 ### TAC / Native Key Lookup
@@ -236,8 +263,8 @@ These examples require the user to obtain a license key in order to
 configure an appropriate Resource Key.
 
 See documentation 
-[TAC](https://51degrees.com/documentation/4.4/_examples__device_detection__tac_lookup__cloud.html), 
-[Native key](https://51degrees.com/documentation/4.4/_examples__device_detection__native_key_lookup__cloud.html)
+[TAC](https://51degrees.com/documentation/_examples__device_detection__tac_lookup__cloud.html), 
+[Native key](https://51degrees.com/documentation/_examples__device_detection__native_key_lookup__cloud.html)
 
 ### Match Metrics
 
@@ -246,7 +273,7 @@ into the detection process and confidence in the output. A key point of this
 example is to illustrate that reducing the number of properties requested 
 can reduce the time for detection.
 
-[See documentation](https://51degrees.com/documentation/4.4/_examples__device_detection__match_metrics__on_premise_hash.html)
+[See documentation](https://51degrees.com/documentation/_examples__device_detection__match_metrics__on_premise_hash.html)
 
 ### Metadata
 
@@ -254,8 +281,8 @@ It is recommended that implementors illustrate the retrieval of evidence keys,
 properties, components and profiles from the on-premise, and 
 properties and evidence keys for cloud. 
 
-See documentation [on-premise](https://51degrees.com/documentation/4.4/_examples__device_detection__metadata__on_premise_hash.html), 
-[cloud](https://51degrees.com/documentation/4.4/_examples__device_detection__metadata__cloud.html).
+See documentation [on-premise](https://51degrees.com/documentation/_examples__device_detection__metadata__on_premise_hash.html), 
+[cloud](https://51degrees.com/documentation/_examples__device_detection__metadata__cloud.html).
 
 ### Performance Options
 
@@ -267,14 +294,14 @@ which are commented out in the example.
 Implementors might consider illustrating the differences between the various
 combinations of options.
 
-[See documentation](https://51degrees.com/documentation/4.4/_examples__device_detection__offline_processing__on_premise_hash.html)
+[See documentation](https://51degrees.com/documentation/_examples__device_detection__offline_processing__on_premise_hash.html)
 
 ### Performance Benchmark
 
 Reference implementations contain a Performance Benchmark which is somewhat 
 similar to the ["Offline Processing" example](#performance-options).  
 
-[See documentation](https://51degrees.com/documentation/4.4/_examples__device_detection__performance__on_premise_hash.html)
+[See documentation](https://51degrees.com/documentation/_examples__device_detection__performance__on_premise_hash.html)
 Java tab.
 
 ### Data Update
@@ -290,4 +317,4 @@ should illustrate:
 - update on start-up 
 - programmatic (non-automatic) update
 
-[See documentation](https://51degrees.com/documentation/4.4/_examples__device_detection__data_file_updates__automatic.html)
+[See documentation](https://51degrees.com/documentation/_examples__device_detection__data_file_updates__automatic.html)
