@@ -22,7 +22,7 @@ are named according to the following format:
 ## Accepted Evidence
 
 This element uses no Evidence, it works on Property values in Element Data
-in the FlowData.
+in the Flow Data.
 
 ## Startup activity
 

@@ -23,6 +23,7 @@ For example, a list of all Properties that have the 'delay execution' flag set.
 Or, for each property, a list of the JavaScript Properties that can cause their
 value to be updated due to new Evidence.
 <span style="color:yellow">not clear what this means, if evidence is immutable???</span>
+<span style="color:yellow">Good point. Evidence is immutable per request. But a future request in the same 'session' may contain new evidence that allows property values to be determined or refined</span>
 
 See the [`PopulateMetaDataCollections`](https://github.com/51Degrees/pipeline-dotnet/blob/master/FiftyOne.Pipeline.Elements/FiftyOne.Pipeline.JsonBuilderElement/FlowElement/JsonBuilderElement.cs#L715)
 method in C# for an example of this.
@@ -55,6 +56,7 @@ By default, these are:
 - [Usage sharing element](usage-sharing-element.md) 
 
 <span style="color:yellow">how do you change the default???</span>
+<span style="color:yellow">In the current implementations it's hard coded. (There is also a hard coded list of properties to exclude, but I think that's only used by the cloud service, so is only present in .NET) It may be useful to make these configurable in the builder. However, there is also one of the oldest tickets on the system, which talks about creating a new setting to allow users to specify the properties that should be included by the json builder.</span>
 
 The following top-level entries that may be populated in the 
 final JSON output:
