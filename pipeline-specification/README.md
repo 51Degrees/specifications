@@ -1,4 +1,6 @@
-# Introduction
+# Pipeline specification
+
+## Introduction
 
 This folder structure contains a language agnostic specification for the 51Degrees
 v4 Pipeline API.
@@ -7,7 +9,7 @@ focus is on the behavior rather than the method by which that behavior is achiev
 This allows implementers to choose an architectural approach that is most appropriate
 for the target language.
 
-# Structure
+## Structure
 
 This specification is broken down into separate markdown files in multiple directories.
 
@@ -20,7 +22,7 @@ This specification is broken down into separate markdown files in multiple direc
 If you're not sure where to start, read through the primer section below before
 exploring further.
 
-# Description
+## Description
 
 51Degrees `Pipeline` provides a framework within which input data is transformed
 and enriched to create output data to be consumed by some application.
@@ -28,7 +30,7 @@ and enriched to create output data to be consumed by some application.
 Note that more concrete details on the terms defined here can be found in the
 [conceptual overview](conceptual-overview.md).
 
-## Flow
+### Flow
 
 Processing is performed by a sequence of steps which consume the
 output of earlier steps and produce output of their own. The sequence of
@@ -46,7 +48,7 @@ Flow Elements "advertise" the Evidence that they consume, the Properties that
 they produce, a key for accessing those Properties from the Flow Data and various
 information about the data types within which those Properties are found.
 
-## Flow Data Lifecycle
+### Flow Data Lifecycle
 
 Creation of Flow Data is carried out by an application requesting an instance
 from a Pipeline. With a number of important exceptions, the creating
@@ -61,7 +63,7 @@ once and belongs to exactly one Pipeline.
 
 Flow Data may also be used to report errors that occur during processing.
 
-## Engine
+### Engine
 
 An `Engine` is a specialization of a Flow Element, which builds on the basic
 functionality provided by Flow Element to provide higher level functions

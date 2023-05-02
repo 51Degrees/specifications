@@ -1,16 +1,18 @@
-# Introduction
+# Specifications
+
+## Introduction
 
 This repository contains specifications for the Pipeline API and some 51Degrees
 products.
 
-# Specifications
+## Contents
 
-| Name                           | Description                                                                                                                 |
-|--------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
-| Pipeline Specification         | Specification for the Pipeline API and its operation. This covers core functionality. |
-| Device Detection Specification | Specification for the Device Detection service. This builds on the concepts and features defined in the Pipeline specification.   |
+| Name                                                                       | Description                                                                                                                     |
+|----------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|
+| [Pipeline Specification](pipeline-specification/README.md)                 | Specification for the Pipeline API and its operation. This covers core functionality.                                           |
+| [Device Detection Specification](device-detection-specification/README.md) | Specification for the Device Detection service. This builds on the concepts and features defined in the pipeline specification. |
 
-# Notes for implementers
+## Notes for implementers
 
 - These specifications are written to be language agnostic. The precise
   details of how to implement features is often not specified. This allows

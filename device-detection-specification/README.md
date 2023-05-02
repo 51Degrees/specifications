@@ -1,4 +1,6 @@
-# Introduction
+# Device Detection specification
+
+## Introduction
 
 This folder structure contains a language agnostic specification for a device
 detection Engine that can be used by
@@ -8,7 +10,7 @@ The focus is on the behavior rather than the method by which that behavior is
 achieved. This allows implementers to choose an architectural approach that is
 most appropriate and familiar for uses of the target language.
 
-# Structure
+## Structure
 
 This specification builds on the concepts and features defined in the
 [Pipeline specification](../pipeline-specification/README.md) the reader should
