@@ -17,7 +17,7 @@ This specification is broken down into separate markdown files in multiple direc
 |---|---|
 | features | Descriptions of Pipeline API features |
 | advanced-features | Descriptions of Pipeline API features that are not implemented in all languages and/or do not have strong enough justifications for the complexity they add |
-| Pipeline-elements | Specifications for **Flow Elements** that are needed to provide core functionality  |
+| Pipeline-elements | Specifications for Flow Elements that are needed to provide core functionality  |
 
 If you're not sure where to start, read through the primer section below before
 exploring further.
@@ -52,7 +52,7 @@ information about the data types within which those Properties are found.
 
 Creation of Flow Data is carried out by an application requesting an instance
 from a Pipeline. With a number of important exceptions, the creating
-application must destroy the Flow Data once it has completed its processing.
+application MUST destroy the Flow Data once it has completed its processing.
 
 The application carries out the initial population of Evidence
 and then requests that the Pipeline `process` it - i.e. present the Flow Data

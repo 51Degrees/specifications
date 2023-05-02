@@ -48,8 +48,8 @@ of [dependencies](https://51degrees.com/documentation/_info__dependencies.html).
 ### Selecting the correct binary
 
 While the implementor is not expected to produce the CI/CD scripts that
-will create the final packages, attention must be given to how the final
-package will determine the correct native binary to use based on the current
+will create the final packages, The final package MUST have some mechanism 
+to determine the correct native binary to use based on the current
 operating system.
 
 In some cases, this capability is built into the packaging infrastructure
@@ -79,7 +79,7 @@ function to return a list of the accepted Evidence keys.
 These values should then be stored to prevent repeated calls to the
 native code.
 
-This must be done at start-up and any time the data is refreshed.
+This MUST be done at start-up and any time the data is refreshed.
 
 Note that the list of accepted Evidence keys is not case-sensitive -
 i.e. `header.user-agent` and `header.User-Agent` should both be
@@ -92,7 +92,7 @@ on data refresh based on the Properties that are available in the data
 source that is used.
 
 In addition, several additional [match metrics](#match-metric-properties)
-Properties must be added as well. The table below shows the native
+Properties MUST be added as well. The table below shows the native
 function to call to get the value for each Property.
 
 | Name         | Function on result object to call to get value [^nb] |
@@ -109,16 +109,16 @@ function to call to get the value for each Property.
 in their code because of a plan to split Device Detection into 4
 separate Engines. This is not necessary in new implementations.
 
-It is essential that the **Element Data** instance populated by this
-On-premise Engine is interface compatible with the **Element Data**
+It is essential that the Element Data instance populated by this
+On-premise Engine is interface compatible with the Element Data
 populated by the [cloud Device Detection Engine](device-detection-cloud.md)
-as well as the individual devices populated in the **Element Data** from
+as well as the individual devices populated in the Element Data from
 the [hardware profile lookup Engine](hardware-profile-lookup-cloud.md).
 
 ## Start-up activity
 
 On start-up, the native Engine needs to be created using the data file.
-Several functions must then be called to get the data that will be needed
+Several functions will then be called to get the data that is needed
 by other Engine features.
 
 See [refresh data](#refresh-data) for details on this process.
@@ -126,14 +126,14 @@ See [refresh data](#refresh-data) for details on this process.
 ## Processing
 
 This section describes the core steps this Engine executes to process
-**Flow Data**. This is on top of any common processing defined for
+Flow Data. This is on top of any common processing defined for
 other Pipeline API features.
 
 - Create and populate the native Evidence object
   - The Evidence values will typically need to be converted to a memory
     format that can be used by the native Cxx code.
   - First, create a new `EvidenceDeviceDetection` C++ instance.
-  - Next, add items from the **Flow Data** Evidence to the C++ instance.
+  - Next, add items from the Flow Data Evidence to the C++ instance.
     - Only need to add entries that the Engine will make use of.
 - Call the `process` function on the native Engine, passing the native
   Evidence instance.
@@ -178,7 +178,7 @@ As such, this should be minimized as much as possible:
 ## Refresh data
 
 The [refresh data function](../../pipeline-specification/features/data-updates.md#aspect-engine-features)
-for this Engine must perform the following tasks:
+for this Engine will perform the following tasks:
 - Create a new instance of the C++ `EngineHashSwig` type using either the
   filename or byte[] constructor.
 - Call `refreshData` on the C++ Engine in order to load data into the
@@ -240,70 +240,70 @@ erDiagram
 
 ### Component
 
-A **component** defines a group of **Properties** that are related.
+A **Component** defines a group of Properties that are related.
 
-In a 51Degrees data set, each **Property** can only be related to one **component**.
-For example, the `Browser Name` **Property** is part of the `Software` **component**,
-whereas the `Model Name` **Property** is part of the `Hardware` **component**.
+In a 51Degrees data set, each Property can only be related to one Component.
+For example, the `Browser Name` Property is part of the `Software` Component,
+whereas the `Model Name` Property is part of the `Hardware` Component.
 
-The metadata associated with a **component** is:
+The metadata associated with a Component is:
 
 | Metadata        | Description                                                                                                                                                                         |
 |-----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Id              | The unique id of the **component**. This is a number and will remain the same when a data file is updated.                                                                          |
-| Name            | The name of the **component** that gives a more 'human' identifier than id. By convention, this is unique within the data file.                                                     |
-| Default profile | The default **profile** for the **component**. This is used to provide **values** for the **component's** **Properties** when a **profile** matching the @Evidence cannot be found. |
-| Properties      | The **Properties** associated with this **component**.                                                                                                                              |
+| Id              | The unique id of the Component. This is a number and will remain the same when a data file is updated.                                                                          |
+| Name            | The name of the Component that gives a more 'human' identifier than id. By convention, this is unique within the data file.                                                     |
+| Default profile | The default Profile for the Component. This is used to provide Values for the Component's Properties when a Profile matching the @Evidence cannot be found. |
+| Properties      | The Properties associated with this Component.                                                                                                                              |
 
 ### Property
 
 The **Properties** exposed by the Device Detection Engine contain more information
-than that which is defined by the standard **Property metadata** interface.
-In addition to the usual information, the following must be made available:
+than that which is defined by the standard Property metadata interface.
+In addition to the usual information, the following MUST be made available:
 
-| Metadata      | Description                                                                                                                                                                                                                                                  |
-|---------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Description   | A description of the **Property** explaining what it refers to, and what significance its values have.                                                                                                                                                       |
-| URL           | A URL where more information on the **Property** can be found.                                                                                                                                                                                               |
-| Component     | The **component** to which the **Property** belongs. This is subtly different from the category, in that a **profile** defines the values for all the **Properties** of a single **component**, which likely contains multiple categories of **Properties**. |
-| Values        | The **values** that the **Property** can have. As a simple example, a **Property** named ``'IsSmartPhone'`` might have three values: ``true``, ``false``, and ``unknown``.                                                                                   |
-| Default Value | The default **value** for the **Property** if it is not otherwise known. In the above example, the **Property** named ``'IsSmartPhone'`` would probably have ``unknown`` as the default value.                                                               |
-| List          | Whether or not the **Property** may have multiple values. For example, the connectivity types a device supports would be a list, as a single device might support Bluetooth, HSDPA, LTE, Wi-Fi, etc.                                                         |
-| Obsolete      | Whether the **Property** is obsolete and only exists to maintain backward compatibility.                                                                                                                                                                     |
-| Display Order | The suggested order in which to display the **Property** when listing **Properties**.                                                                                                                                                                        |
-| Mandatory     | Whether the **Property** is mandatory or not. If a **Property** is mandatory, a **profile** must have a non-default value for it to be classed as valid.                                                                                                     |
-| Show          | Whether the **Property** should be displayed in situations such as a page listing **Properties**. Less important **Properties** may not be displayed.                                                                                                        |
-| Show Values   | Whether values of the **Property** should be displayed in situations such as a page listing the **Property's** values. Showing all the values can make a very long list.                                                                                     |
+| Metadata      | Description                                                                                                                                                                                                                          |
+|---------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Description   | A description of the Property explaining what it refers to, and what significance its values have.                                                                                                                                   |
+| URL           | A URL where more information on the Property can be found.                                                                                                                                                                           |
+| Component     | The Component to which the Property belongs. This is subtly different from the category, in that a Profile defines the values for all the Properties of a single Component, which likely contains multiple categories of Properties. |
+| Values        | The Values that the Property can have. As a simple example, a Property named ``'IsSmartPhone'`` might have three values: ``true``, ``false``, and ``unknown``.                                                                       |
+| Default Value | The default Value for the Property if it is not otherwise known. In the above example, the Property named ``'IsSmartPhone'`` would probably have ``unknown`` as the default value.                                                   |
+| List          | Whether or not the Property may have multiple values. For example, the connectivity types a device supports would be a list, as a single device might support Bluetooth, HSDPA, LTE, Wi-Fi, etc.                                     |
+| Obsolete      | Whether the Property is obsolete and only exists to maintain backward compatibility.                                                                                                                                                 |
+| Display Order | The suggested order in which to display the Property when listing Properties.                                                                                                                                                        |
+| Mandatory     | Whether the Property is mandatory or not. If a Property is mandatory, a Profile MUST have a non-default value for that Property in order for the Profile to be classed as valid.                                                     |
+| Show          | Whether the Property should be displayed in situations such as a page listing Properties. Less important Properties may not be displayed.                                                                                            |
+| Show Values   | Whether values of the Property should be displayed in situations such as a page listing the Property's values. Showing all the values can make a very long list.                                                                     |
 
 ### Profile
 
-A **profile** defines a unique set of **values** for all **Properties** of
-a single **component**.
+A **Profile** defines a unique set of Values for all Properties of
+a single Component.
 
 | Metadata  | Description                                                                                                                                                                           |
 |-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Id        | The unique id of the **profile**. This is usually a number and will remain the same when a data file is updated.                                                                      |
-| Name      | The name of the **profile** that gives a more 'human' identifier than id, usually describing what the **values** it contains are. By convention, this is unique within the data file. |
-| Component | The **component** to which the **profile** relates. This is the **component** which the **profile** contains **values** for.                                                          |
-| Values    | The **values** that define the **profile**.                                                                                                                                           |
+| Id        | The unique id of the Profile. This is usually a number and will remain the same when a data file is updated.                                                                      |
+| Name      | The name of the Profile that gives a more 'human' identifier than id, usually describing what the Values it contains are. By convention, this is unique within the data file. |
+| Component | The Component to which the Profile relates. This is the Component which the Profile contains Values for.                                                          |
+| Values    | The Values that define the Profile.                                                                                                                                           |
 
 ### Value
 
-Each **Property** has a set of possible **values** that it can return.
-The metadata associated with a **value** is:
+Each Property has a set of possible **Values** that it can return.
+The metadata associated with a Value is:
 
 | Metadata    | Description                                                                                                                                                   |
 |-------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Name        | The **value** as a string. This uniquely identifies the **value** only within the **values** relating to the same **Property**.                               |
-| Property    | The **Property** to which the **value** relates. This, in combination with the name, uniquely identifies the **value** within the Device Detection data file. |
-| Description | A description of the **value** explaining what it refers to, and what it means if a **profile** has this **value**.                                           |
-| URL         | A URL where more information on the **value** can be found.                                                                                                   |
+| Name        | The Value as a string. This uniquely identifies the Value only within the Values relating to the same Property.                               |
+| Property    | The Property to which the Value relates. This, in combination with the name, uniquely identifies the Value within the Device Detection data file. |
+| Description | A description of the Value explaining what it refers to, and what it means if a Profile has this Value.                                           |
+| URL         | A URL where more information on the Value can be found.                                                                                                   |
 
 ### Match metric Properties
 
 In addition to the 'standard' Device Detection Properties, there are a set of
 Properties that return details about the processing that was performed and
-the match that was found. Metadata for these Properties must be added, as they
+the match that was found. Metadata for these Properties MUST be added, as they
 will not be included in the metadata exposed by the native code.
 
 All these Properties have the following values:
@@ -311,7 +311,7 @@ All these Properties have the following values:
 - Available With = "Lite", "Premium", "Enterprise", "TAC" - If possible, this
   list should be created dynamically from the lists of files included against
   all other Property metadata that is exposed by the native code.
-- Component = "Metrics" - This component must also be added to the list of
+- Component = "Metrics" - This component MUST also be added to the list of
   components returned by the Engine.
 
 | Name             | Type   | Default value | Description                                                                                                                                                                                                                                                                | Possible values                                 |

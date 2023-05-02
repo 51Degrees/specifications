@@ -7,12 +7,12 @@ Device Detection.
 
 ## Overview
 
-All Engines must populate data objects that
+All Engines MUST populate data objects that
 implement [Aspect Data](../pipeline-specification/conceptual-overview.md#aspect-data)
 as defined in the Pipeline specification.
 
 There are several different Engines for getting information about devices. Each
-of these Engines must return data that is interface compatible with the others.
+of these Engines MUST return data that is interface compatible with the others.
 
 Given an interface `IDeviceData`, the following table shows what should be
 populated by each Engine:

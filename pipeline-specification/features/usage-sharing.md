@@ -16,7 +16,7 @@ to produce each payload.
 
 Shared data includes details such as:
 - Evidence values
-- **Pipeline** configuration.
+- Pipeline configuration.
 - OS, programming language and API versions.
 
 For more technical details, see the
