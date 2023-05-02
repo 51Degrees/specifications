@@ -237,13 +237,13 @@ This will then repeat as before for any JavaScript Properties in the new payload
 The HTTP response headers that must be set for the JSON and JavaScript endpoints
 are:
 
-| **Header**      | **Values**                                                                             | **Purpose**                                                                                      |
-|-----------------|----------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|
-| Cache-Control   | max-age=1800 private                                                                   | Cache item lifetime is 30 minutes. Only local client caches should cache this content.           |
-| Vary            | [all headers in pipeline evidence key filter] (e.g. User-Agent)                        | Let the cache know that if one of these headers changes, the cached content must be re-fetched.  |
-| ETag            | [Calculated hash of ALL the evidence values in evidence filter key for this pipeline]  | Assists caches in re-validating expired content                                                  |
-| Content-Type    | application/x-javascript or application/JSON                                           | Indicate the type of content being returned                                                      |
-| Content-Length  | [Content length in bytes]                                                              | Indicate the expected length of the content                                                      |
+| **Header**      | **Values**                                                                          | **Purpose**                                                                                      |
+|-----------------|-------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|
+| Cache-Control   | max-age=1800 private                                                                | Cache item lifetime is 30 minutes. Only local client caches should cache this content.           |
+| Vary            | all headers in Pipeline Evidence key filter (e.g. User-Agent)                       | Let the cache know that if one of these headers changes, the cached content must be re-fetched.  |
+| ETag            | Calculated hash of ALL the Evidence values in Evidence filter key for this Pipeline | Assists caches in re-validating expired content                                                  |
+| Content-Type    | application/x-javascript or application/JSON                                        | Indicate the type of content being returned                                                      |
+| Content-Length  | Content length in bytes                                                             | Indicate the expected length of the content                                                      |
 
 In order to validate the ETag, the JSON and JavaScript endpoints must check for
 an 'If-None-Match' header in the request. This will be sent when a cached item’s
