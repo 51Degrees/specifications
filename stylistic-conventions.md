@@ -3,7 +3,7 @@
 This document contains some notes on stylistic conventions to be observed
 in the specification, and doesn't for part of the specification.
 
-## Voice. 
+## Voice 
 
 51Degrees style guide says to adopt a friendly personal tone
 however this is a formal specification, so write in third person. 
@@ -20,7 +20,6 @@ however this is a formal specification, so write in third person.
     - "website"
     - "callback"
 
-remote server - not cloud or remote service
 
 ## Capitalization
 
@@ -96,4 +95,10 @@ IntelliJ has a useful linter for markdown.
 Link checking - check all links
 
 Table Formatting - check all tables
+
+## Consistency
+
+Use the term "remote server" - not cloud or remote service
+
+
 
