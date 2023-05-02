@@ -7,6 +7,10 @@ A Cloud Aspect Engine is a type of Engine that works with the
 to refer processing of Evidence to a remote server.
 
 See the link above for an overview of how these Engines work together.
+<span style="color:yellow">It would be good to enumerate the existing Cloud Aspect Engines.  
+Although this is the description of the common abstraction for all of them - any implementation
+still probably would contain at least Cloud Device Detection and Cloud Location Detection - 
+as the most prominent examples of this.</span>
 
 ## Accepted Evidence
 

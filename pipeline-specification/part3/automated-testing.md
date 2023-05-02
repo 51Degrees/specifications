@@ -67,6 +67,11 @@ Numerous additional tests exist (to a total of around 500, running to 100s of
 thousands of lines of code) in the reference implementations and the code of 
 those implementations should be consulted.
 
+<span style="color:yello">Should we add any notes on test coverage %? F.e. reference 
+implementations have X% code coverage. 
+It is of course possible to have a 100% coverage, but only for the code that is present, 
+it won't give any indication that some code is missing - i.e. the functionality not implemented. </span>
+
 ### Core
 
 TypedKeyMap :

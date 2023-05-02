@@ -57,6 +57,9 @@ These are:
 - [Cloud request engine](cloud-request-engine.md) 
 - [Usage sharing element](usage-sharing-element.md) 
 
+<span style="color:yellow">How is this property exclusion achieved?  Is an exclusion-list of 
+certain properties?</span>
+
 The following top-level entries that may be populated in the 
 final JSON output:
 - If the sequence number set by the [sequence element](sequence-element.md) is less 
@@ -160,4 +163,7 @@ JSON with an error value set.
 
 | **Name**      | **Type**        | **Default**  | **Description**                                                                                                                                                                                                                                                                                                       |
 |---------------|-----------------|--------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| SetProperties | List of strings | [Empty list] | A list of the properties to include in the JSON. By default, all properties will be included. Also note that some properties, such as JavaScript properties, will always be included, regardless of this setting. Property names must be fully qualified. (e.g. `device.ismobile` or `devices.profiles.hardwarename`) |
+| SetProperties | List of strings | [Empty list] | A list of the properties to include in the JSON. By default, all properties will be included. Also note that some properties, such as JavaScript properties, will always be included, regardless of this setting <span style="color:yellow">Also metaproperties are included regardless of the setting</span>. Property names must be fully qualified. (e.g. `device.ismobile` or `devices.profiles.hardwarename`) |
+
+<span style="color:yellow">So is this mechanism for exclusion as well?  If some property is not present in this list - will it
+be excluded from json?</span>
