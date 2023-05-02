@@ -223,11 +223,11 @@ If you&rsquo;re not sure where to start, we recommend looking at
 <p>This document contains the details of the data values returned by 51Degrees
 Device Detection.</p>
 <h2 id="overview">Overview</h2>
-<p>All Engines must populate data objects that
+<p>All Engines MUST populate data objects that
 implement <a href="../pipeline-specification/conceptual-overview.md#aspect-data">Aspect Data</a>
 as defined in the Pipeline specification.</p>
 <p>There are several different Engines for getting information about devices. Each
-of these Engines must return data that is interface compatible with the others.</p>
+of these Engines MUST return data that is interface compatible with the others.</p>
 <p>Given an interface <code>IDeviceData</code>, the following table shows what should be
 populated by each Engine:</p>
 <table>
@@ -307,8 +307,8 @@ specification, so it may be helpful to first become familiar with
 the <a href="../pipeline-specification/usage-examples.md">usage examples</a> there.</p>
 <h2 id="create-a-device-detection-pipeline">Create a Device Detection Pipeline</h2>
 <p>There are several different ways that a Pipeline might be created. However, once
-created, usage must be as similar as possible.
-In particular, a cloud Pipeline must be a drop-in replacement for an on-premise
+created, usage SHOULD be as similar as possible.
+In particular, a cloud Pipeline MUST be a drop-in replacement for an on-premise
 Pipeline for performing Device Detection and querying the results.</p>
 <p>Creating an on-premise Device Detection Pipeline in code:</p>
 <pre><code class="language-c#">var deviceDetectionEngine = deviceDetectionHashEngineBuilder
@@ -368,7 +368,7 @@ the <a href="../pipeline-specification/features/properties.md#missing-properties
 <p>The mechanics of this will differ significantly by language.
 See <a href="../pipeline-specification/features/web-integration.md">Pipeline - web integration</a>
 for more detail.
-However, the outcome should be the same. It must be simple for the user to
+However, the outcome should be the same. It MUST be simple for the user to
 create a web application where:</p>
 <ol>
 <li>Each request (following any filtering, etc) will have all relevant Evidence
@@ -384,7 +384,7 @@ easily make use of the Device Detection results.</li>
 - <a href="https://github.com/51Degrees/device-detection-dotnet/tree/master/Examples/OnPremise/GettingStarted-Web">.NET getting started web - on premise</a></p>
 <h3 id="apple-model-detection">Apple model detection</h3>
 <p>Modifying the simple web application described above to be able to correctly
-identify Apple models must also be very easy. For example, by adding a line
+identify Apple models MUST also be very easy. For example, by adding a line
 similar to the following in the HTML:</p>
 <pre><code class="language-html">&lt;script async src='51Degrees.core.js' type='text/javascript'&gt;&lt;/script&gt;
 </code></pre>
@@ -411,7 +411,7 @@ var pipeline = pipelineBuilder
 - <a href="https://github.com/51Degrees/device-detection-dotnet/blob/master/Examples/OnPremise/UpdateDataFile-Console/Program.cs">.NET data file updates</a></p>
 <h2 id="property-metadata">Property metadata</h2>
 <p><a href="../pipeline-specification/features/properties.md#property-metadata">Property metadata</a>
-must be exposed by the Device Detection Engine.
+MUST be exposed by the Device Detection Engine.
 Note that this information should be available for both cloud and On-premise Engines:</p>
 <pre><code class="language-c#">foreach (var property in deviceDetectionEngine.Properties)
 {
@@ -423,7 +423,7 @@ Note that this information should be available for both cloud and On-premise Eng
 - <a href="https://github.com/51Degrees/device-detection-dotnet/blob/master/Examples/Cloud/Metadata-Console/Program.cs#L111">.NET cloud metadata</a></p>
 <h2 id="extended-on-premise-metadata">Extended on-premise metadata</h2>
 <p>Additional <a href="pipeline-elements/device-detection-on-premise.md#metadata">Device Detection metadata</a>
-must be exposed by the On-premise Engine.</p>
+MUST be exposed by the On-premise Engine.</p>
 <pre><code class="language-c#">foreach (var component in deviceDetectionEngine.Components)
 {
   // Do something with component data.
@@ -783,9 +783,54 @@ for an example of this using JavaScript.</li>
 <p>This Element has no configuration options</p>
 
 <hr/>
-<h1 id="builder">Builder</h1>
-<h2 id="sample-configuration">Sample configuration</h2>
-<h1 id="engine">Engine</h1>
+<h1 id="hardware-profile-lookup">Hardware profile lookup</h1>
+<h2 id="overview">Overview</h2>
+<p>This <a href="../../../pipeline-specification/conceptual-overview.md#cloud-aspect-engine">Cloud Aspect Engine</a>
+enables the parsing of &lsquo;profile lookup&rsquo; responses from the 51Degrees cloud service.</p>
+<p>See <a href="../../../pipeline-specification/part3/pipeline-elements/cloud-request-engine.md">here</a>
+for an overview of the data flow for Cloud Engines.</p>
+<p>Profile lookup allows the user to retrieve a list of property values for
+<a href="../../pipeline-elements/device-detection-on-premise.md#profile">profiles</a>
+where a given property has a value matching a supplied parameter.</p>
+<p>Currently, this capability is used for two use-cases:</p>
+<ul>
+<li>Get hardware devices matching a given TAC. More background information on
+TACs can be found through various online sources such as
+<a href="https://en.wikipedia.org/wiki/Type_Allocation_Code">Wikipedia</a>.</li>
+<li>Get hardware devices matching a given native model name. Native model name
+is a string of characters that are returned from a query to the device&rsquo;s OS.
+There are different mechanisms to get native model names for
+<a href="https://developer.android.com/reference/android/os/Build#MODEL">Android devices</a>
+and <a href="https://gist.github.com/soapyigu/c99e1f45553070726f14c1bb0a54053b#file-machinename-swift">iOS devices</a></li>
+</ul>
+<h2 id="accepted-evidence">Accepted Evidence</h2>
+<p>None. This Engine uses the output from the Cloud Aspect Engine as input
+rather than using Evidence.</p>
+<h2 id="start-up-activity">Start-up activity</h2>
+<p>When it is added to a Pipeline, this Engine initializes itself from a
+Cloud Request Engine, which must have been added to the Pipeline
+before it.</p>
+<p>The Cloud Request Engine determines which Properties are available
+based on the Resource Key supplied on start-up. The Hardware Profile Lookup Engine
+then takes the details of the subset of those Properties that are relevant to
+it.</p>
+<h2 id="element-data">Element Data</h2>
+<table>
+<thead>
+<tr><th> <strong>Name</strong>                   </th><th> <strong>Type</strong>                              </th><th> <strong>Description</strong>                                                                                                                           </th></tr>
+</thead>
+<tbody>
+<tr><td> profiles </td><td> <code>IReadOnlyList&lt;IDeviceData&gt;</code> </td><td> A list of instances that are interface compatible with the results from cloud and on-premise device detection engines. </td></tr>
+</tbody>
+</table>
+<h2 id="process">Process</h2>
+<p>The majority of the processing SHOULD be handled by the shared
+<a href="../../../pipeline-specification/part3/pipeline-elements/cloud-aspect-engine.md#processing">Cloud Aspect Engine</a>
+logic.</p>
+<p>This will just need to filter and parse the JSON provided by the Cloud Aspect
+Engine to the form that is required for the Element Data output</p>
+<h2 id="configuration-options">Configuration options</h2>
+<p>There are no configuration options associated with this Engine.</p>
 
 <hr/>
 <h1 id="device-detection-cloud">Device Detection cloud</h1>
@@ -793,7 +838,7 @@ for an example of this using JavaScript.</li>
 <p>Cloud Device Detection presents <a href="../../pipeline-specification/features/evidence.md">Evidence</a>
 to the 51Degrees Cloud Detection server, which carries out the detection
 and returns a JSON data structure, from which Device Detection Properties
-are populated in the <strong>Flow Data</strong>.</p>
+are populated in the Flow Data.</p>
 <p>This is implemented as a two-step process: a Cloud Request Engine
 presents the Evidence to the 51Degrees server with an HTTP request
 and copies the JSON response into Element Data in the Flow Data.</p>
@@ -802,7 +847,7 @@ a Device Detection Cloud Engine, later in the Pipeline. Since the detection
 Engine depends on the request having been processed in advance, it checks that
 Element Data from the cloud request is present in Pipeline before processing.</p>
 <p><img src="../../pipeline-specification/images/Device%20Detection%20Cloud%20Engine.png" alt="Cloud Engine flow" /></p>
-<p>The majority of the logic that must be performed by the Device Detection Cloud
+<p>The majority of the logic that is executed by the Device Detection Cloud
 Engine is common to all Cloud Engines and is described in the
 <a href="../../pipeline-specification/pipeline-elements/cloud-aspect-engine.md">Cloud Aspect Engine</a>
 document.</p>
@@ -810,7 +855,7 @@ document.</p>
 <p>There are no configuration options associated with this Engine.</p>
 <h2 id="device-detection-cloud-engine-processing">Device Detection Cloud Engine processing</h2>
 <p>When it is added to a Pipeline, Device Detection Cloud Engine initializes
-itself from a Cloud Request Engine, which must have been added to the Pipeline
+itself from a Cloud Request Engine, which MUST have been added to the Pipeline
 before it.</p>
 <p>The Cloud Request Engine determines which Properties are available
 based on the Resource Key supplied on start-up. The Device Detection Cloud Engine
@@ -861,8 +906,8 @@ with a number of assumptions about the availability
 of <a href="https://51degrees.com/documentation/_info__dependencies.html">dependencies</a>.</p>
 <h3 id="selecting-the-correct-binary">Selecting the correct binary</h3>
 <p>While the implementor is not expected to produce the CI/CD scripts that
-will create the final packages, attention must be given to how the final
-package will determine the correct native binary to use based on the current
+will create the final packages, The final package MUST have some mechanism
+to determine the correct native binary to use based on the current
 operating system.</p>
 <p>In some cases, this capability is built into the packaging infrastructure
 (For example, .NET/NuGet). Some require additional code to be written to
@@ -884,7 +929,7 @@ on values in the data source.</p>
 function to return a list of the accepted Evidence keys.
 These values should then be stored to prevent repeated calls to the
 native code.</p>
-<p>This must be done at start-up and any time the data is refreshed.</p>
+<p>This MUST be done at start-up and any time the data is refreshed.</p>
 <p>Note that the list of accepted Evidence keys is not case-sensitive -
 i.e. <code>header.user-agent</code> and <code>header.User-Agent</code> should both be
 accepted.</p>
@@ -893,7 +938,7 @@ accepted.</p>
 on data refresh based on the Properties that are available in the data
 source that is used.</p>
 <p>In addition, several additional <a href="#match-metric-properties">match metrics</a>
-Properties must be added as well. The table below shows the native
+Properties MUST be added as well. The table below shows the native
 function to call to get the value for each Property.</p>
 <table>
 <thead>
@@ -912,26 +957,26 @@ function to call to get the value for each Property.</p>
 <p>[^nb] Note that the native implementations have some additional complexity
 in their code because of a plan to split Device Detection into 4
 separate Engines. This is not necessary in new implementations.</p>
-<p>It is essential that the <strong>Element Data</strong> instance populated by this
-On-premise Engine is interface compatible with the <strong>Element Data</strong>
+<p>It is essential that the Element Data instance populated by this
+On-premise Engine is interface compatible with the Element Data
 populated by the <a href="device-detection-cloud.md">cloud Device Detection Engine</a>
-as well as the individual devices populated in the <strong>Element Data</strong> from
+as well as the individual devices populated in the Element Data from
 the <a href="hardware-profile-lookup-cloud.md">hardware profile lookup Engine</a>.</p>
 <h2 id="start-up-activity">Start-up activity</h2>
 <p>On start-up, the native Engine needs to be created using the data file.
-Several functions must then be called to get the data that will be needed
+Several functions will then be called to get the data that is needed
 by other Engine features.</p>
 <p>See <a href="#refresh-data">refresh data</a> for details on this process.</p>
 <h2 id="processing">Processing</h2>
 <p>This section describes the core steps this Engine executes to process
-<strong>Flow Data</strong>. This is on top of any common processing defined for
+Flow Data. This is on top of any common processing defined for
 other Pipeline API features.</p>
 <ul>
 <li>Create and populate the native Evidence object</li>
 <li>The Evidence values will typically need to be converted to a memory
 format that can be used by the native Cxx code.</li>
 <li>First, create a new <code>EvidenceDeviceDetection</code> C++ instance.</li>
-<li>Next, add items from the <strong>Flow Data</strong> Evidence to the C++ instance.
+<li>Next, add items from the Flow Data Evidence to the C++ instance.
 <ul>
 <li>Only need to add entries that the Engine will make use of.</li>
 </ul>
@@ -975,7 +1020,7 @@ a refresh occurs. Not the possible clean-up consequences that this implies.</li>
 </ul>
 <h2 id="refresh-data">Refresh data</h2>
 <p>The <a href="../../pipeline-specification/features/data-updates.md#aspect-engine-features">refresh data function</a>
-for this Engine must perform the following tasks:
+for this Engine will perform the following tasks:
 - Create a new instance of the C++ <code>EngineHashSwig</code> type using either the
 filename or byte[] constructor.
 - Call <code>refreshData</code> on the C++ Engine in order to load data into the
@@ -1034,83 +1079,83 @@ is required for querying.</p>
     Profile ||--|{ Value : has
 </code></pre>
 <h3 id="component">Component</h3>
-<p>A <strong>component</strong> defines a group of <strong>Properties</strong> that are related.</p>
-<p>In a 51Degrees data set, each <strong>Property</strong> can only be related to one <strong>component</strong>.
-For example, the <code>Browser Name</code> <strong>Property</strong> is part of the <code>Software</code> <strong>component</strong>,
-whereas the <code>Model Name</code> <strong>Property</strong> is part of the <code>Hardware</code> <strong>component</strong>.</p>
-<p>The metadata associated with a <strong>component</strong> is:</p>
+<p>A <strong>Component</strong> defines a group of Properties that are related.</p>
+<p>In a 51Degrees data set, each Property can only be related to one Component.
+For example, the <code>Browser Name</code> Property is part of the <code>Software</code> Component,
+whereas the <code>Model Name</code> Property is part of the <code>Hardware</code> Component.</p>
+<p>The metadata associated with a Component is:</p>
 <table>
 <thead>
 <tr><th> Metadata        </th><th> Description                                                                                                                                                                         </th></tr>
 </thead>
 <tbody>
-<tr><td> Id              </td><td> The unique id of the <strong>component</strong>. This is a number and will remain the same when a data file is updated.                                                                          </td></tr>
-<tr><td> Name            </td><td> The name of the <strong>component</strong> that gives a more &lsquo;human&rsquo; identifier than id. By convention, this is unique within the data file.                                                     </td></tr>
-<tr><td> Default profile </td><td> The default <strong>profile</strong> for the <strong>component</strong>. This is used to provide <strong>values</strong> for the <strong>component&rsquo;s</strong> <strong>Properties</strong> when a <strong>profile</strong> matching the @Evidence cannot be found. </td></tr>
-<tr><td> Properties      </td><td> The <strong>Properties</strong> associated with this <strong>component</strong>.                                                                                                                              </td></tr>
+<tr><td> Id              </td><td> The unique id of the Component. This is a number and will remain the same when a data file is updated.                                                                          </td></tr>
+<tr><td> Name            </td><td> The name of the Component that gives a more &lsquo;human&rsquo; identifier than id. By convention, this is unique within the data file.                                                     </td></tr>
+<tr><td> Default profile </td><td> The default Profile for the Component. This is used to provide Values for the Component&rsquo;s Properties when a Profile matching the @Evidence cannot be found. </td></tr>
+<tr><td> Properties      </td><td> The Properties associated with this Component.                                                                                                                              </td></tr>
 </tbody>
 </table>
 <h3 id="property">Property</h3>
 <p>The <strong>Properties</strong> exposed by the Device Detection Engine contain more information
-than that which is defined by the standard <strong>Property metadata</strong> interface.
-In addition to the usual information, the following must be made available:</p>
+than that which is defined by the standard Property metadata interface.
+In addition to the usual information, the following MUST be made available:</p>
 <table>
 <thead>
-<tr><th> Metadata      </th><th> Description                                                                                                                                                                                                                                                  </th></tr>
+<tr><th> Metadata      </th><th> Description                                                                                                                                                                                                                          </th></tr>
 </thead>
 <tbody>
-<tr><td> Description   </td><td> A description of the <strong>Property</strong> explaining what it refers to, and what significance its values have.                                                                                                                                                       </td></tr>
-<tr><td> URL           </td><td> A URL where more information on the <strong>Property</strong> can be found.                                                                                                                                                                                               </td></tr>
-<tr><td> Component     </td><td> The <strong>component</strong> to which the <strong>Property</strong> belongs. This is subtly different from the category, in that a <strong>profile</strong> defines the values for all the <strong>Properties</strong> of a single <strong>component</strong>, which likely contains multiple categories of <strong>Properties</strong>. </td></tr>
-<tr><td> Values        </td><td> The <strong>values</strong> that the <strong>Property</strong> can have. As a simple example, a <strong>Property</strong> named <code>'IsSmartPhone'</code> might have three values: <code>true</code>, <code>false</code>, and <code>unknown</code>.                                                                                   </td></tr>
-<tr><td> Default Value </td><td> The default <strong>value</strong> for the <strong>Property</strong> if it is not otherwise known. In the above example, the <strong>Property</strong> named <code>'IsSmartPhone'</code> would probably have <code>unknown</code> as the default value.                                                               </td></tr>
-<tr><td> List          </td><td> Whether or not the <strong>Property</strong> may have multiple values. For example, the connectivity types a device supports would be a list, as a single device might support Bluetooth, HSDPA, LTE, Wi-Fi, etc.                                                         </td></tr>
-<tr><td> Obsolete      </td><td> Whether the <strong>Property</strong> is obsolete and only exists to maintain backward compatibility.                                                                                                                                                                     </td></tr>
-<tr><td> Display Order </td><td> The suggested order in which to display the <strong>Property</strong> when listing <strong>Properties</strong>.                                                                                                                                                                        </td></tr>
-<tr><td> Mandatory     </td><td> Whether the <strong>Property</strong> is mandatory or not. If a <strong>Property</strong> is mandatory, a <strong>profile</strong> must have a non-default value for it to be classed as valid.                                                                                                     </td></tr>
-<tr><td> Show          </td><td> Whether the <strong>Property</strong> should be displayed in situations such as a page listing <strong>Properties</strong>. Less important <strong>Properties</strong> may not be displayed.                                                                                                        </td></tr>
-<tr><td> Show Values   </td><td> Whether values of the <strong>Property</strong> should be displayed in situations such as a page listing the <strong>Property&rsquo;s</strong> values. Showing all the values can make a very long list.                                                                                     </td></tr>
+<tr><td> Description   </td><td> A description of the Property explaining what it refers to, and what significance its values have.                                                                                                                                   </td></tr>
+<tr><td> URL           </td><td> A URL where more information on the Property can be found.                                                                                                                                                                           </td></tr>
+<tr><td> Component     </td><td> The Component to which the Property belongs. This is subtly different from the category, in that a Profile defines the values for all the Properties of a single Component, which likely contains multiple categories of Properties. </td></tr>
+<tr><td> Values        </td><td> The Values that the Property can have. As a simple example, a Property named <code>'IsSmartPhone'</code> might have three values: <code>true</code>, <code>false</code>, and <code>unknown</code>.                                                                       </td></tr>
+<tr><td> Default Value </td><td> The default Value for the Property if it is not otherwise known. In the above example, the Property named <code>'IsSmartPhone'</code> would probably have <code>unknown</code> as the default value.                                                   </td></tr>
+<tr><td> List          </td><td> Whether or not the Property may have multiple values. For example, the connectivity types a device supports would be a list, as a single device might support Bluetooth, HSDPA, LTE, Wi-Fi, etc.                                     </td></tr>
+<tr><td> Obsolete      </td><td> Whether the Property is obsolete and only exists to maintain backward compatibility.                                                                                                                                                 </td></tr>
+<tr><td> Display Order </td><td> The suggested order in which to display the Property when listing Properties.                                                                                                                                                        </td></tr>
+<tr><td> Mandatory     </td><td> Whether the Property is mandatory or not. If a Property is mandatory, a Profile MUST have a non-default value for that Property in order for the Profile to be classed as valid.                                                     </td></tr>
+<tr><td> Show          </td><td> Whether the Property should be displayed in situations such as a page listing Properties. Less important Properties may not be displayed.                                                                                            </td></tr>
+<tr><td> Show Values   </td><td> Whether values of the Property should be displayed in situations such as a page listing the Property&rsquo;s values. Showing all the values can make a very long list.                                                                     </td></tr>
 </tbody>
 </table>
 <h3 id="profile">Profile</h3>
-<p>A <strong>profile</strong> defines a unique set of <strong>values</strong> for all <strong>Properties</strong> of
-a single <strong>component</strong>.</p>
+<p>A <strong>Profile</strong> defines a unique set of Values for all Properties of
+a single Component.</p>
 <table>
 <thead>
 <tr><th> Metadata  </th><th> Description                                                                                                                                                                           </th></tr>
 </thead>
 <tbody>
-<tr><td> Id        </td><td> The unique id of the <strong>profile</strong>. This is usually a number and will remain the same when a data file is updated.                                                                      </td></tr>
-<tr><td> Name      </td><td> The name of the <strong>profile</strong> that gives a more &lsquo;human&rsquo; identifier than id, usually describing what the <strong>values</strong> it contains are. By convention, this is unique within the data file. </td></tr>
-<tr><td> Component </td><td> The <strong>component</strong> to which the <strong>profile</strong> relates. This is the <strong>component</strong> which the <strong>profile</strong> contains <strong>values</strong> for.                                                          </td></tr>
-<tr><td> Values    </td><td> The <strong>values</strong> that define the <strong>profile</strong>.                                                                                                                                           </td></tr>
+<tr><td> Id        </td><td> The unique id of the Profile. This is usually a number and will remain the same when a data file is updated.                                                                      </td></tr>
+<tr><td> Name      </td><td> The name of the Profile that gives a more &lsquo;human&rsquo; identifier than id, usually describing what the Values it contains are. By convention, this is unique within the data file. </td></tr>
+<tr><td> Component </td><td> The Component to which the Profile relates. This is the Component which the Profile contains Values for.                                                          </td></tr>
+<tr><td> Values    </td><td> The Values that define the Profile.                                                                                                                                           </td></tr>
 </tbody>
 </table>
 <h3 id="value">Value</h3>
-<p>Each <strong>Property</strong> has a set of possible <strong>values</strong> that it can return.
-The metadata associated with a <strong>value</strong> is:</p>
+<p>Each Property has a set of possible <strong>Values</strong> that it can return.
+The metadata associated with a Value is:</p>
 <table>
 <thead>
 <tr><th> Metadata    </th><th> Description                                                                                                                                                   </th></tr>
 </thead>
 <tbody>
-<tr><td> Name        </td><td> The <strong>value</strong> as a string. This uniquely identifies the <strong>value</strong> only within the <strong>values</strong> relating to the same <strong>Property</strong>.                               </td></tr>
-<tr><td> Property    </td><td> The <strong>Property</strong> to which the <strong>value</strong> relates. This, in combination with the name, uniquely identifies the <strong>value</strong> within the Device Detection data file. </td></tr>
-<tr><td> Description </td><td> A description of the <strong>value</strong> explaining what it refers to, and what it means if a <strong>profile</strong> has this <strong>value</strong>.                                           </td></tr>
-<tr><td> URL         </td><td> A URL where more information on the <strong>value</strong> can be found.                                                                                                   </td></tr>
+<tr><td> Name        </td><td> The Value as a string. This uniquely identifies the Value only within the Values relating to the same Property.                               </td></tr>
+<tr><td> Property    </td><td> The Property to which the Value relates. This, in combination with the name, uniquely identifies the Value within the Device Detection data file. </td></tr>
+<tr><td> Description </td><td> A description of the Value explaining what it refers to, and what it means if a Profile has this Value.                                           </td></tr>
+<tr><td> URL         </td><td> A URL where more information on the Value can be found.                                                                                                   </td></tr>
 </tbody>
 </table>
 <h3 id="match-metric-properties">Match metric Properties</h3>
 <p>In addition to the &lsquo;standard&rsquo; Device Detection Properties, there are a set of
 Properties that return details about the processing that was performed and
-the match that was found. Metadata for these Properties must be added, as they
+the match that was found. Metadata for these Properties MUST be added, as they
 will not be included in the metadata exposed by the native code.</p>
 <p>All these Properties have the following values:
 - Category = &ldquo;Device Metrics&rdquo; (sic)
 - Available With = &ldquo;Lite&rdquo;, &ldquo;Premium&rdquo;, &ldquo;Enterprise&rdquo;, &ldquo;TAC&rdquo; - If possible, this
 list should be created dynamically from the lists of files included against
 all other Property metadata that is exposed by the native code.
-- Component = &ldquo;Metrics&rdquo; - This component must also be added to the list of
+- Component = &ldquo;Metrics&rdquo; - This component MUST also be added to the list of
 components returned by the Engine.</p>
 <table>
 <thead>
@@ -1169,7 +1214,7 @@ for the target language.</p>
 <tbody>
 <tr><td> features </td><td> Descriptions of Pipeline API features </td></tr>
 <tr><td> advanced-features </td><td> Descriptions of Pipeline API features that are not implemented in all languages and/or do not have strong enough justifications for the complexity they add </td></tr>
-<tr><td> Pipeline-elements </td><td> Specifications for <strong>Flow Elements</strong> that are needed to provide core functionality  </td></tr>
+<tr><td> Pipeline-elements </td><td> Specifications for Flow Elements that are needed to provide core functionality  </td></tr>
 </tbody>
 </table>
 <p>If you&rsquo;re not sure where to start, read through the primer section below before
@@ -1196,7 +1241,7 @@ information about the data types within which those Properties are found.</p>
 <h3 id="flow-data-lifecycle">Flow Data Lifecycle</h3>
 <p>Creation of Flow Data is carried out by an application requesting an instance
 from a Pipeline. With a number of important exceptions, the creating
-application must destroy the Flow Data once it has completed its processing.</p>
+application MUST destroy the Flow Data once it has completed its processing.</p>
 <p>The application carries out the initial population of Evidence
 and then requests that the Pipeline <code>process</code> it - i.e. present the Flow Data
 to the various Flow Elements that comprise it, in sequence. Processing is
@@ -1228,51 +1273,51 @@ evaluation of Property values. Engine instances may be shared between Pipelines.
 <hr/>
 <h1 id="conceptual-overview">Conceptual overview</h1>
 <h2 id="core">Core</h2>
-<p>The core package contains everything needed to construct a Pipeline and pass through
-a Flow Data object.</p>
+<p>The core package contains everything needed to construct a <strong>Pipeline</strong> and pass through
+a <strong>Flow Data</strong> object.</p>
 <h3 id="flow-data">Flow Data</h3>
-<p>The <strong>Flow Data</strong> object is the fundamental unit of work within the Pipeline API.
+<p>The Flow Data object is the fundamental unit of work within the Pipeline API.
 It is primarily a container for various data sets, and is the mechanism by which
 inputs are provided to the Pipeline and outputs are returned to the user.</p>
 <p>The input data, or &lsquo;Evidence&rsquo; is a set of key-value pairs. For more details,
 see the <a href="features/evidence.md">Evidence</a> section.</p>
-<p>The output data consists of one <strong>Element Data</strong> instance for each <strong>Flow Element</strong>
-in the <strong>Pipeline</strong>. These are accessed using the &lsquo;data key&rsquo; string of the
-<strong>Flow Element</strong> that created each entry.</p>
-<p><strong>Flow Data</strong> objects are created by a Pipeline and can only be used within the
-Pipeline by which they were created. The Process method on <strong>Flow Data</strong>
+<p>The output data consists of one Element Data instance for each Flow Element
+in the Pipeline. These are accessed using the &lsquo;data key&rsquo; string of the
+Flow Element that created each entry.</p>
+<p>Flow Data objects are created by a Pipeline and can only be used within the
+Pipeline by which they were created. The Process method on Flow Data
 initiates Pipeline processing.</p>
-<p>A <strong>Flow Data</strong> belongs to exactly one <strong>Pipeline</strong>.
-While a <strong>Pipeline</strong> may have many <strong>Flow Data</strong> instances.
+<p>A Flow Data belongs to exactly one Pipeline.
+While a Pipeline may have many Flow Data instances.
 The standard usage pattern is to create a singleton Pipeline instance that will
 be used in environments such as web servers. As such, it is expected that many
-<strong>Flow Data</strong> instances will be created and processed in parallel from a single
-<strong>Pipeline</strong>.</p>
-<p>A <strong>Pipeline</strong> does not maintain references to <strong>Flow Data</strong> instances that it
+Flow Data instances will be created and processed in parallel from a single
+Pipeline.</p>
+<p>A Pipeline does not maintain references to Flow Data instances that it
 has created, but they maintain references to it.</p>
 <p>See <a href="features/thread-safety.md">thread safety</a> for details on concurrent access requirements.</p>
-<p><strong>Flow Data</strong> must support various different ways of accessing the data it contains.
+<p>Flow Data MUST support various different ways of accessing the data it contains.
 See <a href="features/access-to-results.md">access to results</a> for more information.</p>
 <h3 id="element-data">Element Data</h3>
-<p><strong>Element Data</strong> is a container, within the <strong>Flow Data</strong>, for Property values
-relating to a particular <strong>Flow Element</strong>. These values are set by
-<strong>Flow Elements</strong> during processing. <strong>Element Data</strong> is retrieved from
-<strong>Flow Data</strong> using the &lsquo;data key&rsquo; associated with the <strong>Flow Element</strong>.</p>
+<p><strong>Element Data</strong> is a container, within the Flow Data, for Property values
+relating to a particular Flow Element. These values are set by
+Flow Elements during processing. Element Data is retrieved from
+Flow Data using the &lsquo;data key&rsquo; associated with the Flow Element.</p>
 <p>See <a href="features/access-to-results.md">access to results</a> for more<br />
 information on how this data should be accessed.</p>
 <p>See <a href="features/resource-cleanup.md">resource cleanup</a> for details on ensuring
-<strong>Element Data</strong> resources are cleaned up correctly.</p>
+Element Data resources are cleaned up correctly.</p>
 <h3 id="flow-element">Flow Element</h3>
-<p>A <strong>Flow Element</strong> is a black box which takes a <strong>Flow Data</strong> and performs some
-processing. This processing may read Evidence and/or <strong>Element Data</strong> instances
+<p>A <strong>Flow Element</strong> is a black box which takes a Flow Data and performs some
+processing. This processing may read Evidence and/or Element Data instances
 that have been added by previous elements. It may add new Evidence values and
 may add an instance of its own Element Data, which may or may not have
 Properties populated.</p>
 <p>See <a href="features/resource-cleanup.md">resource cleanup</a> for details on ensuring
-<strong>Flow Element</strong> resources are cleaned up correctly.</p>
+Flow Element resources are cleaned up correctly.</p>
 <h3 id="flow-element-builder">Flow Element builder</h3>
-<p>It is highly recommended that <strong>Flow Elements</strong> have some associated
-builder/factory that is used to create <strong>Flow Element</strong> instances.</p>
+<p>It is highly recommended that Flow Elements have some associated
+builder/factory that is used to create Flow Element instances.</p>
 <p>The exact specification of this component is less important than having a common
 mechanism for construction of elements. This provides consistency for users and
 will assist in the implementation of other parts of the specification.</p>
@@ -1289,23 +1334,23 @@ has caused some issues that could be avoided by making different design
 decisions in future implementations. These are discussed in more detail
 in <a href="reference-implementation-notes.md#builders">reference implementation notes</a></p>
 <h3 id="pipeline">Pipeline</h3>
-<p>A <strong>Pipeline</strong> is a method of grouping multiple <strong>Flow Elements</strong> into a single
+<p>A Pipeline is a method of grouping multiple Flow Elements into a single
 process. By default, elements are always executed sequentially in the order
 that they are added. See <a href="#pipeline-builder">Pipeline builder</a> for more details.</p>
-<p>A <strong>Pipeline</strong> object is intended to be immutable. In other words, once created, it cannot be
+<p>A Pipeline object is intended to be immutable. In other words, once created, it cannot be
 changed by adding new elements, removing old ones, etc.</p>
 <h3 id="pipeline-builder">Pipeline builder</h3>
 <p>As with <a href="#flow-element-builder">Flow Elements</a>, we have found that the builder
-pattern is a good way to control the creation of <strong>Pipeline</strong> instances.</p>
+pattern is a good way to control the creation of Pipeline instances.</p>
 <p>See <a href="features/pipeline-configuration.md">Pipeline configuration</a> for more information
 on configuring and creating instances.</p>
 <h2 id="engines">Engines</h2>
-<p>The Engines package adds features to <strong>Flow Elements</strong> that are common to
+<p>The <strong>Engines</strong> package adds features to Flow Elements that are common to
 multiple different 51Degrees element implementations.</p>
 <h3 id="aspect-engine">Aspect Engine</h3>
 <p>See the <a href="README.md#engine">readme</a> for a definition of &lsquo;Aspect&rsquo;.</p>
-<p><strong>Aspect Engines</strong> (often shortened to just &lsquo;<strong>Engines</strong>&rsquo;) are a specific type
-of <strong>Flow Element</strong> with additional features and Properties:</p>
+<p><strong>Aspect Engines</strong> (often shortened to just &lsquo;Engines&rsquo;) are a specific type
+of Flow Element with additional features and Properties:</p>
 <ul>
 <li><a href="features/caching.md">Results caching</a></li>
 <li><a href="features/data-updates.md">Data file automatic updates</a></li>
@@ -1313,16 +1358,16 @@ of <strong>Flow Element</strong> with additional features and Properties:</p>
 <li><a href="features/properties.md#missing-properties">Missing Properties</a></li>
 </ul>
 <h3 id="aspect-data">Aspect data</h3>
-<p>In the same way that <strong>Aspect Engines</strong> are specific types of <strong>Flow Element</strong>.
-<strong>Aspect Data</strong> are specific types of <strong>Element Data</strong>.</p>
+<p>In the same way that Aspect Engines are specific types of Flow Element.
+<strong>Aspect Data</strong> are specific types of Element Data.</p>
 <p>See <a href="#aspect-engine">Aspect Engines</a> for details of the features that
-<strong>Aspect Engines</strong> / <strong>Aspect Data</strong> have on top of standard <strong>Flow Element</strong> /
-<strong>Element Data</strong>.</p>
+Aspect Engines / Aspect Data have on top of standard Flow Element /
+Element Data.</p>
 <h2 id="cloud-engines">Cloud Engines</h2>
-<p>The premise of Cloud Engines is to offload processing that might otherwise
-be performed by an on-premise <strong>Aspect Engine</strong> to a remote service.</p>
+<p>The premise of <strong>Cloud Engines</strong> is to offload processing that might otherwise
+be performed by an on-premise Aspect Engine to a remote service.</p>
 <h3 id="cloud-request-engine">Cloud Request Engine</h3>
-<p>The Cloud Request Engine is a further specialization of <strong>Aspect Engine</strong>
+<p>The <strong>Cloud Request Engine</strong> is a further specialization of Aspect Engine
 with the task of making requests to a remote service.</p>
 <p>In theory, this could be an internally hosted service. In practice, it is
 usually the <a href="https://cloud.51degrees.com/api-docs/index.html">51Degrees cloud service</a>.</p>
@@ -1331,9 +1376,9 @@ that is returned by the remote service that it calls.</p>
 <p>See <a href="pipeline-elements/cloud-request-engine.md">Cloud Request Engine</a>
 for the technical details.</p>
 <h3 id="cloud-aspect-engine">Cloud Aspect Engine</h3>
-<p>The Cloud Aspect Engine is also a specialization of <strong>Aspect Engine</strong>.
+<p>The <strong>Cloud Aspect Engine</strong> is also a specialization of Aspect Engine.
 It takes the JSON result from the Cloud Request Engine and transforms
-it into an <strong>Aspect Data</strong> instance that is interface compatible with
+it into an Aspect Data instance that is interface compatible with
 the data from the equivalent On-premise Engine.</p>
 <p>See <a href="pipeline-elements/cloud-aspect-engine.md">Cloud Aspect Engine</a>
 for the technical details.</p>
@@ -1412,7 +1457,7 @@ of some concrete usage of that system. As such, it may be helpful to look at
 other use-case documents such as
 <a href="../device-detection-specification/usage-examples.md">Device Detection</a></p>
 <h2 id="creating-elements-and-pipelines">Creating elements and Pipelines</h2>
-<p>Creating <strong>Flow Elements</strong> should always be done using a consistent mechanism.
+<p>Creating Flow Elements should always be done using a consistent mechanism.
 In the case of C#, we use a separate builder class. For more details on this,
 see the <a href="conceptual-overview.md#flow-element-builder">Flow Element builder</a>
 section in the conceptual overview.</p>
@@ -1420,8 +1465,8 @@ section in the conceptual overview.</p>
   .SetConfigurationFlag(true)
   .Build()
 </code></pre>
-<p>As with <strong>Flow Elements</strong>, C# also uses separate builder class when creating
-<strong>Pipelines</strong>:</p>
+<p>As with Flow Elements, C# also uses separate builder class when creating
+Pipelines:</p>
 <pre><code class="language-c#">var pipeline = pipelineBuilder
   .AddElement(element)
   .Build()
@@ -1436,7 +1481,7 @@ details.</p>
 <p>Once the Pipeline has been created, processing a request can generally
 be broken down into 4 steps:</p>
 <ol>
-<li>Create <strong>Flow Data</strong>:</li>
+<li>Create Flow Data:</li>
 </ol>
 <pre><code class="language-c#">var flowData = pipeline.createFlowData();
 </code></pre>
@@ -1446,7 +1491,7 @@ be broken down into 4 steps:</p>
 <pre><code class="language-c#">flowData.AddEvidence(&quot;query.evidence-key&quot;, &quot;evidence value&quot;);
 </code></pre>
 <ol>
-<li>Request the <strong>Pipeline</strong> to process the data:</li>
+<li>Request the Pipeline to process the data:</li>
 </ol>
 <pre><code class="language-c#">flowData.Process();
 </code></pre>
@@ -1478,18 +1523,18 @@ allowing for a single build cycle. Specific features, such as Device Detection,
 use separate repos.</p>
 <p>Pipeline itself is modularized as follows:</p>
 <ul>
-<li><strong>Common</strong> base utilities potentially of wider application than Pipeline</li>
-<li><strong>Core</strong> features essential to Pipeline, Flow Data, Flow Elements etc.</li>
-<li><strong>Engines</strong> base classes providing features that are beyond what is provided in Flow Elements</li>
-<li><strong>Web</strong> Adaptors and features to assist with use of Pipeline in a Web environment</li>
-<li><strong>51Engines</strong> features specific to 51Degrees and 51Degrees Engines:</li>
-<li><strong>ShareUsage</strong></li>
-<li><strong>SetHeaders</strong></li>
-<li><strong>Sequence</strong></li>
-<li><strong>Engine Implementations</strong> Separate Modules for each of the following:</li>
-<li><strong>JSON</strong></li>
-<li><strong>JavaScript</strong></li>
-<li><strong>CloudRequest</strong></li>
+<li><em>Common</em> base utilities potentially of wider application than Pipeline</li>
+<li><em>Core</em> features essential to Pipeline, Flow Data, Flow Elements etc.</li>
+<li>Engines base classes providing features that are beyond what is provided in Flow Elements</li>
+<li><em>Web</em> Adaptors and features to assist with use of Pipeline in a Web environment</li>
+<li><em>51Engines</em> features specific to 51Degrees and 51Degrees Engines:</li>
+<li><em>ShareUsage</em></li>
+<li><em>SetHeaders</em></li>
+<li><em>Sequence</em></li>
+<li><em>Engine Implementations</em> Separate Modules for each of the following:</li>
+<li><em>JSON</em></li>
+<li><em>JavaScript</em></li>
+<li><em>CloudRequest</em></li>
 </ul>
 <p>This diagram illustrates the structure of .NET NuGet packages:</p>
 <p><img src="images/v4%20Packages.png" alt="Illustration of package structure" /></p>
@@ -1802,11 +1847,11 @@ ecosystem, rather than simply repeating what worked for some other
 language/framework.</p>
 <p>Some common tasks that the web integration may perform are:</p>
 <ul>
-<li>Creation of <strong>Pipeline</strong> on start-up.</li>
-<li>Manage <strong>Flow Data</strong> lifecycle</li>
-<li>Create <strong>Flow Data</strong> when request comes in</li>
+<li>Creation of Pipeline on start-up.</li>
+<li>Manage Flow Data lifecycle</li>
+<li>Create Flow Data when request comes in</li>
 <li>Populate Evidence values and call &lsquo;Process&rsquo;</li>
-<li>Make the processed <strong>Flow Data</strong> easily accessible to other parts of the
+<li>Make the processed Flow Data easily accessible to other parts of the
 application so the results can be used.</li>
 <li>Handle <a href="resource-cleanup.md">resource cleanup</a> once request handling is
 completed.</li>
@@ -1814,10 +1859,10 @@ completed.</li>
 <li>Set HTTP response headers to request additional information.</li>
 </ul>
 <h2 id="pipeline-configuration">Pipeline configuration</h2>
-<p>The web integration makes use of several <strong>Flow Elements</strong> in order to support
+<p>The web integration makes use of several Flow Elements in order to support
 <a href="#javascript-properties">client-side</a> functionality.</p>
-<p>Where the web integration is responsible for creation of the <strong>Pipeline</strong>, it
-must also ensure that these additional <strong>Flow Elements</strong> will be present.</p>
+<p>Where the web integration is responsible for creation of the Pipeline, it
+must also ensure that these additional Flow Elements will be present.</p>
 <ul>
 <li>The <a href="../pipeline-elements/sequence-element.md">Sequence Element</a> must be
 present. If not, it should be added as the first element in the Pipeline.</li>
@@ -1827,7 +1872,7 @@ present. If not, it should be added as the penultimate element.
 <li>The <a href="../pipeline-elements/javascript-builder.md">JavaScript Builder Element</a>
 must be present. If not, it should be added after all other elements.</li>
 </ul>
-<p>Another <strong>Flow Element</strong> is needed to allow the web integration to automatically
+<p>Another Flow Element is needed to allow the web integration to automatically
 set HTTP response headers.</p>
 <ul>
 <li>The <a href="../pipeline-elements/set-headers-element.md">Set Headers Element</a> must
@@ -1867,9 +1912,9 @@ be appended, rather than replacing the existing value.</p>
 <h2 id="client-side-features">Client-side features</h2>
 <p>There are two major client-side features that the web integration must provide:
 1. Enable the execution of JavaScript snippets which can be used to gather
-additional Evidence. Handle passing this data back to the <strong>Pipeline</strong> for
+additional Evidence. Handle passing this data back to the Pipeline for
 processing.
-2. Allow the user to access results on <strong>Pipeline</strong> processing in client side
+2. Allow the user to access results on Pipeline processing in client side
 code.</p>
 <h3 id="access-to-results">Access to results</h3>
 <p>Generally, this is achieved by adding a specific JavaScript include to the HTML
@@ -1894,12 +1939,12 @@ snippets
 (only repeat up to a configurable limit in order to avoid infinite loops)</p>
 <h3 id="flow-elements">Flow Elements</h3>
 <p>These features are implemented using the web integration logic itself, along
-with several <strong>Flow Elements</strong>:</p>
+with several Flow Elements:</p>
 <ul>
 <li><a href="../pipeline-elements/sequence-element.md">Sequence Element</a> - Used to
 prevent the infinite loops described in the section above.</li>
 <li><a href="../pipeline-elements/json-builder.md">JSON Builder Element</a> - Converts the
-Property values in the current <strong>Flow Data</strong> into a JSON data object.</li>
+Property values in the current Flow Data into a JSON data object.</li>
 <li><a href="../pipeline-elements/javascript-builder.md">JavaScript Builder Element</a> -
 Takes the output from JSON Builder Element and packages it within a JavaScript
 template.</li>
@@ -2009,14 +2054,16 @@ if it is found to be an issue for a particular client.</p>
 <hr/>
 <h1 id="caching">Caching</h1>
 <h2 id="overview">Overview</h2>
-<p><strong>Aspect Engines</strong> may support the addition of a cache.
+<p>Aspect Engines may support the addition of a cache.
 This is intended to improve performance when the Engine receives a process
 request containing Evidence values that are sufficiently similar to a previous request.</p>
 <p>As with any caching strategy, the implications for memory use and
 performance should be investigated by profiling in the target environment.
-Although we must certainly ensure that the caching implementation is doing its
-job effectively, such concerns are primarily the responsibility of the end
-user of the Pipeline API.</p>
+Such concerns are the responsibility of the end
+user of the Pipeline API, rather than the implementor of the API.
+However, the implementor MUST ensure that there are tests to demonstrate that
+the caching system can provide some benefit in the limited scope of the
+testing environment.</p>
 <p>In practice, we have found that the primary use-case for caching is the
 <a href="../pipeline-elements/cloud-request-engine.md">Cloud Request Engine</a>.
 This works well when cloud requests are being made for one product.
@@ -2048,15 +2095,15 @@ flowData.Add(engineDataKey, result);
 is likely to vary significantly from this in order to account for concurrency
 concerns, error handling, other features, etc.</p>
 <h2 id="generation-of-keys">Generation of keys</h2>
-<p>All <strong>Flow Elements</strong> must <a href="advertize-accepted-evidence.md">advertise</a> the
+<p>All Flow Elements MUST <a href="advertize-accepted-evidence.md">advertise</a> the
 Evidence keys that they make use of.
 You will need to use this to build a list of the relevant Evidence keys
-and values that are present in the <strong>Flow Data</strong>.</p>
+and values that are present in the Flow Data.</p>
 <p>Other considerations when creating keys:
-- Evidence values must always be added in the same Evidence key order.
+- Evidence values MUST always be added in the same Evidence key order.
 For example, <code>query.user-agent</code> first, then <code>header.user-agent</code>, etc</p>
 <ul>
-<li>Comparison of Evidence keys must be case-insensitive. For example,
+<li>Comparison of Evidence keys MUST be case-insensitive. For example,
 the following keys are considered the same:</li>
 </ul>
 <pre><code>&quot;query.user-agent&quot; = &quot;abc&quot;
@@ -2064,7 +2111,7 @@ the following keys are considered the same:</li>
 <pre><code>&quot;query.User-Agent&quot; = &quot;abc&quot;
 </code></pre>
 <ul>
-<li>Comparison of Evidence values must be case-sensitive.</li>
+<li>Comparison of Evidence values MUST be case-sensitive.</li>
 </ul>
 <h2 id="cache-implementation">Cache implementation</h2>
 <p>The system should allow any cache conforming to a simple interface to be
@@ -2088,18 +2135,18 @@ describes the internals of such a cache. You can also review the
 and <a href="https://github.com/51Degrees/caching-dotnet/blob/master/FiftyOne.Caching/LruCacheBase.cs">.NET</a>
 reference implementations.</p>
 <h2 id="data-lifetime-and-concurrency-issues">Data lifetime and concurrency issues</h2>
-<p>The cache stores the instance of <strong>Aspect Data</strong> that was generated based
+<p>The cache stores the instance of Aspect Data that was generated based
 on the Evidence values in the key.</p>
 <p>Where <a href="resource-cleanup.md">resource cleanup</a> is required, the lifetime
-of such data objects is tied to the <strong>Flow Data</strong> that is generated for
+of such data objects is tied to the Flow Data that is generated for
 that request.</p>
-<p>However, cached instances can persist long after the original <strong>Flow Data</strong>
+<p>However, cached instances can persist long after the original Flow Data
 that resulted in their creation is gone.</p>
-<p>Consequently, if the <strong>Element Data</strong> produced by an <strong>Engine</strong> requires
+<p>Consequently, if the Element Data produced by an Engine requires
 cleanup, then that Engine must not allow a cache to be added.</p>
 <p>In addition, this functionality can result in a scenario where the
 instance is accessed by multiple threads simultaneously.
-If access to the <strong>Element Data</strong> cannot be guaranteed to be thread-safe,
+If access to the Element Data cannot be guaranteed to be thread-safe,
 then the Engine must not allow a cache to be added.</p>
 <p>Design note - There are various routes we could potentially take to allow
 caches to still work in the scenarios described above. (Creating a duplicate
@@ -2112,26 +2159,26 @@ implementations simply do not support adding a cache in these cases.</p>
 <h2 id="flow-elements">Flow Elements</h2>
 <p>The Pipeline API is designed to be used in highly concurrent environments
 such as high traffic web servers.</p>
-<p>Consequently, <strong>Pipeline</strong> and <strong>Flow Element</strong> implementations must be
+<p>Consequently, Pipeline and Flow Element implementations must be
 capable of handling multiple concurrent requests to the <code>Process</code> function.</p>
 <h2 id="flow-data">Flow Data</h2>
-<p>In general user-facing data structures linked to <strong>Flow Data</strong> do not need to be
+<p>In general user-facing data structures linked to Flow Data do not need to be
 thread-safe as the most common use-case is that they will be accessed and
 updated only on the current thread.
 This ensures users get the best performance by default.</p>
-<p>Where the <strong>Pipeline</strong> contains elements running in parallel, <strong>Element Data</strong> instances
-will be added to the <strong>Flow Data</strong> in parallel. However, it is a useful optimization
-to allow <strong>Flow Data</strong> to be non-thread safe in contexts where no parallel execution
+<p>Where the Pipeline contains elements running in parallel, Element Data instances
+will be added to the Flow Data in parallel. However, it is a useful optimization
+to allow Flow Data to be non-thread safe in contexts where no parallel execution
 is required.</p>
-<p><strong>Flow Data</strong> instances are created by the Pipeline instance on which they
+<p>Flow Data instances are created by the Pipeline instance on which they
 will be processed. The Pipeline can determine whether any Flow Elements are
 to be processed in parallel and thus can determine whether to create thread-safe
 Flow Data or not.</p>
 <h3 id="evidence">Evidence</h3>
-<p>Evidence collection stored within <strong>Flow Data</strong> needs to be thread safe for
+<p>Evidence collection stored within Flow Data needs to be thread safe for
 concurrent read access and immutable once created.</p>
 <h2 id="element-data">Element Data</h2>
-<p>In general, <strong>Element Data</strong> instances do not need to be thread safe, as they
+<p>In general, Element Data instances do not need to be thread safe, as they
 should only be accessed and updated from a single thread.</p>
 <p>While it is certainly possible for a user to Engineer a scenario where an
 instance is accessed from multiple threads. We do not consider it worthwhile
@@ -2163,12 +2210,12 @@ let IDEs and users know what exceptions/errors a particular function can
 throw.</p>
 <h2 id="process-function">Process function</h2>
 <p>One of the key points that failures can occur is in the &lsquo;Process&rsquo; function.
-There may be any combination of <strong>Flow Elements</strong>, including custom
-third-party ones in the <strong>Pipeline</strong>.</p>
-<p>Consequently, exceptions and errors must be caught at the <strong>Pipeline</strong>
+There may be any combination of Flow Elements, including custom
+third-party ones in the Pipeline.</p>
+<p>Consequently, exceptions and errors must be caught at the Pipeline
 level.
-By default, these errors should be added to the <strong>Flow Data</strong> errors
-collection. Once all <strong>Flow Elements</strong> have completed processing, throw an
+By default, these errors should be added to the Flow Data errors
+collection. Once all Flow Elements have completed processing, throw an
 exception/error with all the stored errors included as sub-errors.</p>
 <p>There must be an option to modify this behavior to just add these errors
 to the errors collection and <a href="logging.md">log</a> them (I.e. don&rsquo;t throw an
@@ -2176,13 +2223,13 @@ exception/error at the end of processing). This option should be available
 when the <a href="../conceptual-overview.md#pipeline-builder">Pipeline is created</a>
 and be called <code>SuppressProcessExceptions</code> or similar.</p>
 <h3 id="flow-elements">Flow Elements</h3>
-<p><strong>Flow Elements</strong> should throw exceptions/errors freely, unless it makes
+<p>Flow Elements should throw exceptions/errors freely, unless it makes
 sense for an element to handle a specific error internally.
-In general, it is the responsibility of the <strong>Pipeline</strong> to handle these for
+In general, it is the responsibility of the Pipeline to handle these for
 the user as described above.</p>
 <h2 id="flow-data-and-derived-accessors">Flow Data and derived accessors</h2>
 <p>Apart from the &lsquo;Process&rsquo; function, almost all user interaction is handled
-through <strong>Flow Data</strong>.
+through Flow Data.
 The general guidance is that these functions and accessors should only
 throw errors/exceptions if the failure is likely due to something that
 the API user has done wrong.</p>
@@ -2208,7 +2255,7 @@ cause the process to crash.</p>
 The precise naming will be language-dependant, but in C#, these are:</p>
 <h3 id="property-missing-exception">Property Missing Exception</h3>
 <p>A Property missing exception is thrown if an attempt is made to access a
-Property that does not exist in the <strong>Flow Data</strong>.</p>
+Property that does not exist in the Flow Data.</p>
 <p>See <a href="properties.md#missing-properties">missing Properties</a> for more details.</p>
 <h3 id="pipeline-configuration-exception">Pipeline Configuration Exception</h3>
 <p>Can be thrown by any Pipeline, Element or Pipeline/Element builder. This
@@ -2224,9 +2271,9 @@ the user can act on it)</p>
 <hr/>
 <h1 id="evidence">Evidence</h1>
 <h2 id="overview">Overview</h2>
-<p>Evidence is the name for the input values added to a <strong>Flow Data</strong> instance.</p>
-<p>It is stored as key-value pairs and is used by <strong>Flow Elements</strong> within the
-<strong>Pipeline</strong> and is immutable once created.
+<p>Evidence is the name for the input values added to a Flow Data instance.</p>
+<p>It is stored as key-value pairs and is used by Flow Elements within the
+Pipeline and is immutable once created.
 Keys should be case-insensitive and will usually be split into &lt;prefix&gt;.&lt;field&gt;.</p>
 <p>Currently, defined examples of keys are:</p>
 <ul>
@@ -2260,19 +2307,19 @@ in the list above should be used.</p>
 This rule just ensures that any conflicts are resolved deterministically.
 For example the <a href="../pipeline-elements/cloud-request-engine.md#processing">Cloud Request Engine</a></p>
 <h2 id="adding-evidence-values">Adding Evidence values</h2>
-<p>Evidence is immutable. However, it may be desireable for some <strong>Flow Elements</strong>
+<p>Evidence is immutable. However, it may be desireable for some Flow Elements
 to add new values to Evidence for later elements to use.</p>
 <p>In order to allow for this scenario, we suggest creating a helper function
-that will pull a value from an existing <strong>Element Data</strong> if available, or
+that will pull a value from an existing Element Data if available, or
 fallback to pulling it from Evidence if needed.</p>
 <p>For example, if Device Detection Engine requests <code>query.sec-ch-ua-platform</code>
-from this function, it would return a Property value from any <strong>Element Data</strong>
+from this function, it would return a Property value from any Element Data
 with that Property name.
 It there were no such Property, if would return the value from Evidence entry
 that matched that name.
-If multiple <strong>Element Data</strong> instances include Properties with this name,
+If multiple Element Data instances include Properties with this name,
 an exception/error should be thrown.</p>
-<p>This function may be defined on <strong>Flow Data</strong> itself, as a separate helper, or
+<p>This function may be defined on Flow Data itself, as a separate helper, or
 both. That is an implementation detail that may depend on the language and
 design patterns being used.</p>
 
@@ -2297,55 +2344,55 @@ However, see <a href="web-integration.md">web integration</a> for further notes
 on where this is not the case.</p>
 <h2 id="detail">Detail</h2>
 <h3 id="pipeline">Pipeline</h3>
-<p>By default, <strong>Pipeline</strong> will clean up the <strong>Flow Elements</strong> it contains.
+<p>By default, Pipeline will clean up the Flow Elements it contains.
 However, there must be an option to disable this behavior.</p>
 <p>This is needed for scenarios where single elements are added to multiple
-<strong>Pipelines</strong>.
+Pipelines.
 In this case, the user must take responsibility for cleanup of
-<strong>Flow Element</strong> resources. This should be made clear in comments and
+Flow Element resources. This should be made clear in comments and
 documentation around the use of this option.</p>
 <h3 id="flow-element">Flow Element</h3>
-<p><strong>Flow Elements</strong> can be very light-weight, but can also maintain significant
+<p>Flow Elements can be very light-weight, but can also maintain significant
 internal resources.</p>
-<p>Similar to <strong>Element Data</strong> we have found native resources to be
+<p>Similar to Element Data we have found native resources to be
 the primary problem area.</p>
 <p>There must be some mechanism to ensure that such resources are cleaned up
-when the <strong>Flow Element</strong> is no longer needed.</p>
-<p>Whether other <strong>Flow Elements</strong> need any specific cleanup logic is
+when the Flow Element is no longer needed.</p>
+<p>Whether other Flow Elements need any specific cleanup logic is
 left up to implementers.</p>
 <h3 id="element-data">Element Data</h3>
 <p>In general, we have found that specific clean up of resources associated with
-<strong>Element Data</strong> instances is not needed as the garbage collector does a good
+Element Data instances is not needed as the garbage collector does a good
 enough job.
 However, there are two caveats to this:</p>
 <ol>
 <li>This will not be the case in all programming languages. Some profiling should
 be done to ensure that cleanup is being done effectively in the absence of
 specific cleanup logic.</li>
-<li>Where the <strong>Element Data</strong> contains references to native (C/C++) resources
-the system needs assistance to tie the cleanup of the <strong>Element Data</strong> to
+<li>Where the Element Data contains references to native (C/C++) resources
+the system needs assistance to tie the cleanup of the Element Data to
 the cleanup of these native resources. We have found that without this
 assistance, the system fails to clean resources up fast enough, leading to
 resource starvation and low level memory exceptions.</li>
 </ol>
 <h4 id="impact-on-caching">Impact on caching</h4>
-<p>Where the <a href="caching.md">result caching</a> feature is being used, <strong>Element Data</strong>
+<p>Where the <a href="caching.md">result caching</a> feature is being used, Element Data
 instances will be stored in the cache.</p>
 <p>If the instances are cleaned up after they are used, then the ones stored in
 the cache become useless.</p>
-<p>Consequently, the system must not allow a cache to be added to <strong>Engines</strong>
-where the <strong>Element Data</strong> they produce requires cleanup beyond what normal
+<p>Consequently, the system must not allow a cache to be added to Engines
+where the Element Data they produce requires cleanup beyond what normal
 garbage collection will achieve.</p>
 <h3 id="flow-data">Flow Data</h3>
-<p>Cleanup of <strong>Flow Data</strong> may include any resources that it holds. However,
-the primary concern is to ensure that any <strong>Element Data</strong> instances that
+<p>Cleanup of Flow Data may include any resources that it holds. However,
+the primary concern is to ensure that any Element Data instances that
 it holds that require cleanup are taken care of.</p>
-<p><strong>Element Data</strong> instances that do not require cleanup must be left alone
+<p>Element Data instances that do not require cleanup must be left alone
 in order for <a href="caching.md">result caching</a> to work correctly.</p>
-<p>Note that <strong>Flow Data</strong> holds a reference to the <strong>Pipeline</strong> that created
-it. However, <strong>Flow Data</strong> instances are not cleaned up when the <strong>Pipeline</strong>
+<p>Note that Flow Data holds a reference to the Pipeline that created
+it. However, Flow Data instances are not cleaned up when the Pipeline
 is cleaned up. As such, it is possible to have active references to
-<strong>Flow Data</strong> instances that reference disposed <strong>Pipeline</strong> instances and
+Flow Data instances that reference disposed Pipeline instances and
 would fail if processed.</p>
 <p>Ideally, a helpful error message should be thrown in this scenario.</p>
 
@@ -2374,7 +2421,7 @@ essential.</p>
 to produce each payload.</p>
 <p>Shared data includes details such as:
 - Evidence values
-- <strong>Pipeline</strong> configuration.
+- Pipeline configuration.
 - OS, programming language and API versions.</p>
 <p>For more technical details, see the
 <a href="../pipeline-elements/usage-sharing-element.md">share usage element</a>.</p>
@@ -2383,13 +2430,13 @@ to produce each payload.</p>
 <h1 id="properties">Properties</h1>
 <h2 id="overview">Overview</h2>
 <p>This document contains details on the features associated with the Properties that
-are populated by <strong>Flow Elements</strong>.</p>
+are populated by Flow Elements.</p>
 <p>In this case, a &lsquo;Property&rsquo; refers to a specific, named data field that can be
 set to different values.</p>
 <p>The Property value will be determined during the &lsquo;process&rsquo; step that is performed
-by each <strong>Flow Element</strong>. This value will be stored within the <strong>Element Data</strong>,
-which is in turn stored within <strong>Flow Data</strong>.</p>
-<p>Each <strong>Flow Element</strong> may populate values for zero or more Properties.</p>
+by each Flow Element. This value will be stored within the Element Data,
+which is in turn stored within Flow Data.</p>
+<p>Each Flow Element may populate values for zero or more Properties.</p>
 <h2 id="value-types">Value types</h2>
 <p>A Property may return values of any type. However, there are certain types that are
 specifically expected and supported throughout the API.</p>
@@ -2415,7 +2462,7 @@ It is used to identify values that contain JavaScript snippets that are intended
 to be executed on the client device.</p>
 <p>See <a href="web-integration.md">web integration</a> for more detail.</p>
 <h2 id="null-values">Null values</h2>
-<p>Property values populated by <strong>Engines</strong> (as opposed to all <strong>Flow Elements</strong>)
+<p>Property values populated by Engines (as opposed to all Flow Elements)
 must be capable of having &lsquo;no value&rsquo;.</p>
 <p>Where &lsquo;no value&rsquo; is used, attempting to access the value should throw an
 error/exception with a customizable message explaining why the value is not set.</p>
@@ -2426,9 +2473,9 @@ chosen not to set its value for some reason.</p>
 <h2 id="property-metadata">Property metadata</h2>
 <p>All <a href="../conceptual-overview.md#flow-element">Flow Elements</a> must expose metadata
 describing details of the Properties that they can populate.</p>
-<p>In addition, it must be possible to get Property metadata at the <strong>Pipeline</strong>
-level for all Properties that can be populated by all <strong>Flow Elements</strong> in the
-<strong>Pipeline</strong>.</p>
+<p>In addition, it must be possible to get Property metadata at the Pipeline
+level for all Properties that can be populated by all Flow Elements in the
+Pipeline.</p>
 <p>The table below describes the metadata that is available.</p>
 <table>
 <thead>
@@ -2436,10 +2483,10 @@ level for all Properties that can be populated by all <strong>Flow Elements</str
 </thead>
 <tbody>
 <tr><td> Name                     </td><td> string                                  </td><td> The name of the Property. This is the string name used to access the Property value in the <a href="../conceptual-overview.md#element-data">Element Data</a>                                                                                                                                                                    </td></tr>
-<tr><td> Element                  </td><td> IFlowElement                            </td><td> The <strong>Flow Element</strong> that will populate the value for this Property.                                                                                                                                                                                                                                                 </td></tr>
+<tr><td> Element                  </td><td> IFlowElement                            </td><td> The Flow Element that will populate the value for this Property.                                                                                                                                                                                                                                                 </td></tr>
 <tr><td> Category                 </td><td> string                                  </td><td> A string name of the category that this Property belongs to. This is used to help organize Properties for elements that populate large numbers of them.                                                                                                                                                              </td></tr>
 <tr><td> Type                     </td><td> Type                                    </td><td> The type of the value returned by the Property                                                                                                                                                                                                                                                                       </td></tr>
-<tr><td> Available                </td><td> bool                                    </td><td> Flag used to store whether this Property is currently available to the caller or not. If not, then the Property value will not be present in <strong>Element Data</strong>                                                                                                                                                        </td></tr>
+<tr><td> Available                </td><td> bool                                    </td><td> Flag used to store whether this Property is currently available to the caller or not. If not, then the Property value will not be present in Element Data                                                                                                                                                        </td></tr>
 <tr><td> Delay Execution          </td><td> bool                                    </td><td> Flag used to control execution of <a href="#the-javascript-type">JavaScript</a> Properties. See <a href="web-integration.md">web integration</a> for more detail.                                                                                                                                                                          </td></tr>
 <tr><td> Evidence Properties      </td><td> List&lt;string&gt;                          </td><td> A list of the string names of any <a href="#the-javascript-type">JavaScript</a> Properties that can be executed to help determine the value of this Property. See <a href="web-integration.md">web integration</a> for more detail.                                                                                                        </td></tr>
 <tr><td> Item Properties          </td><td> List&lt;IPropertyMetaData&gt;               </td><td> Some Property values will be a collection of complex objects. In that scenario, this contains the metadata for the Properties on that complex object. Currently, this is only used by the <a href="../../device-detection-specification/pipeline-elements/hardware-profile-lookup-cloud.md">Hardware profile lookup Engine</a> </td></tr>
@@ -2448,7 +2495,7 @@ level for all Properties that can be populated by all <strong>Flow Elements</str
 </table>
 <h3 id="aspect-property-metadata">Aspect Property metadata</h3>
 <p><a href="../conceptual-overview.md#aspect-engine">Aspect Engines</a> are required to populate
-some additional metadata values beyond those required for <strong>Flow Elements</strong>.</p>
+some additional metadata values beyond those required for Flow Elements.</p>
 <p>The table below describes the additional metadata that is available.</p>
 <table>
 <thead>
@@ -2460,8 +2507,8 @@ some additional metadata values beyond those required for <strong>Flow Elements<
 </tbody>
 </table>
 <h2 id="missing-properties">Missing Properties</h2>
-<p>This feature is specific to Properties populated by <strong>Engines</strong> (rather than all
-<strong>Flow Elements</strong>).</p>
+<p>This feature is specific to Properties populated by Engines (rather than all
+Flow Elements).</p>
 <p>When the user attempts to access a Property that is defined for an Engine, but
 does not exist in the result set for some reason, the system must throw an
 error/exception with a message explaining why the Property is not available.</p>
@@ -2495,7 +2542,7 @@ impact performance when it is not enabled.</p>
 <hr/>
 <h1 id="data-update">Data update</h1>
 <h2 id="overview">Overview</h2>
-<p>An on-premise <strong>Aspect Engine</strong> may require data that is independent of the
+<p>An on-premise Aspect Engine may require data that is independent of the
 logic of the Engine and that is periodically refreshed. For example,
 when new phones or browser versions are released, the Device Detection
 Engine will require a new data file in order to detect and populate
@@ -2509,7 +2556,7 @@ implementers may choose either to provide the data in a single unified way
 or to implement the Data Update service to allow for multiple file sources.</p>
 <p>[^1] data sources are referred to as data files in the reference implementations</p>
 <h3 id="aspect-engine-features">Aspect Engine features</h3>
-<p>In order to support this feature, <strong>Aspect Engines</strong> must have
+<p>In order to support this feature, Aspect Engines must have
 some additional abilities:</p>
 <ol>
 <li>At configuration time, there must be a mechanism for supplying details about
@@ -2645,7 +2692,7 @@ while a new data file is made available.</p>
 <p>[^1] This is called <em>tempDataFile</em> in current reference implementations.</p>
 <p>Since creating a data file copy is required for disk based operation
 implementations may choose not to provide control over
-<strong>createOperationalDataCopy</strong> since disallowing it when either update option
+<em>createOperationalDataCopy</em> since disallowing it when either update option
 is enabled and disk based operation is enabled is an error.</p>
 <p>Implementations may choose to report an error if any item
 in this configuration is set for memory data source operation.</p>
@@ -2682,7 +2729,7 @@ in this configuration is set for memory data source operation.</p>
 <p>Probably can&rsquo;t compare dates so load whatever we have:
 - load buffer</p>
 <h3 id="newfileavailable-via-remote-or-file-watcher">newFileAvailable (via remote or file watcher)</h3>
-<p>The file will be in <strong>dataFilePath</strong> from watcher or from download, if the
+<p>The file will be in <em>dataFilePath</em> from watcher or from download, if the
 downloaded file is newer than the current file
 - pause file watcher, if any
 - pause update polling, if any
@@ -2699,7 +2746,7 @@ downloaded file is newer than the current file
 </ul>
 </li>
 <li>return</li>
-<li>if newer file in <strong>dataFilePath</strong></li>
+<li>if newer file in <em>dataFilePath</em></li>
 <li>process as per newFile above</li>
 <li>return</li>
 </ul>
@@ -2728,7 +2775,7 @@ implementations used for calls made to the Distributor.</p>
 compared with the current file data source, if file data source mode is active.
 If the downloaded file is more recent, it replaces the current file data source.</p>
 <p>If the data downloaded is more recent or if memory data source mode is in
-operation the <strong>Aspect Engine</strong> is refreshed with the new data.</p>
+operation the Aspect Engine is refreshed with the new data.</p>
 <p>Once the refresh is complete, the data update service can start
 checking for updates using the newly refreshed <em>next expected update</em>
 date/time.</p>
@@ -2791,10 +2838,10 @@ than a procedural update.</p>
 <hr/>
 <h1 id="advertise-accepted-evidence">Advertise accepted Evidence</h1>
 <h2 id="summary">Summary</h2>
-<p>All <strong>Flow Elements</strong> and <strong>Pipelines</strong> must be capable of programmatically
+<p>All Flow Elements and Pipelines MUST be capable of programmatically
 describing the Evidence keys that they can make use of.</p>
 <h2 id="flow-elements">Flow Elements</h2>
-<p>For the majority of <strong>Flow Elements</strong>, simply returning a list of Evidence
+<p>For the majority of Flow Elements, simply returning a list of Evidence
 values
 they can use would be sufficient.
 For example, the Device Detection Engine will accept <code>query.user-agent</code>,
@@ -2823,15 +2870,15 @@ request is automatically added to Evidence.</li>
 <ul>
 <li>Strings should only contain alphanumeric characters, full stop or hyphen.</li>
 <li>Some 51Degrees Properties also use the ‘/’ character. No new Properties will
-be added with this character, but it must be accommodated.</li>
+be added with this character, but it will need to be accommodated.</li>
 <li>Lower-case is preferred but not required.</li>
-<li>String comparisons must be case insensitive.</li>
+<li>String comparisons MUST be case insensitive.</li>
 </ul>
 <h2 id="accessing-results">Accessing results</h2>
 <p>There are multiple ways to access the results of processing.</p>
 <p>Firstly, these are the mechanisms for getting Element Data:</p>
 <ol>
-<li>It must be possible to get Element Data by supplying the string key
+<li>It MUST be possible to get Element Data by supplying the string key
 for the element. For example:</li>
 </ol>
 <pre><code class="language-c#">IElementData deviceData = flowData.Get(DeviceDetectionEngine.ElementDataKey);
@@ -2858,7 +2905,7 @@ instance. For example:</li>
 </code></pre>
 <p>Below are the mechanisms for getting Properties:</p>
 <ol>
-<li>It must be possible to get a Property value from an Element Data instance by
+<li>It MUST be possible to get a Property value from an Element Data instance by
 supplying the string key for that Property. For example:</li>
 </ol>
 <pre><code class="language-c#">object propertyValue = deviceData.Get(&quot;ismobile&quot;);
@@ -2883,8 +2930,8 @@ considered and agreed up front.</p>
 
 <hr/>
 <h1 id="lazy-loading">Lazy loading</h1>
-<p>This feature is specific to Properties populated by <strong>Engines</strong> (rather than all
-<strong>Flow Elements</strong>).
+<p>This feature is specific to Properties populated by Engines (rather than all
+Flow Elements).
 It is currently only implemented in .NET and Java.</p>
 <p>There are several execution strategies one might consider for the Process function.
 For example:</p>
@@ -2952,19 +2999,19 @@ is supplied, we suggest considering a differently named function for that scenar
 
 <hr/>
 <h1 id="multi-pipeline-elements">Multi-Pipeline elements</h1>
-<p>It should be possible for a <strong>Flow Element</strong> to be added to multiple
-<strong>Pipelines</strong> once it has been created.</p>
+<p>It should be possible for a Flow Element to be added to multiple
+Pipelines once it has been created.</p>
 <p>The intention is that this can be used to allow users to create Pipelines
 that only do as much processing as they need for different use cases within
 a single system.
-Without this feature, new <strong>Flow Element</strong> instances, which may come with
-a significant memory footprint, would be required for each <strong>Pipeline</strong>.</p>
-<p>This causes difficulties for any <strong>Flow Elements</strong> that maintain some
-state information relating to the <strong>Pipeline</strong> they are added to (For
+Without this feature, new Flow Element instances, which may come with
+a significant memory footprint, would be required for each Pipeline.</p>
+<p>This causes difficulties for any Flow Elements that maintain some
+state information relating to the Pipeline they are added to (For
 example, <a href="../pipeline-elements/json-builder.md">JSON builder</a>).</p>
-<p>If this feature is enabled, then all <strong>Flow Elements</strong> that maintain any
-such state information must ensure that they have the means to keep track of
-isolated instances of this state for each <strong>Pipeline</strong> to which they are
+<p>If this feature is enabled, then all Flow Elements that maintain any
+such state information MUST ensure that they have the means to keep track of
+isolated instances of this state for each Pipeline to which they are
 added and use the correct state information when processing.</p>
 <p>Note that is may be preferable for some elements to throw an error if added
 to a second Pipeline, rather than implement the logic that would be required
@@ -3540,11 +3587,11 @@ the output collection if it has not yet been added for that key.</li>
 <hr/>
 <h1 id="usage-sharing-element">Usage sharing element</h1>
 <h2 id="overview">Overview</h2>
-<p>This <strong>Flow Element</strong> implements the <a href="../features/usage-sharing.md">usage-sharing</a>
+<p>This Flow Element implements the <a href="../features/usage-sharing.md">usage-sharing</a>
 feature.</p>
 <h2 id="accepted-evidence">Accepted Evidence</h2>
 <p>The EvidenceKeyFilter for share usage is unusual as it cannot simply be a
-list of accepted keys like most <strong>Flow Elements</strong>.</p>
+list of accepted keys like most Flow Elements.</p>
 <p>Instead, it is a filter function that should return false (i.e. not shared)
 for any key where:</p>
 <ul>
@@ -3559,10 +3606,10 @@ shared.</li>
 <p>See <a href="#configuration-options">configuration options</a> for more detail on the
 configuration parameters that can affect this filter function.</p>
 <h2 id="element-data">Element Data</h2>
-<p>This <strong>Flow Element</strong> does not add an <strong>Element Data</strong> instance to <strong>Flow Data</strong>.</p>
+<p>This Flow Element does not add an Element Data instance to Flow Data.</p>
 <h2 id="start-up-activity">Start-up activity</h2>
 <p>A static XML snippet can be generated for values that will be invariant
-for the lifetime of the current <strong>Pipeline</strong>.</p>
+for the lifetime of the current Pipeline.</p>
 <p>From the list of parameters in the processing section below, the invariant ones
 are:
 - Version
