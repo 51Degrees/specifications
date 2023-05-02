@@ -104,7 +104,7 @@ in a non-interactive CI/CD environment.</li>
 <p><a href="./pipeline-specification/advanced-features/parallel-processing.md">TODO - write this up.</a></p>
 <p><a href="./pipeline-specification/advanced-features/process-cancellation.md">Process cancellation</a></p>
 <p><a href="./pipeline-specification/advanced-features/multi-pipeline-elements.md">Multi-Pipeline elements</a></p>
-<h3 id="pipeline-elements">Pipeline Elements</h3>
+<h3 id="pipeline-elements-1">Pipeline Elements</h3>
 <p><a href="./pipeline-specification/part3/pipeline-elements/sequence-element.md">Sequence Element</a></p>
 <p><a href="./pipeline-specification/part3/pipeline-elements/javascript-builder.md">JavaScript Builder Element</a></p>
 <p><a href="./pipeline-specification/part3/pipeline-elements/json-builder.md">JSON Builder Element</a></p>
@@ -199,8 +199,8 @@ Refer to 51Degrees Glossary</p>
 <p>Use the term &ldquo;remote server&rdquo; - not cloud or remote service</p>
 
 <hr/>
-<h1 id="device-detection-specification">Device Detection specification</h1>
-<h2 id="introduction">Introduction</h2>
+<h1 id="device-detection-specification-1">Device Detection specification</h1>
+<h2 id="introduction-1">Introduction</h2>
 <p>This folder structure contains a language agnostic specification for a device
 detection Engine that can be used by
 the <a href="../pipeline-specification/README.md">51Degrees v4 Pipeline API</a>.
@@ -219,7 +219,7 @@ If you&rsquo;re not sure where to start, we recommend looking at
 
 <hr/>
 <h1 id="data-model">Data model</h1>
-<h2 id="introduction">Introduction</h2>
+<h2 id="introduction-2">Introduction</h2>
 <p>This document contains the details of the data values returned by 51Degrees
 Device Detection.</p>
 <h2 id="overview">Overview</h2>
@@ -299,7 +299,7 @@ or <a href="https://www.npmjs.com/search?q=fiftyone.devicedetection">NPM</a></p>
 
 <hr/>
 <h1 id="usage-examples">Usage examples</h1>
-<h2 id="introduction">Introduction</h2>
+<h2 id="introduction-3">Introduction</h2>
 <p>This document contains descriptions of Device Detection use-cases along with
 C# examples.</p>
 <p>Many of these examples build on the concepts established in the Pipeline
@@ -471,7 +471,7 @@ using(var flowdata = pipeline.CreateFlowData())
 
 <hr/>
 <h1 id="required-examples">Required Examples</h1>
-<h2 id="features">Features</h2>
+<h2 id="features-1">Features</h2>
 <p>It is recommended that the following features are demonstrated in examples:</p>
 <ul>
 <li>On-Premise Device Detection</li>
@@ -727,7 +727,7 @@ of any output from tests of examples.</p>
 
 <hr/>
 <h1 id="ua-ch-high-entropy-decoder">UA-CH high entropy decoder</h1>
-<h2 id="overview">Overview</h2>
+<h2 id="overview-1">Overview</h2>
 <p>This Element is part of the system that allows Device Detection to use
 values from the User-Agent Client Hints (UA-CH) JavaScript API rather
 that the UA-CH HTTP headers.</p>
@@ -784,7 +784,7 @@ for an example of this using JavaScript.</li>
 
 <hr/>
 <h1 id="hardware-profile-lookup">Hardware profile lookup</h1>
-<h2 id="overview">Overview</h2>
+<h2 id="overview-2">Overview</h2>
 <p>This <a href="../../../pipeline-specification/conceptual-overview.md#cloud-aspect-engine">Cloud Aspect Engine</a>
 enables the parsing of &lsquo;profile lookup&rsquo; responses from the 51Degrees cloud service.</p>
 <p>See <a href="../../../pipeline-specification/part3/pipeline-elements/cloud-request-engine.md">here</a>
@@ -803,7 +803,7 @@ There are different mechanisms to get native model names for
 <a href="https://developer.android.com/reference/android/os/Build#MODEL">Android devices</a>
 and <a href="https://gist.github.com/soapyigu/c99e1f45553070726f14c1bb0a54053b#file-machinename-swift">iOS devices</a></li>
 </ul>
-<h2 id="accepted-evidence">Accepted Evidence</h2>
+<h2 id="accepted-evidence-1">Accepted Evidence</h2>
 <p>None. This Engine uses the output from the Cloud Aspect Engine as input
 rather than using Evidence.</p>
 <h2 id="start-up-activity">Start-up activity</h2>
@@ -814,7 +814,7 @@ before it.</p>
 based on the Resource Key supplied on start-up. The Hardware Profile Lookup Engine
 then takes the details of the subset of those Properties that are relevant to
 it.</p>
-<h2 id="element-data">Element Data</h2>
+<h2 id="element-data-1">Element Data</h2>
 <table>
 <thead>
 <tr><th> <strong>Name</strong>                   </th><th> <strong>Type</strong>                              </th><th> <strong>Description</strong>                                                                                                                           </th></tr>
@@ -823,18 +823,18 @@ it.</p>
 <tr><td> profiles </td><td> <code>IReadOnlyList&lt;IDeviceData&gt;</code> </td><td> A list of instances that are interface compatible with the results from cloud and on-premise device detection engines. </td></tr>
 </tbody>
 </table>
-<h2 id="process">Process</h2>
+<h2 id="process-1">Process</h2>
 <p>The majority of the processing SHOULD be handled by the shared
 <a href="../../../pipeline-specification/part3/pipeline-elements/cloud-aspect-engine.md#processing">Cloud Aspect Engine</a>
 logic.</p>
 <p>This will just need to filter and parse the JSON provided by the Cloud Aspect
 Engine to the form that is required for the Element Data output</p>
-<h2 id="configuration-options">Configuration options</h2>
+<h2 id="configuration-options-1">Configuration options</h2>
 <p>There are no configuration options associated with this Engine.</p>
 
 <hr/>
 <h1 id="device-detection-cloud">Device Detection cloud</h1>
-<h2 id="overview">Overview</h2>
+<h2 id="overview-3">Overview</h2>
 <p>Cloud Device Detection presents <a href="../../pipeline-specification/features/evidence.md">Evidence</a>
 to the 51Degrees Cloud Detection server, which carries out the detection
 and returns a JSON data structure, from which Device Detection Properties
@@ -866,7 +866,7 @@ for more details of this Engine.</p>
 
 <hr/>
 <h1 id="device-detection-on-premise">Device Detection on-premise</h1>
-<h2 id="overview">Overview</h2>
+<h2 id="overview-4">Overview</h2>
 <p>This Engine provides Device Detection capabilities using a high performance
 on-premise algorithm we refer to as the
 <a href="http://51degrees.com/documentation/_device_detection__hash.html">hash</a>
@@ -922,7 +922,7 @@ for customers who may just be able to consume pre-built native binaries.</p>
 moving the native binary and target language wrapper to a separate
 repository and package from the target language Device Detection Engine
 logic.</p>
-<h2 id="accepted-evidence">Accepted Evidence</h2>
+<h2 id="accepted-evidence-2">Accepted Evidence</h2>
 <p>This Engine determines the accepted Evidence keys on data refresh based
 on values in the data source.</p>
 <p>After loading the data source into the native code, call the <code>getKeys</code>
@@ -933,7 +933,7 @@ native code.</p>
 <p>Note that the list of accepted Evidence keys is not case-sensitive -
 i.e. <code>header.user-agent</code> and <code>header.User-Agent</code> should both be
 accepted.</p>
-<h2 id="element-data">Element Data</h2>
+<h2 id="element-data-2">Element Data</h2>
 <p>The list of Properties that can be populated by this Engine is determined
 on data refresh based on the Properties that are available in the data
 source that is used.</p>
@@ -962,7 +962,7 @@ On-premise Engine is interface compatible with the Element Data
 populated by the <a href="device-detection-cloud.md">cloud Device Detection Engine</a>
 as well as the individual devices populated in the Element Data from
 the <a href="hardware-profile-lookup-cloud.md">hardware profile lookup Engine</a>.</p>
-<h2 id="start-up-activity">Start-up activity</h2>
+<h2 id="start-up-activity-1">Start-up activity</h2>
 <p>On start-up, the native Engine needs to be created using the data file.
 Several functions will then be called to get the data that is needed
 by other Engine features.</p>
@@ -1059,8 +1059,8 @@ mentioned above:</p>
 <tr><td> Refresh complete </td><td> Used by client to perform some action after a new data file has been loaded </td></tr>
 </tbody>
 </table>
-<h2 id="metadata">Metadata</h2>
-<h3 id="overview">Overview</h3>
+<h2 id="metadata-1">Metadata</h2>
+<h3 id="overview-5">Overview</h3>
 <p>On-premise Device Detection has two related metadata structures:
 1. The Device Detection data file includes metadata relating to the structure of the
 values that are stored in the file. This is exposed by the Device Detection Engine
@@ -1171,7 +1171,7 @@ components returned by the Engine.</p>
 <tr><td> Method           </td><td> string </td><td> &ldquo;NONE&rdquo;        </td><td> The method used to determine the match result.                                                                                                                                                                                                                             </td><td> &ldquo;NONE&rdquo;, &ldquo;PERFORMANCE&rdquo;, &ldquo;COMBINED&rdquo;, &ldquo;PREDICTIVE&rdquo; </td></tr>
 </tbody>
 </table>
-<h2 id="configuration-options">Configuration options</h2>
+<h2 id="configuration-options-2">Configuration options</h2>
 <p>These are the configuration options that are unique to this Engine. They are in
 addition to all the configuration options defined for other features. For example,
 <a href="../../pipeline-specification/features/data-updates.md#configuration-groups">data updates</a></p>
@@ -1197,15 +1197,15 @@ C/C++ code. You can find these defaults in the following files:
 - <a href="https://github.com/51Degrees/device-detection-cxx/blob/master/src/config-dd.h">https://github.com/51Degrees/device-detection-cxx/blob/master/src/config-dd.h</a></p>
 
 <hr/>
-<h1 id="pipeline-specification">Pipeline specification</h1>
-<h2 id="introduction">Introduction</h2>
+<h1 id="pipeline-specification-1">Pipeline specification</h1>
+<h2 id="introduction-4">Introduction</h2>
 <p>This folder structure contains a language agnostic specification for the 51Degrees
 v4 Pipeline API.
 We aim to avoid specific details of classes, interfaces, methods or the like. The
 focus is on the behavior rather than the method by which that behavior is achieved.
 This allows implementers to choose an architectural approach that is most appropriate
 for the target language.</p>
-<h2 id="structure">Structure</h2>
+<h2 id="structure-1">Structure</h2>
 <p>This specification is broken down into separate markdown files in multiple directories.</p>
 <table>
 <thead>
@@ -1298,7 +1298,7 @@ has created, but they maintain references to it.</p>
 <p>See <a href="features/thread-safety.md">thread safety</a> for details on concurrent access requirements.</p>
 <p>Flow Data MUST support various different ways of accessing the data it contains.
 See <a href="features/access-to-results.md">access to results</a> for more information.</p>
-<h3 id="element-data">Element Data</h3>
+<h3 id="element-data-3">Element Data</h3>
 <p><strong>Element Data</strong> is a container, within the Flow Data, for Property values
 relating to a particular Flow Element. These values are set by
 Flow Elements during processing. Element Data is retrieved from
@@ -1450,7 +1450,7 @@ need some capability that is beyond its scope, they have to migrate to the
 care should be taken to try to avoid the issues described above.</p>
 
 <hr/>
-<h1 id="usage-examples">Usage examples</h1>
+<h1 id="usage-examples-1">Usage examples</h1>
 <p>For the most part, the Pipeline specification is describing the pieces of an
 empty data processing system. Many use-cases only make sense in the context
 of some concrete usage of that system. As such, it may be helpful to look at
@@ -1546,7 +1546,7 @@ items, such as test data, between languages using Git <a href="https://git-scm.c
 In principle, using an aggregator module would allow both simple update
 and multiple distinct module versions, but we have considered that there
 are insufficient advantages to this approach.</p>
-<h2 id="examples">Examples</h2>
+<h2 id="examples-1">Examples</h2>
 <p>We do not distribute examples as compiled artifacts.</p>
 <p>There would be advantages to distributing examples using a separate repository
 to the code they exemplify in order to
@@ -1557,13 +1557,13 @@ regression testing of the examples more complicated during the release cycle.</p
 <p>Automated tests and expected to be present in the same repository as the
 API code and will be run as part of CI/CD workflows.
 For more details, see <a href="automated-testing.md">automated testing</a>.</p>
-<h3 id="test-data">Test data</h3>
+<h3 id="test-data-1">Test data</h3>
 <p>We recommend that for convenience, test data of some kind is distributed with
 library code and examples. We also recommend that alternative means of updating
 test data are provided.</p>
 
 <hr/>
-<h1 id="required-examples">Required Examples</h1>
+<h1 id="required-examples-1">Required Examples</h1>
 <h2 id="general">General</h2>
 <p>It is recommended that the following features are demonstrated in examples:</p>
 <ul>
@@ -1602,7 +1602,7 @@ although this example is runnable you can&rsquo;t actually &ldquo;see&rdquo; tha
 </ul>
 
 <hr/>
-<h1 id="automated-testing">Automated Testing</h1>
+<h1 id="automated-testing-1">Automated Testing</h1>
 <h2 id="types-of-tests">Types of tests</h2>
 <p>The reference implementations contain a considerable number of tests both
 to support functional testing and regression testing.</p>
@@ -1653,7 +1653,7 @@ there must be a test to check that an attempt to process it twice, fails.</p>
 <p>Numerous additional tests exist (to a total of around 500, running to 100s of
 thousands of lines of code) in the reference implementations and the code of
 those implementations should be consulted.</p>
-<h3 id="core">Core</h3>
+<h3 id="core-1">Core</h3>
 <p>TypedKeyMap :
 - (ThreadSafe and non-ThreadSafe) test each of the methods.</p>
 <p>Pipeline:</p>
@@ -1688,7 +1688,7 @@ depending on configuration.</li>
 <p>Lookup: The Java reference implementation allows interpolation of values
 (environment variables etc.) in Pipeline options files. Test for correct
 operation of the various items that can be interpolated.</p>
-<h3 id="engines">Engines</h3>
+<h3 id="engines-1">Engines</h3>
 <p>Pipeline Overhead:</p>
 <p>Create a test Pipeline and check that the processing costs is within
 reasonable bound for the cases:
@@ -1836,8 +1836,8 @@ internal <code>develop</code> branches.</p>
 <a href="https://github.com/51Degrees/device-detection-java/blob/master/device-detection.examples/console/src/main/resources/gettingStartedOnPrem.xml">Java</a></p>
 
 <hr/>
-<h1 id="web-integration">Web integration</h1>
-<h2 id="overview">Overview</h2>
+<h1 id="web-integration-1">Web integration</h1>
+<h2 id="overview-6">Overview</h2>
 <p>The web integration feature is intended to simplify usage of the Pipeline API
 in websites/applications that are built using a particular web framework.</p>
 <p>The exact details may vary significantly based on the web framework that
@@ -1858,7 +1858,7 @@ completed.</li>
 <li>Handling requests for <a href="#client-side-features">client-side</a> functionality.</li>
 <li>Set HTTP response headers to request additional information.</li>
 </ul>
-<h2 id="pipeline-configuration">Pipeline configuration</h2>
+<h2 id="pipeline-configuration-1">Pipeline configuration</h2>
 <p>The web integration makes use of several Flow Elements in order to support
 <a href="#javascript-properties">client-side</a> functionality.</p>
 <p>Where the web integration is responsible for creation of the Pipeline, it
@@ -1937,7 +1937,7 @@ snippets
 4. Use the result from the callback to update the result data set
 5. Repeat if there are any JavaScript Property values in the new result set.
 (only repeat up to a configurable limit in order to avoid infinite loops)</p>
-<h3 id="flow-elements">Flow Elements</h3>
+<h3 id="flow-elements-1">Flow Elements</h3>
 <p>These features are implemented using the web integration logic itself, along
 with several Flow Elements:</p>
 <ul>
@@ -2053,7 +2053,7 @@ if it is found to be an issue for a particular client.</p>
 
 <hr/>
 <h1 id="caching">Caching</h1>
-<h2 id="overview">Overview</h2>
+<h2 id="overview-7">Overview</h2>
 <p>Aspect Engines may support the addition of a cache.
 This is intended to improve performance when the Engine receives a process
 request containing Evidence values that are sufficiently similar to a previous request.</p>
@@ -2156,12 +2156,12 @@ implementations simply do not support adding a cache in these cases.</p>
 
 <hr/>
 <h1 id="thread-safety">Thread safety</h1>
-<h2 id="flow-elements">Flow Elements</h2>
+<h2 id="flow-elements-2">Flow Elements</h2>
 <p>The Pipeline API is designed to be used in highly concurrent environments
 such as high traffic web servers.</p>
 <p>Consequently, Pipeline and Flow Element implementations must be
 capable of handling multiple concurrent requests to the <code>Process</code> function.</p>
-<h2 id="flow-data">Flow Data</h2>
+<h2 id="flow-data-1">Flow Data</h2>
 <p>In general user-facing data structures linked to Flow Data do not need to be
 thread-safe as the most common use-case is that they will be accessed and
 updated only on the current thread.
@@ -2177,14 +2177,14 @@ Flow Data or not.</p>
 <h3 id="evidence">Evidence</h3>
 <p>Evidence collection stored within Flow Data needs to be thread safe for
 concurrent read access and immutable once created.</p>
-<h2 id="element-data">Element Data</h2>
+<h2 id="element-data-4">Element Data</h2>
 <p>In general, Element Data instances do not need to be thread safe, as they
 should only be accessed and updated from a single thread.</p>
 <p>While it is certainly possible for a user to Engineer a scenario where an
 instance is accessed from multiple threads. We do not consider it worthwhile
 to cater for this scenario given the decreased performance and increased
 complexity that it would require.</p>
-<h2 id="aspect-data">Aspect data</h2>
+<h2 id="aspect-data-1">Aspect data</h2>
 <p>In contrast to Element Data, Aspect Data instances must be thread-safe as the
 same instance may be used for multiple different calls to <code>Process</code> when
 the <a href="caching.md">caching</a> feature is enabled.
@@ -2193,7 +2193,7 @@ to be added.</p>
 
 <hr/>
 <h1 id="exception-handling">Exception handling</h1>
-<h2 id="overview">Overview</h2>
+<h2 id="overview-8">Overview</h2>
 <p>Exceptions and errors may occur at many places within the Pipeline
 API. It is vital that these are presented and handled consistently.</p>
 <p>In general, we aim to follow these principles:</p>
@@ -2222,7 +2222,7 @@ to the errors collection and <a href="logging.md">log</a> them (I.e. don&rsquo;t
 exception/error at the end of processing). This option should be available
 when the <a href="../conceptual-overview.md#pipeline-builder">Pipeline is created</a>
 and be called <code>SuppressProcessExceptions</code> or similar.</p>
-<h3 id="flow-elements">Flow Elements</h3>
+<h3 id="flow-elements-3">Flow Elements</h3>
 <p>Flow Elements should throw exceptions/errors freely, unless it makes
 sense for an element to handle a specific error internally.
 In general, it is the responsibility of the Pipeline to handle these for
@@ -2237,7 +2237,7 @@ the API user has done wrong.</p>
 attempting to access result data before &lsquo;Process&rsquo; has been called.</p>
 <p>These are both things that the user should correct by making changes to
 their code.</p>
-<h2 id="web-integration">Web integration</h2>
+<h2 id="web-integration-2">Web integration</h2>
 <p>The <a href="web-integration.md">web integration</a> feature will be hooking into
 the web request handling logic of the target language/framework. As such,
 it will be executing code outside easily handled areas.</p>
@@ -2269,8 +2269,8 @@ exception must include the value of the &lsquo;Retry-After&rsquo; header so that
 the user can act on it)</p>
 
 <hr/>
-<h1 id="evidence">Evidence</h1>
-<h2 id="overview">Overview</h2>
+<h1 id="evidence-1">Evidence</h1>
+<h2 id="overview-9">Overview</h2>
 <p>Evidence is the name for the input values added to a Flow Data instance.</p>
 <p>It is stored as key-value pairs and is used by Flow Elements within the
 Pipeline and is immutable once created.
@@ -2325,7 +2325,7 @@ design patterns being used.</p>
 
 <hr/>
 <h1 id="resource-cleanup">Resource cleanup</h1>
-<h2 id="summary">Summary</h2>
+<h2 id="summary-1">Summary</h2>
 <p>There must be some mechanism to clean up system resources
 associated with various instances:</p>
 <table>
@@ -2343,7 +2343,7 @@ associated with various instances:</p>
 However, see <a href="web-integration.md">web integration</a> for further notes
 on where this is not the case.</p>
 <h2 id="detail">Detail</h2>
-<h3 id="pipeline">Pipeline</h3>
+<h3 id="pipeline-1">Pipeline</h3>
 <p>By default, Pipeline will clean up the Flow Elements it contains.
 However, there must be an option to disable this behavior.</p>
 <p>This is needed for scenarios where single elements are added to multiple
@@ -2351,7 +2351,7 @@ Pipelines.
 In this case, the user must take responsibility for cleanup of
 Flow Element resources. This should be made clear in comments and
 documentation around the use of this option.</p>
-<h3 id="flow-element">Flow Element</h3>
+<h3 id="flow-element-1">Flow Element</h3>
 <p>Flow Elements can be very light-weight, but can also maintain significant
 internal resources.</p>
 <p>Similar to Element Data we have found native resources to be
@@ -2360,7 +2360,7 @@ the primary problem area.</p>
 when the Flow Element is no longer needed.</p>
 <p>Whether other Flow Elements need any specific cleanup logic is
 left up to implementers.</p>
-<h3 id="element-data">Element Data</h3>
+<h3 id="element-data-5">Element Data</h3>
 <p>In general, we have found that specific clean up of resources associated with
 Element Data instances is not needed as the garbage collector does a good
 enough job.
@@ -2383,7 +2383,7 @@ the cache become useless.</p>
 <p>Consequently, the system must not allow a cache to be added to Engines
 where the Element Data they produce requires cleanup beyond what normal
 garbage collection will achieve.</p>
-<h3 id="flow-data">Flow Data</h3>
+<h3 id="flow-data-2">Flow Data</h3>
 <p>Cleanup of Flow Data may include any resources that it holds. However,
 the primary concern is to ensure that any Element Data instances that
 it holds that require cleanup are taken care of.</p>
@@ -2428,7 +2428,7 @@ to produce each payload.</p>
 
 <hr/>
 <h1 id="properties">Properties</h1>
-<h2 id="overview">Overview</h2>
+<h2 id="overview-10">Overview</h2>
 <p>This document contains details on the features associated with the Properties that
 are populated by Flow Elements.</p>
 <p>In this case, a &lsquo;Property&rsquo; refers to a specific, named data field that can be
@@ -2470,7 +2470,7 @@ error/exception with a customizable message explaining why the value is not set.
 In that case, the Property is not present in the result dataset at all. In this
 case, the Property is present in the result. However, the Flow Element has
 chosen not to set its value for some reason.</p>
-<h2 id="property-metadata">Property metadata</h2>
+<h2 id="property-metadata-1">Property metadata</h2>
 <p>All <a href="../conceptual-overview.md#flow-element">Flow Elements</a> must expose metadata
 describing details of the Properties that they can populate.</p>
 <p>In addition, it must be possible to get Property metadata at the Pipeline
@@ -2540,8 +2540,8 @@ in <a href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging.
 impact performance when it is not enabled.</p>
 
 <hr/>
-<h1 id="data-update">Data update</h1>
-<h2 id="overview">Overview</h2>
+<h1 id="data-update-1">Data update</h1>
+<h2 id="overview-11">Overview</h2>
 <p>An on-premise Aspect Engine may require data that is independent of the
 logic of the Engine and that is periodically refreshed. For example,
 when new phones or browser versions are released, the Device Detection
@@ -2697,7 +2697,7 @@ is enabled and disk based operation is enabled is an error.</p>
 <p>Implementations may choose to report an error if any item
 in this configuration is set for memory data source operation.</p>
 <h2 id="update-processes">Update processes</h2>
-<h3 id="update-on-start-up">Update on start-up</h3>
+<h3 id="update-on-start-up-1">Update on start-up</h3>
 <ul>
 <li>for disk data source, check operational data configuration consistency</li>
 <li>check HTTP server for new file</li>
@@ -2737,7 +2737,7 @@ downloaded file is newer than the current file
 - resume polling, if any
 - resume file watcher, if any
 - trigger onUpdateCallbacks</p>
-<h3 id="programmatic-update">Programmatic update</h3>
+<h3 id="programmatic-update-1">Programmatic update</h3>
 <ul>
 <li>poll remote, if polling is configured</li>
 <li>check if file is newer
@@ -2782,7 +2782,7 @@ date/time.</p>
 <p>If no update was found then the service should repeat the same checks
 after the <em>polling interval</em> + a random time based on<br />
 <em>update time maximum randomization</em> has passed.</p>
-<h2 id="logging">Logging</h2>
+<h2 id="logging-1">Logging</h2>
 <p>The data update service is a complex process. As such, it is
 essential that detailed logging is
 available to help diagnose issues that might arise.</p>
@@ -2837,10 +2837,10 @@ than a procedural update.</p>
 
 <hr/>
 <h1 id="advertise-accepted-evidence">Advertise accepted Evidence</h1>
-<h2 id="summary">Summary</h2>
+<h2 id="summary-2">Summary</h2>
 <p>All Flow Elements and Pipelines MUST be capable of programmatically
 describing the Evidence keys that they can make use of.</p>
-<h2 id="flow-elements">Flow Elements</h2>
+<h2 id="flow-elements-4">Flow Elements</h2>
 <p>For the majority of Flow Elements, simply returning a list of Evidence
 values
 they can use would be sufficient.
@@ -2864,7 +2864,7 @@ request is automatically added to Evidence.</li>
 </ul>
 
 <hr/>
-<h1 id="access-to-results">Access to results</h1>
+<h1 id="access-to-results-1">Access to results</h1>
 <h2 id="general-guidance">General guidance</h2>
 <p>Where string keys are used, the following rules apply:</p>
 <ul>
@@ -3020,19 +3020,19 @@ be taken if the element has a very low memory footprint.</p>
 
 <hr/>
 <h1 id="sequence-element">Sequence Element</h1>
-<h2 id="overview">Overview</h2>
+<h2 id="overview-12">Overview</h2>
 <p>The Sequence Element is used to keep track of the number of times that
 the script produced by the <a href="javascript-builder.md">JavaScript Builder Element</a>
 makes callbacks to the server.</p>
 <p>The generated &lsquo;session id&rsquo; is also used as a key in various places.</p>
 <p>Note that in this context, &lsquo;session&rsquo; is not necessarily a one to one
 mapping to an HTTP session.</p>
-<h2 id="accepted-evidence">Accepted Evidence</h2>
+<h2 id="accepted-evidence-3">Accepted Evidence</h2>
 <ul>
 <li>query.session-id</li>
 <li>query.sequence</li>
 </ul>
-<h2 id="element-data">Element Data</h2>
+<h2 id="element-data-6">Element Data</h2>
 <table>
 <thead>
 <tr><th> <strong>Name</strong>   </th><th> <strong>Type</strong> </th><th> <strong>Description</strong>                                                                       </th></tr>
@@ -3042,7 +3042,7 @@ mapping to an HTTP session.</p>
 <tr><td> sequence   </td><td> int      </td><td> A counter that records how many consecutive callbacks have been made in this session. </td></tr>
 </tbody>
 </table>
-<h2 id="process">Process</h2>
+<h2 id="process-2">Process</h2>
 <p>If <code>query.session-id</code> is not present in Evidence then generate a new id and
 add it to the output. The reference implementations use a GUID.</p>
 <p>If <code>query.sequence</code> is present in Evidence then add one to it and add it to
@@ -3050,12 +3050,12 @@ the output. If it is not present, set the output value for sequence to one.</p>
 <p>Note that the reference implementations currently write these output values
 back to the Evidence collection as Evidence is not implemented as
 immutable in the reference implementations.</p>
-<h2 id="configuration-options">Configuration options</h2>
+<h2 id="configuration-options-3">Configuration options</h2>
 <p>None</p>
 
 <hr/>
 <h1 id="javascript-builder-element">JavaScript Builder Element</h1>
-<h2 id="overview">Overview</h2>
+<h2 id="overview-13">Overview</h2>
 <p>The JavaScript Builder Element takes the JSON output from the
 <a href="json-builder.md">JSON Builder Element</a> and merges it into a
 template which contains JavaScript.</p>
@@ -3068,17 +3068,17 @@ following features:</p>
 JavaScript. This is described in more detail in our
 <a href="https://51degrees.com/documentation/_features__client_side_evidence.html">documentation</a></li>
 </ul>
-<h2 id="accepted-evidence">Accepted Evidence</h2>
+<h2 id="accepted-evidence-4">Accepted Evidence</h2>
 <ul>
 <li>header.host</li>
 <li>header.protocol</li>
 <li>query.fod-js-object-name</li>
 </ul>
-<h2 id="start-up-activity">Start-up activity</h2>
+<h2 id="start-up-activity-2">Start-up activity</h2>
 <p>On start-up, initialize the normal data structures, such as
 accepted Evidence, and perform any set-up for the template system to
 operate as efficiently as possible.</p>
-<h2 id="element-data">Element Data</h2>
+<h2 id="element-data-7">Element Data</h2>
 <table>
 <thead>
 <tr><th> <strong>Name</strong>   </th><th> <strong>Type</strong> </th><th> <strong>Description</strong>                              </th></tr>
@@ -3087,7 +3087,7 @@ operate as efficiently as possible.</p>
 <tr><td> javascript </td><td> string   </td><td> The raw JavaScript produced by this Element. </td></tr>
 </tbody>
 </table>
-<h2 id="process">Process</h2>
+<h2 id="process-3">Process</h2>
 <p>Determine several values to be passed to the template:</p>
 <ol>
 <li>If protocol was not specified in configuration, get it from the
@@ -3169,7 +3169,7 @@ by combining the session ID and sequence number generated by the
 <p>Session ID is retained for the lifetime of the session, a future request
 to the JSON endpoint with the same session ID and sequence number
 as a previous result can be retrieved from session storage.</p>
-<h2 id="configuration-options">Configuration options</h2>
+<h2 id="configuration-options-4">Configuration options</h2>
 <table>
 <thead>
 <tr><th> <strong>Name</strong>         </th><th> <strong>Type</strong> </th><th> <strong>Default</strong>    </th><th> <strong>Description</strong>                                                                                                                                                                                               </th></tr>
@@ -3186,16 +3186,16 @@ as a previous result can be retrieved from session storage.</p>
 
 <hr/>
 <h1 id="json-builder-element">JSON Builder Element</h1>
-<h2 id="overview">Overview</h2>
+<h2 id="overview-14">Overview</h2>
 <p>The JSON Builder Element creates a JSON representation of most of the values
 in the Flow Data.</p>
 <p>This is used along with the <a href="javascript-builder.md">JavaScript builder element</a>
 and <a href="sequence-element.md">Sequence Element</a> to enable client-side features of
 the Pipeline <a href="../../features/web-integration.md">web integration</a>.</p>
-<h2 id="accepted-evidence">Accepted Evidence</h2>
+<h2 id="accepted-evidence-5">Accepted Evidence</h2>
 <p>This Element uses no Evidence, its only input is the current set of
 Element Data instances in the Flow Data.</p>
-<h2 id="start-up-activity">Start-up activity</h2>
+<h2 id="start-up-activity-3">Start-up activity</h2>
 <p>For performance reasons, on start-up it may be important to create lists of
 Property metadata that meet certain criteria.</p>
 <p>For example, a list of all Properties that have the &lsquo;delay execution&rsquo; flag set.
@@ -3206,7 +3206,7 @@ available in second or subsequent requests as part of the same &lsquo;session&rs
 These values can then be used to determine or refine results.</p>
 <p>See the <a href="https://github.com/51Degrees/pipeline-dotnet/blob/master/FiftyOne.Pipeline.Elements/FiftyOne.Pipeline.JsonBuilderElement/FlowElement/JsonBuilderElement.cs#L715"><code>PopulateMetaDataCollections</code></a>
 method in C# for an example of creating these lists.</p>
-<h2 id="element-data">Element Data</h2>
+<h2 id="element-data-8">Element Data</h2>
 <table>
 <thead>
 <tr><th> <strong>Name</strong> </th><th> <strong>Type</strong> </th><th> <strong>Description</strong>                        </th></tr>
@@ -3215,7 +3215,7 @@ method in C# for an example of creating these lists.</p>
 <tr><td> JSON     </td><td> string   </td><td> The raw JSON produced by this element. </td></tr>
 </tbody>
 </table>
-<h2 id="process">Process</h2>
+<h2 id="process-4">Process</h2>
 <p>The Element needs to produce a JSON representation of the Flow Data.
 There should be a top-level entry for each Element Data containing sub-entries
 for each Property and its value (set to &lsquo;null&rsquo; if there is no value).</p>
@@ -3244,7 +3244,7 @@ then get a list of the complete names of all JavaScript Properties. Add this to 
 result under the top-level key <code>javascriptProperties</code>.
 - Add any errors from the Flow Data errors collection to the result. This is structured
 as a string array of the error messages under the top-level key <code>errors</code>.</p>
-<h3 id="examples">Examples</h3>
+<h3 id="examples-2">Examples</h3>
 <p>Device Detection result including some javascript Properties.
 Note the <code>screenpixelswidth</code> Property is currently zero because device
 detection does not know how wide the screen is.
@@ -3321,7 +3321,7 @@ this Property.</p>
   &quot;errors&quot;: [ &quot;'abc' is not a valid Resource Key. See http://51degrees.com/documentation/_info__error_messages.html#Resource_key_not_valid for more information.&quot; ]
 }
 </code></pre>
-<h2 id="configuration-options">Configuration options</h2>
+<h2 id="configuration-options-5">Configuration options</h2>
 <table>
 <thead>
 <tr><th> <strong>Name</strong>      </th><th> <strong>Type</strong>        </th><th> <strong>Default</strong>  </th><th> <strong>Description</strong>                                                                                                                                                                                                                                                                                                       </th></tr>
@@ -3332,8 +3332,8 @@ this Property.</p>
 </table>
 
 <hr/>
-<h1 id="cloud-request-engine">Cloud Request Engine</h1>
-<h2 id="overview">Overview</h2>
+<h1 id="cloud-request-engine-1">Cloud Request Engine</h1>
+<h2 id="overview-15">Overview</h2>
 <p>Cloud Engines offload their processing to a remote system. This reduces
 resource requirements and avoids the complexities of some local
 Engines (For example,
@@ -3367,12 +3367,12 @@ result. Resource Keys are created using the
 <a href="https://51degrees.com/documentation/_concepts__configurator.html">51Degrees Configurator</a>.
 See <a href="https://51degrees.com/documentation/_info__resource_keys.html">Resource Key Documentation</a>
 for more information.</p>
-<h2 id="accepted-evidence">Accepted Evidence</h2>
+<h2 id="accepted-evidence-6">Accepted Evidence</h2>
 <p>Accepted Evidence is dependent on the supplied Resource Key.</p>
 <p><a href="#startup-activity">On start-up</a>, the Engine must make a request to its
 remote server
 to get this information.</p>
-<h2 id="element-data">Element Data</h2>
+<h2 id="element-data-9">Element Data</h2>
 <table>
 <thead>
 <tr><th> <strong>Name</strong>      </th><th> <strong>Type</strong> </th><th> <strong>Description</strong>                                   </th></tr>
@@ -3408,7 +3408,7 @@ to get this information.</p>
   ]
 }
 </code></pre>
-<h2 id="start-up-activity">Start-up activity</h2>
+<h2 id="start-up-activity-4">Start-up activity</h2>
 <p>On start-up, the Engine must call its configured <code>accessibleproperties</code>
 and <code>evidencekeys</code>
 endpoints, using the configured Resource Key.</p>
@@ -3424,7 +3424,7 @@ to populate their Property metadata collections.</p>
 error as the Pipeline will be unable to function correctly.</p>
 <p>See <a href="#http-requests">HTTP requests</a> for details on general
 HTTP request handling.</p>
-<h2 id="processing">Processing</h2>
+<h2 id="processing-1">Processing</h2>
 <p>The Engine processes Flow Data by filtering the Evidence provided to that
 required by the server, and makes an HTTP
 request to the server using the filtered Evidence. The HTTP API used for access to
@@ -3462,7 +3462,7 @@ error messages for the reasons mentioned above, the message must be
 </ul>
 <p>Similarly to the <code>errors</code> array, any entries in the <code>warnings</code> array in the
 response SHOULD be logged as warnings.</p>
-<h2 id="configuration-options">Configuration options</h2>
+<h2 id="configuration-options-6">Configuration options</h2>
 <p>These are the configuration options that are unique to this Engine. They
 are in addition to all the configuration options defined for other features.
 For example,
@@ -3483,30 +3483,30 @@ For example,
 </table>
 
 <hr/>
-<h1 id="cloud-aspect-engine">Cloud Aspect Engine</h1>
-<h2 id="overview">Overview</h2>
+<h1 id="cloud-aspect-engine-1">Cloud Aspect Engine</h1>
+<h2 id="overview-16">Overview</h2>
 <p>A Cloud Aspect Engine is a type of Engine that works with the
 <a href="cloud-request-engine.md#overview">Cloud Request Engine</a> to enable users
 to refer processing of Evidence to a remote server.</p>
 <p>See the link above for an overview of how these Engines work together.</p>
-<h2 id="accepted-evidence">Accepted Evidence</h2>
+<h2 id="accepted-evidence-7">Accepted Evidence</h2>
 <p>Cloud Aspect Engines do not use any Evidence values, they just consume
 the output from the Cloud Request Engine.</p>
-<h2 id="element-data">Element Data</h2>
+<h2 id="element-data-10">Element Data</h2>
 <p>The Element Data definition will be different for each Cloud Aspect Engine.
 The key requirement is that the Element Data for a Cloud Aspect Engine MUST
 be interface compatible with the Element Data for the equivalent on-premise
 Engine.</p>
 <p>For example, both cloud and on-premise Device Detection Engines in C#
 produce an Element Data that implements <code>IDeviceData</code>.</p>
-<h2 id="start-up-activity">Start-up activity</h2>
+<h2 id="start-up-activity-5">Start-up activity</h2>
 <p>Cloud Aspect Engines do not intrinsically contain Property metadata, they
 derive that from the Cloud Request Engine that precedes them in
 the Pipeline.</p>
 <p>The Cloud Request Engine <a href="cloud-request-engine.md#start-up-activity">requests</a>
 this information on start-up. Each Cloud Aspect Engine accesses that
 data to obtain Property metadata relating to the Properties that it populates.</p>
-<h2 id="processing">Processing</h2>
+<h2 id="processing-2">Processing</h2>
 <p>The precise processing that occurs depends on the Aspect this
 Engine relates to.</p>
 <p>In outline, the process is:</p>
@@ -3530,12 +3530,12 @@ there needs to be logic to:</p>
 name suffixed with <code>nullreason</code>. Use this value to set the <code>NoValueMessage</code>
 on the instance.</li>
 </ol>
-<h2 id="configuration-options">Configuration options</h2>
+<h2 id="configuration-options-7">Configuration options</h2>
 <p>There are no configuration options for this Engine.</p>
 
 <hr/>
 <h1 id="set-headers-element">Set Headers Element</h1>
-<h2 id="overview">Overview</h2>
+<h2 id="overview-17">Overview</h2>
 <p>The Set Headers Element constructs a list of all the HTTP response
 header values that are required to be set by other Elements in the Pipeline.
 Usually, this is done in order to request more Evidence from the
@@ -3551,14 +3551,14 @@ for setting HTTP response headers.</li>
 It MUST NOT have upper-case characters after the first character.</li>
 <li><code>[HeaderName]</code> is the name of the HTTP header to set in the response.</li>
 </ul>
-<h2 id="accepted-evidence">Accepted Evidence</h2>
+<h2 id="accepted-evidence-8">Accepted Evidence</h2>
 <p>This element uses no Evidence, it works on Property values in Element Data
 in the Flow Data.</p>
-<h2 id="start-up-activity">Start-up activity</h2>
+<h2 id="start-up-activity-6">Start-up activity</h2>
 <p>For performance reasons, it is usually best to construct a list of
 Properties with the <code>SetHeader</code> prefix on start-up, rather than doing
 so for each request.</p>
-<h2 id="element-data">Element Data</h2>
+<h2 id="element-data-11">Element Data</h2>
 <table>
 <thead>
 <tr><th> <strong>Name</strong>                   </th><th> <strong>Type</strong>                              </th><th> <strong>Description</strong>                                                                                                                           </th></tr>
@@ -3567,7 +3567,7 @@ so for each request.</p>
 <tr><td> response-header-dictionary </td><td> <code>IReadOnlyDictionary&lt;string, string&gt;</code> </td><td> A collection of key value pairs where the key is the HTTP response header name and the value is the value to set that response header to. </td></tr>
 </tbody>
 </table>
-<h2 id="process">Process</h2>
+<h2 id="process-5">Process</h2>
 <ul>
 <li>Get all Properties in Flow Data with <code>SetHeader</code> at the start of the name.</li>
 <li>For each Property</li>
@@ -3581,15 +3581,15 @@ the output collection if it has not yet been added for that key.</li>
 </ul>
 </li>
 </ul>
-<h2 id="configuration-options">Configuration options</h2>
+<h2 id="configuration-options-8">Configuration options</h2>
 <p>None</p>
 
 <hr/>
 <h1 id="usage-sharing-element">Usage sharing element</h1>
-<h2 id="overview">Overview</h2>
+<h2 id="overview-18">Overview</h2>
 <p>This Flow Element implements the <a href="../features/usage-sharing.md">usage-sharing</a>
 feature.</p>
-<h2 id="accepted-evidence">Accepted Evidence</h2>
+<h2 id="accepted-evidence-9">Accepted Evidence</h2>
 <p>The EvidenceKeyFilter for share usage is unusual as it cannot simply be a
 list of accepted keys like most Flow Elements.</p>
 <p>Instead, it is a filter function that should return false (i.e. not shared)
@@ -3605,9 +3605,9 @@ shared.</li>
 <p>Anything else should return true. (i.e. it will be shared)</p>
 <p>See <a href="#configuration-options">configuration options</a> for more detail on the
 configuration parameters that can affect this filter function.</p>
-<h2 id="element-data">Element Data</h2>
+<h2 id="element-data-12">Element Data</h2>
 <p>This Flow Element does not add an Element Data instance to Flow Data.</p>
-<h2 id="start-up-activity">Start-up activity</h2>
+<h2 id="start-up-activity-7">Start-up activity</h2>
 <p>A static XML snippet can be generated for values that will be invariant
 for the lifetime of the current Pipeline.</p>
 <p>From the list of parameters in the processing section below, the invariant ones
@@ -3624,7 +3624,7 @@ by moving these values to a <code>header</code> element rather than duplicating 
 every <code>device</code> element.
 Implementing this will be a future enhancement as changes will first be required
 to 51Degrees&rsquo; data collection infrastructure.</p>
-<h2 id="processing">Processing</h2>
+<h2 id="processing-3">Processing</h2>
 <p>The process function must get the data it needs and complete as soon as
 possible.
 We recommend implementing a producer/consumer approach where the process
@@ -3749,7 +3749,7 @@ it will need to handle cleanup a little more carefully than other elements.</p>
 less than the configured minimum batch size)</li>
 <li>Free any resources associated with the queue and background processing.</li>
 </ol>
-<h2 id="configuration-options">Configuration options</h2>
+<h2 id="configuration-options-9">Configuration options</h2>
 <table>
 <thead>
 <tr><th> <strong>Parameter</strong>                     </th><th> <strong>User configurable</strong> </th><th> <strong>Optional</strong> </th><th> <strong>Default</strong>                                                                  </th><th> <strong>Notes</strong>                                                                                                                      </th></tr>
