@@ -240,7 +240,7 @@ erDiagram
 
 ### Component
 
-A Component defines a group of Properties that are related.
+A **Component** defines a group of Properties that are related.
 
 In a 51Degrees data set, each Property can only be related to one Component.
 For example, the `Browser Name` Property is part of the `Software` Component,
@@ -257,7 +257,7 @@ The metadata associated with a Component is:
 
 ### Property
 
-The Properties exposed by the Device Detection Engine contain more information
+The **Properties** exposed by the Device Detection Engine contain more information
 than that which is defined by the standard Property metadata interface.
 In addition to the usual information, the following must be made available:
 
@@ -277,7 +277,7 @@ In addition to the usual information, the following must be made available:
 
 ### Profile
 
-A Profile defines a unique set of Values for all Properties of
+A **Profile** defines a unique set of Values for all Properties of
 a single Component.
 
 | Metadata  | Description                                                                                                                                                                           |
@@ -289,7 +289,7 @@ a single Component.
 
 ### Value
 
-Each Property has a set of possible Values that it can return.
+Each Property has a set of possible **Values** that it can return.
 The metadata associated with a Value is:
 
 | Metadata    | Description                                                                                                                                                   |

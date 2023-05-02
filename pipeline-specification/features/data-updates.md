@@ -203,7 +203,7 @@ while a new data file is made available.
 
 Since creating a data file copy is required for disk based operation
 implementations may choose not to provide control over
-**createOperationalDataCopy** since disallowing it when either update option
+*createOperationalDataCopy* since disallowing it when either update option
 is enabled and disk based operation is enabled is an error.
 
 Implementations may choose to report an error if any item
@@ -240,7 +240,7 @@ Probably can't compare dates so load whatever we have:
 
 ### newFileAvailable (via remote or file watcher)
 
-The file will be in **dataFilePath** from watcher or from download, if the
+The file will be in *dataFilePath* from watcher or from download, if the
 downloaded file is newer than the current file
 - pause file watcher, if any
 - pause update polling, if any
@@ -255,7 +255,7 @@ downloaded file is newer than the current file
   - check if file is newer
     - if so, process as per newFile above
   - return
-- if newer file in **dataFilePath**
+- if newer file in *dataFilePath*
   - process as per newFile above
   - return
 

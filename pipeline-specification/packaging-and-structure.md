@@ -25,18 +25,18 @@ use separate repos.
 
 Pipeline itself is modularized as follows:
 
-- **Common** base utilities potentially of wider application than Pipeline
-- **Core** features essential to Pipeline, Flow Data, Flow Elements etc.
-- **Engines** base classes providing features that are beyond what is provided in Flow Elements
-- **Web** Adaptors and features to assist with use of Pipeline in a Web environment
-- **51Engines** features specific to 51Degrees and 51Degrees Engines:
-  - **ShareUsage**
-  - **SetHeaders**
-  - **Sequence**
-- **Engine Implementations** Separate Modules for each of the following:
-  - **JSON**
-  - **JavaScript**
-  - **CloudRequest**
+- *Common* base utilities potentially of wider application than Pipeline
+- *Core* features essential to Pipeline, Flow Data, Flow Elements etc.
+- Engines base classes providing features that are beyond what is provided in Flow Elements
+- *Web* Adaptors and features to assist with use of Pipeline in a Web environment
+- *51Engines* features specific to 51Degrees and 51Degrees Engines:
+  - *ShareUsage*
+  - *SetHeaders*
+  - *Sequence*
+- *Engine Implementations* Separate Modules for each of the following:
+  - *JSON*
+  - *JavaScript*
+  - *CloudRequest*
 
 This diagram illustrates the structure of .NET NuGet packages:
 

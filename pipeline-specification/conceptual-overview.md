@@ -2,8 +2,8 @@
 
 ## Core
 
-The core package contains everything needed to construct a Pipeline and pass through
-a Flow Data object.
+The core package contains everything needed to construct a **Pipeline** and pass through
+a **Flow Data** object.
 
 ### Flow Data
 
@@ -39,7 +39,7 @@ See [access to results](features/access-to-results.md) for more information.
 
 ### Element Data
 
-Element Data is a container, within the Flow Data, for Property values
+**Element Data** is a container, within the Flow Data, for Property values
 relating to a particular Flow Element. These values are set by
 Flow Elements during processing. Element Data is retrieved from
 Flow Data using the 'data key' associated with the Flow Element.
@@ -52,7 +52,7 @@ Element Data resources are cleaned up correctly.
 
 ### Flow Element
 
-A Flow Element is a black box which takes a Flow Data and performs some
+A **Flow Element** is a black box which takes a Flow Data and performs some
 processing. This processing may read Evidence and/or Element Data instances
 that have been added by previous elements. It may add new Evidence values and
 may add an instance of its own Element Data, which may or may not have
@@ -105,14 +105,14 @@ on configuring and creating instances.
 
 ## Engines
 
-The Engines package adds features to Flow Elements that are common to
+The **Engines** package adds features to Flow Elements that are common to
 multiple different 51Degrees element implementations.
 
 ### Aspect Engine
 
 See the [readme](README.md#engine) for a definition of 'Aspect'.
 
-Aspect Engines (often shortened to just 'Engines') are a specific type
+**Aspect Engines** (often shortened to just 'Engines') are a specific type
 of Flow Element with additional features and Properties:
 
 - [Results caching](features/caching.md)
@@ -123,7 +123,7 @@ of Flow Element with additional features and Properties:
 ### Aspect data
 
 In the same way that Aspect Engines are specific types of Flow Element.
-Aspect Data are specific types of Element Data.
+**Aspect Data** are specific types of Element Data.
 
 See [Aspect Engines](#aspect-engine) for details of the features that
 Aspect Engines / Aspect Data have on top of standard Flow Element /
@@ -131,12 +131,12 @@ Element Data.
 
 ## Cloud Engines
 
-The premise of Cloud Engines is to offload processing that might otherwise
+The premise of **Cloud Engines** is to offload processing that might otherwise
 be performed by an on-premise Aspect Engine to a remote service.
 
 ### Cloud Request Engine
 
-The Cloud Request Engine is a further specialization of Aspect Engine
+The **Cloud Request Engine** is a further specialization of Aspect Engine
 with the task of making requests to a remote service.
 
 In theory, this could be an internally hosted service. In practice, it is
@@ -150,7 +150,7 @@ for the technical details.
 
 ### Cloud Aspect Engine
 
-The Cloud Aspect Engine is also a specialization of Aspect Engine.
+The **Cloud Aspect Engine** is also a specialization of Aspect Engine.
 It takes the JSON result from the Cloud Request Engine and transforms
 it into an Aspect Data instance that is interface compatible with
 the data from the equivalent On-premise Engine.
