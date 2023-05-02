@@ -2,7 +2,7 @@
 
 ## Overview
 
-**Aspect Engines** may support the addition of a cache.
+Aspect Engines may support the addition of a cache.
 This is intended to improve performance when the Engine receives a process
 request containing Evidence values that are sufficiently similar to a previous request.
 
@@ -50,10 +50,10 @@ concerns, error handling, other features, etc.
 
 ## Generation of keys
 
-All **Flow Elements** must [advertise](advertize-accepted-evidence.md) the
+All Flow Elements must [advertise](advertize-accepted-evidence.md) the
 Evidence keys that they make use of.
 You will need to use this to build a list of the relevant Evidence keys
-and values that are present in the **Flow Data**.
+and values that are present in the Flow Data.
 
 Other considerations when creating keys:
 - Evidence values must always be added in the same Evidence key order.
@@ -94,22 +94,22 @@ reference implementations.
 
 ## Data lifetime and concurrency issues
 
-The cache stores the instance of **Aspect Data** that was generated based
+The cache stores the instance of Aspect Data that was generated based
 on the Evidence values in the key.
 
 Where [resource cleanup](resource-cleanup.md) is required, the lifetime
-of such data objects is tied to the **Flow Data** that is generated for
+of such data objects is tied to the Flow Data that is generated for
 that request.
 
-However, cached instances can persist long after the original **Flow Data**
+However, cached instances can persist long after the original Flow Data
 that resulted in their creation is gone.
 
-Consequently, if the **Element Data** produced by an **Engine** requires
+Consequently, if the Element Data produced by an Engine requires
 cleanup, then that Engine must not allow a cache to be added.
 
 In addition, this functionality can result in a scenario where the
 instance is accessed by multiple threads simultaneously.
-If access to the **Element Data** cannot be guaranteed to be thread-safe,
+If access to the Element Data cannot be guaranteed to be thread-safe,
 then the Engine must not allow a cache to be added.
 
 Design note - There are various routes we could potentially take to allow

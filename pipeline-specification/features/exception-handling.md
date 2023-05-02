@@ -21,13 +21,13 @@ throw.
 ## Process function
 
 One of the key points that failures can occur is in the 'Process' function.
-There may be any combination of **Flow Elements**, including custom
-third-party ones in the **Pipeline**.
+There may be any combination of Flow Elements, including custom
+third-party ones in the Pipeline.
 
-Consequently, exceptions and errors must be caught at the **Pipeline**
+Consequently, exceptions and errors must be caught at the Pipeline
 level.
-By default, these errors should be added to the **Flow Data** errors
-collection. Once all **Flow Elements** have completed processing, throw an
+By default, these errors should be added to the Flow Data errors
+collection. Once all Flow Elements have completed processing, throw an
 exception/error with all the stored errors included as sub-errors.
 
 There must be an option to modify this behavior to just add these errors
@@ -38,15 +38,15 @@ and be called `SuppressProcessExceptions` or similar.
 
 ### Flow Elements
 
-**Flow Elements** should throw exceptions/errors freely, unless it makes
+Flow Elements should throw exceptions/errors freely, unless it makes
 sense for an element to handle a specific error internally.
-In general, it is the responsibility of the **Pipeline** to handle these for
+In general, it is the responsibility of the Pipeline to handle these for
 the user as described above.
 
 ## Flow Data and derived accessors
 
 Apart from the 'Process' function, almost all user interaction is handled
-through **Flow Data**.
+through Flow Data.
 The general guidance is that these functions and accessors should only
 throw errors/exceptions if the failure is likely due to something that
 the API user has done wrong.
@@ -84,7 +84,7 @@ The precise naming will be language-dependant, but in C#, these are:
 ### Property Missing Exception
 
 A Property missing exception is thrown if an attempt is made to access a
-Property that does not exist in the **Flow Data**.
+Property that does not exist in the Flow Data.
 
 See [missing Properties](properties.md#missing-properties) for more details.
 

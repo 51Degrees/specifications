@@ -13,11 +13,11 @@ language/framework.
 
 Some common tasks that the web integration may perform are:
 
-- Creation of **Pipeline** on start-up.
-- Manage **Flow Data** lifecycle
-  - Create **Flow Data** when request comes in
+- Creation of Pipeline on start-up.
+- Manage Flow Data lifecycle
+  - Create Flow Data when request comes in
   - Populate Evidence values and call 'Process'
-  - Make the processed **Flow Data** easily accessible to other parts of the
+  - Make the processed Flow Data easily accessible to other parts of the
     application so the results can be used.
   - Handle [resource cleanup](resource-cleanup.md) once request handling is
     completed.
@@ -26,11 +26,11 @@ Some common tasks that the web integration may perform are:
 
 ## Pipeline configuration
 
-The web integration makes use of several **Flow Elements** in order to support
+The web integration makes use of several Flow Elements in order to support
 [client-side](#javascript-properties) functionality.
 
-Where the web integration is responsible for creation of the **Pipeline**, it
-must also ensure that these additional **Flow Elements** will be present.
+Where the web integration is responsible for creation of the Pipeline, it
+must also ensure that these additional Flow Elements will be present.
 
 - The [Sequence Element](../pipeline-elements/sequence-element.md) must be
   present. If not, it should be added as the first element in the Pipeline.
@@ -40,7 +40,7 @@ must also ensure that these additional **Flow Elements** will be present.
 - The [JavaScript Builder Element](../pipeline-elements/javascript-builder.md)
   must be present. If not, it should be added after all other elements.
 
-Another **Flow Element** is needed to allow the web integration to automatically
+Another Flow Element is needed to allow the web integration to automatically
 set HTTP response headers.
 
 - The [Set Headers Element](../pipeline-elements/set-headers-element.md) must
@@ -90,9 +90,9 @@ be appended, rather than replacing the existing value.
 
 There are two major client-side features that the web integration must provide:
 1. Enable the execution of JavaScript snippets which can be used to gather
-   additional Evidence. Handle passing this data back to the **Pipeline** for
+   additional Evidence. Handle passing this data back to the Pipeline for
    processing.
-2. Allow the user to access results on **Pipeline** processing in client side
+2. Allow the user to access results on Pipeline processing in client side
    code.
 
 ### Access to results
@@ -125,12 +125,12 @@ be enhanced to perform the following steps:
 ### Flow Elements
 
 These features are implemented using the web integration logic itself, along
-with several **Flow Elements**:
+with several Flow Elements:
 
 - [Sequence Element](../pipeline-elements/sequence-element.md) - Used to
   prevent the infinite loops described in the section above.
 - [JSON Builder Element](../pipeline-elements/json-builder.md) - Converts the
-  Property values in the current **Flow Data** into a JSON data object.
+  Property values in the current Flow Data into a JSON data object.
 - [JavaScript Builder Element](../pipeline-elements/javascript-builder.md) -
   Takes the output from JSON Builder Element and packages it within a JavaScript
   template.

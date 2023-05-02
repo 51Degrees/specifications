@@ -5,7 +5,7 @@
 Cloud Device Detection presents [Evidence](../../pipeline-specification/features/evidence.md)
 to the 51Degrees Cloud Detection server, which carries out the detection
 and returns a JSON data structure, from which Device Detection Properties
-are populated in the **Flow Data**.
+are populated in the Flow Data.
 
 This is implemented as a two-step process: a Cloud Request Engine
 presents the Evidence to the 51Degrees server with an HTTP request

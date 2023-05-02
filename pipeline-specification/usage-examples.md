@@ -8,7 +8,7 @@ other use-case documents such as
 
 ## Creating elements and Pipelines
 
-Creating **Flow Elements** should always be done using a consistent mechanism.
+Creating Flow Elements should always be done using a consistent mechanism.
 In the case of C#, we use a separate builder class. For more details on this,
 see the [Flow Element builder](conceptual-overview.md#flow-element-builder)
 section in the conceptual overview.
@@ -19,8 +19,8 @@ var element = myElementBuilder
   .Build()
 ```
 
-As with **Flow Elements**, C# also uses separate builder class when creating
-**Pipelines**:
+As with Flow Elements, C# also uses separate builder class when creating
+Pipelines:
 
 ```c#
 var pipeline = pipelineBuilder
@@ -41,7 +41,7 @@ details.
 Once the Pipeline has been created, processing a request can generally
 be broken down into 4 steps:
 
-1. Create **Flow Data**:
+1. Create Flow Data:
 
    ```c#
    var flowData = pipeline.createFlowData();
@@ -51,7 +51,7 @@ be broken down into 4 steps:
    ```c#
    flowData.AddEvidence("query.evidence-key", "evidence value");
    ```
-3. Request the **Pipeline** to process the data:
+3. Request the Pipeline to process the data:
 
    ```c#
    flowData.Process();

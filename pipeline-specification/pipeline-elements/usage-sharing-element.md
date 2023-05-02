@@ -2,13 +2,13 @@
 
 ## Overview
 
-This **Flow Element** implements the [usage-sharing](../features/usage-sharing.md)
+This Flow Element implements the [usage-sharing](../features/usage-sharing.md)
 feature.
 
 ## Accepted Evidence
 
 The EvidenceKeyFilter for share usage is unusual as it cannot simply be a
-list of accepted keys like most **Flow Elements**.
+list of accepted keys like most Flow Elements.
 
 Instead, it is a filter function that should return false (i.e. not shared)
 for any key where:
@@ -27,12 +27,12 @@ configuration parameters that can affect this filter function.
 
 ## Element Data
 
-This **Flow Element** does not add an **Element Data** instance to **Flow Data**.
+This Flow Element does not add an Element Data instance to Flow Data.
 
 ## Start-up activity
 
 A static XML snippet can be generated for values that will be invariant
-for the lifetime of the current **Pipeline**.
+for the lifetime of the current Pipeline.
 
 From the list of parameters in the processing section below, the invariant ones
 are:

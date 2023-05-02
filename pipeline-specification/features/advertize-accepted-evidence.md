@@ -2,12 +2,12 @@
 
 ## Summary
 
-All **Flow Elements** and **Pipelines** must be capable of programmatically
+All Flow Elements and Pipelines must be capable of programmatically
 describing the Evidence keys that they can make use of.
 
 ## Flow Elements
 
-For the majority of **Flow Elements**, simply returning a list of Evidence
+For the majority of Flow Elements, simply returning a list of Evidence
 values
 they can use would be sufficient.
 For example, the Device Detection Engine will accept `query.user-agent`,

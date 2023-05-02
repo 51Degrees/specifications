@@ -2,7 +2,7 @@
 
 ## Overview
 
-An on-premise **Aspect Engine** may require data that is independent of the
+An on-premise Aspect Engine may require data that is independent of the
 logic of the Engine and that is periodically refreshed. For example,
 when new phones or browser versions are released, the Device Detection
 Engine will require a new data file in order to detect and populate
@@ -21,7 +21,7 @@ or to implement the Data Update service to allow for multiple file sources.
 
 ### Aspect Engine features
 
-In order to support this feature, **Aspect Engines** must have
+In order to support this feature, Aspect Engines must have
 some additional abilities:
 
 1. At configuration time, there must be a mechanism for supplying details about
@@ -289,7 +289,7 @@ compared with the current file data source, if file data source mode is active.
 If the downloaded file is more recent, it replaces the current file data source.
 
 If the data downloaded is more recent or if memory data source mode is in
-operation the **Aspect Engine** is refreshed with the new data.
+operation the Aspect Engine is refreshed with the new data.
 
 Once the refresh is complete, the data update service can start
 checking for updates using the newly refreshed *next expected update*

@@ -1,7 +1,7 @@
 # Lazy loading
 
-This feature is specific to Properties populated by **Engines** (rather than all
-**Flow Elements**).
+This feature is specific to Properties populated by Engines (rather than all
+Flow Elements).
 It is currently only implemented in .NET and Java.
 
 There are several execution strategies one might consider for the Process function.
