@@ -312,7 +312,7 @@ relevant details (e.g. which Engine + data file the update is for)
 
 | **Action**                            | **Message**                  |
 |---------------------------------------|------------------------------|
-| Running the update on start-up process | Updating on startup          |
+| Running the update on start-up process | Updating on start-up          |
 | File system watcher created           | Creating file system watcher |
 
 ### Messages during operation
@@ -320,10 +320,10 @@ relevant details (e.g. which Engine + data file the update is for)
 | **Action**                                           | **Message**                                                                     |
 |------------------------------------------------------|---------------------------------------------------------------------------------|
 | Starting the check for update process                | Checking for update                                                             |
-| Call [refresh](#aspect-engine-features) on an Engine | Attempting to refresh Engine '\<engine type\>' with new data                    |
-| Send HTTP request to check for new data file         | Checking for update from '\<url\>' for Engine '\<engine type\>'                 |
-| Successfully downloaded new data file                | Downloaded new data from '\<url\>' for Engine '\<engine type\>'                 |
-| 304 (Not modified) response from HTTP request        | No data newer than \<datetime\> found at '\<url\>' for Engine '\<engine type\>' |
+| Call [refresh](#aspect-engine-features) on an Engine | Attempting to refresh Engine '\<Engine type\>' with new data                    |
+| Send HTTP request to check for new data file         | Checking for update from '\<url\>' for Engine '\<Engine type\>'                 |
+| Successfully downloaded new data file                | Downloaded new data from '\<url\>' for Engine '\<Engine type\>'                 |
+| 304 (Not modified) response from HTTP request        | No data newer than \<datetime\> found at '\<url\>' for Engine '\<Engine type\>' |
 
 ### Errors
 

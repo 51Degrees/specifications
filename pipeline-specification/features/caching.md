@@ -58,6 +58,7 @@ and values that are present in the **Flow Data**.
 Other considerations when creating keys:
 - Evidence values must always be added in the same Evidence key order.
   For example, `query.user-agent` first, then `header.user-agent`, etc
+
 - Comparison of Evidence keys must be case-insensitive. For example,
   the following keys are considered the same:
 

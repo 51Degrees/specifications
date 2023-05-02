@@ -8,7 +8,7 @@ products.
 | Name                           | Description                                                                                                                 |
 |--------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
 | Pipeline Specification         | Specification for the Pipeline API and its operation. This covers core functionality. |
-| Device Detection Specification | Specification for the Device Detection service. This builds on the concepts and features defined in the pipeline specification.   |
+| Device Detection Specification | Specification for the Device Detection service. This builds on the concepts and features defined in the Pipeline specification.   |
 
 # Notes for implementers
 
@@ -18,19 +18,17 @@ products.
   For example, Java and .NET developers would be familiar with the use of a
   fluent builder to create instances. However, a Node.JS developer would not
   normally use this approach.
-- [Java](https://github.com/51Degrees/pipeline-java) and 
+- [Java](https://github.com/51Degrees/pipeline-java) and
   [.NET](https://github.com/51Degrees/pipeline-dotnet) are considered the reference
-  implementations. At least one of these should be reviewed by the reader to 
-  see what a real-world implementation of the specification looks like. There 
-  is also [a section](pipeline-specification/reference-implementation-notes.md) 
-  containing reflections on the architectural choices made when creating the 
-  Java and .NET versions. This may be helpful when designing future implementations. 
+  implementations. At least one of these should be reviewed by the reader to
+  see what a real-world implementation of the specification looks like. There
+  is also [a section](pipeline-specification/reference-implementation-notes.md)
+  containing reflections on the architectural choices made when creating the
+  Java and .NET versions. This may be helpful when designing future implementations.
 - URLs in these specifications are fixed. Code comments should include
   references to these URLs in order to avoid re-writing the same descriptions
   and definitions in multiple places.
 - CI/CD scripts and the like are out of scope. However, implementers should be
   mindful of the requirement to have the ability to build and test the software
   in a non-interactive CI/CD environment.
-
-
 
