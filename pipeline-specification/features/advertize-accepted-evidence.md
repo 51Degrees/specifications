@@ -1,4 +1,4 @@
-# Advertize accepted Evidence
+# Advertise accepted Evidence
 
 ## Summary
 
