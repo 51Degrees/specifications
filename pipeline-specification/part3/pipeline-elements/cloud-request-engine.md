@@ -39,8 +39,8 @@ of the number of different Aspects required.
 A Resource Key is a token that serves both to authenticate a request to the
 remote server and to specify which Property values are returned in the
 result. Resource Keys are created using the
-[51Degrees Configurator](https://51degrees.com/documentation/4.4/_concepts__configurator.html).
-See [Resource Key Documentation](https://51degrees.com/documentation/4.4/_info__resource_keys.html)
+[51Degrees Configurator](https://51degrees.com/documentation/_concepts__configurator.html).
+See [Resource Key Documentation](https://51degrees.com/documentation/_info__resource_keys.html)
 for more information.
 
 ## Accepted Evidence
@@ -82,7 +82,7 @@ An example of the JSON response received from the server:
     "device.javascripthardwareprofile"
   ],
   "warnings": [
-    "Low entropy client-hints were supplied in the evidence, but high-entropy client-hints were not.\nThis will lead to less accurate results, and indicates that permissions were not set correctly in the original response to the browser.\nFor more info on client-hint permissions, see http://51degrees.me/documentation/4.4/_device_detection__features__user_agent_client_hints.html."
+    "Low entropy client-hints were supplied in the evidence, but high-entropy client-hints were not.\nThis will lead to less accurate results, and indicates that permissions were not set correctly in the original response to the browser.\nFor more info on client-hint permissions, see http://51degrees.me/documentation/_device_detection__features__user_agent_client_hints.html."
   ]
 }
 ```

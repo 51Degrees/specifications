@@ -13,7 +13,7 @@ following features:
 - Allow access to Pipeline processing results in client-side JavaScript.
 - Acquire additional Evidence that is only accessible to client-side
   JavaScript. This is described in more detail in our
-  [documentation](https://51degrees.com/documentation/4.4/_features__client_side_evidence.html)
+  [documentation](https://51degrees.com/documentation/_features__client_side_evidence.html)
 
 ## Accepted Evidence
 

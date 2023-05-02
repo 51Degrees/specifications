@@ -265,7 +265,7 @@ This section making an HTTP request to check for
 updated data and handling the response.
 
 51Degrees Device Detection data files are supplied by the
-[Distributor](http://51degrees.com/documentation/4.4/_info__distributor.html)
+[Distributor](http://51degrees.com/documentation/_info__distributor.html)
 web API. The capabilities of the data update service align with those of
 the Distributor. However, the service must be capable of using other sources
 as well. For example, a simple static URL that just supplies a file.
