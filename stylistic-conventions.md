@@ -1,7 +1,6 @@
 # Stylistic Conventions
 
-
-Write in third person. The 51Degrees implementation etc. 
+Write in third person. The 51Degrees implementation etc.
 It is recommended rather than we recommend.
 
 ## Spelling
@@ -29,9 +28,9 @@ Defined Terms:
 - Flow Element
 - Flow Data
 - Engine and all specializations of Engines e.g.
-Aspect Engine,
-Cloud Aspect Engine,
-Cloud Request Engine, On-premise Engine, Cloud Engine
+  Aspect Engine,
+  Cloud Aspect Engine,
+  Cloud Request Engine, On-premise Engine, Cloud Engine
 - Evidence
 - Property
 - Element Data

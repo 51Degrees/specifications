@@ -1,6 +1,6 @@
 # Packaging and structure
 
-Some general guidance as to how to structure an implementation based on 
+Some general guidance as to how to structure an implementation based on
 51Degrees experience.
 
 ## Modularity
@@ -12,14 +12,14 @@ use features  without having to import unused features.
 Excessive modularity, of course, makes the libraries hard to use.
 
 Use of transitive dependencies can be very helpful and allow definition
-of a single library aggregation. Most of the dependencies in pipeline
+of a single library aggregation. Most of the dependencies in Pipeline
 are required for most use cases. However, if it is of concern that various
-features are not included then facilities such as Maven's optional dependency can 
+features are not included then facilities such as Maven's optional dependency can
 be used.
 
 ## Reference modularity
 
-51Degrees pipeline reference implementations are developed in a single repository
+51Degrees Pipeline reference implementations are developed in a single repository
 allowing for a single build cycle. Specific features, such as Device Detection,
 use separate repos.
 
@@ -34,9 +34,9 @@ Pipeline itself is modularized as follows:
   - **SetHeaders**
   - **Sequence**
 - **Engine Implementations** Separate Modules for each of the following:
-    - **JSON**
-    - **JavaScript**
-    - **CloudRequest**
+  - **JSON**
+  - **JavaScript**
+  - **CloudRequest**
 
 This diagram illustrates the structure of .NET NuGet packages:
 
@@ -49,18 +49,18 @@ items, such as test data, between languages using Git [submodules](https://git-s
 
 ## Versioning
 
-We distribute pipeline with a single version number for all modules/artifacts.
+We distribute Pipeline with a single version number for all modules/artifacts.
 In principle, using an aggregator module would allow both simple update
 and multiple distinct module versions, but we have considered that there
 are insufficient advantages to this approach.
 
 ## Examples
 
-We do not distribute examples as compiled artifacts. 
+We do not distribute examples as compiled artifacts.
 
-There would be advantages to distributing examples using a separate repository 
+There would be advantages to distributing examples using a separate repository
 to the code they exemplify in order to
-ensure that distributed library artifacts are used. However, this would make 
+ensure that distributed library artifacts are used. However, this would make
 regression testing of the examples more complicated during the release cycle.
 
 For more details, see [required examples](required-examples.md).
@@ -73,7 +73,7 @@ For more details, see [automated testing](automated-testing.md).
 
 ### Test data
 
-We recommend that for convenience, test data of some kind is distributed with 
+We recommend that for convenience, test data of some kind is distributed with
 library code and examples. We also recommend that alternative means of updating
 test data are provided.
 

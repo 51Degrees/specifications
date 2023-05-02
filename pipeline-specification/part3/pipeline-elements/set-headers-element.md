@@ -2,12 +2,12 @@
 
 ## Overview
 
-The Set Headers Element constructs a list of all the HTTP response 
+The Set Headers Element constructs a list of all the HTTP response
 header values that are required to be set by other Elements in the Pipeline.
-Usually, this is done in order to request more evidence from the 
+Usually, this is done in order to request more Evidence from the
 client (For example [User-Agent Client Hints](http://51degrees.com/documentation/4.4/_device_detection__features__u_a_c_h__headers.html)).
 
-This relies on a Property naming convention whereby any Property 
+This relies on a Property naming convention whereby any Property
 values containing data that should be sent in a response header
 are named according to the following format:
 
@@ -15,7 +15,7 @@ are named according to the following format:
 
 - The `SetHeader` prefix indicates that this Property is intended
   for setting HTTP response headers.
-- `[Identifier]` is some string that relates to what this value is for. 
+- `[Identifier]` is some string that relates to what this value is for.
   It MUST NOT have upper-case characters after the first character.
 - `[HeaderName]` is the name of the HTTP header to set in the response.
 
@@ -24,13 +24,13 @@ are named according to the following format:
 This element uses no Evidence, it works on Property values in Element Data
 in the Flow Data.
 
-## Startup activity
+## Start-up activity
 
-For performance reasons, it is usually best to construct a list of 
-properties with the `SetHeader` prefix on start-up, rather than doing
+For performance reasons, it is usually best to construct a list of
+Properties with the `SetHeader` prefix on start-up, rather than doing
 so for each request.
 
-## Element data
+## Element Data
 
 | **Name**                   | **Type**                              | **Description**                                                                                                                           |
 |----------------------------|---------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|
@@ -39,12 +39,12 @@ so for each request.
 ## Process
 
 - Get all Properties in Flow Data with `SetHeader` at the start of the name.
-- For each property
-  - If property value is set and is not `Unknown`
-    - Extract the header name from the Property name using the convention 
+- For each Property
+  - If Property value is set and is not `Unknown`
+    - Extract the header name from the Property name using the convention
       outlined [above](#overview). Use this as the key to the output key value
       pair collection.
-    - Split the Property value using `,` and add each individual segment to 
+    - Split the Property value using `,` and add each individual segment to
       the output collection if it has not yet been added for that key.
 
 ## Configuration options
