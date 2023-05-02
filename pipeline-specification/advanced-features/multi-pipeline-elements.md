@@ -14,7 +14,7 @@ state information relating to the Pipeline they are added to (For
 example, [JSON builder](../pipeline-elements/json-builder.md)).
 
 If this feature is enabled, then all Flow Elements that maintain any
-such state information must ensure that they have the means to keep track of
+such state information MUST ensure that they have the means to keep track of
 isolated instances of this state for each Pipeline to which they are
 added and use the correct state information when processing.
 

@@ -6,9 +6,9 @@ Where string keys are used, the following rules apply:
 
 - Strings should only contain alphanumeric characters, full stop or hyphen.
 - Some 51Degrees Properties also use the ‘/’ character. No new Properties will
-  be added with this character, but it must be accommodated.
+  be added with this character, but it will need to be accommodated.
 - Lower-case is preferred but not required.
-- String comparisons must be case insensitive.
+- String comparisons MUST be case insensitive.
 
 ## Accessing results
 
@@ -16,7 +16,7 @@ There are multiple ways to access the results of processing.
 
 Firstly, these are the mechanisms for getting Element Data:
 
-1. It must be possible to get Element Data by supplying the string key
+1. It MUST be possible to get Element Data by supplying the string key
    for the element. For example:
 
    ```c#
@@ -45,7 +45,7 @@ Firstly, these are the mechanisms for getting Element Data:
 
 Below are the mechanisms for getting Properties:
 
-1. It must be possible to get a Property value from an Element Data instance by
+1. It MUST be possible to get a Property value from an Element Data instance by
    supplying the string key for that Property. For example:
 
    ```c#

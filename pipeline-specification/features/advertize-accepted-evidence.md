@@ -2,7 +2,7 @@
 
 ## Summary
 
-All Flow Elements and Pipelines must be capable of programmatically
+All Flow Elements and Pipelines MUST be capable of programmatically
 describing the Evidence keys that they can make use of.
 
 ## Flow Elements

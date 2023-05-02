@@ -8,9 +8,11 @@ request containing Evidence values that are sufficiently similar to a previous r
 
 As with any caching strategy, the implications for memory use and
 performance should be investigated by profiling in the target environment.
-Although we must certainly ensure that the caching implementation is doing its
-job effectively, such concerns are primarily the responsibility of the end
-user of the Pipeline API.
+Such concerns are the responsibility of the end
+user of the Pipeline API, rather than the implementor of the API.
+However, the implementor MUST ensure that there are tests to demonstrate that 
+the caching system can provide some benefit in the limited scope of the 
+testing environment. 
 
 In practice, we have found that the primary use-case for caching is the
 [Cloud Request Engine](../pipeline-elements/cloud-request-engine.md).
@@ -50,16 +52,16 @@ concerns, error handling, other features, etc.
 
 ## Generation of keys
 
-All Flow Elements must [advertise](advertize-accepted-evidence.md) the
+All Flow Elements MUST [advertise](advertize-accepted-evidence.md) the
 Evidence keys that they make use of.
 You will need to use this to build a list of the relevant Evidence keys
 and values that are present in the Flow Data.
 
 Other considerations when creating keys:
-- Evidence values must always be added in the same Evidence key order.
+- Evidence values MUST always be added in the same Evidence key order.
   For example, `query.user-agent` first, then `header.user-agent`, etc
 
-- Comparison of Evidence keys must be case-insensitive. For example,
+- Comparison of Evidence keys MUST be case-insensitive. For example,
   the following keys are considered the same:
 
   ```
@@ -69,7 +71,7 @@ Other considerations when creating keys:
   ```
   "query.User-Agent" = "abc"
   ```
-- Comparison of Evidence values must be case-sensitive.
+- Comparison of Evidence values MUST be case-sensitive.
 
 ## Cache implementation
 

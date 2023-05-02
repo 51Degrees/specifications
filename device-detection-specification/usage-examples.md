@@ -12,8 +12,8 @@ the [usage examples](../pipeline-specification/usage-examples.md) there.
 ## Create a Device Detection Pipeline
 
 There are several different ways that a Pipeline might be created. However, once
-created, usage must be as similar as possible.
-In particular, a cloud Pipeline must be a drop-in replacement for an on-premise
+created, usage SHOULD be as similar as possible.
+In particular, a cloud Pipeline MUST be a drop-in replacement for an on-premise
 Pipeline for performing Device Detection and querying the results.
 
 Creating an on-premise Device Detection Pipeline in code:
@@ -92,7 +92,7 @@ using(var flowdata = pipeline.CreateFlowData())
 The mechanics of this will differ significantly by language.
 See [Pipeline - web integration](../pipeline-specification/features/web-integration.md)
 for more detail.
-However, the outcome should be the same. It must be simple for the user to
+However, the outcome should be the same. It MUST be simple for the user to
 create a web application where:
 
 1. Each request (following any filtering, etc) will have all relevant Evidence
@@ -110,7 +110,7 @@ For detailed examples see:
 ### Apple model detection
 
 Modifying the simple web application described above to be able to correctly
-identify Apple models must also be very easy. For example, by adding a line
+identify Apple models MUST also be very easy. For example, by adding a line
 similar to the following in the HTML:
 
 ```html
@@ -147,7 +147,7 @@ For more detailed examples see:
 ## Property metadata
 
 [Property metadata](../pipeline-specification/features/properties.md#property-metadata)
-must be exposed by the Device Detection Engine.
+MUST be exposed by the Device Detection Engine.
 Note that this information should be available for both cloud and On-premise Engines:
 
 ```c#
@@ -164,7 +164,7 @@ For more detailed examples see:
 ## Extended on-premise metadata
 
 Additional [Device Detection metadata](pipeline-elements/device-detection-on-premise.md#metadata)
-must be exposed by the On-premise Engine.
+MUST be exposed by the On-premise Engine.
 
 ```c#
 foreach (var component in deviceDetectionEngine.Components)

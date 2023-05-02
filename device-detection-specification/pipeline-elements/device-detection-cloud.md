@@ -18,7 +18,7 @@ Element Data from the cloud request is present in Pipeline before processing.
 
 ![Cloud Engine flow](../../pipeline-specification/images/Device%20Detection%20Cloud%20Engine.png)
 
-The majority of the logic that must be performed by the Device Detection Cloud
+The majority of the logic that is executed by the Device Detection Cloud
 Engine is common to all Cloud Engines and is described in the
 [Cloud Aspect Engine](../../pipeline-specification/pipeline-elements/cloud-aspect-engine.md)
 document.
@@ -30,7 +30,7 @@ There are no configuration options associated with this Engine.
 ## Device Detection Cloud Engine processing
 
 When it is added to a Pipeline, Device Detection Cloud Engine initializes
-itself from a Cloud Request Engine, which must have been added to the Pipeline
+itself from a Cloud Request Engine, which MUST have been added to the Pipeline
 before it.
 
 The Cloud Request Engine determines which Properties are available

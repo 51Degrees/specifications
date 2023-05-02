@@ -34,7 +34,7 @@ has created, but they maintain references to it.
 
 See [thread safety](features/thread-safety.md) for details on concurrent access requirements.
 
-Flow Data must support various different ways of accessing the data it contains.
+Flow Data MUST support various different ways of accessing the data it contains.
 See [access to results](features/access-to-results.md) for more information.
 
 ### Element Data

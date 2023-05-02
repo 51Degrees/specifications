@@ -52,7 +52,7 @@ information about the data types within which those Properties are found.
 
 Creation of Flow Data is carried out by an application requesting an instance
 from a Pipeline. With a number of important exceptions, the creating
-application must destroy the Flow Data once it has completed its processing.
+application MUST destroy the Flow Data once it has completed its processing.
 
 The application carries out the initial population of Evidence
 and then requests that the Pipeline `process` it - i.e. present the Flow Data
