@@ -1,44 +1,56 @@
 # Stylistic Conventions
 
-Write in third person. The 51Degrees implementation etc.
-It is recommended rather than we recommend.
+This document contains some notes on stylistic conventions to be observed
+in the specification, and doesn't for part of the specification.
+
+## Voice. 
+
+51Degrees style guide says to adopt a friendly personal tone
+however this is a formal specification, so write in third person. 
+
+- The 51Degrees implementation rather than "our"
+- It is recommended rather than we recommend.
 
 ## Spelling
 
-US English
-
-C# this should be spelled in uppercase
-
-metadata all one word
-
-website all one word
-
-start-up - as in "does x on start-up"
-
-on-premise
+- use US English spelling
+- possibly hyphenated terms, render as follows:
+    - "start-up"
+    - "metadata"
+    - "website"
+    - "callback"
 
 remote server - not cloud or remote service
-JSON uppercase
 
 ## Capitalization
 
+- JSON
+- DLL
+- C#
+
 Defined Terms:
+
+Defined Terms are Capitalized.
 
 - Pipeline
 - Flow Element
 - Flow Data
-- Engine and all specializations of Engines e.g.
-  Aspect Engine,
-  Cloud Aspect Engine,
-  Cloud Request Engine, On-premise Engine, Cloud Engine
+- Element Data
+- Engine
+- Aspect Engine
+- Cloud Aspect Engine
+- Cloud Request Engine
+- On-premise Engine
+- Cloud Engine
+- Sequence Element
+- Set Headers Element
+- Device Detection
 - Evidence
 - Property
-- Element Data
+- Properties
 - Flow Data
 - Resource Key
 - Aspect
-
-Defined Terms are Capitalized.
 
 Where defined terms are introduced, in Conceptual overview and introductory
 material, they are **emboldened** on first occurrence.
@@ -54,16 +66,20 @@ When referring to an implementation class which is an instantiation
 of a concept that has a Defined Term, the name of
 the class is used and rendered in monospace e.g. `FlowData`
 
-Tables:
+## Tables
 - Bold column headers
 - Equal space columns
+
+## RFC 2119
 
 RFC 2119 terms are UPPER CASE when used with the meaning defined in RFC 2119.
 Avoid use of the same terms where they do not have the RFC 2119 meaning.
 
 MUST, SHOULD, MUST NOT, SHOULD NOT, MAY etc.
 
-Section heads use sentence case.
+## Section Heads
+
+Section heads use sentence case, per company style guide..
 
 When a section head contains a defined term the term retains its
 capitalization e.g. Flow Element, and Flow Element builder. The logic for this
@@ -71,8 +87,6 @@ is that sentence case would have you say, for example,
 "Taking a trip to Buenos Aires"
 
 ## Checking adherence to conventions
-
-This section may be removed before publication.
 
 Refer to 51Degrees Style Guide.
 Refer to 51Degrees Glossary
