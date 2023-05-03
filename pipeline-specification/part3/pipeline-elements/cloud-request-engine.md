@@ -47,7 +47,7 @@ for more information.
 
 Accepted Evidence is dependent on the supplied Resource Key.
 
-[On start-up](#startup-activity), the Engine must make a request to its
+[On start-up](#startup-activity), the Engine will make a request to its
 remote server
 to get this information.
 
@@ -89,7 +89,7 @@ An example of the JSON response received from the server:
 
 ## Start-up activity
 
-On start-up, the Engine must call its configured `accessibleproperties`
+On start-up, the Engine will call its configured `accessibleproperties`
 and `evidencekeys`
 endpoints, using the configured Resource Key.
 
@@ -126,7 +126,7 @@ When Evidence is added, its prefix MUST be removed.
 For example, `query.user-agent` becomes `user-agent`.
 This means that conflicts can occur when there are Evidence values for the same
 key with different prefixes. Where there are conflicts, the precedence order
-defined in [Evidence](../features/evidence.md) must be used to
+defined in [Evidence](../features/evidence.md) MUST be used to
 determine which value to use.
 
 See [HTTP requests](#http-requests) for details on general
@@ -135,23 +135,22 @@ HTTP request handling.
 ## HTTP requests
 
 When making requests to the cloud service during start-up or processing, some
-common steps must be followed.
+common steps MUST be followed.
 
-Firstly, the `Origin` HTTP Header must be set using the configured
+Firstly, the `Origin` HTTP Header MUST be set using the configured
 [CloudRequestOrigin](#configuration-options).
 
-Second, there are several scenarios that MUST cause an error to be thrown:
+Second, there are several scenarios that will cause an error to be thrown:
 
-- The response will be a JSON object. A check must be made for an array under a
-  top-level Property called `errors`. If this contains an entry then it must be
-  extracted and the text
+- The response will be a JSON object. If the top-level `errors` Property 
+  contains an entry then it will need to be parsed and the text
   used as the message for the thrown error. (If there are multiple entries
   then a language-appropriate structure, such as the C# AggregateException
   SHOULD be used)
-- If the response is empty then the message must be
+- If the response is empty then the message will be
   `No data in response from cloud service at '[url]'`
-- If the HTTP status code indicates failure (i.e. not 200) AND there are no
-  error messages for the reasons mentioned above, the message must be
+- If the HTTP status code indicates failure (i.e. not 200) and there are no
+  error messages for the reasons mentioned above, the message will be
   `Cloud service at '[url]' returned status code '[code]' with content [raw response]`
 
 Similarly to the `errors` array, any entries in the `warnings` array in the

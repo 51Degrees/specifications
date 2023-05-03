@@ -5,7 +5,7 @@
 The Pipeline API is designed to be used in highly concurrent environments
 such as high traffic web servers.
 
-Consequently, Pipeline and Flow Element implementations must be
+Consequently, Pipeline and Flow Element implementations MUST be
 capable of handling multiple concurrent requests to the `Process` function.
 
 ## Flow Data
@@ -15,7 +15,7 @@ thread-safe as the most common use-case is that they will be accessed and
 updated only on the current thread.
 This ensures users get the best performance by default.
 
-Where the Pipeline contains elements running in parallel, Element Data instances
+Where the Pipeline contains elements running in [parallel](../advanced-features/parallel-processing.md), Element Data instances
 will be added to the Flow Data in parallel. However, it is a useful optimization
 to allow Flow Data to be non-thread safe in contexts where no parallel execution
 is required.
@@ -42,8 +42,9 @@ complexity that it would require.
 
 ## Aspect data
 
-In contrast to Element Data, Aspect Data instances must be thread-safe as the
+
+In contrast to Element Data, Aspect Data instances MUST be thread-safe. As the
 same instance may be used for multiple different calls to `Process` when
 the [caching](caching.md) feature is enabled.
-If this is not possible for some reason then the Engine must not allow a cache
+If this is not possible for some reason then the Engine MUST NOT allow a cache
 to be added.

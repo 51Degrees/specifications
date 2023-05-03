@@ -10,11 +10,11 @@ In general, we aim to follow these principles:
 1. Exceptions and errors should be highly visible (e.g. display error message
    and stop the process) by default in order to highlight issues during
    development.
-2. It must be possible for the user to configure the system to prioritize
+2. It MUST be possible for the user to configure the system to prioritize
    remaining operational over making failures visible. Many users will
    prefer this for production.
 
-In all cases, we must use standard language features where available to
+In all cases, standard language features SHOULD be used to
 let IDEs and users know what exceptions/errors a particular function can
 throw.
 
@@ -24,13 +24,13 @@ One of the key points that failures can occur is in the 'Process' function.
 There may be any combination of Flow Elements, including custom
 third-party ones in the Pipeline.
 
-Consequently, exceptions and errors must be caught at the Pipeline
+Consequently, exceptions and errors will need to be caught at the Pipeline
 level.
 By default, these errors should be added to the Flow Data errors
 collection. Once all Flow Elements have completed processing, throw an
 exception/error with all the stored errors included as sub-errors.
 
-There must be an option to modify this behavior to just add these errors
+There MUST be an option to modify this behavior to just add these errors
 to the errors collection and [log](logging.md) them (I.e. don't throw an
 exception/error at the end of processing). This option should be available
 when the [Pipeline is created](../conceptual-overview.md#pipeline-builder)
@@ -63,7 +63,7 @@ The [web integration](web-integration.md) feature will be hooking into
 the web request handling logic of the target language/framework. As such,
 it will be executing code outside easily handled areas.
 
-We must ensure that exceptions/errors that happen in these areas are
+The implementor MUST ensure that exceptions/errors that happen in these areas are
 handled correctly in order to avoid the API taking down the customer's
 production website.
 
@@ -71,9 +71,9 @@ production website.
 
 The [data update](data-updates.md) process runs on a background thread.
 Consequently, it is outside any other error handling mechanisms and
-must handle all its errors internally.
+will need to handle all its errors internally.
 
-When errors do occur, they must be [logged](logging.md) and must not
+When errors do occur, they will be [logged](logging.md) and MUST NOT
 cause the process to crash.
 
 ## Custom exceptions/errors
@@ -98,6 +98,6 @@ preventing the creation or execution of the Pipeline.
 
 Can be thrown by the [CloudRequestEngine](../pipeline-elements/cloud-request-engine.md)
 following requests to a cloud service. Must be populated with details
-relevant to the failure (For example, when a 429 error occurs, the
-exception must include the value of the 'Retry-After' header so that
+relevant to the failure (For example, when a 429 error occurs, include the 
+value of the 'Retry-After' header in the exception message so that
 the user can act on it)

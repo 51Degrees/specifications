@@ -19,7 +19,7 @@ Each Flow Element may populate values for zero or more Properties.
 A Property may return values of any type. However, there are certain types that are
 specifically expected and supported throughout the API.
 
-The primary limitation is that it must be possible for these types to be represented
+The primary limitation is that these type values will need to be represented
 in JSON data.
 
 As such, the core types are:
@@ -47,7 +47,7 @@ See [web integration](web-integration.md) for more detail.
 ## Null values
 
 Property values populated by Engines (as opposed to all Flow Elements)
-must be capable of having 'no value'.
+MUST be capable of having 'no value'.
 
 Where 'no value' is used, attempting to access the value should throw an
 error/exception with a customizable message explaining why the value is not set.
@@ -59,10 +59,10 @@ chosen not to set its value for some reason.
 
 ## Property metadata
 
-All [Flow Elements](../conceptual-overview.md#flow-element) must expose metadata
+All [Flow Elements](../conceptual-overview.md#flow-element) MUST expose metadata
 describing details of the Properties that they can populate.
 
-In addition, it must be possible to get Property metadata at the Pipeline
+In addition, it MUST be possible to get Property metadata at the Pipeline
 level for all Properties that can be populated by all Flow Elements in the
 Pipeline.
 
@@ -98,7 +98,7 @@ This feature is specific to Properties populated by Engines (rather than all
 Flow Elements).
 
 When the user attempts to access a Property that is defined for an Engine, but
-does not exist in the result set for some reason, the system must throw an
+does not exist in the result set for some reason, the system MUST throw an
 error/exception with a message explaining why the Property is not available.
 
 This may be any of the following reasons:

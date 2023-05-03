@@ -2,12 +2,12 @@
 
 ## Summary
 
-There must be some mechanism to clean up system resources
+There MUST be some mechanism to clean up system resources
 associated with various instances:
 
 | Type         | Description                                                                                                                             |
 |--------------|-----------------------------------------------------------------------------------------------------------------------------------------|
-| Element Data | If the instance contains any native (C/C++) resources, it must clean them up when triggered.                                            |
+| Element Data | If the instance contains any native (C/C++) resources, it will need to clean them up when triggered.                                            |
 | Flow Data    | Trigger clean up of contained Element Data instances.                                                                                   |
 | Flow Element | Clean up large in-memory data items, file handles, etc.                                                                                 |
 | Pipeline     | Trigger clean up of Flow Elements that it contains. This behavior is configurable to accommodate sharing of elements between Pipelines. |
@@ -21,11 +21,11 @@ on where this is not the case.
 ### Pipeline
 
 By default, Pipeline will clean up the Flow Elements it contains.
-However, there must be an option to disable this behavior.
+However, there MUST be an option to disable this behavior.
 
 This is needed for scenarios where single elements are added to multiple
 Pipelines.
-In this case, the user must take responsibility for cleanup of
+In this case, the user will take responsibility for cleanup of
 Flow Element resources. This should be made clear in comments and
 documentation around the use of this option.
 
@@ -37,7 +37,7 @@ internal resources.
 Similar to Element Data we have found native resources to be
 the primary problem area.
 
-There must be some mechanism to ensure that such resources are cleaned up
+There MUST be some mechanism to ensure that such resources are cleaned up
 when the Flow Element is no longer needed.
 
 Whether other Flow Elements need any specific cleanup logic is
@@ -67,7 +67,7 @@ instances will be stored in the cache.
 If the instances are cleaned up after they are used, then the ones stored in
 the cache become useless.
 
-Consequently, the system must not allow a cache to be added to Engines
+Consequently, the system MUST NOT allow a cache to be added to Engines
 where the Element Data they produce requires cleanup beyond what normal
 garbage collection will achieve.
 
@@ -77,7 +77,7 @@ Cleanup of Flow Data may include any resources that it holds. However,
 the primary concern is to ensure that any Element Data instances that
 it holds that require cleanup are taken care of.
 
-Element Data instances that do not require cleanup must be left alone
+Element Data instances that do not require cleanup MUST be left alone
 in order for [result caching](caching.md) to work correctly.
 
 Note that Flow Data holds a reference to the Pipeline that created

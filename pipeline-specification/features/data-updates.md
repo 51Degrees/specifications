@@ -21,17 +21,17 @@ or to implement the Data Update service to allow for multiple file sources.
 
 ### Aspect Engine features
 
-In order to support this feature, Aspect Engines must have
+In order to support this feature, Aspect Engines require
 some additional abilities:
 
-1. At configuration time, there must be a mechanism for supplying details about
+1. At configuration time, there MUST be a mechanism for supplying details about
    the data sources that the Engine needs along with any information
    and configuration options associated with updating it.
-2. The Engine must provide a mechanism to allow it to refresh,
+2. The Engine MUST provide a mechanism to allow it to refresh,
    (use an updated data source) on demand.
-3. The mechanism must be thread safe.
+3. The mechanism MUST be thread safe.
 
-The Pipeline that contains the Aspect Engine must still be capable of
+The Pipeline that contains the Aspect Engine MUST still be capable of
 processing Flow Data with minimal
 performance impact while data refresh is happening.
 
@@ -159,7 +159,7 @@ If it is automatic update via HTTP is not enabled, for file data sources
 it causes immediate update, irrespective of whether Automatic Update
 from File is enabled.
 
-For memory data sources programmatic update must allow provision of the new memory data source.
+For memory data sources, programmatic update MUST allow provision of the new memory data source.
 
 Implementations may choose to provide options of Programmatic Update that
 distinguish a request for HTTP update as opposed to file update.
@@ -267,7 +267,7 @@ updated data and handling the response.
 51Degrees Device Detection data files are supplied by the
 [Distributor](http://51degrees.com/documentation/_info__distributor.html)
 web API. The capabilities of the data update service align with those of
-the Distributor. However, the service must be capable of using other sources
+the Distributor. However, the service MUST be capable of using other sources
 as well. For example, a simple static URL that just supplies a file.
 
 When sending a request to the *data update URL*, the `If-Modified-Since`
@@ -276,7 +276,7 @@ If the data file does not have a publication date then the file system last modi
 date/time can be used instead. This ensures that if a new data file has not
 been published yet, we won't waste bandwidth downloading it.
 
-There must be some mechanism for the update service to add query parameters
+There MUST be some mechanism for the update service to add query parameters
 to the data update URL when needed.
 The reference implementations use a 'URL formatter' class. Below are the
 implementations used for calls made to the Distributor.
@@ -284,7 +284,7 @@ implementations used for calls made to the Distributor.
 - [.NET FiftyOneUrlFormatter](https://github.com/51Degrees/pipeline-dotnet/blob/master/FiftyOne.Pipeline.Engines.FiftyOne/Data/FiftyOneUrlFormatter.cs)
 - [Java FiftyOneUrlFormatter](https://github.com/51Degrees/pipeline-java/blob/master/pipeline.engines.fiftyone/src/main/java/fiftyone/pipeline/engines/fiftyone/data/FiftyOneUrlFormatter.java)
 
-If a new data file is downloaded, the date of the downloaded data must be
+If a new data file is downloaded, the date of the downloaded data is
 compared with the current file data source, if file data source mode is active.
 If the downloaded file is more recent, it replaces the current file data source.
 
@@ -328,10 +328,10 @@ relevant details (e.g. which Engine + data file the update is for)
 ### Errors
 
 There are several possible causes of errors within the data update service.
-As this is a background service, we must ensure that any failures are
+As this is a background service, any failures will need to be 
 caught and logged, rather than being lost or causing process failures.
 
-These messages must also be consistent across languages to make life easier
+These messages MUST also be consistent across languages to make life easier
 for 51Degrees support.
 
 [***Highlighted***] text should only be present if this is an automated update rather

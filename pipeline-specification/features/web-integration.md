@@ -30,23 +30,23 @@ The web integration makes use of several Flow Elements in order to support
 [client-side](#javascript-properties) functionality.
 
 Where the web integration is responsible for creation of the Pipeline, it
-must also ensure that these additional Flow Elements will be present.
+will also need to ensure that these additional Flow Elements are present.
 
-- The [Sequence Element](../pipeline-elements/sequence-element.md) must be
+- The [Sequence Element](../pipeline-elements/sequence-element.md) MUST be
   present. If not, it should be added as the first element in the Pipeline.
-- The [JSON Builder Element](../pipeline-elements/json-builder.md) must be
+- The [JSON Builder Element](../pipeline-elements/json-builder.md) MUST be
   present. If not, it should be added as the penultimate element.
   (Immediately before the JavaScript Builder Element).
 - The [JavaScript Builder Element](../pipeline-elements/javascript-builder.md)
-  must be present. If not, it should be added after all other elements.
+  MUST be present. If not, it should be added after all other elements.
 
 Another Flow Element is needed to allow the web integration to automatically
 set HTTP response headers.
 
-- The [Set Headers Element](../pipeline-elements/set-headers-element.md) must
+- The [Set Headers Element](../pipeline-elements/set-headers-element.md) MUST
   be present. If not, it should be added after all other elements.
 
-For all of these elements, there must be configuration options to allow
+For all of these elements, there MUST be configuration options to allow
 users to prevent them being added if they wish to do so.
 
 ## Populating Evidence
@@ -63,15 +63,14 @@ Evidence, and hence defer processing until the Evidence is actually used.
 In any case, the list below illustrates the type of data that should be used
 and the Evidence names they would be associated with.
 
-- All HTTP headers. (Except cookies header) Key must be `header.[header name]`
-- All cookies. Key must be `cookie.[cookie name]`
-- All query string parameters. Key must be `query.[parameter name]`
-- All form parameters from POST requests. Key must be `query.[parameter name]`
-- Where there is an HTTP session object, data stored in the session. Key must
-  be `session.[value name]`
-- Public client IP. Key must be `server.client-ip`
+- All HTTP headers. (Except cookies header) Key is `header.[header name]`
+- All cookies. Key is `cookie.[cookie name]`
+- All query string parameters. Key is `query.[parameter name]`
+- All form parameters from POST requests. Key is `query.[parameter name]`
+- Where there is an HTTP session object, data stored in the session. Key is `session.[value name]`
+- Public client IP. Key is `server.client-ip`
 - Request protocol. Can come from the request itself or headers such as
-  `X-Origin-Proto` or `X-Forwarded-Proto`. Key must be `header.protocol`
+  `X-Origin-Proto` or `X-Forwarded-Proto`. Key is `header.protocol`
 
 ## Setting response headers
 
@@ -80,15 +79,15 @@ produce an output that describes which response headers should be set to which
 values.
 
 However, it has no access to the web request itself. Consequently, the web
-integration logic must take this output and actually set the required response
+integration logic will need to take this output and actually set the required response
 headers.
 
-Where the required headers are already set to some value, the new value must
-be appended, rather than replacing the existing value.
+Where the required headers are already set to some value, append the new 
+value, rather than replacing the existing value.
 
 ## Client-side features
 
-There are two major client-side features that the web integration must provide:
+There are two major client-side features that the web integration provides:
 1. Enable the execution of JavaScript snippets which can be used to gather
    additional Evidence. Handle passing this data back to the Pipeline for
    processing.
@@ -112,8 +111,7 @@ As these JavaScript Property values are part of the result set, they will
 already be accessible in client-side code through the JavaScript include that
 is discussed in the section above.
 
-Therefore, in order to meet this requirement, the JavaScript include must
-be enhanced to perform the following steps:
+Therefore, in order to meet this requirement, the JavaScript include will need to:
 1. Identify these JavaScript Property values
 2. Execute the snippets
 3. Call back to the server, including the results from the execution of the
@@ -178,7 +176,7 @@ on each line.
 A client connecting to a web server that uses a Pipeline API with web
 integration will typically be directed to download a script such as
 51Degrees.core.js. The local cache will not have this as it is the first
-request. Proxy and server caches must never cache this resource, so will also be
+request. Proxy and server caches will never cache this resource, so will also be
 cache misses. The web integration code will intercept the request on the server
 and serve the JavaScript that is produced by the JavaScript Builder Element in the
 Pipeline.
@@ -191,7 +189,7 @@ parameters list. A request will then be sent to the callback URL.
 ###### Line 2: first request to JSON endpoint:
 
 As this is the first request, there is nothing in the session storage.
-Proxy and server caches must never cache this resource. On the server, the
+Proxy and server caches will never cache this resource. On the server, the
 request to the JSON endpoint will again be intercepted and handled. This time,
 by responding with the output from the JSON Builder Element.
 
@@ -234,18 +232,18 @@ This will then repeat as before for any JavaScript Properties in the new payload
 
 ##### Cache header detail
 
-The HTTP response headers that must be set for the JSON and JavaScript endpoints
+The HTTP response headers that MUST be set for the JSON and JavaScript endpoints
 are:
 
-| **Header**      | **Values**                                                                          | **Purpose**                                                                                      |
-|-----------------|-------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|
-| Cache-Control   | max-age=1800 private                                                                | Cache item lifetime is 30 minutes. Only local client caches should cache this content.           |
-| Vary            | all headers in Pipeline Evidence key filter (e.g. User-Agent)                       | Let the cache know that if one of these headers changes, the cached content must be re-fetched.  |
-| ETag            | Calculated hash of ALL the Evidence values in Evidence filter key for this Pipeline | Assists caches in re-validating expired content                                                  |
-| Content-Type    | application/x-javascript or application/JSON                                        | Indicate the type of content being returned                                                      |
-| Content-Length  | Content length in bytes                                                             | Indicate the expected length of the content                                                      |
+| **Header**     | **Values**                                                                          | **Purpose**                                                                                             |
+|----------------|-------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
+| Cache-Control  | max-age=1800 private                                                                | Cache item lifetime is 30 minutes. Only local client caches should cache this content.                  |
+| Vary           | all headers in Pipeline Evidence key filter (e.g. User-Agent)                       | Let the cache know that if one of these headers changes, the cached content will need to be re-fetched. |
+| ETag           | Calculated hash of ALL the Evidence values in Evidence filter key for this Pipeline | Assists caches in re-validating expired content                                                         |
+| Content-Type   | application/x-javascript or application/JSON                                        | Indicate the type of content being returned                                                             |
+| Content-Length | Content length in bytes                                                             | Indicate the expected length of the content                                                             |
 
-In order to validate the ETag, the JSON and JavaScript endpoints must check for
+In order to validate the ETag, the JSON and JavaScript endpoints will need to check for
 an 'If-None-Match' header in the request. This will be sent when a cached item’s
 lifetime has expired and the cache needs to check if what it holds is still
 valid.

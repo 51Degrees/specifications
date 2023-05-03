@@ -14,8 +14,8 @@ languages.
 
 ## Pipelines
 
-- During construction, Pipelines must have the ability to add elements/Engines.
-  These will run in sequence in the order they are added.
+- During construction, there MUST be the ability to add elements/Engines 
+  to Pipelines. These will run in sequence in the order they are added.
 - During construction, Pipelines may have the ability to add multiple
   elements/Engines that will run in parallel (where the language supports this -
   See [parallel processing](../advanced-features/parallel-processing.md) for a
@@ -36,7 +36,7 @@ This would create a Pipeline that performs the following processing:
 
 - Elements/Engines may or may not have configuration options to customize the
   processing that they perform.
-- The configuration file definition must be as similar as possible to configuration
+- The configuration file definition MUST be as similar as possible to configuration
   files for other languages.
 - All configuration options should use the same names in the configuration file
   as would be used when configuring in code.
@@ -46,7 +46,7 @@ This would create a Pipeline that performs the following processing:
 
 ## Deserialization
 
-Configuration files must be human-readable and consistent between languages.
+Configuration files MUST be human-readable and consistent between languages.
 Consequently, we don't want any type information or metadata appearing in
 these files. This implies some limitations on the types that can be deserialized
 from values in the files, as additional logic may need to be added for each type.

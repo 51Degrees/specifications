@@ -54,15 +54,15 @@ mocks can be a lot harder than debugging test implementations.
 
 ## Test Cases
 
-This section itemises key required tests, by module of the reference
+This section itemizes key required tests, by module of the reference
 implementation they are found in.
 
-In all cases all methods of all classes must be tested for correct operation
+In all cases all methods of all classes SHOULD be tested for correct operation
 when valid data is supplied, and correct exceptional operation is taken for
 incorrect data. The cases listed here are mostly concerned with testing that
 underlying functionality is correctly implemented where internal state of
 the object can vary. For example a Flow Data can only be processed once, so
-there must be a test to check that an attempt to process it twice, fails.
+there MUST be a test to check that an attempt to process it twice, fails.
 
 Numerous additional tests exist (to a total of around 500, running to 100s of
 thousands of lines of code) in the reference implementations and the code of

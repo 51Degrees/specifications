@@ -13,10 +13,10 @@ list of accepted keys like most Flow Elements.
 Instead, it is a filter function that should return false (i.e. not shared)
 for any key where:
 
-- Prefix = ‘header’ and field is in a user-configurable block list
-  (by default, this block list must include the ‘cookies’ header).
-- Prefix = ‘cookie’ and field does not start with `51D_`
-- Prefix = ‘query’ and field does not start with `51D_` and is not in a
+- Prefix = `header.` and field is in a user-configurable block list
+  (by default, this block list SHOULD include the `cookies` HTTP header).
+- Prefix = `cookie.` and field does not start with `51D_`
+- Prefix = `query.` and field does not start with `51D_` and is not in a
   user-configurable allow list of query string parameters that should be
   shared.
 
@@ -52,7 +52,7 @@ to 51Degrees' data collection infrastructure.
 
 ## Processing
 
-The process function must get the data it needs and complete as soon as
+The process function SHOULD get the data it needs and complete as soon as
 possible.
 We recommend implementing a producer/consumer approach where the process
 function just adds the raw data to a shared queue.
@@ -61,7 +61,7 @@ A background thread can then be used to consume items from this queue,
 adding them to the XML payload and sending it once it contains the
 required quantity of data.
 
-The complete XML document must contain a `<Devices>` root element with
+The complete XML document MUST contain a `<Devices>` root element with
 each `<Device>` element containing the details related to a request.
 
 Multiple `<Device>` elements will be batched up as part of each message.
@@ -156,7 +156,7 @@ These requests will usually all generate exactly the same usage data.
 We have no need for this duplicate data, so it should be discarded as
 early as possible.
 
-The usage sharing element must maintain a data structure containing
+The usage sharing element MUST maintain a data structure containing
 recently shared Evidence values. If the data entry being processed
 already has a matching entry in this data structure, it should not
 be shared. For example, the C# implementation generates a hash of the
@@ -211,7 +211,7 @@ it will need to handle cleanup a little more carefully than other elements.
 | Blocked HTTP headers              | yes                   | yes          | All HTTP headers are shared except for cookies that do not start with `51D_` | Allows the user to exclude specific HTTP headers that they do not want to share.                                               |
 | Ignore Flow Data Evidence filter  | yes                   | yes          | not set                                                                      | Allows the user to block a request from being shared if the specified criteria are met.                                        |
 | Share percentage                  | yes                   | yes          | 1.0                                                                          | Used to set the approximate proportion of requests that should be shared. A value of 1 means that 100% of requests are shared. |
-| Minimum entries per message       | yes                   | yes          | 50                                                                           | The number of requests that must be added to a usage sharing payload before it is sent.                                        |
+| Minimum entries per message       | yes                   | yes          | 50                                                                           | The number of requests that will be added to a usage sharing payload before it is sent.                                        |
 | Maximum queue size                | yes                   | yes          | 1000                                                                         | The size of the queue that is used to buffer requests to be added to a usage sharing payload.                                  |
 | Add timeout milliseconds          | yes                   | yes          | 5                                                                            | The timeout to use when trying to add items to the usage sharing queue. If the request times out, the data should be discarded |
 | Take timeout milliseconds         | yes                   | yes          | 100                                                                          | The timeout to use when getting items from the usage sharing queue to add to the next payload.                                 |

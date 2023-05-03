@@ -81,12 +81,12 @@ However, the default implementation should be a sharded LRU cache.
 This will ensure that memory use is always well-defined and that the cache
 can cope with concurrent requests reasonably well.
 
-The cache must be configurable:
+Configuration options:
 
-| Configuration option | Default             | Description                                                           |
-|----------------------|---------------------|-----------------------------------------------------------------------|
-| Size                 | 1000                | Number of items stored in the cache before it starts evicting things. |
-| Concurrency          | Number of CPU cores | Number of shards in the cache.                                        |
+| Name        | Default             | Description                                                           |
+|-------------|---------------------|-----------------------------------------------------------------------|
+| Size        | 1000                | Number of items stored in the cache before it starts evicting things. |
+| Concurrency | Number of CPU cores | Number of shards in the cache.                                        |
 
 [This article](https://medium.com/@yewang2018/lru-cache-design-8257850a69fe)
 describes the internals of such a cache. You can also review the
@@ -107,12 +107,12 @@ However, cached instances can persist long after the original Flow Data
 that resulted in their creation is gone.
 
 Consequently, if the Element Data produced by an Engine requires
-cleanup, then that Engine must not allow a cache to be added.
+cleanup, then that Engine MUST NOT allow a cache to be added.
 
 In addition, this functionality can result in a scenario where the
 instance is accessed by multiple threads simultaneously.
 If access to the Element Data cannot be guaranteed to be thread-safe,
-then the Engine must not allow a cache to be added.
+then the Engine MUST NOT allow a cache to be added.
 
 Design note - There are various routes we could potentially take to allow
 caches to still work in the scenarios described above. (Creating a duplicate

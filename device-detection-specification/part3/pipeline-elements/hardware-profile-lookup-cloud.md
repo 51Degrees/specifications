@@ -31,7 +31,7 @@ rather than using Evidence.
 ## Start-up activity
 
 When it is added to a Pipeline, this Engine initializes itself from a 
-Cloud Request Engine, which must have been added to the Pipeline
+Cloud Request Engine, which MUST have been added to the Pipeline
 before it.
 
 The Cloud Request Engine determines which Properties are available
