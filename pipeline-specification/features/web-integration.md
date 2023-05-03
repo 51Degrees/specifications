@@ -79,10 +79,10 @@ produce an output that describes which response headers should be set to which
 values.
 
 However, it has no access to the web request itself. Consequently, the web
-integration logic will need to take this output and actually set the required response
+integration logic will need to take this output and actually set the necessary response
 headers.
 
-Where the required headers are already set to some value, append the new 
+Where the relevant headers are already set to some value, append the new 
 value, rather than replacing the existing value.
 
 ## Client-side features

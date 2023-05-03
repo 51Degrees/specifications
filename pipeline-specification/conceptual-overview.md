@@ -45,7 +45,7 @@ Flow Elements during processing. Element Data is retrieved from
 Flow Data using the 'data key' associated with the Flow Element.
 
 See [access to results](features/access-to-results.md) for more  
-information on how this data should be accessed.
+information on how this data can be accessed.
 
 See [resource cleanup](features/resource-cleanup.md) for details on ensuring
 Element Data resources are cleaned up correctly.

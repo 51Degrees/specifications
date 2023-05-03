@@ -5,7 +5,7 @@
 Many Flow Elements have numerous configuration options, it is also possible
 to configure Pipelines in many ways.
 
-In order to make configuration as simple as possible for users, it is required
+In order to make configuration as simple as possible for users, it is REQUIRED
 that elements and Pipelines can be configured and created using either a pure
 code approach, or a configuration file.
 

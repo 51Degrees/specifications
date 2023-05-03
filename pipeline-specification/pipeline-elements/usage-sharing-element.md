@@ -47,8 +47,8 @@ are:
 Note that there is a proposal to reduce the size of the usage sharing payload
 by moving these values to a `header` element rather than duplicating them in
 every `device` element.
-Implementing this will be a future enhancement as changes will first be required
-to 51Degrees' data collection infrastructure.
+Implementing this will be a future enhancement as changes will first need 
+to be made to 51Degrees' data collection infrastructure.
 
 ## Processing
 
@@ -59,7 +59,7 @@ function just adds the raw data to a shared queue.
 
 A background thread can then be used to consume items from this queue,
 adding them to the XML payload and sending it once it contains the
-required quantity of data.
+configured quantity of data.
 
 The complete XML document MUST contain a `<Devices>` root element with
 each `<Device>` element containing the details related to a request.

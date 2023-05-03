@@ -32,7 +32,7 @@ This approach is taken in order to allow Cloud Engines to behave as
 similarly as possible to On-premise Engines from the user point of view,
 while limiting the number of HTTP requests to the same remote
 server to one per Flow Data, regardless
-of the number of different Aspects required.
+of the number of different Aspects that are involved.
 
 ### Resource Key
 
@@ -112,8 +112,8 @@ HTTP request handling.
 
 ## Processing
 
-The Engine processes Flow Data by filtering the Evidence provided to that
-required by the server, and makes an HTTP
+The Engine processes Flow Data by filtering the full list of Evidence down 
+to just Evidence keys needed by the server, and makes an HTTP
 request to the server using the filtered Evidence. The HTTP API used for access to
 51Degrees servers is defined at https://cloud.51degrees.com/api-docs/index.html.
 

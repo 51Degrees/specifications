@@ -13,7 +13,7 @@ Excessive modularity, of course, makes the libraries hard to use.
 
 Use of transitive dependencies can be very helpful and allow definition
 of a single library aggregation. Most of the dependencies in Pipeline
-are required for most use cases. However, if it is of concern that various
+are needed for most use cases. However, if it is of concern that various
 features are not included then facilities such as Maven's optional dependency can
 be used.
 

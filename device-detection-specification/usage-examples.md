@@ -92,7 +92,7 @@ using(var flowdata = pipeline.CreateFlowData())
 The mechanics of this will differ significantly by language.
 See [Pipeline - web integration](../pipeline-specification/features/web-integration.md)
 for more detail.
-However, the outcome should be the same. It MUST be simple for the user to
+However, the outcome will be the same. It MUST be simple for the user to
 create a web application where:
 
 1. Each request (following any filtering, etc) will have all relevant Evidence
@@ -123,10 +123,8 @@ section of the Pipeline specification.
 
 ## Automatic data updates
 
-All [data update](../pipeline-specification/features/data-updates.md)
-functionality should be part of configuration.
 This Pipeline creation example demonstrates how to configure the Pipeline to
-update the Device Detection data file when needed:
+[update](../pipeline-specification/features/data-updates.md) the Device Detection data file when needed:
 
 ```c#
 // This parameter must be set to true for auto updates to work
@@ -148,7 +146,7 @@ For more detailed examples see:
 
 [Property metadata](../pipeline-specification/features/properties.md#property-metadata)
 MUST be exposed by the Device Detection Engine.
-Note that this information should be available for both cloud and On-premise Engines:
+Note that this information will be available for both cloud and On-premise Engines:
 
 ```c#
 foreach (var property in deviceDetectionEngine.Properties)

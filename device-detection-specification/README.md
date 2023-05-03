@@ -13,9 +13,8 @@ most appropriate and familiar for uses of the target language.
 ## Structure
 
 This specification builds on the concepts and features defined in the
-[Pipeline specification](../pipeline-specification/README.md) the reader should
-at least be familiar with the basics from there before reading this.  
+[Pipeline specification](../pipeline-specification/README.md). The reader will need to be familiar with the basics from there before reading this.  
 Structurally, this specification is broken down into separate markdown files
 in multiple directories.
-If you're not sure where to start, we recommend looking at
+If you're not sure where to start, we advise looking at
 [usage examples](usage-examples.md) first.

@@ -52,7 +52,7 @@ The majority of the processing SHOULD be handled by the shared
 logic.
 
 This will just need to filter and parse the JSON provided by the Cloud Aspect 
-Engine to the form that is required for the Element Data output
+Engine to the form that is needed for the Element Data output
 
 ## Configuration options
 

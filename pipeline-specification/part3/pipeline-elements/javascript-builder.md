@@ -57,7 +57,7 @@ Determine several values to be passed to the template:
    This can be done by looking at the query entries in the existing Evidence:
    - Get all Evidence values starting with `query.`
    - Use the text after `query.` as the key.
-   - Pass keys and values in the form required by the template (don't forget
+   - Pass keys and values in the form needed by the template (don't forget
      URL encoding, etc. if needed).
 
 These values are applied to the template.

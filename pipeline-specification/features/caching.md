@@ -7,7 +7,7 @@ This is intended to improve performance when the Engine receives a process
 request containing Evidence values that are sufficiently similar to a previous request.
 
 As with any caching strategy, the implications for memory use and
-performance should be investigated by profiling in the target environment.
+performance will need to be investigated by profiling in the target environment.
 Such concerns are the responsibility of the end
 user of the Pipeline API, rather than the implementor of the API.
 However, the implementor MUST ensure that there are tests to demonstrate that 
@@ -75,9 +75,9 @@ Other considerations when creating keys:
 
 ## Cache implementation
 
-The system should allow any cache conforming to a simple interface to be
+The system SHOULD allow any cache conforming to a simple interface to be
 used.
-However, the default implementation should be a sharded LRU cache.
+However, the default implementation will be a sharded LRU cache.
 This will ensure that memory use is always well-defined and that the cache
 can cope with concurrent requests reasonably well.
 
@@ -99,7 +99,7 @@ reference implementations.
 The cache stores the instance of Aspect Data that was generated based
 on the Evidence values in the key.
 
-Where [resource cleanup](resource-cleanup.md) is required, the lifetime
+Where [resource cleanup](resource-cleanup.md) is needed, the lifetime
 of such data objects is tied to the Flow Data that is generated for
 that request.
 

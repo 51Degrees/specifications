@@ -82,10 +82,10 @@ The table below describes the metadata that is available.
 
 ### Aspect Property metadata
 
-[Aspect Engines](../conceptual-overview.md#aspect-engine) are required to populate
-some additional metadata values beyond those required for Flow Elements.
+[Aspect Engines](../conceptual-overview.md#aspect-engine) are REQUIRED to populate
+some additional metadata values beyond those described for Flow Elements.
 
-The table below describes the additional metadata that is available.
+The table below outlines the additional metadata that is available.
 
 | Property                 | Type           | Description                                                                                                                                                                         |
 |--------------------------|----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|

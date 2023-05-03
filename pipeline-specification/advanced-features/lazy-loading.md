@@ -14,7 +14,7 @@ For example:
 
 This feature, as currently implemented, corresponds with the eager, non-blocking
 strategy from the list above. This may lead to renaming the feature in future. For
-the time being, in order to be consistent, it should be called 'lazy loading'.
+the time being, in order to be consistent, it will be called 'lazy loading'.
 
 This means that 'process' will return immediately. When the user attempts to access
 the value of a Property that is populated by this Engine, the call will block until

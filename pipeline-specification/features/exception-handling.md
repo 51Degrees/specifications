@@ -51,7 +51,7 @@ The general guidance is that these functions and accessors should only
 throw errors/exceptions if the failure is likely due to something that
 the API user has done wrong.
 
-For example, passing a null parameter when a value is required or
+For example, passing a null parameter when a value is mandatory or
 attempting to access result data before 'Process' has been called.
 
 These are both things that the user should correct by making changes to

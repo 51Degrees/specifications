@@ -14,7 +14,7 @@ as defined in the Pipeline specification.
 There are several different Engines for getting information about devices. Each
 of these Engines MUST return data that is interface compatible with the others.
 
-Given an interface `IDeviceData`, the following table shows what should be
+Given an interface `IDeviceData`, the following table shows what will be
 populated by each Engine:
 
 | Engine          | Result                   |
@@ -30,7 +30,7 @@ data file. As such, they are subject to change over time.
 
 For weakly typed languages, this is usually less of an issue as developers in
 these ecosystems are generally more used to the idea of discovering Properties
-at runtime. However, there should be clear signposting to locations such as
+at runtime. However, there will need to be clear signposting to locations such as
 the [Property dictionary](https://51degrees.com/developers/property-dictionary)
 in order to help discover what Properties are available.
 
@@ -40,8 +40,8 @@ see [Element Data](../pipeline-specification/conceptual-overview.md#element-data
 in the Pipeline specification.
 
 However, we also want to provide strongly-typed accessors. This could become a
-significant maintenance burden, so a command line utility should be created that
-can generate an interface definition and any required implementations from the
+significant maintenance burden, so a command line utility SHOULD be created that
+can generate an interface definition and any necessary implementations from the
 metadata embedded in the data files.
 
 This can be used during development as well as within 51Degrees' CI/CD
@@ -55,7 +55,7 @@ interfaces, etc.
 
 ## Property details
 
-Each Property should return
+Each Property SHOULD return
 an [Aspect Property value](../pipeline-specification/features/properties.md#null-values)
 in order to support exposing the reason that a value is not set.
 

@@ -4,10 +4,10 @@
 
 Where string keys are used, the following rules apply:
 
-- Strings should only contain alphanumeric characters, full stop or hyphen.
+- Strings SHOULD only contain alphanumeric characters, full stop or hyphen.
 - Some 51Degrees Properties also use the ‘/’ character. No new Properties will
   be added with this character, but it will need to be accommodated.
-- Lower-case is preferred but not required.
+- Lower-case SHOULD be used.
 - String comparisons MUST be case insensitive.
 
 ## Accessing results
@@ -22,13 +22,13 @@ Firstly, these are the mechanisms for getting Element Data:
    ```c#
    IElementData deviceData = flowData.Get(DeviceDetectionEngine.ElementDataKey);
    ```
-2. In strongly typed languages, it should be possible to get Element Data
-   instance by supplying the type of the data required. For example:
+2. In strongly typed languages, it SHOULD be possible to get an Element Data
+   instance by supplying the type of the data that is needed. For example:
 
    ```c#
    IDeviceData deviceData = flowData.Get<IDeviceData>();
    ```
-3. In strongly typed languages, it should be possible to get an Element Data
+3. In strongly typed languages, it SHOULD be possible to get an Element Data
    instance by supplying an element instance.
    For example:
 
@@ -51,7 +51,7 @@ Below are the mechanisms for getting Properties:
    ```c#
    object propertyValue = deviceData.Get("ismobile");
    ```
-2. It should be possible to get a Property value from an Element Data instance
+2. It SHOULD be possible to get a Property value from an Element Data instance
    by using standard Property accessors for the language. For example:
 
    ```c#

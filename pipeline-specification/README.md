@@ -80,7 +80,7 @@ by delegation to a remote server, and `On-Premise` Engines, which typically
 carry out processing by reference to one or more data files, stored locally.
 Facilities are available for update and installation of such data files.
 
-Where both Cloud and On-Premise variants of an Engine are available, they should
+Where both Cloud and On-Premise variants of an Engine are available, they SHOULD
 arrange that the Properties and values produced are compatible with each other
 so that the Engines may be substituted in the Pipeline without alteration to
 the consuming application.

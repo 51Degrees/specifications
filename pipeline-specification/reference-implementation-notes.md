@@ -80,4 +80,4 @@ need some capability that is beyond its scope, they have to migrate to the
 'standard' Pipeline builder.
 
 On the whole, we prefer solutions that will reduce complexity for users. However,
-care should be taken to try to avoid the issues described above.
+care will need to be taken to avoid the issues described above.

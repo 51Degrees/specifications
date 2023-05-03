@@ -108,7 +108,7 @@ This option provides for periodic ongoing checking of an HTTP server
 for the availability of an updated data source.
 
 If the current data contains a *data update expected* timestamp, then polling
-should start after that time. Options include the ability to control the remote
+will not start until after that time. Options include the ability to control the remote
 endpoint and the polling frequency.
 
 As an optimization, the request for data may contain an *if modified since* HTTP
@@ -121,7 +121,7 @@ the existing data, at the location configured for data files.
 
 51Degrees download servers have a request rate limiting feature which provides
 for a 429 HTTP Status (Too many requests) with a *Retry After* HTTP header
-whose value should be used to reset polling.
+whose value can be used to reset polling.
 
 Rate limiting may be triggered
 in the event that a single user has multiple servers each of which is set to
@@ -146,7 +146,7 @@ and whatever file is found is used as the data source for the restarted
 Aspect Engine.
 
 If the operational environment does not support file system watching events,
-implementors may need to use polling to determine changes and should have
+implementors may need to use polling to determine changes and have
 due regard to file system load when setting polling frequency.
 
 ### Programmatic update
@@ -201,7 +201,7 @@ while a new data file is made available.
 
 [^1] This is called *tempDataFile* in current reference implementations.
 
-Since creating a data file copy is required for disk based operation
+Since creating a data file copy is necessary for disk based operation,
 implementations may choose not to provide control over
 *createOperationalDataCopy* since disallowing it when either update option
 is enabled and disk based operation is enabled is an error.
@@ -271,7 +271,7 @@ the Distributor. However, the service MUST be capable of using other sources
 as well. For example, a simple static URL that just supplies a file.
 
 When sending a request to the *data update URL*, the `If-Modified-Since`
-header should be set to the publication date of the existing data file.
+header SHOULD be set to the publication date of the existing data file.
 If the data file does not have a publication date then the file system last modified
 date/time can be used instead. This ensures that if a new data file has not
 been published yet, we won't waste bandwidth downloading it.
@@ -295,7 +295,7 @@ Once the refresh is complete, the data update service can start
 checking for updates using the newly refreshed *next expected update*
 date/time.
 
-If no update was found then the service should repeat the same checks
+If no update was found then the service will need to repeat the same checks
 after the *polling interval* + a random time based on  
 *update time maximum randomization* has passed.
 
@@ -305,7 +305,7 @@ The data update service is a complex process. As such, it is
 essential that detailed logging is
 available to help diagnose issues that might arise.
 
-All major actions should be logged at the appropriate level along with
+All major actions SHOULD be logged at the appropriate level along with
 relevant details (e.g. which Engine + data file the update is for)
 
 ### Messages at start-up
@@ -334,7 +334,7 @@ caught and logged, rather than being lost or causing process failures.
 These messages MUST also be consistent across languages to make life easier
 for 51Degrees support.
 
-[***Highlighted***] text should only be present if this is an automated update rather
+[***Highlighted***] text will only be present if this is an automated update rather
 than a procedural update.
 
 | **Error**                                                                                                                       | **Log level** | **Message**                                                                                                                                                                                  |

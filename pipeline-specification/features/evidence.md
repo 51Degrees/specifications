@@ -6,7 +6,7 @@ Evidence is the name for the input values added to a Flow Data instance.
 
 It is stored as key-value pairs and is used by Flow Elements within the
 Pipeline and is immutable once created.
-Keys should be case-insensitive and will usually be split into \<prefix\>.\<field\>.
+Keys MUST be case-insensitive and will usually be split into \<prefix\>.\<field\>.
 
 Currently, defined examples of keys are:
 
@@ -16,7 +16,7 @@ Currently, defined examples of keys are:
 - `server.client-ip`
 - `server.host-ip`
 
-Any new Evidence should be defined in a similar manner.
+Any new Evidence keys can be defined in a similar manner.
 
 \* Note that the 'cookie' prefix is a bit of a special case as cookies are supplied
 to the web server using an HTTP header. Generally, 51Degrees Engines will not make
@@ -37,7 +37,7 @@ The prefix indicates where the value has come from. Currently, defined prefixes 
 The prefixes above are in order from highest to lowest precedence. I.e. if the same
 Evidence value is available with two different prefixes (For example,
 `header.user-agent` and `query.user-agent`), then the entry whose prefix is earlier
-in the list above should be used.
+in the list above MUST be used.
 
 If any other prefixes are present then their order of precedence is alphabetical.
 This rule just ensures that any conflicts are resolved deterministically.
@@ -58,7 +58,7 @@ with that Property name.
 It there were no such Property, if would return the value from Evidence entry
 that matched that name.
 If multiple Element Data instances include Properties with this name,
-an exception/error should be thrown.
+an exception/error can be thrown.
 
 This function may be defined on Flow Data itself, as a separate helper, or
 both. That is an implementation detail that may depend on the language and

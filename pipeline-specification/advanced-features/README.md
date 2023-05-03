@@ -8,6 +8,6 @@ to complexity or simply not being possible.
 
 Most also provide questionable benefits to justify this complexity.
 
-Whether these features are implemented or not should be carefully
+Whether these features are implemented or not will need to be carefully
 considered and agreed up front.
 

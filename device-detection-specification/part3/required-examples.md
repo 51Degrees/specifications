@@ -28,10 +28,10 @@ above features - see [Concrete Examples](#concrete-examples).
 
 ### Execution
 
-It is recommended that examples are simply executable from an IDE, so
-examples should be runnable in such a context.
+It MUST be possible to simply execute examples from command line/IDE as 
+expected by a user of the implementation language.
 
-It is recommended that unit tests be provided for examples, to verify that
+There MUST be unit tests for examples, to verify that
 the example remains valid though various code changes. Since examples
 are primarily concerned with providing visual output at the time of execution
 it is often difficult to carry out verification of the results produced by the
@@ -41,6 +41,8 @@ runs and completes without failure.
 The need for examples to be runnable as an application and as a test suggests
 that they are written with example code to be executed as a public method, and
 a pattern may be established across examples.
+
+It MUST be possible to programmatically supply any necessary configuration or parameters, such as cloud resource keys, or device detection license keys. 
 
 ### Legibility
 
@@ -135,13 +137,12 @@ Additionally, assuming default values are needed
 this does simplify the examples. However, it has the disadvantage that users
 may not understand how to use the Pipeline builder and the various Engine
 builders in concert, and hence may not be aware of how they can configure
-Properties that are not exposed by the simplified builder, should they need to.
+Properties that are not exposed by the simplified builder, if they need to.
 
 It is recommended that at least one example demonstrates this technique for
 creating a Pipeline and that it is made clear that the lifetime of the
-FlowElements added to the Pipeline should, in general, be controlled by
-the Pipeline
-they are added to (`setAutoClose(true)`). In other words, destruction of the
+FlowElements added to the Pipeline will probably, in production environments, be controlled by the Pipeline
+they are added to (using `setAutoClose(true)`). In other words, destruction of the
 Pipeline causes the elements added to it to be destroyed.
 
 It is recommended that examples make reference to the options available
@@ -162,8 +163,8 @@ Engines. This information is also available in a Git submodule
 Some 51Degrees support queries relate to user confusion over the intended
 lifecycle of a Pipeline and Flow Data created from it.
 
-It's important to emphasize, in examples, that only one Pipeline is usually
-required in any implementation and that it can be created as a singleton,
+It's important to emphasize, in examples, that only one Pipeline instance is 
+needed for most use cases and that it can be created as a singleton,
 whose lifetime is often the same as the application that it is in.
 
 Nevertheless, it is suggested that this lifetime be illustrated using the
@@ -185,7 +186,7 @@ the calculations that are performed regarding current usage.
 For somewhat arbitrary reasons, reference implementations inhibit usage
 sharing for console examples, but enable it for web examples. Every example in
 which share usage is inhibited needs to have a comment saying that in normal
-operation it should not be, which diminishes the clarity of the example.
+operation the inhibiting code SHOULD be removed, which diminishes the clarity of the example.
 
 ## Concrete Examples
 
@@ -194,7 +195,7 @@ These examples are provided in the reference implementations to illustrate
 
 ### Getting Started Console
 
-Examples should be provided that illustrate basic usage of the API for
+Examples MUST be provided that illustrate basic usage of the API for
 both Cloud and On-Prem, using fluent builder and options file configuration,
 when executed as a console application.
 
@@ -219,7 +220,7 @@ The example also illustrates the availability of Device Detection Properties
 from client-side JavaScript as well as illustrating use of JavaScript
 to collect Evidence directly from the client and present it to the server.
 
-The example should illustrate various techniques for obtaining "high entropy
+The example SHOULD illustrate various techniques for obtaining "high entropy
 values" for presentation to the origin server as well as to the 51degrees
 cloud service. See [Implementing User Agent Client Hints](https://51degrees.com/blog/implementing-user-agent-client-hints).
 
@@ -283,11 +284,11 @@ Java tab.
 
 ### Data Update
 
-Examples should illustrate updating an on-premise data source both by
+Examples will need to illustrate updating an on-premise data source both by
 access to remote servers and by direct update of a file store location.
 
 The data update service has a range of options available. Implementors
-should illustrate:
+SHOULD illustrate:
 
 - file system watcher
 - remote update polling

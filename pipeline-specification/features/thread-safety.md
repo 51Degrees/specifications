@@ -18,7 +18,7 @@ This ensures users get the best performance by default.
 Where the Pipeline contains elements running in [parallel](../advanced-features/parallel-processing.md), Element Data instances
 will be added to the Flow Data in parallel. However, it is a useful optimization
 to allow Flow Data to be non-thread safe in contexts where no parallel execution
-is required.
+is needed.
 
 Flow Data instances are created by the Pipeline instance on which they
 will be processed. The Pipeline can determine whether any Flow Elements are

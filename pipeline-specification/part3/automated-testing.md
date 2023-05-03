@@ -54,7 +54,7 @@ mocks can be a lot harder than debugging test implementations.
 
 ## Test Cases
 
-This section itemizes key required tests, by module of the reference
+This section itemizes key tests, by module of the reference
 implementation they are found in.
 
 In all cases all methods of all classes SHOULD be tested for correct operation
@@ -141,7 +141,7 @@ DataUpdate is a complex process with many options.
 
 MissingPropertyService:
 
-- check that "upgrade required" is returned for a Property that is available in a different tier
+- check that "upgrade needed" is returned for a Property that is available in a different tier
 - check that "unknown" is return for a Property that is not known
 - check that "not in resource" is returned for Cloud Engine
 - check unknown returned otherwise

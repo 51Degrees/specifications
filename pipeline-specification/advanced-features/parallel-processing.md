@@ -8,7 +8,7 @@ For example, C# enables this by using an additional Element called
 ## Benefits
 
 The intention is that this would allow a user to reduce the end-to-end time 
-required to process a given request. Particularly when large numbers of 
+needed to process a given request. Particularly when large numbers of 
 relatively slow engines are involved.
 
 ## Drawbacks

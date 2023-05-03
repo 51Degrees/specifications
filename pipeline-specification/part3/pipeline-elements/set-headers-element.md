@@ -3,7 +3,7 @@
 ## Overview
 
 The Set Headers Element constructs a list of all the HTTP response
-header values that are required to be set by other Elements in the Pipeline.
+header values that other Elements in the Pipeline want to be set.
 Usually, this is done in order to request more Evidence from the
 client (For example [User-Agent Client Hints](http://51degrees.com/documentation/_device_detection__features__u_a_c_h__headers.html)).
 

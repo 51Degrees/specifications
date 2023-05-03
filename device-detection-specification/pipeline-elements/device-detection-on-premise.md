@@ -25,7 +25,7 @@ detection processing to a native DLL/so library that is written in C/C++.
 
 The intention was that this will ensure the best performance for the most
 computationally complex part of the process and reduce maintenance overhead,
-as well as the time required to add support for Device Detection in a new
+as well as the time needed to add support for Device Detection in a new
 language.
 
 The code for this component is available on GitHub:
@@ -76,13 +76,13 @@ on values in the data source.
 
 After loading the data source into the native code, call the `getKeys`
 function to return a list of the accepted Evidence keys.
-These values should then be stored to prevent repeated calls to the
+These values will then need to be stored to prevent repeated calls to the
 native code.
 
 This MUST be done at start-up and any time the data is refreshed.
 
 Note that the list of accepted Evidence keys is not case-sensitive -
-i.e. `header.user-agent` and `header.User-Agent` should both be
+i.e. `header.user-agent` and `header.User-Agent` would both be
 accepted.
 
 ## Element Data
@@ -161,7 +161,7 @@ end-users may be tempted to create their own cache of results.
 We have found that the main performance bottleneck is usually the process
 of marshalling data values to and from native representations.
 
-As such, this should be minimized as much as possible:
+As such, steps SHOULD be taken to minimize this as much as possible:
 
 - Languages often have many mechanisms for passing data in calls
   to native binaries, some more efficient than others. SWIG code will
@@ -171,9 +171,9 @@ As such, this should be minimized as much as possible:
 - Whenever making a call to native code, be aware of the data that is being
   passed and check if there is anything that can be done to reduce it.
 - Finally, do not call native code at all if it can be avoided. For example, any
-  values that will only change after a [data refresh](#refresh-data) should
+  values that will only change after a [data refresh](#refresh-data) can
   be stored in the Engine instance to avoid native calls for that value until
-  a refresh occurs. Not the possible clean-up consequences that this implies.
+  a refresh occurs. Note the possible clean-up consequences that this implies.
 
 ## Refresh data
 
@@ -207,7 +207,7 @@ mentioned above:
 
 ## Events
 
-This Engine should implement the following events/callbacks/hooks:
+This Engine implements the following events/callbacks/hooks:
 
 | Name             | Notes                                                                       |
 |------------------|-----------------------------------------------------------------------------|
@@ -228,7 +228,7 @@ On-premise Device Detection has two related metadata structures:
 [^performance] Note that, due to the structure of the data, this is not intended to support
 high-performance querying scenarios. For that use-case, customers are directed to our
 'csv' data file, which can be consumed and stored in a database or whatever other form
-is required for querying.
+is needed for querying.
 
 ```mermaid
 erDiagram
@@ -272,8 +272,8 @@ In addition to the usual information, the following MUST be made available:
 | Obsolete      | Whether the Property is obsolete and only exists to maintain backward compatibility.                                                                                                                                                 |
 | Display Order | The suggested order in which to display the Property when listing Properties.                                                                                                                                                        |
 | Mandatory     | Whether the Property is mandatory or not. If a Property is mandatory, a Profile MUST have a non-default value for that Property in order for the Profile to be classed as valid.                                                     |
-| Show          | Whether the Property should be displayed in situations such as a page listing Properties. Less important Properties may not be displayed.                                                                                            |
-| Show Values   | Whether values of the Property should be displayed in situations such as a page listing the Property's values. Showing all the values can make a very long list.                                                                     |
+| Show          | Whether the Property will be displayed in situations such as a page listing Properties. Less important Properties may not be displayed.                                                                                            |
+| Show Values   | Whether values of the Property will be displayed in situations such as a page listing the Property's values. Showing all the values can make a very long list.                                                                     |
 
 ### Profile
 
@@ -308,8 +308,8 @@ will not be included in the metadata exposed by the native code.
 
 All these Properties have the following values:
 - Category = "Device Metrics" (sic)
-- Available With = "Lite", "Premium", "Enterprise", "TAC" - If possible, this
-  list should be created dynamically from the lists of files included against
+- Available With = "Lite", "Premium", "Enterprise", "TAC" - This
+  list could be created dynamically from the lists of files included against
   all other Property metadata that is exposed by the native code.
 - Component = "Metrics" - This component MUST also be added to the list of
   components returned by the Engine.
@@ -335,8 +335,8 @@ addition to all the configuration options defined for other features. For exampl
 | Difference                | [ConfigHash::setDifference()](https://github.com/51Degrees/device-detection-cxx/blob/main/src/hash/ConfigHash.hpp#L139)                             | Yes          | Native code [^1]                                                                                                                 | Used to set the maximum [difference](https://51degrees.com/documentation/_device_detection__hash.html#difference) in hash value to allow when processing HTTP headers.                                                                                                                                                                                                                                  |
 | Drift                     | [ConfigHash::setDrift()](https://github.com/51Degrees/device-detection-cxx/blob/main/src/hash/ConfigHash.hpp#L147)                                  | Yes          | Native code [^1]                                                                                                                 | Used to set the maximum [drift](https://51degrees.com/documentation/_device_detection__hash.html#drift) in hash position to allow when processing HTTP headers.                                                                                                                                                                                                                                         |
 | Allow Unmatched           | [ConfigDeviceDetection::setAllowUnmatched()](https://github.com/51Degrees/device-detection-cxx/blob/main/src/ConfigDeviceDetection.hpp#L108)        | Yes          | Native code [^1]                                                                                                                 | If no match is found for the Evidence value then this controls how the Property values will be populated in the result.</br>If set to false, Properties will not have set values.</br>If set to true, Property values will be set from the default [profile](#profile) for that component. This means that Properties will always have values (i.e. no need to check .HasValue) but some may be inaccurate. |
-| Reuse Operational File    | [ConfigBase=>setReuseTempFile()](https://github.com/51Degrees/common-cxx/blob/main/ConfigBase.hpp#L104)                                             | Yes          | Native code [^1]                                                                                                                 | Set whether or not an existing operational file should be used if one is found in the temp directory.                                                                                                                                                                                                                                                                                                       |
-| Update Matched User Agent | [ConfigDeviceDetection::setUpdateMatchedUserAgent()](https://github.com/51Degrees/device-detection-cxx/blob/main/src/ConfigDeviceDetection.hpp#L91) | Yes          | Native code [^1]                                                                                                                 | Set whether or not the result should include the characters from the Evidence values that were used to find a match. If set, this will be available from the 'MatchingEvidence' [match metric](#match-metric-properties) Property. This is optional because it adds some overhead that is not necessary in normal operation.                                                                                |
+| Reuse Operational File    | [ConfigBase=>setReuseTempFile()](https://github.com/51Degrees/common-cxx/blob/main/ConfigBase.hpp#L104)                                             | Yes          | Native code [^1]                                                                                                                 | Set whether or not an existing operational file will be used if one is found in the temp directory.                                                                                                                                                                                                                                                                                                       |
+| Update Matched User Agent | [ConfigDeviceDetection::setUpdateMatchedUserAgent()](https://github.com/51Degrees/device-detection-cxx/blob/main/src/ConfigDeviceDetection.hpp#L91) | Yes          | Native code [^1]                                                                                                                 | Set whether or not the result will include the characters from the Evidence values that were used to find a match. If set, this will be available from the 'MatchingEvidence' [match metric](#match-metric-properties) Property. This is optional because it adds some overhead that is not necessary in normal operation.                                                                                |
 | Use Performance Graph     | [ConfigHash::setUsePerformanceGraph()](https://github.com/51Degrees/device-detection-cxx/blob/main/src/hash/ConfigHash.hpp#L159)                    | Yes          | Native code [^1]                                                                                                                 | Set whether or not to use the [performance](https://51degrees.com/documentation/_device_detection__hash.html#performance-graphs) graph when attempting to match Evidence values.                                                                                                                                                                                                                        |
 | Use Predictive Graph      | [ConfigHash::setUsePredictiveGraph()](https://github.com/51Degrees/device-detection-cxx/blob/main/src/hash/ConfigHash.hpp#L170)                     | Yes          | Native code [^1]                                                                                                                 | Set whether or not to use the [predictive](https://51degrees.com/documentation/_device_detection__hash.html#predictive-graphs) graph when attempting to match Evidence values.                                                                                                                                                                                                                          |
 | Performance Profile       | [ConfigHash=>set\[ProfileName\]()](https://github.com/51Degrees/device-detection-cxx/blob/main/src/hash/ConfigHash.hpp#L104)                        | Yes          | Balanced. See [native code](https://github.com/51Degrees/device-detection-cxx/blob/master/src/hash/hash.c#L175) for definitions. | Set the performance profile to use when creating the Engine. Each profile has default values for various internal configuration options, as well as things like the use of predictive/performance graphs.                                                                                                                                                                                                   |
