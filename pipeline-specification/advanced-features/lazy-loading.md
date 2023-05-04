@@ -13,14 +13,14 @@ For example:
 - Eager asynchronous, that is awaited (allowing the thread do run loop execution)
 
 This feature, as currently implemented, corresponds with the eager, non-blocking
-strategy from the list above. This may lead to renaming the feature in future. For
+strategy from the list above. This might lead to renaming the feature in future. For
 the time being, in order to be consistent, it will be called 'lazy loading'.
 
 This means that 'process' will return immediately. When the user attempts to access
 the value of a Property that is populated by this Engine, the call will block until
 the background task is complete.
 
-Some languages may have async/await features that may appear to be a good fit for
+Some languages have async/await features that might appear to be a good fit for
 handling this type of execution in a neater way. There is no rule in this
 specification against using such features. However, the implementation will need
 to be carefully considered in order to avoid falling into the trap of adding

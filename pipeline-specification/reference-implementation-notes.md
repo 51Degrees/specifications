@@ -7,8 +7,8 @@ for possible re-use in the creation of Flow Elements and Engines.
 It is not the intention to constrain or limit implementations to follow
 the patterns listed here, indeed, in some languages such patterns are not
 idiomatic or are hard to achieve. In other cases experience says that the
-desirability of doing so may be in question.
-However, taking advantage of the existing design may be expedient, or desirable.
+desirability of doing so might be in question.
+However, taking advantage of the existing design could be expedient, or desirable.
 
 ## Interfaces, base classes, inheritance
 
@@ -65,7 +65,7 @@ approach to default values.
 
 A Pipeline is usually constructed using a fluent builder which accepts Flow Elements
 being added to it in flow order. Those Flow Elements are usually created using
-fluent builders of their own, which may in turn accept features, such as a cache,
+fluent builders of their own, which can in turn accept features, such as a cache,
 constructed using a builder of its own.
 
 A special builder is provided to simplify the creation of commonly used Pipelines

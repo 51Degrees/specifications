@@ -9,14 +9,14 @@ In order to make configuration as simple as possible for users, it is REQUIRED
 that elements and Pipelines can be configured and created using either a pure
 code approach, or a configuration file.
 
-For consistency, configuration files should be as similar as possible between
+For consistency, configuration files need to be as similar as possible between
 languages.
 
 ## Pipelines
 
 - During construction, there MUST be the ability to add elements/Engines 
   to Pipelines. These will run in sequence in the order they are added.
-- During construction, Pipelines may have the ability to add multiple
+- During construction, Pipelines MAY have the ability to add multiple
   elements/Engines that will run in parallel (where the language supports this -
   See [parallel processing](../advanced-features/parallel-processing.md) for a
   discussion of the complexities this adds).
@@ -34,13 +34,13 @@ This would create a Pipeline that performs the following processing:
 
 ## Flow Elements
 
-- Elements/Engines may or may not have configuration options to customize the
+- Elements/Engines MAY have configuration options to customize the
   processing that they perform.
 - The configuration file definition MUST be as similar as possible to configuration
   files for other languages.
-- All configuration options should use the same names in the configuration file
+- All configuration options SHOULD use the same names in the configuration file
   as would be used when configuring in code.
-- Where feasible, all configuration options available in code should be configurable
+- Where feasible, all configuration options available in code SHOULD be configurable
   via a file. The exceptions are usually options that take complex objects, which
   cannot easily be defined in a text-based file.
 
@@ -49,7 +49,7 @@ This would create a Pipeline that performs the following processing:
 Configuration files MUST be human-readable and consistent between languages.
 Consequently, we don't want any type information or metadata appearing in
 these files. This implies some limitations on the types that can be deserialized
-from values in the files, as additional logic may need to be added for each type.
+from values in the files, as additional logic might need to be added for each type.
 
 To date, the following types are supported in configuration files for all languages:
 

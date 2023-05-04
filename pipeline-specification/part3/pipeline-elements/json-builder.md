@@ -16,7 +16,7 @@ Element Data instances in the Flow Data.
 
 ## Start-up activity
 
-For performance reasons, on start-up it may be important to create lists of
+For performance reasons, on start-up it MAY be important to create lists of
 Property metadata that meet certain criteria.
 
 For example, a list of all Properties that have the 'delay execution' flag set.
@@ -39,10 +39,10 @@ method in C# for an example of creating these lists.
 ## Process
 
 The Element needs to produce a JSON representation of the Flow Data.
-There should be a top-level entry for each Element Data containing sub-entries
+There MUST be a top-level entry for each Element Data containing sub-entries
 for each Property and its value (set to 'null' if there is no value).
 
-There are also several metadata Properties with different suffixes that may
+There are also several metadata Properties with different suffixes that can
 be added for each Property:
 
 | **Suffix**         | **Description**                                                                                                                                                                                                                                                                              |
@@ -51,13 +51,13 @@ be added for each Property:
 | delayexecution     | This meta-Property MUST be added with the value 'true' for all Properties where the [metadata](../../features/properties.md#property-metadata) delay execution flag is true.                                                                                                                |
 | EvidenceProperties | Where the JSON includes other Properties that are in the [metadata](../../features/properties.md#property-metadata) Evidence Properties list for this Property and those Properties have the delayed execution flag set to true, this meta-Property MUST be added to list those Properties. |
 
-Some Elements should be excluded from having their Properties added to the JSON.
+Some Elements MUST be excluded from having their Properties added to the JSON.
 These are:
 - [Set Headers Element](set-headers-element.md)
 - [Cloud Request Engine](cloud-request-engine.md)
 - [Usage sharing element](usage-sharing-element.md)
 
-The following top-level entries that may be populated in the
+The following top-level entries might also be populated in the
 final JSON output:
 - If the sequence number set by the [Sequence Element](sequence-element.md) is less
   than the maximum (specified by a constant set to 10 in the reference implementations)

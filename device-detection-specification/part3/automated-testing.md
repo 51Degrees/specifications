@@ -7,8 +7,8 @@ and the general comments made there are not usually repeated here.
 ## Device Detection Cloud Engine
 
 Testing of several 
-parts of the operation of the Cloud Engine may require access to a 
-remote server and hence the tests may appear more as integration tests
+parts of the operation of the Cloud Engine might require access to a 
+remote server and hence the tests can appear more as integration tests
 than unit tests.
 
 The Java reference implementation doesn't provide a stub server and doesn't
@@ -33,7 +33,7 @@ Carry out similar tests to Cloud Engine, in addition
 
 ## Examples
 
-Testing of examples is strongly recommended, at least to assess whether they
+Testing of examples is strongly RECOMMENDED, at least to assess whether they
 compile and can be run. It's usually not practical to assess the correctness
 of any output from tests of examples.
 

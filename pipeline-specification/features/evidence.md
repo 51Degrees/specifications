@@ -45,10 +45,10 @@ For example the [Cloud Request Engine](../pipeline-elements/cloud-request-engine
 
 ## Adding Evidence values
 
-Evidence is immutable. However, it may be desireable for some Flow Elements
+Evidence is immutable. However, it might be desireable for some Flow Elements
 to add new values to Evidence for later elements to use.
 
-In order to allow for this scenario, we suggest creating a helper function
+In order to allow for something similar this usage scenario, we suggest creating a helper function
 that will pull a value from an existing Element Data if available, or
 fallback to pulling it from Evidence if needed.
 
@@ -60,6 +60,6 @@ that matched that name.
 If multiple Element Data instances include Properties with this name,
 an exception/error can be thrown.
 
-This function may be defined on Flow Data itself, as a separate helper, or
-both. That is an implementation detail that may depend on the language and
+This function MAY be defined on Flow Data itself, as a separate helper, or
+both. That is an implementation detail that will depend on the language and
 design patterns being used.

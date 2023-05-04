@@ -26,7 +26,7 @@ However, there MUST be an option to disable this behavior.
 This is needed for scenarios where single elements are added to multiple
 Pipelines.
 In this case, the user will take responsibility for cleanup of
-Flow Element resources. This should be made clear in comments and
+Flow Element resources. This can be made clear in comments and
 documentation around the use of this option.
 
 ### Flow Element
@@ -50,7 +50,7 @@ Element Data instances is not needed as the garbage collector does a good
 enough job.
 However, there are two caveats to this:
 
-1. This will not be the case in all programming languages. Some profiling should
+1. This will not be the case in all programming languages. Some profiling can
    be done to ensure that cleanup is being done effectively in the absence of
    specific cleanup logic.
 2. Where the Element Data contains references to native (C/C++) resources
@@ -73,7 +73,7 @@ garbage collection will achieve.
 
 ### Flow Data
 
-Cleanup of Flow Data may include any resources that it holds. However,
+Cleanup of Flow Data might include any resources that it holds. However,
 the primary concern is to ensure that any Element Data instances that
 it holds that require cleanup are taken care of.
 
@@ -86,4 +86,4 @@ is cleaned up. As such, it is possible to have active references to
 Flow Data instances that reference disposed Pipeline instances and
 would fail if processed.
 
-Ideally, a helpful error message should be thrown in this scenario.
+Ideally, a helpful error message could be thrown in this scenario.

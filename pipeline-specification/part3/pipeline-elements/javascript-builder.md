@@ -52,8 +52,8 @@ Determine several values to be passed to the template:
 6. If protocol, host and endpoint are all set, then generate a URL in the
    following format: `[protocol]://[host][endpoint]`. Ensure that values
    with/without slashes are handled correctly.
-7. The JavaScript may need to make call backs to the server. A list of any
-   query parameters that should be included in those calls needs to be created.
+7. The JavaScript might need to make call backs to the server. A list of any
+   query parameters that will be included in those calls needs to be created.
    This can be done by looking at the query entries in the existing Evidence:
    - Get all Evidence values starting with `query.`
    - Use the text after `query.` as the key.
@@ -77,18 +77,18 @@ The parameters to the existing template are:
 | \_sequence             | Item 5 above                                                                                | The sequence is the number of calls made by the Session ID                                                                               |
 | \_supportsPromises     | False. Unless Device Detection is in the Pipeline and the ‘Promise’ Property returns ‘Full’ | If true, the script will use Promises                                                                                                    |
 | \_url                  | Item 6 above                                                                                | The callback url to use when javascript Properties are executed on the client-side.                                                      |
-| \_parameters           | Item 7 above                                                                                | Any query parameters in Evidence, these should be relayed in callbacks to the cloud service.                                            |
+| \_parameters           | Item 7 above                                                                                | Any query parameters in Evidence, these can be relayed in callbacks to the cloud service.                                                |
 | \_enableCookies        | From configuration                                                                          | If false, the script will automatically delete any cookies prefixed with `51D_` after evaluating Properties.                             |
-| \_updateEnabled        | Should be true if \_url is set                                                              | If true, the JavaScript will include functionality to make callbacks to the server after evaluating JavaScript Properties.               |
+| \_updateEnabled        | Will usually be true if \_url is set                                                        | If true, the JavaScript will include functionality to make callbacks to the server after evaluating JavaScript Properties.               |
 | \_hasDelayedProperties | True if the JSON contains the text `delayexecution`                                         | If true, the JavaScript will include functionality to support Properties where execution of the JavaScript will be delayed until needed. |
 
-Finally, the resulting JavaScript can optionally be minified, based on the
-configuration provided. If minification is desired, a third-party library should
-be used.
+Finally, the resulting JavaScript will be minified (or not, based on the
+configuration provided). Minification SHOULD be performed using an existing 
+third-party library.
 
-Performance tests MUST be in place to verify that this feature has minimal
-performance impact. If it does have a significant impact, and no alternative
-libraries offer better performance, a cut-down minification process should be
+Performance tests MUST be in place to verify the performance impact of this 
+feature. If it does have a significant impact, and no alternative
+libraries offer better performance, a cut-down minification process MAY be
 implemented in order to achieve the major benefits without a significant
 performance cost.
 
@@ -129,4 +129,4 @@ as a previous result can be retrieved from session storage.
 | SetEndpoint      | string   | [Empty string] | The endpoint that a request will be sent to once additional Evidence is available from client-side execution. This endpoint MUST return JSON data in the same form as the JSON embedded within the JavaScript |
 | SetObjectName    | String   | fod            | The name of the JavaScript object created in the global scope on the client                                                                                                                                   |
 | SetMinify        | Bool     | True           | Enable or disable minification of the Javascript that is produced                                                                                                                                             |
-| SetEnableCookies | Bool     | True           | True if results of client-side processing should be retained in cookies so that they are sent by default in subsequent requests                                                                               |
+| SetEnableCookies | Bool     | True           | True if results of client-side processing can be retained in cookies so that they are sent by default in subsequent requests                                                                               |

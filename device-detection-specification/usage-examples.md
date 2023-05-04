@@ -6,7 +6,7 @@ This document contains descriptions of Device Detection use-cases along with
 C# examples.
 
 Many of these examples build on the concepts established in the Pipeline
-specification, so it may be helpful to first become familiar with
+specification, so it might be helpful to first become familiar with
 the [usage examples](../pipeline-specification/usage-examples.md) there.
 
 ## Create a Device Detection Pipeline

@@ -24,7 +24,7 @@ Cloud Engine:
 
 ![Cloud Engine flow](../../../pipeline-specification/images/Device%20Detection%20Cloud%20Engine.png)
 
-A Pipeline will usually have a single Cloud Request Engine, but may have
+A Pipeline will usually have a single Cloud Request Engine, but might have
 multiple Cloud Aspect Engines - for example, a Location Cloud Engine,
 Device Detection Cloud Engine, etc.
 
@@ -118,7 +118,7 @@ request to the server using the filtered Evidence. The HTTP API used for access 
 51Degrees servers is defined at https://cloud.51degrees.com/api-docs/index.html.
 
 The server can handle Evidence in a number of different forms, but where
-possible, URL-encoded form data should be used. This is constructed
+possible, URL-encoded form data will be used. This is constructed
 by adding the Resource Key value using the key `resource`, then adding
 all the values from the Flow Data Evidence.
 

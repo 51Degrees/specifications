@@ -5,13 +5,13 @@
 The web integration feature is intended to simplify usage of the Pipeline API
 in websites/applications that are built using a particular web framework.
 
-The exact details may vary significantly based on the web framework that
+The exact details will vary significantly based on the web framework that
 is being used. The capabilities and common usage of the target web framework
-should be fully understood so that the integration is in keeping with that
+will need to be fully understood so that the integration is in keeping with that
 ecosystem, rather than simply repeating what worked for some other
 language/framework.
 
-Some common tasks that the web integration may perform are:
+Some common tasks that the web integration performs are:
 
 - Creation of Pipeline on start-up.
 - Manage Flow Data lifecycle
@@ -33,34 +33,34 @@ Where the web integration is responsible for creation of the Pipeline, it
 will also need to ensure that these additional Flow Elements are present.
 
 - The [Sequence Element](../pipeline-elements/sequence-element.md) MUST be
-  present. If not, it should be added as the first element in the Pipeline.
+  present. If not, it MUST be added as the first element in the Pipeline.
 - The [JSON Builder Element](../pipeline-elements/json-builder.md) MUST be
-  present. If not, it should be added as the penultimate element.
+  present. If not, it MUST be added as the penultimate element.
   (Immediately before the JavaScript Builder Element).
 - The [JavaScript Builder Element](../pipeline-elements/javascript-builder.md)
-  MUST be present. If not, it should be added after all other elements.
+  MUST be present. If not, it MUST be added after all other elements.
 
 Another Flow Element is needed to allow the web integration to automatically
 set HTTP response headers.
 
 - The [Set Headers Element](../pipeline-elements/set-headers-element.md) MUST
-  be present. If not, it should be added after all other elements.
+  be present. If not, it MUST be added after all other elements.
 
 For all of these elements, there MUST be configuration options to allow
 users to prevent them being added if they wish to do so.
 
 ## Populating Evidence
 
-The web integration should automatically populate [Evidence](evidence.md) from
+The web integration SHOULD automatically populate [Evidence](evidence.md) from
 the web request.
 
-It may use the Pipeline's [accepted Evidence](advertise-accepted-evidence.md)
-feature to determine if individual values should be added to Evidence or not.
+It MAY use the Pipeline's [accepted Evidence](advertise-accepted-evidence.md)
+feature to determine if individual values need to be added to Evidence or not.
 
 An alternative approach would be to wrap the web request structure itself as
 Evidence, and hence defer processing until the Evidence is actually used.
 
-In any case, the list below illustrates the type of data that should be used
+In any case, the list below illustrates the type of data that can be used
 and the Evidence names they would be associated with.
 
 - All HTTP headers. (Except cookies header) Key is `header.[header name]`
@@ -75,7 +75,7 @@ and the Evidence names they would be associated with.
 ## Setting response headers
 
 The [Set Headers Element](../pipeline-elements/set-headers-element.md) will
-produce an output that describes which response headers should be set to which
+produce an output that describes which response headers need to be set to which
 values.
 
 However, it has no access to the web request itself. Consequently, the web
@@ -136,7 +136,7 @@ with several Flow Elements:
 ### Intercepted Urls
 
 In order for this to work, the web integration needs to intercept requests
-to two urls. These should be configurable, but the default values are:
+to two urls. These SHOULD be configurable, but the default values are:
 
 - `/51Degrees.core.js` - Serves the JavaScript produced by JavaScript Builder Element.
 - `/51dpipeline/json` - Serves the JSON produced by JSON Builder Element.
@@ -237,7 +237,7 @@ are:
 
 | **Header**     | **Values**                                                                          | **Purpose**                                                                                             |
 |----------------|-------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
-| Cache-Control  | max-age=1800 private                                                                | Cache item lifetime is 30 minutes. Only local client caches should cache this content.                  |
+| Cache-Control  | max-age=1800 private                                                                | Cache item lifetime is 30 minutes. Only local client caches can cache this content.                  |
 | Vary           | all headers in Pipeline Evidence key filter (e.g. User-Agent)                       | Let the cache know that if one of these headers changes, the cached content will need to be re-fetched. |
 | ETag           | Calculated hash of ALL the Evidence values in Evidence filter key for this Pipeline | Assists caches in re-validating expired content                                                         |
 | Content-Type   | application/x-javascript or application/JSON                                        | Indicate the type of content being returned                                                             |
@@ -257,5 +257,5 @@ correct if the JavaScript snippet is getting data values that might change over 
 For example, if we're using JavaScript to get location and the user has moved then
 session storage will still contain the previous location lookup response.
 In practice this seems unlikely to cause any real issues, as long as the cache
-max-age is not too long. Max-age should be configurable to allow this to be addressed
+max-age is not too long. Max-age SHOULD be configurable to allow this to be addressed
 if it is found to be an issue for a particular client.

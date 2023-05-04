@@ -2,7 +2,7 @@
 
 ## Overview
 
-Aspect Engines may support the addition of a cache.
+Aspect Engines MAY support the addition of a cache.
 This is intended to improve performance when the Engine receives a process
 request containing Evidence values that are sufficiently similar to a previous request.
 

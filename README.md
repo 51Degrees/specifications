@@ -26,7 +26,7 @@ products.
   see what a real-world implementation of the specification looks like. There
   is also [a section](pipeline-specification/reference-implementation-notes.md)
   containing reflections on the architectural choices made when creating the
-  Java and .NET versions. This may be helpful when designing future implementations.
+  Java and .NET versions. This could be helpful when designing future implementations.
 - URLs in these specifications are fixed. Code comments SHOULD include
   references to these URLs in order to avoid re-writing the same descriptions
   and definitions in multiple places.

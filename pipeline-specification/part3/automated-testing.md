@@ -66,7 +66,7 @@ there MUST be a test to check that an attempt to process it twice, fails.
 
 Numerous additional tests exist (to a total of around 500, running to 100s of
 thousands of lines of code) in the reference implementations and the code of
-those implementations should be consulted.
+those implementations can be consulted for more details.
 
 ### Core
 

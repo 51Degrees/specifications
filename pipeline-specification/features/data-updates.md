@@ -2,7 +2,7 @@
 
 ## Overview
 
-An on-premise Aspect Engine may require data that is independent of the
+An on-premise Aspect Engine can require data that is independent of the
 logic of the Engine and that is periodically refreshed. For example,
 when new phones or browser versions are released, the Device Detection
 Engine will require a new data file in order to detect and populate
@@ -14,7 +14,7 @@ endpoint or that it can be provided by means of file store that is accessible
 to an instance of the Aspect Engine.
 
 It is possible that an Aspect Engine requires more than one data source [^1] and
-implementers may choose either to provide the data in a single unified way
+implementers can choose either to provide the data in a single unified way
 or to implement the Data Update service to allow for multiple file sources.
 
 [^1] data sources are referred to as data files in the reference implementations
@@ -37,7 +37,7 @@ performance impact while data refresh is happening.
 
 ## Data refresh availability
 
-A data source may contain a timestamp that specifies when it was created and may
+A data source might contain a timestamp that specifies when it was created and might
 contain a timestamp that indicates when refreshed data will be available. This
 information can be used to optimize polling, or to provide information as to
 how up-to-date the current data is.
@@ -51,13 +51,13 @@ operational modes:
 - File Data Source, Memory Based Operation
 - Memory Data Source, Memory Based Operation
 
-Other operational modes may be possible, such as an Aspect Engine's data residing
+Other operational modes are theoretically possible, such as an Aspect Engine's data residing
 in a relational database.
 
 ### File data source, file based operation
 
 In this operational mode an Aspect Engine uses data that
-resides in the file system to support its operation. This may be because the
+resides in the file system to support its operation. This might be because the
 data is too extensive to be loaded into memory or because of memory limitations
 in the system.
 
@@ -68,7 +68,7 @@ is provided in a file, to be loaded into memory on start-up and on refresh.
 
 ### Memory data source
 
-In some cases, to provide for fully disk-less operation, it may be desirable
+In some cases, to provide for fully disk-less operation, it might be desirable
 for an Aspect Engine to obtain its data
 as a memory buffer on start-up and on refresh.
 
@@ -82,7 +82,7 @@ from a disk based data file and update from HTTP.
 Providing for both being active at the same time adds complexity to the
 implementation.
 
-Implementations may choose to report an error when inconsistent configuration
+Implementations MAY choose to report an error when inconsistent configuration
 options are chosen.
 
 ### Update on start-up
@@ -111,7 +111,7 @@ If the current data contains a *data update expected* timestamp, then polling
 will not start until after that time. Options include the ability to control the remote
 endpoint and the polling frequency.
 
-As an optimization, the request for data may contain an *if modified since* HTTP
+As an optimization, the request for data MAY contain an *if modified since* HTTP
 header, containing the date of the current data file.
 
 If data is received that is newer than the current data, then the Aspect Engine
@@ -123,9 +123,9 @@ the existing data, at the location configured for data files.
 for a 429 HTTP Status (Too many requests) with a *Retry After* HTTP header
 whose value can be used to reset polling.
 
-Rate limiting may be triggered
+Rate limiting can be triggered
 in the event that a single user has multiple servers each of which is set to
-auto update. It is recommended that users with multiple servers do not use
+auto update. It is expected that users with multiple servers do not use
 this feature and that they obtain updated data once and distribute it to their
 various servers by other means.
 
@@ -146,7 +146,7 @@ and whatever file is found is used as the data source for the restarted
 Aspect Engine.
 
 If the operational environment does not support file system watching events,
-implementors may need to use polling to determine changes and have
+implementors might need to use polling to determine changes and have
 due regard to file system load when setting polling frequency.
 
 ### Programmatic update
@@ -161,7 +161,7 @@ from File is enabled.
 
 For memory data sources, programmatic update MUST allow provision of the new memory data source.
 
-Implementations may choose to provide options of Programmatic Update that
+Implementations MAY choose to provide options of Programmatic Update that
 distinguish a request for HTTP update as opposed to file update.
 
 Configuration Groups:
@@ -202,11 +202,11 @@ while a new data file is made available.
 [^1] This is called *tempDataFile* in current reference implementations.
 
 Since creating a data file copy is necessary for disk based operation,
-implementations may choose not to provide control over
+implementations MAY choose not to provide control over
 *createOperationalDataCopy* since disallowing it when either update option
 is enabled and disk based operation is enabled is an error.
 
-Implementations may choose to report an error if any item
+Implementations MAY choose to report an error if any item
 in this configuration is set for memory data source operation.
 
 ## Update processes

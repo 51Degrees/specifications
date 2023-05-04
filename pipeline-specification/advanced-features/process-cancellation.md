@@ -6,7 +6,7 @@ caller to cancel processing. This will:
 1. Where possible - cancel processing for any elements that are currently executing.
 2. Skip processing for any elements that have not yet started.
 
-Note that a Flow Data instance that has had processing cancelled may be
+Note that a Flow Data instance that has had processing cancelled might be
 missing data that would normally have been populated.
 
 The ability to cancel processing implies that the processing takes place

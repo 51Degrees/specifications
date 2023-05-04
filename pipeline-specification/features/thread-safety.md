@@ -33,9 +33,9 @@ concurrent read access and immutable once created.
 ## Element Data
 
 In general, Element Data instances do not need to be thread safe, as they
-should only be accessed and updated from a single thread.
+will only be accessed and updated from a single thread.
 
-While it is certainly possible for a user to Engineer a scenario where an
+While it is certainly possible for a user to engineer a scenario where an
 instance is accessed from multiple threads. We do not consider it worthwhile
 to cater for this scenario given the decreased performance and increased
 complexity that it would require.
@@ -44,7 +44,7 @@ complexity that it would require.
 
 
 In contrast to Element Data, Aspect Data instances MUST be thread-safe. As the
-same instance may be used for multiple different calls to `Process` when
+same instance might be used for multiple different calls to `Process` when
 the [caching](caching.md) feature is enabled.
 If this is not possible for some reason then the Engine MUST NOT allow a cache
 to be added.

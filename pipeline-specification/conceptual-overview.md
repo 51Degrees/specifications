@@ -23,7 +23,7 @@ Pipeline by which they were created. The Process method on Flow Data
 initiates Pipeline processing.
 
 A Flow Data belongs to exactly one Pipeline.
-While a Pipeline may have many Flow Data instances.
+While a Pipeline can have many Flow Data instances.
 The standard usage pattern is to create a singleton Pipeline instance that will
 be used in environments such as web servers. As such, it is expected that many
 Flow Data instances will be created and processed in parallel from a single
@@ -53,17 +53,15 @@ Element Data resources are cleaned up correctly.
 ### Flow Element
 
 A **Flow Element** is a black box which takes a Flow Data and performs some
-processing. This processing may read Evidence and/or Element Data instances
-that have been added by previous elements. It may add new Evidence values and
-may add an instance of its own Element Data, which may or may not have
-Properties populated.
+processing. This processing can read Evidence and/or Element Data instances
+that have been added by previous elements. It MAY add an instance of its own Element Data, with values for it's own Properties populated.
 
 See [resource cleanup](features/resource-cleanup.md) for details on ensuring
 Flow Element resources are cleaned up correctly.
 
 ### Flow Element builder
 
-It is highly recommended that Flow Elements have some associated
+It is highly RECOMMENDED that Flow Elements have some associated
 builder/factory that is used to create Flow Element instances.
 
 The exact specification of this component is less important than having a common

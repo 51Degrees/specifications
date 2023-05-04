@@ -12,11 +12,11 @@ The Property value will be determined during the 'process' step that is performe
 by each Flow Element. This value will be stored within the Element Data,
 which is in turn stored within Flow Data.
 
-Each Flow Element may populate values for zero or more Properties.
+Each Flow Element MAY populate values for zero or more Properties.
 
 ## Value types
 
-A Property may return values of any type. However, there are certain types that are
+A Property can return values of any type. However, there are certain types that are
 specifically expected and supported throughout the API.
 
 The primary limitation is that these type values will need to be represented
@@ -49,7 +49,7 @@ See [web integration](web-integration.md) for more detail.
 Property values populated by Engines (as opposed to all Flow Elements)
 MUST be capable of having 'no value'.
 
-Where 'no value' is used, attempting to access the value should throw an
+Where 'no value' is used, attempting to access the value MUST throw an
 error/exception with a customizable message explaining why the value is not set.
 
 This is similar to the [missing Property](#missing-properties) feature.
@@ -101,7 +101,7 @@ When the user attempts to access a Property that is defined for an Engine, but
 does not exist in the result set for some reason, the system MUST throw an
 error/exception with a message explaining why the Property is not available.
 
-This may be any of the following reasons:
+This could be any of the following reasons:
 
 | Reason                                  | Notes           | Message                                                                                                                                                                                                                                                                                                            | Parameters                                                                                             |
 |-----------------------------------------|-----------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|

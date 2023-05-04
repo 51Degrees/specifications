@@ -2,12 +2,12 @@
 
 ## Overview
 
-Exceptions and errors may occur at many places within the Pipeline
+Exceptions and errors can occur at many places within the Pipeline
 API. It is vital that these are presented and handled consistently.
 
 In general, we aim to follow these principles:
 
-1. Exceptions and errors should be highly visible (e.g. display error message
+1. Exceptions and errors SHOULD be highly visible (e.g. display error message
    and stop the process) by default in order to highlight issues during
    development.
 2. It MUST be possible for the user to configure the system to prioritize
@@ -21,24 +21,24 @@ throw.
 ## Process function
 
 One of the key points that failures can occur is in the 'Process' function.
-There may be any combination of Flow Elements, including custom
+There can be any combination of Flow Elements, including custom
 third-party ones in the Pipeline.
 
 Consequently, exceptions and errors will need to be caught at the Pipeline
 level.
-By default, these errors should be added to the Flow Data errors
+These errors need to be added to the Flow Data errors
 collection. Once all Flow Elements have completed processing, throw an
 exception/error with all the stored errors included as sub-errors.
 
 There MUST be an option to modify this behavior to just add these errors
 to the errors collection and [log](logging.md) them (I.e. don't throw an
-exception/error at the end of processing). This option should be available
+exception/error at the end of processing). This option will be available
 when the [Pipeline is created](../conceptual-overview.md#pipeline-builder)
 and be called `SuppressProcessExceptions` or similar.
 
 ### Flow Elements
 
-Flow Elements should throw exceptions/errors freely, unless it makes
+Flow Elements can throw exceptions/errors freely, unless it makes
 sense for an element to handle a specific error internally.
 In general, it is the responsibility of the Pipeline to handle these for
 the user as described above.
@@ -47,14 +47,14 @@ the user as described above.
 
 Apart from the 'Process' function, almost all user interaction is handled
 through Flow Data.
-The general guidance is that these functions and accessors should only
+The general guidance is that these functions and accessors SHOULD only
 throw errors/exceptions if the failure is likely due to something that
 the API user has done wrong.
 
 For example, passing a null parameter when a value is mandatory or
 attempting to access result data before 'Process' has been called.
 
-These are both things that the user should correct by making changes to
+These are both things that the user will need to correct by making changes to
 their code.
 
 ## Web integration
@@ -97,7 +97,7 @@ preventing the creation or execution of the Pipeline.
 ### Cloud Request Exception
 
 Can be thrown by the [CloudRequestEngine](../pipeline-elements/cloud-request-engine.md)
-following requests to a cloud service. Must be populated with details
+following requests to a cloud service. MUST be populated with details
 relevant to the failure (For example, when a 429 error occurs, include the 
 value of the 'Retry-After' header in the exception message so that
 the user can act on it)

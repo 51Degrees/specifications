@@ -35,7 +35,7 @@ Firstly, these are the mechanisms for getting Element Data:
    ```c#
    IDeviceData deviceData = flowData.GetFromElement(deviceDetectionEngine);
    ```
-4. In strongly typed languages it may be useful to get the type of
+4. In strongly typed languages it MAY be useful to get the type of
    Element Data associated with a Flow Element, without getting an associated
    instance. For example:
 

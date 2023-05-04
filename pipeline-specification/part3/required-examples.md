@@ -2,7 +2,7 @@
 
 ## General
 
-It is recommended that the following features are demonstrated in examples:
+It is RECOMMENDED that the following features are demonstrated in examples:
 
 - Pipeline build from options
 - Use of fluent builder
@@ -20,7 +20,7 @@ star sign from a birthdate, and do so in a number of different ways:
 - Using client side Evidence, the example prompts the user for a date using a
   JavaScript dialog box, in Java this is implemented using Spring MVC
 
-- Using a Cloud Request Engine - this needs a cloud endpoint which may be
+- Using a Cloud Request Engine - this needs a cloud endpoint which can be
   built and run as a local server
 
 - Using a Flow Element that returns star sign given a date of birth as

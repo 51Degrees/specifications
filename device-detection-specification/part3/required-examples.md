@@ -2,7 +2,7 @@
 
 ## Features
 
-It is recommended that the following features are demonstrated in examples:
+It is RECOMMENDED that the following features are demonstrated in examples:
 
 - On-Premise Device Detection
 - Cloud Device Detection
@@ -40,7 +40,7 @@ runs and completes without failure.
 
 The need for examples to be runnable as an application and as a test suggests
 that they are written with example code to be executed as a public method, and
-a pattern may be established across examples.
+a common pattern is established across examples.
 
 It MUST be possible to programmatically supply any necessary configuration or parameters, such as cloud resource keys, or device detection license keys. 
 
@@ -53,7 +53,7 @@ being illustrated. In creating the examples, 51Degrees found that there is a
 trade-off between helper functions hiding unimportant details, and helper
 functions hiding awkwardness of access to certain features.
 
-Implementors may wish to consider adding those helper functions to their
+Implementors MAY wish to consider adding those helper functions to their
 API implementations, rather than them being accessible only in the
 context of examples.
 
@@ -61,7 +61,7 @@ Some examples of helpers in the latter category:
 - a helper that creates a hash Engine to provide access to the data file
   metadata (date and data tier).
 - a helper that gets the value of a Property as a string, taking into account
-  that a value may not exist or that it may be a list.
+  that a value might not exist or that it might be a list.
 
 ### Code Comments
 
@@ -75,9 +75,9 @@ generation is placed at the bottom of source files.
 
 ### File References
 
-Finding a path to files used by examples may not be completely straightforward, as
-the example may have been downloaded from GitHub, or if it's part of
-the standard distribution of the API files, it may appear at different relative paths
+Finding a path to files used by examples might not be completely straightforward, as
+the example could have been downloaded from GitHub, or if it's part of
+the standard distribution of the API files, it could appear at different relative paths
 to the current working directory when the example is executed - especially
 when executed as an automated test as opposed to being run from an IDE.
 
@@ -118,10 +118,10 @@ find the production date of the file.
 Reference implementation examples illustrate use of Resource Keys to access
 the cloud service. A predefined link [such as](https://configure.51degrees.com/jqz435Nc)
 can be created to create a Resource Key to provide access to the Properties
-used in the examples. For simplicity, it may be convenient for such a link to
+used in the examples. For simplicity, it might be convenient for such a link to
 provide access to all free Properties.
 
-Since the Resource Key is shared between several examples, it may be convenient
+Since the Resource Key is shared between several examples, it might be convenient
 for it to be set as an environment variable, rather than passing as a command
 argument, especially given the need for examples to be executed in
 a test environment.
@@ -135,17 +135,17 @@ approach and some disadvantages.
 
 Additionally, assuming default values are needed
 this does simplify the examples. However, it has the disadvantage that users
-may not understand how to use the Pipeline builder and the various Engine
-builders in concert, and hence may not be aware of how they can configure
+might not understand how to use the Pipeline builder and the various Engine
+builders in concert, and hence might not be aware of how they can configure
 Properties that are not exposed by the simplified builder, if they need to.
 
-It is recommended that at least one example demonstrates this technique for
+It is RECOMMENDED that at least one example demonstrates this technique for
 creating a Pipeline and that it is made clear that the lifetime of the
 FlowElements added to the Pipeline will probably, in production environments, be controlled by the Pipeline
 they are added to (using `setAutoClose(true)`). In other words, destruction of the
 Pipeline causes the elements added to it to be destroyed.
 
-It is recommended that examples make reference to the options available
+It is RECOMMENDED that examples make reference to the options available
 and their default values in a Git submodule (and see below regarding an
 example XML options file containing the same information as an XML comment).
 <span style="color:yellow">reference that submodule in GitHub</span>
@@ -180,7 +180,7 @@ being part of a "try-with-resources" construct.
 
 Since Evidence used in examples is already collected by 51Degrees there is
 no value in sharing those values with 51Degrees. In addition, though use of
-examples is likely to be statistically insignificant, it may nonetheless alter
+examples is likely to be statistically insignificant, it might nonetheless alter
 the calculations that are performed regarding current usage.
 
 For somewhat arbitrary reasons, reference implementations inhibit usage
@@ -255,7 +255,7 @@ can reduce the time for detection.
 
 ### Metadata
 
-It is recommended that implementors illustrate the retrieval of Evidence keys,
+It is RECOMMENDED that implementors illustrate the retrieval of Evidence keys,
 Properties, components and profiles from the on-premise, and
 Properties and Evidence keys for cloud.
 

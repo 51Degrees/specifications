@@ -8,7 +8,7 @@ Usually, this is done in order to request more Evidence from the
 client (For example [User-Agent Client Hints](http://51degrees.com/documentation/_device_detection__features__u_a_c_h__headers.html)).
 
 This relies on a Property naming convention whereby any Property
-values containing data that should be sent in a response header
+values containing data that needs to be sent in a response header
 are named according to the following format:
 
 `SetHeader[Identifier][HeaderName]`
