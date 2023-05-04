@@ -57,6 +57,9 @@ These are:
 - [Cloud Request Engine](cloud-request-engine.md)
 - [Usage sharing element](usage-sharing-element.md)
 
+(The reference implementations have an exclusion list containing the key name 
+of the elements to exclude.)
+
 The following top-level entries might also be populated in the
 final JSON output:
 - If the sequence number set by the [Sequence Element](sequence-element.md) is less
@@ -158,6 +161,6 @@ JSON with an error value set.
 
 ## Configuration options
 
-| **Name**      | **Type**        | **Default**  | **Description**                                                                                                                                                                                                                                                                                                       |
-|---------------|-----------------|--------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| SetProperties | List of strings | [Empty list] | A list of the Properties to include in the JSON. By default, all Properties will be included. Also note that some Properties, such as JavaScript Properties, will always be included, regardless of this setting. Property names will need to be fully qualified. (e.g. `device.ismobile` or `devices.profiles.hardwarename`) |
+| **Name**      | **Type**        | **Default**  | **Description**                                                                                                                                                                                                                                                                                                                                                                |
+|---------------|-----------------|--------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| SetProperties | List of strings | [Empty list] | A list of the Properties to include in the JSON. By default, the list is empty and all Properties will be included in the JSON. Note that some Properties, such as JavaScript Properties and meta properties, will always be included, regardless of this setting. Property names will need to be fully qualified. (e.g. `device.ismobile` or `devices.profiles.hardwarename`) |

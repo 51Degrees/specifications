@@ -68,6 +68,13 @@ Numerous additional tests exist (to a total of around 500, running to 100s of
 thousands of lines of code) in the reference implementations and the code of
 those implementations can be consulted for more details.
 
+Code coverage is a useful tool to be able to see which areas of logic may require
+test to be added. However, it is not recommended that code coverage is used 
+as a metric. This is because, even with 100% coverage, there are many scenarios 
+that might not be tested. Thus, the focus should be on ensuring different usage 
+scenarios are tested, rather than ensuring a certain percentage of the code is 
+covered by tests. 
+
 ### Core
 
 TypedKeyMap :
@@ -195,7 +202,6 @@ require a [headless browser](https://en.wikipedia.org/wiki/Headless_browser) for
 
 Things to check:
 - operation of the SetHeaders Engine
-- operation of the JSON and Javascript Engines
+- operation of the JSON and JavaScript Engines
+  - operation of the JavaScript that is produced  
 - operation of the Sequence Element
-
-<span style="color:yellow">hard to know what else to say?</span>

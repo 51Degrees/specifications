@@ -59,11 +59,10 @@ Each Property SHOULD return
 an [Aspect Property value](../pipeline-specification/features/properties.md#null-values)
 in order to support exposing the reason that a value is not set.
 
-TODO - finish links once content is available
 Beyond this, there are considerations unique to each Engine. Ensure to review
 the details linked below:
 
 - [on-premise](pipeline-elements/device-detection-on-premise.md#metadata)
-- [cloud](pipeline-elements/device-detection-cloud.md#)
-- [hardware lookup](pipeline-elements/hardware-profile-lookup-cloud.md#)
+- [cloud](pipeline-elements/device-detection-cloud.md#start-up-activity)
+- [hardware lookup](part3/pipeline-elements/hardware-profile-lookup-cloud.md#start-up-activity)
 

@@ -1,35 +1,8 @@
 # Table of Contents
-## Pipeline Specifications
+
 [Overview](./README.md)
 
-[Table of Contents](./table-of-contents.md)
-
 [Stylistic Conventions](./stylistic-conventions.md)
-
-## Device Detection Specification
-
-[Overview](./device-detection-specification/README.md)
-
-[Data model](./device-detection-specification/data-model.md)
-
-[Packaging](./device-detection-specification/packaging-and-structure.md)
-
-[Usage examples](./device-detection-specification/usage-examples.md)
-
-[Required Examples](./device-detection-specification/part3/required-examples.md)
-
-[Automated Testing](./device-detection-specification/part3/automated-testing.md)
-
-### Pipeline Elements
-
-[UA-CH high entropy decoder](./device-detection-specification/part3/pipeline-elements/uach-high-entropy-decoder.md)
-
-[Hardware Profile lookup](./device-detection-specification/part3/pipeline-elements/hardware-profile-lookup-cloud.md)
-
-[Device Detection cloud](./device-detection-specification/pipeline-elements/device-detection-cloud.md)
-
-[Device Detection on-premise](./device-detection-specification/pipeline-elements/device-detection-on-premise.md)
-
 ## Pipeline Specification
 
 [Overview](./pipeline-specification/README.md)
@@ -83,7 +56,7 @@
 
 [Lazy loading](./pipeline-specification/advanced-features/lazy-loading.md)
 
-[TODO - write this up.](./pipeline-specification/advanced-features/parallel-processing.md)
+[Parallel processing](./pipeline-specification/advanced-features/parallel-processing.md)
 
 [Process cancellation](./pipeline-specification/advanced-features/process-cancellation.md)
 
@@ -103,3 +76,28 @@
 [Set Headers Element](./pipeline-specification/part3/pipeline-elements/set-headers-element.md)
 
 [Usage sharing element](./pipeline-specification/pipeline-elements/usage-sharing-element.md)
+
+
+## Device Detection Specification
+
+[Overview](./device-detection-specification/README.md)
+
+[Data model](./device-detection-specification/data-model.md)
+
+[Packaging](./device-detection-specification/packaging-and-structure.md)
+
+[Usage examples](./device-detection-specification/usage-examples.md)
+
+[Required Examples](./device-detection-specification/part3/required-examples.md)
+
+[Automated Testing](./device-detection-specification/part3/automated-testing.md)
+
+### Pipeline Elements
+
+[UA-CH high entropy decoder](./device-detection-specification/part3/pipeline-elements/uach-high-entropy-decoder.md)
+
+[Hardware Profile lookup](./device-detection-specification/part3/pipeline-elements/hardware-profile-lookup-cloud.md)
+
+[Device Detection cloud](./device-detection-specification/pipeline-elements/device-detection-cloud.md)
+
+[Device Detection on-premise](./device-detection-specification/pipeline-elements/device-detection-on-premise.md)

@@ -145,18 +145,18 @@ FlowElements added to the Pipeline will probably, in production environments, be
 they are added to (using `setAutoClose(true)`). In other words, destruction of the
 Pipeline causes the elements added to it to be destroyed.
 
-It is RECOMMENDED that examples make reference to the options available
-and their default values in a Git submodule (and see below regarding an
-example XML options file containing the same information as an XML comment).
-<span style="color:yellow">reference that submodule in GitHub</span>
-
 ### Build from Configuration
 
 Reference implementation examples include illustration of creating a Pipeline
-from a configuration file. In XML, this configuration file can be used to add,
-as a comment, a listing of all the possible options for the Pipeline and all
-Engines. This information is also available in a Git submodule
-<span style="color:yellow">reference that submodule in GitHub</span>.
+from a configuration file. In XML or JSON, this configuration file can be used 
+to add, as a comment, a listing of all the possible options for the Pipeline 
+and all Engines. This information is also available in sample files:
+
+TODO - these sample files are not yet publicly available, they are in
+internal `develop` branches, but will be available at the following URLs in future:
+
+[.NET](https://github.com/51Degrees/device-detection-dotnet/blob/master/Examples/sample-configuration.json)
+[Java](https://github.com/51Degrees/device-detection-java/blob/master/device-detection.examples/console/src/main/resources/gettingStartedOnPrem.xml)
 
 ### Pipeline and Flow Data Lifecycle
 

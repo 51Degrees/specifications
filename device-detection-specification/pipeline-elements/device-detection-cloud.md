@@ -7,27 +7,17 @@ to the 51Degrees Cloud Detection server, which carries out the detection
 and returns a JSON data structure, from which Device Detection Properties
 are populated in the Flow Data.
 
-This is implemented as a two-step process: a Cloud Request Engine
-presents the Evidence to the 51Degrees server with an HTTP request
-and copies the JSON response into Element Data in the Flow Data.
+This Engine is the Cloud Aspect Engine for Device Detection.
 
-This Element Data is passed using the standard Pipeline Flow Data mechanism to
-a Device Detection Cloud Engine, later in the Pipeline. Since the detection
-Engine depends on the request having been processed in advance, it checks that
-Element Data from the cloud request is present in Pipeline before processing.
+See [here](../../../pipeline-specification/part3/pipeline-elements/cloud-request-engine.md) 
+for an overview of the data flow for Cloud Engines.
 
-![Cloud Engine flow](../../pipeline-specification/images/Device%20Detection%20Cloud%20Engine.png)
+## Accepted Evidence
 
-The majority of the logic that is executed by the Device Detection Cloud
-Engine is common to all Cloud Engines and is described in the
-[Cloud Aspect Engine](../../pipeline-specification/pipeline-elements/cloud-aspect-engine.md)
-document.
+This element uses no Evidence, it works on Property values in Element Data
+in the Flow Data.
 
-## Device Detection Cloud Engine configuration
-
-There are no configuration options associated with this Engine.
-
-## Device Detection Cloud Engine processing
+## Start-up activity
 
 When it is added to a Pipeline, Device Detection Cloud Engine initializes
 itself from a Cloud Request Engine, which MUST have been added to the Pipeline
@@ -38,5 +28,25 @@ based on the Resource Key supplied on start-up. The Device Detection Cloud Engin
 then takes the details of the subset of those Properties that are relevant to
 Device Detection.
 
-See [Cloud Request Engine](../../pipeline-specification/pipeline-elements/cloud-request-engine.md)
-for more details of this Engine.
+## Element Data
+
+The Element Data populated by this engine must be interface compatible with 
+the Element Data populated by the [on-premise](device-detection-on-premise.md)
+Engine.
+
+See [data model](../data-model.md) for more information.
+
+## Process
+
+The majority of the processing SHOULD be handled by the shared 
+[Cloud Aspect Engine](../../pipeline-specification/part3/pipeline-elements/cloud-aspect-engine.md#processing)
+logic.
+
+This will just need to filter and parse the JSON provided by the Cloud Aspect 
+Engine to the form that is needed for the Element Data output
+
+## Configuration options
+
+There are no configuration options associated with this Engine.
+
+

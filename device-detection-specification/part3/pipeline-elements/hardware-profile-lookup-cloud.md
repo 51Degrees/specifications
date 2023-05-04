@@ -39,6 +39,9 @@ based on the Resource Key supplied on start-up. The Hardware Profile Lookup Engi
 then takes the details of the subset of those Properties that are relevant to
 it.
 
+Be aware that this engine also has sub-properties under the top level property 
+that MUST also be catered for.
+
 ## Element Data
 
 | **Name**                   | **Type**                              | **Description**                                                                                                                           |
