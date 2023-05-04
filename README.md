@@ -9,6 +9,7 @@ products.
 
 | Name                                                                       | Description                                                                                                                     |
 |----------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|
+| [Table of contents](table-of-contents.md)                                  | A more in-depth table of contents for this repository                                                                           |
 | [Pipeline Specification](pipeline-specification/README.md)                 | Specification for the Pipeline API and its operation. This covers core functionality.                                           |
 | [Device Detection Specification](device-detection-specification/README.md) | Specification for the Device Detection service. This builds on the concepts and features defined in the Pipeline specification. |
 
@@ -32,5 +33,6 @@ products.
   and definitions in multiple places.
 - CI/CD scripts and the like are out of scope. However, implementers will need to be
   mindful of the requirement to have the ability to build and test the software
-  in a non-interactive CI/CD environment. See 51Degrees [CI/CD documentation](https://github.com/51Degrees/common-ci#readme) for more details.
+  in a non-interactive CI/CD environment. See 51Degrees 
+  [CI/CD documentation](https://github.com/51Degrees/common-ci#readme) for more details.
 
