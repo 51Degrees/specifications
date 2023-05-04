@@ -2,7 +2,8 @@
 
 [Overview](./README.md)
 
-[Stylistic Conventions](./stylistic-conventions.md)
+[Stylistic conventions](./stylistic-conventions.md)
+
 ## Pipeline Specification
 
 [Overview](./pipeline-specification/README.md)
@@ -60,22 +61,22 @@
 
 [Process cancellation](./pipeline-specification/advanced-features/process-cancellation.md)
 
-[Multi-Pipeline elements](./pipeline-specification/advanced-features/multi-pipeline-elements.md)
+[Multi-Pipeline Elements](./pipeline-specification/advanced-features/multi-pipeline-elements.md)
 
 ### Pipeline Elements
 [Sequence Element](./pipeline-specification/part3/pipeline-elements/sequence-element.md)
 
-[JavaScript Builder Element](./pipeline-specification/part3/pipeline-elements/javascript-builder.md)
+[JavaScript builder Element](./pipeline-specification/part3/pipeline-elements/javascript-builder.md)
 
-[JSON Builder Element](./pipeline-specification/part3/pipeline-elements/json-builder.md)
+[JSON builder Element](./pipeline-specification/part3/pipeline-elements/json-builder.md)
 
 [Cloud Request Engine](./pipeline-specification/part3/pipeline-elements/cloud-request-engine.md)
 
 [Cloud Aspect Engine](./pipeline-specification/part3/pipeline-elements/cloud-aspect-engine.md)
 
-[Set Headers Element](./pipeline-specification/part3/pipeline-elements/set-headers-element.md)
+[Set headers Element](./pipeline-specification/part3/pipeline-elements/set-headers-element.md)
 
-[Usage sharing element](./pipeline-specification/pipeline-elements/usage-sharing-element.md)
+[Usage sharing Element](./pipeline-specification/pipeline-elements/usage-sharing-element.md)
 
 
 ## Device Detection Specification
@@ -88,9 +89,9 @@
 
 [Usage examples](./device-detection-specification/usage-examples.md)
 
-[Required Examples](./device-detection-specification/part3/required-examples.md)
+[Required examples](./device-detection-specification/part3/required-examples.md)
 
-[Automated Testing](./device-detection-specification/part3/automated-testing.md)
+[Automated testing](./device-detection-specification/part3/automated-testing.md)
 
 ### Pipeline Elements
 

@@ -148,7 +148,7 @@ other Pipeline API features.
     the native code marshalling values back and forth [^caching].
 
 [^caching] Note the effect that
-holding the "unmanaged" memory references (i.e. memory references that
+holding the "un-managed" memory references (i.e. memory references that
 are not handled by language garbage collection) has on
 [caching](../../pipeline-specification/features/caching.md) and
 [resource cleanup](../../pipeline-specification/features/resource-cleanup.md).

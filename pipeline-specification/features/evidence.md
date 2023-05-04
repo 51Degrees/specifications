@@ -32,7 +32,7 @@ The prefix indicates where the value has come from. Currently, defined prefixes 
 - `server` – Evidence came from a server that received a request but did not fit into
   any other category. For example, the IP address of the server.
 - `fiftyone` – used internally by 51Degrees.
-- `location` – Used in some cases to supply geolocation information.
+- `location` – Used in some cases to supply geo-location information.
 
 The prefixes above are in order from highest to lowest precedence. I.e. if the same
 Evidence value is available with two different prefixes (For example,

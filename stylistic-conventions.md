@@ -1,7 +1,7 @@
 # Stylistic Conventions
 
 This document contains some notes on stylistic conventions to be observed
-in the specification, and doesn't for part of the specification.
+in the specification, and doesn't form part of the specification itself.
 
 ## Voice 
 
@@ -51,8 +51,9 @@ Defined Terms are Capitalized.
 - Resource Key
 - Aspect
 
-Where defined terms are introduced, in Conceptual overview and introductory
-material, they are **emboldened** on first occurrence.
+Where defined terms are introduced, in 
+[Conceptual overview](pipeline-specification/conceptual-overview.md) 
+and introductory material, they are **emboldened** on first occurrence.
 
 Pluralized forms of Defined Terms are capitalized.
 
@@ -78,9 +79,9 @@ MUST, SHOULD, MUST NOT, SHOULD NOT, MAY etc.
 
 ## Section Heads
 
-Section heads use sentence case, per company style guide..
+Section heads use sentence case, per company style guide.
 
-When a section head contains a defined term the term retains its
+When a section head contains a defined term, the term retains its
 capitalization e.g. Flow Element, and Flow Element builder. The logic for this
 is that sentence case would have you say, for example,
 "Taking a trip to Buenos Aires"
@@ -90,11 +91,11 @@ is that sentence case would have you say, for example,
 Refer to 51Degrees Style Guide.
 Refer to 51Degrees Glossary
 
-IntelliJ has a useful linter for markdown.
-
-Link checking - check all links
-
-Table Formatting - check all tables
+Some VSCode extensions that have proven useful:
+- Code Spell Checker
+- HTTP/s and relative link checker
+- Markdown All in One
+- Markdown Table Prettifier
 
 ## Consistency
 

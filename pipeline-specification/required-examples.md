@@ -15,7 +15,7 @@ See [Device Detection required examples](../device-detection-specification/part3
 ## Suggested Examples
 
 The examples in the reference implementations demonstrate determination of a
-star sign from a birthdate, and do so in a number of different ways:
+star sign from a birth date, and do so in a number of different ways:
 
 - Using client side Evidence, the example prompts the user for a date using a
   JavaScript dialog box, in Java this is implemented using Spring MVC
