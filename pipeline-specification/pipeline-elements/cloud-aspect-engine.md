@@ -9,8 +9,8 @@ to refer processing of Evidence to a remote server.
 See the link above for an overview of how these Engines work together.
 
 At time of writing, there were 3 concrete Cloud Aspect Engine implementations:
-- [Device Detection](../../../device-detection-specification/pipeline-elements/device-detection-cloud.md)
-- [Device Lookup (TAC and native key)](../../../device-detection-specification/part3/pipeline-elements/hardware-profile-lookup-cloud.md)
+- [Device Detection](../../device-detection-specification/pipeline-elements/device-detection-cloud.md)
+- [Device Lookup (TAC and native key)](../../device-detection-specification/part3/pipeline-elements/hardware-profile-lookup-cloud.md)
 - [Location](https://github.com/51Degrees/location-dotnet/blob/master/FiftyOne.GeoLocation.Cloud/FlowElements/GeoLocationCloudEngine.cs)
 
 ## Accepted Evidence
@@ -52,7 +52,7 @@ In outline, the process is:
 
 The primary difficulty with this process is usually converting from the JSON
 format to whatever structure is needed to support the
-[Null Values](../../features/properties.md#null-values) feature.
+[Null Values](../features/properties.md#null-values) feature.
 
 For example, in C#, this feature is implemented with the `AspectPropertyValue`
 type. Each value in the JSON is a simple raw string/numeric/boolean value, so

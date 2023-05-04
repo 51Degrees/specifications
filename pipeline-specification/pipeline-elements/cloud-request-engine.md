@@ -22,7 +22,7 @@ Engine:
 The following diagram illustrates this process with a Device Detection
 Cloud Engine:
 
-![Cloud Engine flow](../../../pipeline-specification/images/Device%20Detection%20Cloud%20Engine.png)
+![Cloud Engine flow](../images/Device%20Detection%20Cloud%20Engine.png)
 
 A Pipeline will usually have a single Cloud Request Engine, but might have
 multiple Cloud Aspect Engines - for example, a Location Cloud Engine,
@@ -161,7 +161,7 @@ response SHOULD be logged as warnings.
 These are the configuration options that are unique to this Engine. They
 are in addition to all the configuration options defined for other features.
 For example,
-[caching](../../../pipeline-specification/part2/features/caching.md)
+[caching](../../pipeline-specification/features/caching.md)
 
 | **Name**             | **Type** | **Default**                                             | **Description**                                                                                                                                                                           |
 |----------------------|----------|---------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|

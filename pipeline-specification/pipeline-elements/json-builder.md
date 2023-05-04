@@ -7,7 +7,7 @@ in the Flow Data.
 
 This is used along with the [JavaScript builder element](javascript-builder.md)
 and [Sequence Element](sequence-element.md) to enable client-side features of
-the Pipeline [web integration](../../features/web-integration.md).
+the Pipeline [web integration](../features/web-integration.md).
 
 ## Accepted Evidence
 
@@ -48,8 +48,8 @@ be added for each Property:
 | **Suffix**         | **Description**                                                                                                                                                                                                                                                                              |
 |--------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | nullreason         | Where the Property value is null, this meta-Property MUST be added with a string message that explains why this Property does not have a value.                                                                                                                                              |
-| delayexecution     | This meta-Property MUST be added with the value 'true' for all Properties where the [metadata](../../features/properties.md#property-metadata) delay execution flag is true.                                                                                                                |
-| EvidenceProperties | Where the JSON includes other Properties that are in the [metadata](../../features/properties.md#property-metadata) Evidence Properties list for this Property and those Properties have the delayed execution flag set to true, this meta-Property MUST be added to list those Properties. |
+| delayexecution     | This meta-Property MUST be added with the value 'true' for all Properties where the [metadata](../features/properties.md#property-metadata) delay execution flag is true.                                                                                                                |
+| EvidenceProperties | Where the JSON includes other Properties that are in the [metadata](../features/properties.md#property-metadata) Evidence Properties list for this Property and those Properties have the delayed execution flag set to true, this meta-Property MUST be added to list those Properties. |
 
 Some Elements MUST be excluded from having their Properties added to the JSON.
 These are:

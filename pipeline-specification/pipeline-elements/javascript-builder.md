@@ -105,11 +105,11 @@ following functionality:
 #### Session storage caching
 
 As explained in  
-[web integration](../../part2/features/web-integration.md#client-side-caching),
+[web integration](../features/web-integration.md#client-side-caching),
 caching SHOULD be used to reduce the need to resend data.
 
 Since the response to the server is a POST request and
-[is not cached](../../part2/features/web-integration.md#storing-results-of-post-requests),
+[is not cached](../features/web-integration.md#storing-results-of-post-requests),
 the generated JavaScript MUST
 include functionality to retain results of previous JSON endpoint requests
 in session storage on the browser. These are stored using a key created

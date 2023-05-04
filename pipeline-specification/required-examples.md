@@ -10,7 +10,7 @@ It is RECOMMENDED that the following features are demonstrated in examples:
 - Determination of various metadata associated with a Flow Element, such as
   Evidence accepted and Flow Data key
 
-See [Device Detection required examples](../../device-detection-specification/part3/required-examples.md) for more detailed recommendations
+See [Device Detection required examples](../device-detection-specification/part3/required-examples.md) for more detailed recommendations
 
 ## Suggested Examples
 
