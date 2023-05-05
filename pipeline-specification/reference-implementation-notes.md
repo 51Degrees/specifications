@@ -12,7 +12,7 @@ However, taking advantage of the existing design could be expedient, or desirabl
 
 ## Interfaces, base classes, inheritance
 
-The reference implementations follow "classic" Object-Oriented approach of defining
+The reference implementations follow a "classic" Object-Oriented approach of defining
 interfaces, implementing abstract base classes and creating default
 implementations for the majority of features of the system.
 
@@ -49,7 +49,7 @@ hierarchies. As well as simplifying test configuration and the like.
 
 Builders are an intrinsic part of the current reference architecture and,
 like the classes they build, are extensively subclassed and parameterized. There
-are builders for many significant components and for all Engines (and each of their
+are builders for many significant components and for all Engines (and most of their
 supertypes).
 
 Considerable simplification would theoretically be possible between the builders and
@@ -57,7 +57,7 @@ their target classes in the area of Property getters and setters, as well as
 the target class constructors, of which there are usually several.
 
 It's not usually very easy to establish the default value of a configuration item that
-can be set in a builder, since it can be set in the target class, a superclass
+can be set in a builder, since it might be set in the target class, a superclass
 of that target class, the builder or a superclass of the builder.
 
 This could be resolved by simplifying the constructors and defining a standard  
@@ -79,5 +79,5 @@ configuration file. Finally, if the user is using this builder and decides they
 need some capability that is beyond its scope, they have to migrate to the
 'standard' Pipeline builder.
 
-On the whole, we prefer solutions that will reduce complexity for users. However,
+On the whole, we prefer solutions that will reduce complexity for users, such as this special builder. However, if this is implemented,
 care will need to be taken to avoid the issues described above.

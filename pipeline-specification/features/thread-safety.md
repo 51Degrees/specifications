@@ -15,7 +15,8 @@ thread-safe as the most common use-case is that they will be accessed and
 updated only on the current thread.
 This ensures users get the best performance by default.
 
-Where the Pipeline contains elements running in [parallel](../advanced-features/parallel-processing.md), Element Data instances
+Where the Pipeline contains elements running in
+[parallel](../advanced-features/parallel-processing.md), Element Data instances
 will be added to the Flow Data in parallel. However, it is a useful optimization
 to allow Flow Data to be non-thread safe in contexts where no parallel execution
 is needed.
@@ -40,10 +41,13 @@ instance is accessed from multiple threads. We do not consider it worthwhile
 to cater for this scenario given the decreased performance and increased
 complexity that it would require.
 
+Code comments and documentation MUST be clear that these instances are not
+intended to be accessed from multiple threads simultaneously.
+
 ## Aspect data
 
-In contrast to Element Data, Aspect Data instances MUST be thread-safe. As the
-same instance might be used for multiple different calls to `Process` when
-the [caching](caching.md) feature is enabled.
-If this is not possible for some reason then the Engine MUST NOT allow a cache
-to be added.
+In contrast to Element Data, Aspect Data instances SHOULD be thread-safe. This
+is because, if the [caching](caching.md) feature is enabled, the same instance
+might be added to multiple different Flow Data from different calls to `Process`.
+If the Aspect Data cannot be made thread safe for some reason then the
+corresponding Engine MUST NOT allow a cache to be added.

@@ -1,18 +1,17 @@
 # Cloud Aspect Engine
 
-## Overview
-
 A Cloud Aspect Engine is a type of Engine that works with the
 [Cloud Request Engine](cloud-request-engine.md#overview) to enable users
 to refer processing of Evidence to a remote server.
 
 See the link above for an overview of how these Engines work together.
 
-At time of writing, there were 3 concrete Cloud Aspect Engine implementations:
+At time of writing, there are 3 concrete Cloud Aspect Engine implementations:
 
 - [Device Detection](../../device-detection-specification/pipeline-elements/device-detection-cloud.md)
 - [Device Lookup (TAC and native key)](../../device-detection-specification/part3/pipeline-elements/hardware-profile-lookup-cloud.md)
 - [Location](https://github.com/51Degrees/location-dotnet/blob/master/FiftyOne.GeoLocation.Cloud/FlowElements/GeoLocationCloudEngine.cs)
+  (Location is not yet included in this specification repository)
 
 ## Accepted Evidence
 
@@ -27,7 +26,7 @@ be interface compatible with the Element Data for the equivalent on-premise
 Engine.
 
 For example, both cloud and on-premise Device Detection Engines in C#
-produce an Element Data that implements `IDeviceData`.
+produce an Element Data that implements the interface `IDeviceData`.
 
 ## Start-up activity
 
@@ -42,14 +41,13 @@ data to obtain Property metadata relating to the Properties that it populates.
 ## Processing
 
 The precise processing that occurs depends on the Aspect this
-Engine relates to.
+Engine relates to. In essence though, it simply needs to filter and
+deserialize the raw JSON from the Cloud Request Engine:
 
-In outline, the process is:
-
-1. Get the portion of the raw JSON (provided by the Cloud Request Engine as its
-   Element Data) that relates to this Aspect by using a
-   string data key. (For example, `device` for Device Detection)
-2. Use that portion of the raw JSON to construct the Element Data result.
+1. Get the portion of the raw JSON (provided by the Cloud Request Engine in its
+   Element Data) that relates to this Aspect by using the appropriate
+   string Data Key. (For example, `device` for Device Detection)
+2. Deserialize that portion of the raw JSON to construct the Element Data result.
 
 The primary difficulty with this process is usually converting from the JSON
 format to whatever structure is needed to support the
@@ -68,4 +66,13 @@ there needs to be logic to:
 
 ## Configuration options
 
-There are no configuration options for this Engine.
+There are no specific configuration options for this Engine.
+
+The [caching](../features/caching.md) feature will not work
+with this Engine because it does not use any Evidence, hence there
+is no key to use in the cache.
+It is recommended that caching is applied to the Cloud Request Engine instead
+(Though this also becomes problematic if more than one Cloud Aspect Engine
+is involved)
+
+Implementors MAY chose to restrict the available configuration options accordingly.

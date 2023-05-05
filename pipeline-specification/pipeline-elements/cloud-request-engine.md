@@ -1,18 +1,17 @@
 # Cloud Request Engine
 
-## Overview
-
 Cloud Engines offload their processing to a remote system. This reduces
 resource requirements and avoids the complexities of some local
 Engines (For example,
 [Device Detection on premise](../../device-detection-specification/pipeline-elements/device-detection-on-premise.md)
-has a native component that requires additional dependencies)
+has a native component that requires additional dependencies that
+can be difficult to get running in some environments)
 
 The Pipeline API splits this cloud processing over two separate types of
 Engine:
 
 - Cloud Request Engine - The subject of this section, makes an HTTP
-  call to a remote service and makes a raw JSON response available
+  call to a remote service and makes the raw JSON response available
   by adding it to its Aspect Data.
 - [Cloud Aspect Engine](cloud-aspect-engine.md) - Designed to be swapped
   out with an equivalent On-premise Engine. Takes the raw JSON response
@@ -31,17 +30,19 @@ Device Detection Cloud Engine, etc.
 
 This approach is taken in order to allow Cloud Engines to behave as
 similarly as possible to On-premise Engines from the user point of view,
-while limiting the number of HTTP requests to the same remote
+while limiting the number of HTTP requests to the remote
 server to one per Flow Data, regardless
-of the number of different Aspects that are involved.
+of the number of different Aspects that are involved. This is important
+for performance as the HTTP request time is the majority of the time
+taken in many scenarios.
 
-### Resource Key
+## Resource Key
 
 A Resource Key is a token that serves both to authenticate a request to the
 remote server and to specify which Property values are returned in the
 result. Resource Keys are created using the
 [51Degrees Configurator](https://51degrees.com/documentation/_concepts__configurator.html).
-See [Resource Key Documentation](https://51degrees.com/documentation/_info__resource_keys.html)
+See [Resource Key documentation](https://51degrees.com/documentation/_info__resource_keys.html)
 for more information.
 
 ## Accepted Evidence
@@ -49,8 +50,7 @@ for more information.
 Accepted Evidence is dependent on the supplied Resource Key.
 
 [On start-up](#start-up-activity), the Engine will make a request to its
-remote server
-to get this information.
+remote server to get this information.
 
 ## Element Data
 
@@ -90,8 +90,8 @@ An example of the JSON response received from the server:
 
 ## Start-up activity
 
-On start-up, the Engine will call its configured `accessibleproperties`
-and `evidencekeys`
+On start-up, the Engine will call its [configured](#configuration-options)
+`accessibleproperties` and `evidencekeys`
 endpoints, using the configured Resource Key.
 
 The result from `accessibleproperties` will be used to populate a publicly
@@ -108,7 +108,7 @@ The result from `evidencekeys` will be used to populate the
 If either of these requests fails, the Engine MUST throw a critical
 error as the Pipeline will be unable to function correctly.
 
-See [HTTP requests](#http-requests) for details on general
+See [HTTP requests](#http-requests) for general details on
 HTTP request handling.
 
 ## Processing
@@ -128,34 +128,35 @@ For example, `query.user-agent` becomes `user-agent`.
 This means that conflicts can occur when there are Evidence values for the same
 key with different prefixes. Where there are conflicts, the precedence order
 defined in [Evidence](../features/evidence.md) MUST be used to
-determine which value to use.
+determine which value to send to the remote server.
 
-See [HTTP requests](#http-requests) for details on general
+See [HTTP requests](#http-requests) for general details on
 HTTP request handling.
 
 ## HTTP requests
 
-When making requests to the cloud service during start-up or processing, some
+When making requests to the remote server during start-up or processing, some
 common steps MUST be followed.
 
 Firstly, the `Origin` HTTP Header MUST be set using the configured
 [CloudRequestOrigin](#configuration-options).
 
-Second, there are several scenarios that will cause an error to be thrown:
+Second, there are several scenarios that SHOULD cause an error to be thrown:
 
-- The response will be a JSON object. If the top-level `errors` Property
-  contains an entry then it will need to be parsed and the text
+- If the top-level `errors` Property in the JSON response
+  contains an entry, then it will need to be parsed and the text
   used as the message for the thrown error. (If there are multiple entries
   then a language-appropriate structure, such as the C# AggregateException
   SHOULD be used)
-- If the response is empty then the message will be
+- If the HTTP response body is empty then the message will be
   `No data in response from cloud service at '[url]'`
-- If the HTTP status code indicates failure (i.e. not 200) and there are no
-  error messages for the reasons mentioned above, the message will be
+- If neither of the above scenarios apply but the HTTP status code indicates
+- failure (i.e. not 200), the message will be
   `Cloud service at '[url]' returned status code '[code]' with content [raw response]`
+  (truncate raw response as needed)
 
 Similarly to the `errors` array, any entries in the `warnings` array in the
-response SHOULD be logged as warnings.
+response MUST be logged as warnings.
 
 ## Configuration options
 

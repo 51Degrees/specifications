@@ -1,7 +1,5 @@
 # Sequence Element
 
-## Overview
-
 The Sequence Element is used to keep track of the number of times that
 the script produced by the [JavaScript Builder Element](javascript-builder.md)
 makes callbacks to the server.
@@ -13,8 +11,8 @@ mapping to an HTTP session.
 
 ## Accepted Evidence
 
-- query.session-id
-- query.sequence
+- `query.session-id`
+- `query.sequence`
 
 ## Element Data
 

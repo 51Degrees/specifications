@@ -1,13 +1,14 @@
 # JSON Builder Element
 
-## Overview
-
 The JSON Builder Element creates a JSON representation of most of the values
 in the Flow Data.
 
 This is used along with the [JavaScript builder element](javascript-builder.md)
 and [Sequence Element](sequence-element.md) to enable client-side features of
 the Pipeline [web integration](../features/web-integration.md).
+
+In particular, the functionality of this Element is very closely coupled with
+the JavaScript builder element.
 
 ## Accepted Evidence
 
@@ -24,8 +25,9 @@ Or, for each Property, a list of the JavaScript Properties that can cause their
 value to be updated due to new Evidence.
 
 Note that 'new Evidence' in this case refers to Evidence values that are made
-available in second or subsequent requests as part of the same 'session'.
-These values can then be used to determine or refine results.
+available in second or subsequent requests as part of the same
+[session](sequence-element.md). These values can then be used to determine or
+refine results.
 
 See the [`PopulateMetaDataCollections`](https://github.com/51Degrees/pipeline-dotnet/blob/master/FiftyOne.Pipeline.Elements/FiftyOne.Pipeline.JsonBuilderElement/FlowElement/JsonBuilderElement.cs#L715)
 method in C# for an example of creating these lists.
@@ -45,9 +47,9 @@ for each Property and its value (set to 'null' if there is no value).
 There are also several metadata Properties with different suffixes that can
 be added for each Property:
 
-| **Suffix**         | **Description**                                                                                                                                                                                                                                                                              |
-|--------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| nullreason         | Where the Property value is null, this meta-Property MUST be added with a string message that explains why this Property does not have a value.                                                                                                                                              |
+| **Suffix**         | **Description**                                                                                                                                                                                                                                                                          |
+|--------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| nullreason         | Where the Property value is null, this meta-Property MUST be added with a string message that explains why this Property does not have a value.                                                                                                                                          |
 | delayexecution     | This meta-Property MUST be added with the value 'true' for all Properties where the [metadata](../features/properties.md#property-metadata) delay execution flag is true.                                                                                                                |
 | EvidenceProperties | Where the JSON includes other Properties that are in the [metadata](../features/properties.md#property-metadata) Evidence Properties list for this Property and those Properties have the delayed execution flag set to true, this meta-Property MUST be added to list those Properties. |
 
@@ -58,8 +60,8 @@ These are:
 - [Cloud Request Engine](cloud-request-engine.md)
 - [Usage sharing element](usage-sharing-element.md)
 
-(The reference implementations have an exclusion list containing the key name
-of the elements to exclude.)
+The reference implementations achieve this with a hard-coded exclusion list which
+contains the Data Key of the elements to exclude.
 
 The following top-level entries might also be populated in the
 final JSON output:
@@ -68,12 +70,17 @@ final JSON output:
   than the maximum (specified by a constant set to 10 in the reference implementations)
   then get a list of the complete names of all JavaScript Properties. Add this to the
   result under the top-level key `javascriptProperties`.
+  - If sequence number is 10 (or more) then, to prevent infinite loops, we want to
+    stop further execution of JavaScript property snippets. Not setting
+    `javascriptProperties` means that the JavaScript produced by the
+    [JavaScript Builder](javascript-builder.md) will ignore such snippets that are
+    present.
 - Add any errors from the Flow Data errors collection to the result. This is structured
   as a string array of the error messages under the top-level key `errors`.
 
 ### Examples
 
-Device Detection result including some javascript Properties.
+Below is the JSON for a Device Detection result including some javascript Properties.
 Note the `screenpixelswidth` Property is currently zero because device
 detection does not know how wide the screen is.
 The `screenpixelswidthjavascript` Property contains the JavaScript snippet that
@@ -92,7 +99,7 @@ can be executed to gather this information.
 }
 ```
 
-Result from a location lookup before any coordinates have been supplied.
+Below is the JSON from a location lookup before any coordinates have been supplied.
 
 - The `javascript` Property contains the script to be executed to get the
   coordinate values.
@@ -122,7 +129,7 @@ Result from a location lookup before any coordinates have been supplied.
 
 ```
 
-Partial result from a TAC lookup that returns multiple devices.
+Below is the partial JSON from a TAC lookup that returns multiple devices.
 
 ```json
 {
@@ -154,7 +161,7 @@ Partial result from a TAC lookup that returns multiple devices.
 }
 ```
 
-JSON with an error value set.
+Below is JSON with an error value set.
 
 ```json
 { 
@@ -166,4 +173,4 @@ JSON with an error value set.
 
 | **Name**      | **Type**        | **Default**  | **Description**                                                                                                                                                                                                                                                                                                                                                                |
 |---------------|-----------------|--------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| SetProperties | List of strings | [Empty list] | A list of the Properties to include in the JSON. By default, the list is empty and all Properties will be included in the JSON. Note that some Properties, such as JavaScript Properties and meta properties, will always be included, regardless of this setting. Property names will need to be fully qualified. (e.g. `device.ismobile` or `devices.profiles.hardwarename`) |
+| SetProperties | List of strings | [Empty list] | A list of the Properties to include in the JSON. By default, the list is empty and all Properties will be included in the JSON. Note that some Properties, such as JavaScript Properties and meta properties, MUST always be included, regardless of this setting. Property names will need to be fully qualified. (e.g. `device.ismobile` or `devices.profiles.hardwarename`) |

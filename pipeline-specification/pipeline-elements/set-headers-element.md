@@ -1,7 +1,5 @@
 # Set Headers Element
 
-## Overview
-
 The Set Headers Element constructs a list of all the HTTP response
 header values that other Elements in the Pipeline want to be set.
 Usually, this is done in order to request more Evidence from the
@@ -42,8 +40,8 @@ so for each request.
 - For each Property
   - If Property value is set and is not `Unknown`
     - Extract the header name from the Property name using the convention
-      outlined [above](#overview). Use this as the key to the output key value
-      pair collection.
+      outlined [above](#set-headers-element). Use this as the key to the output
+      key value pair collection.
     - Split the Property value using `,` and add each individual segment to
       the output collection if it has not yet been added for that key.
 

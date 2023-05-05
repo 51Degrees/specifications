@@ -7,7 +7,7 @@ Some general guidance as to how to structure an implementation based on
 
 Using language-provided modularity features to provide separation
 of concerns and to provide for applications being able selectively to
-use features  without having to import unused features.
+use features without having to import unused features.
 
 Excessive modularity, of course, makes the libraries hard to use.
 
@@ -49,10 +49,10 @@ items, such as test data, between languages using Git [submodules](https://git-s
 
 ## Versioning
 
-We distribute Pipeline with a single version number for all modules/artifacts.
-In principle, using an aggregator module would allow both simple update
-and multiple distinct module versions, but we have considered that there
-are insufficient advantages to this approach.
+We distribute packages with a single version number for all modules/artifacts
+from each repository. In principle, using an aggregator module would allow both
+simple update and multiple distinct module versions, but we have considered
+that there are insufficient advantages to this approach.
 
 ## Examples
 
@@ -70,9 +70,3 @@ For more details, see [required examples](required-examples.md).
 Automated tests and expected to be present in the same repository as the
 API code and will be run as part of CI/CD workflows.
 For more details, see [automated testing](automated-testing.md).
-
-### Test data
-
-We recommend that for convenience, test data of some kind is distributed with
-library code and examples. We also recommend that alternative means of updating
-test data are provided.

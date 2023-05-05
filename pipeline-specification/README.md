@@ -13,18 +13,15 @@ for the target language.
 
 This specification is broken down into separate markdown files in multiple directories.
 
-| Directory | Description |
-|---|---|
-| features | Descriptions of Pipeline API features |
-| advanced-features | Descriptions of Pipeline API features that are not implemented in all languages and/or do not have strong enough justifications for the complexity they add |
-| Pipeline-elements | Specifications for Flow Elements that are needed to provide core functionality  |
+| Directory         | Description                                                                                                                                                        |
+|-------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| features          | Descriptions of Pipeline API features                                                                                                                              |
+| advanced-features | Descriptions of Pipeline API features that are not implemented in all languages and/or do not always have strong enough justifications for the complexity they add |
+| Pipeline-elements | Specifications for Flow Elements that are needed to provide core functionality                                                                                     |
 
-If you're not sure where to start, read through the primer section below before
-exploring further.
+## What is the Pipeline API?
 
-## Description
-
-51Degrees `Pipeline` provides a framework within which input data is transformed
+51Degrees Pipeline provides a framework within which input data is transformed
 and enriched to create output data to be consumed by some application.
 
 Note that more concrete details on the terms defined here can be found in the
@@ -33,16 +30,16 @@ Note that more concrete details on the terms defined here can be found in the
 ### Flow
 
 Processing is performed by a sequence of steps which consume the
-output of earlier steps and produce output of their own. The sequence of
-steps is called *flow*: the steps are called Flow Elements and the data
-transferred between them is called Flow Data.
+input, which may include the output of earlier steps, and produce output. The sequence of
+steps is called *flow*: the steps are called **Flow Elements** and the data
+transferred between them is called **Flow Data**.
 
 Flow is unidirectional and does not provide for branching and looping. Parallel
-operation of steps or a sequence of steps is possible.
+operation of steps or a sequence of steps MAY be possible depending on the implementation.
 
-Flow Elements consume Evidence and MAY produce Element Data. This consists
-of name-value pairs of Property values which are accessible by Property name.
-There Element Data instances are then stored in the Flow Data. Hence, Flow
+Flow Elements consume **Evidence** and MAY produce **Element Data**. This consists
+of name-value pairs of **Property** values which are accessible by Property name.
+These Element Data instances are then stored in the Flow Data. Hence, Flow
 Elements MAY also consume Element Data generated earlier in the flow.
 Flow Elements "advertise" the Evidence that they consume, the Properties that
 they produce, a key for accessing those Properties from the Flow Data and various
@@ -52,7 +49,7 @@ information about the data types within which those Properties are found.
 
 Creation of Flow Data is carried out by an application requesting an instance
 from a Pipeline. With a number of important exceptions, the creating
-application MUST destroy the Flow Data once it has completed its processing.
+application SHOULD destroy the Flow Data once it has completed its processing.
 
 The application carries out the initial population of Evidence
 and then requests that the Pipeline process it - i.e. present the Flow Data
@@ -65,7 +62,7 @@ Flow Data is also be used to report errors that occur during processing.
 
 ### Engine
 
-An Engine is a specialization of a Flow Element, which builds on the basic
+An **Aspect Engine** (sometimes shortened to **Engine**) is a specialization of a Flow Element, which builds on the basic
 functionality provided by Flow Element to provide higher level functions
 in a consistent way.
 
@@ -75,12 +72,11 @@ Properties related to some *Aspect* related to the received Evidence. For exampl
 *browser* and *operating system* determined by analysis of Evidence received
 in an HTTP request, such as HTTP Headers and Cookies.
 
-Engines are classed as Cloud Engines, which carry out their processing
-by delegation to a remote server, and On-Premise Engines, which typically
+Engines are usually classed as either **Cloud Engines**, which carry out their processing
+by delegation to a remote server, or **On-Premise Engines**, which typically
 carry out processing by reference to one or more data files, stored locally.
-Facilities are available for update and installation of such data files.
 
-Where both Cloud and On-Premise variants of an Engine are available, they SHOULD
+Where both Cloud and On-Premise variants of an Engine are available, they MUST
 arrange that the Properties and values produced are compatible with each other
 so that the Engines can be substituted in the Pipeline without alteration to
 the consuming application.

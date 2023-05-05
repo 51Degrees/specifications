@@ -78,6 +78,8 @@
 
 [Usage sharing Element](./pipeline-specification/pipeline-elements/usage-sharing-element.md)
 
+---
+
 ## Device Detection specification
 
 [Overview](./device-detection-specification/README.md)

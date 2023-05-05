@@ -1,7 +1,5 @@
 # Web integration
 
-## Overview
-
 The web integration feature is intended to simplify usage of the Pipeline API
 in websites/applications that are built using a particular web framework.
 
@@ -15,14 +13,14 @@ Some common tasks that the web integration performs are:
 
 - Creation of Pipeline on start-up.
 - Manage Flow Data lifecycle
-  - Create Flow Data when request comes in
+  - Create Flow Data when an HTTP request comes in
   - Populate Evidence values and call 'Process'
   - Make the processed Flow Data easily accessible to other parts of the
     application so the results can be used.
   - Handle [resource cleanup](resource-cleanup.md) once request handling is
     completed.
 - Handling requests for [client-side](#client-side-features) functionality.
-- Set HTTP response headers to request additional information.
+- Set HTTP response headers to request additional information if needed.
 
 ## Pipeline configuration
 
@@ -79,8 +77,8 @@ produce an output that describes which response headers need to be set to which
 values.
 
 However, it has no access to the web request itself. Consequently, the web
-integration logic will need to take this output and actually set the necessary response
-headers.
+integration logic will need to take this output and actually set the necessary
+response headers.
 
 Where the relevant headers are already set to some value, append the new
 value, rather than replacing the existing value.
@@ -92,7 +90,7 @@ There are two major client-side features that the web integration provides:
 1. Enable the execution of JavaScript snippets which can be used to gather
    additional Evidence. Handle passing this data back to the Pipeline for
    processing.
-2. Allow the user to access results on Pipeline processing in client side
+2. Allow the user to access results of Pipeline processing in client side
    code.
 
 ### Access to results
@@ -103,7 +101,7 @@ JavaScript object that can be used to access the results from processing.
 
 ### JavaScript snippets
 
-Aspect Engines can return Properties with a type of
+Elements can return Properties with a type of
 [Javascript](properties.md#the-javascript-type). For these Properties,
 the Property value contains JavaScript code that is intended to be
 executed on the client device.
@@ -160,7 +158,7 @@ cache-able and will not respect cache headers.
 
 The reference implementations work around this by using the session storage
 API. See the
-[JavaScript Builder Element](../pipeline-elements/javascript-builder.md)
+[JavaScript Builder Element](../pipeline-elements/javascript-builder.md#session-storage-caching)
 for more details.
 
 ##### Caching example
@@ -254,7 +252,7 @@ If the value in the 'If-None-Match' header matches the calculated ETag value for
 the current request, then the content in the cache is still valid and the
 endpoint can just return a 304 status code. (Not modified)
 
-Note on correctness – This process could lead to responses that are not strictly
+This process could lead to responses that are not strictly
 correct if the JavaScript snippet is getting data values that might change over time.
 For example, if we're using JavaScript to get location and the user has moved then
 session storage will still contain the previous location lookup response.

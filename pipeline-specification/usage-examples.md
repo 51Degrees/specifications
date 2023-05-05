@@ -1,14 +1,16 @@
 # Usage examples
 
+This section demonstrates usage of the API.
+
 For the most part, the Pipeline specification is describing the pieces of an
 empty data processing system. Many use-cases only make sense in the context
 of some concrete usage of that system. As such, it might be helpful to look at
-other use-case documents such as
-[Device Detection](../device-detection-specification/usage-examples.md)
+other usage example documents such as
+[Device Detection](../device-detection-specification/usage-examples.md).
 
 ## Creating elements and Pipelines
 
-Creating Flow Elements will always be done using a consistent mechanism.
+Creating Flow Elements SHOULD always be done using a consistent mechanism.
 In the case of C#, we use a separate builder class. For more details on this,
 see the [Flow Element builder](conceptual-overview.md#flow-element-builder)
 section in the conceptual overview.
@@ -53,7 +55,7 @@ be broken down into 4 steps:
    flowData.AddEvidence("query.evidence-key", "evidence value");
    ```
 
-3. Request the Pipeline to process the data:
+3. Tell the Pipeline to process the data:
 
    ```c#
    flowData.Process();
