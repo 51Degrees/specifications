@@ -65,4 +65,3 @@ the details linked below:
 - [on-premise](pipeline-elements/device-detection-on-premise.md#metadata)
 - [cloud](pipeline-elements/device-detection-cloud.md#start-up-activity)
 - [hardware lookup](part3/pipeline-elements/hardware-profile-lookup-cloud.md#start-up-activity)
-

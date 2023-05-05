@@ -9,7 +9,7 @@ are populated in the Flow Data.
 
 This Engine is the Cloud Aspect Engine for Device Detection.
 
-See [here](../../../pipeline-specification/part3/pipeline-elements/cloud-request-engine.md) 
+See [here](../../../pipeline-specification/part3/pipeline-elements/cloud-request-engine.md)
 for an overview of the data flow for Cloud Engines.
 
 ## Accepted Evidence
@@ -30,7 +30,7 @@ Device Detection.
 
 ## Element Data
 
-The Element Data populated by this engine must be interface compatible with 
+The Element Data populated by this engine must be interface compatible with
 the Element Data populated by the [on-premise](device-detection-on-premise.md)
 Engine.
 
@@ -38,15 +38,13 @@ See [data model](../data-model.md) for more information.
 
 ## Process
 
-The majority of the processing SHOULD be handled by the shared 
+The majority of the processing SHOULD be handled by the shared
 [Cloud Aspect Engine](../../pipeline-specification/part3/pipeline-elements/cloud-aspect-engine.md#processing)
 logic.
 
-This will just need to filter and parse the JSON provided by the Cloud Aspect 
+This will just need to filter and parse the JSON provided by the Cloud Aspect
 Engine to the form that is needed for the Element Data output
 
 ## Configuration options
 
 There are no configuration options associated with this Engine.
-
-

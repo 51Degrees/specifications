@@ -1,10 +1,10 @@
-# Table of Contents
+# Table of contents
 
 [Overview](./README.md)
 
 [Stylistic conventions](./stylistic-conventions.md)
 
-## Pipeline Specification
+## Pipeline specification
 
 [Overview](./pipeline-specification/README.md)
 
@@ -21,7 +21,6 @@
 [Automated Testing](./pipeline-specification/part3/automated-testing.md)
 
 ### Features
-
 
 [Pipeline configuration](./pipeline-specification/features/pipeline-configuration.md)
 
@@ -51,7 +50,7 @@
 
 [Access to results](./pipeline-specification/features/access-to-results.md)
 
-### Advanced Features
+### Advanced features
 
 [Overview](./pipeline-specification/advanced-features/README.md)
 
@@ -63,7 +62,8 @@
 
 [Multi-Pipeline Elements](./pipeline-specification/advanced-features/multi-pipeline-elements.md)
 
-### Pipeline Elements
+### Core Pipeline Elements
+
 [Sequence Element](./pipeline-specification/part3/pipeline-elements/sequence-element.md)
 
 [JavaScript builder Element](./pipeline-specification/part3/pipeline-elements/javascript-builder.md)
@@ -78,8 +78,7 @@
 
 [Usage sharing Element](./pipeline-specification/pipeline-elements/usage-sharing-element.md)
 
-
-## Device Detection Specification
+## Device Detection specification
 
 [Overview](./device-detection-specification/README.md)
 
@@ -93,7 +92,7 @@
 
 [Automated testing](./device-detection-specification/part3/automated-testing.md)
 
-### Pipeline Elements
+### Device Detection Pipeline Elements
 
 [UA-CH high entropy decoder](./device-detection-specification/part3/pipeline-elements/uach-high-entropy-decoder.md)
 

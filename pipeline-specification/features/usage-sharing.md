@@ -15,10 +15,10 @@ Data is shared in XML format, with multiple process requests aggregated
 to produce each payload.
 
 Shared data includes details such as:
+
 - Evidence values
 - Pipeline configuration.
 - OS, programming language and API versions.
 
 For more technical details, see the
 [share usage element](../pipeline-elements/usage-sharing-element.md).
-

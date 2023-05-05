@@ -48,7 +48,7 @@ of [dependencies](https://51degrees.com/documentation/_info__dependencies.html).
 ### Selecting the correct binary
 
 While the implementor is not expected to produce the CI/CD scripts that
-will create the final packages, The final package MUST have some mechanism 
+will create the final packages, The final package MUST have some mechanism
 to determine the correct native binary to use based on the current
 operating system.
 
@@ -179,6 +179,7 @@ As such, steps SHOULD be taken to minimize this as much as possible:
 
 The [refresh data function](../../pipeline-specification/features/data-updates.md#aspect-engine-features)
 for this Engine will perform the following tasks:
+
 - Create a new instance of the C++ `EngineHashSwig` type using either the
   filename or byte[] constructor.
 - Call `refreshData` on the C++ Engine in order to load data into the
@@ -215,9 +216,8 @@ This Engine implements the following events/callbacks/hooks:
 
 ## Metadata
 
-### Overview
-
 On-premise Device Detection has two related metadata structures:
+
 1. The Device Detection data file includes metadata relating to the structure of the
    values that are stored in the file. This is exposed by the Device Detection Engine
    in order to allow users to query the data. [^performance]
@@ -307,6 +307,7 @@ the match that was found. Metadata for these Properties MUST be added, as they
 will not be included in the metadata exposed by the native code.
 
 All these Properties have the following values:
+
 - Category = "Device Metrics" (sic)
 - Available With = "Lite", "Premium", "Enterprise", "TAC" - This
   list could be created dynamically from the lists of files included against
@@ -344,6 +345,6 @@ addition to all the configuration options defined for other features. For exampl
 
 [^1]: The default values for many configuration options comes from the native
 C/C++ code. You can find these defaults in the following files:
-- https://github.com/51Degrees/common-cxx/blob/master/config.h
-- https://github.com/51Degrees/device-detection-cxx/blob/master/src/config-dd.h
 
+- <https://github.com/51Degrees/common-cxx/blob/master/config.h>
+- <https://github.com/51Degrees/device-detection-cxx/blob/master/src/config-dd.h>

@@ -14,7 +14,7 @@ languages.
 
 ## Pipelines
 
-- During construction, there MUST be the ability to add elements/Engines 
+- During construction, there MUST be the ability to add elements/Engines
   to Pipelines. These will run in sequence in the order they are added.
 - During construction, Pipelines MAY have the ability to add multiple
   elements/Engines that will run in parallel (where the language supports this -
@@ -28,6 +28,7 @@ var pipeline = pipelineBuilder.Add(s1).AddParallel([p1,p2]).Add(s2).Build()
 ```
 
 This would create a Pipeline that performs the following processing:
+
 - Execute s1.
 - When s1 is finished, p1 and p2 are started in parallel.
 - When both p1 and p2 are complete, s2 is started.
@@ -66,4 +67,3 @@ internal `develop` branches.
 
 [.NET](https://github.com/51Degrees/device-detection-dotnet/blob/master/Examples/sample-configuration.json)
 [Java](https://github.com/51Degrees/device-detection-java/blob/master/device-detection.examples/console/src/main/resources/gettingStartedOnPrem.xml)
-

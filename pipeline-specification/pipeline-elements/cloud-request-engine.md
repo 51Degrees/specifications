@@ -10,6 +10,7 @@ has a native component that requires additional dependencies)
 
 The Pipeline API splits this cloud processing over two separate types of
 Engine:
+
 - Cloud Request Engine - The subject of this section, makes an HTTP
   call to a remote service and makes a raw JSON response available
   by adding it to its Aspect Data.
@@ -47,7 +48,7 @@ for more information.
 
 Accepted Evidence is dependent on the supplied Resource Key.
 
-[On start-up](#startup-activity), the Engine will make a request to its
+[On start-up](#start-up-activity), the Engine will make a request to its
 remote server
 to get this information.
 
@@ -112,10 +113,10 @@ HTTP request handling.
 
 ## Processing
 
-The Engine processes Flow Data by filtering the full list of Evidence down 
+The Engine processes Flow Data by filtering the full list of Evidence down
 to just Evidence keys needed by the server, and makes an HTTP
 request to the server using the filtered Evidence. The HTTP API used for access to
-51Degrees servers is defined at https://cloud.51degrees.com/api-docs/index.html.
+51Degrees servers is defined at <https://cloud.51degrees.com/api-docs/index.html>.
 
 The server can handle Evidence in a number of different forms, but where
 possible, URL-encoded form data will be used. This is constructed
@@ -142,7 +143,7 @@ Firstly, the `Origin` HTTP Header MUST be set using the configured
 
 Second, there are several scenarios that will cause an error to be thrown:
 
-- The response will be a JSON object. If the top-level `errors` Property 
+- The response will be a JSON object. If the top-level `errors` Property
   contains an entry then it will need to be parsed and the text
   used as the message for the thrown error. (If there are multiple entries
   then a language-appropriate structure, such as the C# AggregateException
@@ -163,13 +164,12 @@ are in addition to all the configuration options defined for other features.
 For example,
 [caching](../../pipeline-specification/features/caching.md)
 
-| **Name**             | **Type** | **Default**                                             | **Description**                                                                                                                                                                           |
-|----------------------|----------|---------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| EndPoint             | string   | https://cloud.51degrees.com/api/v4/                     | The base URL for the cloud service. This will be suffixed with `json`, `accessibleproperties` or `evidencekeys` to form the complete URLs for the various endpoints called by the Engine. |
-| DataEndPoint         | string   | https://cloud.51degrees.com/api/v4/JSON                 | The URL for the cloud service data end point                                                                                                                                              |
-| PropertiesEndPoint   | string   | https://cloud.51degrees.com/api/v4/accessibleProperties | The URL for the cloud service Properties end point                                                                                                                                        |
-| EvidenceKeysEndPoint | string   | https://cloud.51degrees.com/api/v4/Evidencekeys         | The URL for the cloud service Evidence keys end point                                                                                                                                     |
-| ResourceKey          | string   | null                                                    | The Resource Key to use when making requests to the cloud service                                                                                                                         |
-| TimeoutSeconds       | integer  | 100                                                     | The timeout to use when making requests to the cloud service                                                                                                                              |
-| CloudRequestOrigin   | string   | null                                                    | The value to set the 'Origin' header to when making requests to the cloud service                                                                                                         |
-
+| **Name**             | **Type** | **Default**                                               | **Description**                                                                                                                                                                           |
+|----------------------|----------|-----------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| EndPoint             | string   | <https://cloud.51degrees.com/api/v4/>                     | The base URL for the cloud service. This will be suffixed with `json`, `accessibleproperties` or `evidencekeys` to form the complete URLs for the various endpoints called by the Engine. |
+| DataEndPoint         | string   | <https://cloud.51degrees.com/api/v4/JSON>                 | The URL for the cloud service data end point                                                                                                                                              |
+| PropertiesEndPoint   | string   | <https://cloud.51degrees.com/api/v4/accessibleProperties> | The URL for the cloud service Properties end point                                                                                                                                        |
+| EvidenceKeysEndPoint | string   | <https://cloud.51degrees.com/api/v4/Evidencekeys>         | The URL for the cloud service Evidence keys end point                                                                                                                                     |
+| ResourceKey          | string   | null                                                      | The Resource Key to use when making requests to the cloud service                                                                                                                         |
+| TimeoutSeconds       | integer  | 100                                                       | The timeout to use when making requests to the cloud service                                                                                                                              |
+| CloudRequestOrigin   | string   | null                                                      | The value to set the 'Origin' header to when making requests to the cloud service                                                                                                         |

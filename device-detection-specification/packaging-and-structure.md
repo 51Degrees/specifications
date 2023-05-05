@@ -19,4 +19,3 @@ For examples, see 51Degrees Device Detection packages on
 [NuGet](https://www.nuget.org/packages?q=FiftyOne.DeviceDetection),
 [Maven](https://central.sonatype.com/search?namespace=com.51degrees&q=device-detection)
 or [NPM](https://www.npmjs.com/search?q=fiftyone.devicedetection)
-

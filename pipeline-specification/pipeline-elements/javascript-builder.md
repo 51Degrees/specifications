@@ -83,10 +83,10 @@ The parameters to the existing template are:
 | \_hasDelayedProperties | True if the JSON contains the text `delayexecution`                                         | If true, the JavaScript will include functionality to support Properties where execution of the JavaScript will be delayed until needed. |
 
 Finally, the resulting JavaScript will be minified (or not, based on the
-configuration provided). Minification SHOULD be performed using an existing 
+configuration provided). Minification SHOULD be performed using an existing
 third-party library.
 
-Performance tests MUST be in place to verify the performance impact of this 
+Performance tests MUST be in place to verify the performance impact of this
 feature. If it does have a significant impact, and no alternative
 libraries offer better performance, a cut-down minification process MAY be
 implemented in order to achieve the major benefits without a significant

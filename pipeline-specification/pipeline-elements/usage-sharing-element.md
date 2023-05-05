@@ -36,6 +36,7 @@ for the lifetime of the current Pipeline.
 
 From the list of parameters in the processing section below, the invariant ones
 are:
+
 - Version
 - Product
 - Flow Elements
@@ -47,7 +48,7 @@ are:
 Note that there is a proposal to reduce the size of the usage sharing payload
 by moving these values to a `header` element rather than duplicating them in
 every `device` element.
-Implementing this will be a future enhancement as changes will first need 
+Implementing this will be a future enhancement as changes will first need
 to be made to 51Degrees' data collection infrastructure.
 
 ## Processing
@@ -68,6 +69,11 @@ Multiple `<Device>` elements will be batched up as part of each message.
 The number of items per batch is configurable using the
 [minimum entries per message](#configuration-options) setting.
 
+In the snippet below:
+
+- Text in CAPS represent variable values.
+- Things in [square brackets] are optional
+
 ```xml
 <Device>
   <SessionId>SESSION_ID</SessionId> 
@@ -76,19 +82,18 @@ The number of items per batch is configurable using the
   <Version>API_VERSION</Version> 
   <Product>API_NAME</Product>  
   <FlowElement>ELEMENT1</FlowElement> 
-  <FlowElement>ELEMENT2</FlowElement>	 
+  <FlowElement>ELEMENT2</FlowElement>  
   <Language>LANG</Language> 
   <LanguageVersion>LANG_VERSION</LanguageVersion> 
   <ClientIP>IP_ADDRESS</ClientIP> 
   <ServerIP>IP_ADDRESS</ServerIP> 
   <Platform>PLATFORM PLATFORM_VER SERVICE_PACK</Platform> 
-Each evidence value is represented as an entry in the form: 
-  <PREFIX [escaped=true] [truncated=true] Name=”FIELD”>VALUE</PREFIX> 
-For example: 
-  <Header Name=”User-Agent”>USER_AGENT</Header> 
-  <Header Name=”Host”>HOST</Header>
-  <Cookie Name=”51D_ScreenPixelsHeight”>1080</Cookie> 
-  [<BadSchema>true</BadSchema>]
+  <!--Each evidence value is represented as an entry in the form:--> 
+  <PREFIX [escaped=true] [truncated=true] Name="FIELD">VALUE</PREFIX> 
+  <!--For example:--> 
+  <Header Name="user-agent">USER_AGENT</Header> 
+  <Header Name="host">HOST</Header>
+  <Cookie Name="51d_screenpixelsheight">SCREEN_HEIGHT</Cookie> 
 </Device> 
 ```
 
@@ -131,6 +136,7 @@ function in Java for an example of this.
 ### Request detail
 
 When sending the data, use the following details:
+
 - URL configurable using the [share usage URL](#configuration-options) option.
 - POST request
 - XML content written to the body of the request using GZip compression
@@ -139,7 +145,7 @@ When sending the data, use the following details:
   - content-type = text/xml
 
 Response will be a 200 on success. Anything else is a failure.
-When failures occur, the status code and content of the response MUST be logged 
+When failures occur, the status code and content of the response MUST be logged
 to aid troubleshooting.
 
 See the [BuildAndSendXml](https://github.com/51Degrees/pipeline-dotnet/blob/master/FiftyOne.Pipeline.Engines.FiftyOne/FlowElements/ShareUsageElement.cs#L104) method in C# for an example of this.
@@ -159,7 +165,7 @@ early as possible.
 
 The usage sharing element MUST maintain a data structure containing
 recently shared Evidence values. If the data entry being processed
-already has a matching entry in this data structure, it MUST NOT 
+already has a matching entry in this data structure, it MUST NOT
 be shared. For example, the C# implementation generates a hash of the
 Evidence values using the same logic as the [caching](../features/caching.md)
 feature.
@@ -216,6 +222,5 @@ it will need to handle cleanup a little more carefully than other elements.
 | Maximum queue size                | yes                   | yes          | 1000                                                                         | The size of the queue that is used to buffer requests to be added to a usage sharing payload.                                |
 | Add timeout milliseconds          | yes                   | yes          | 5                                                                            | The timeout to use when trying to add items to the usage sharing queue. If the request times out, the data will be discarded |
 | Take timeout milliseconds         | yes                   | yes          | 100                                                                          | The timeout to use when getting items from the usage sharing queue to add to the next payload.                               |
-| Share usage URL                   | yes                   | yes          | https://devices-v4.51degrees.com/new.ashx                                    | The URL to send data to                                                                                                      |
+| Share usage URL                   | yes                   | yes          | <https://devices-v4.51degrees.com/new.ashx>                                  | The URL to send data to                                                                                                      |
 | Repeat Evidence interval minutes  | yes                   | yes          | 20                                                                           | The size of the sliding window during which identical usage data will not be sent if it is seen second or subsequent times.  |
-

@@ -100,6 +100,7 @@ any local data. In the case of file data source, the data is stored once
 obtained via HTTP.
 
 Configuration Groups:
+
 - *HTTP config*
 
 ### Automatic update via HTTP
@@ -130,6 +131,7 @@ this feature and that they obtain updated data once and distribute it to their
 various servers by other means.
 
 Configuration Groups:
+
 - *HTTP config*
 - *Polling config*
 - *Operational file config*
@@ -165,6 +167,7 @@ Implementations MAY choose to provide options of Programmatic Update that
 distinguish a request for HTTP update as opposed to file update.
 
 Configuration Groups:
+
 - *HTTP config*
 - *Polling config*
 - *Operational file config*
@@ -174,6 +177,7 @@ Configuration Groups:
 ### HTTP config
 
 Configuration of the remote endpoint for download:
+
 - **dataUpdateUrl** - the remote URL
 - **urlFormatter** - URL customization
 - **useIfModifiedSince** - request data using if modified since HTTP header
@@ -183,6 +187,7 @@ Configuration of the remote endpoint for download:
 ### Polling config
 
 Configuration of the frequency for checking of new content:
+
 - **pollingInterval** - frequency of polling of server
 - **randomization** - provide a variation of polling frequency to avoid
   synchronized requests from more than one server
@@ -190,6 +195,7 @@ Configuration of the frequency for checking of new content:
 ### Operational file config
 
 Configuration of the locations that disk based operation is done from:
+
 - **dataSourceFileLocation** - where to load the data source fom
 - **createOperationalDataCopy** - create a copy of the data source, for operation
 - **operationalDataFileDirectory** - the directory for the data file copy
@@ -236,12 +242,14 @@ in this configuration is set for memory data source operation.
 ### newBufferAvailable (from memory, via remote)
 
 Probably can't compare dates so load whatever we have:
+
 - load buffer
 
 ### newFileAvailable (via remote or file watcher)
 
 The file will be in *dataFilePath* from watcher or from download, if the
 downloaded file is newer than the current file
+
 - pause file watcher, if any
 - pause update polling, if any
 - load file
@@ -328,7 +336,7 @@ relevant details (e.g. which Engine + data file the update is for)
 ### Errors
 
 There are several possible causes of errors within the data update service.
-As this is a background service, any failures will need to be 
+As this is a background service, any failures will need to be
 caught and logged, rather than being lost or causing process failures.
 
 These messages MUST also be consistent across languages to make life easier

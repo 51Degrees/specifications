@@ -22,12 +22,14 @@ Firstly, these are the mechanisms for getting Element Data:
    ```c#
    IElementData deviceData = flowData.Get(DeviceDetectionEngine.ElementDataKey);
    ```
+
 2. In strongly typed languages, it SHOULD be possible to get an Element Data
    instance by supplying the type of the data that is needed. For example:
 
    ```c#
    IDeviceData deviceData = flowData.Get<IDeviceData>();
    ```
+
 3. In strongly typed languages, it SHOULD be possible to get an Element Data
    instance by supplying an element instance.
    For example:
@@ -35,6 +37,7 @@ Firstly, these are the mechanisms for getting Element Data:
    ```c#
    IDeviceData deviceData = flowData.GetFromElement(deviceDetectionEngine);
    ```
+
 4. In strongly typed languages it MAY be useful to get the type of
    Element Data associated with a Flow Element, without getting an associated
    instance. For example:
@@ -51,10 +54,10 @@ Below are the mechanisms for getting Properties:
    ```c#
    object propertyValue = deviceData.Get("ismobile");
    ```
+
 2. It SHOULD be possible to get a Property value from an Element Data instance
    by using standard Property accessors for the language. For example:
 
    ```c#
    IAspectPropertyValue<bool> propertyValue = deviceData.IsMobile;
    ```
-

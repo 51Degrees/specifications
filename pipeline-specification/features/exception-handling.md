@@ -98,6 +98,6 @@ preventing the creation or execution of the Pipeline.
 
 Can be thrown by the [CloudRequestEngine](../pipeline-elements/cloud-request-engine.md)
 following requests to a cloud service. MUST be populated with details
-relevant to the failure (For example, when a 429 error occurs, include the 
+relevant to the failure (For example, when a 429 error occurs, include the
 value of the 'Retry-After' header in the exception message so that
 the user can act on it)

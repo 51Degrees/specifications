@@ -69,15 +69,16 @@ thousands of lines of code) in the reference implementations and the code of
 those implementations can be consulted for more details.
 
 Code coverage is a useful tool to be able to see which areas of logic may require
-test to be added. However, it is not recommended that code coverage is used 
-as a metric. This is because, even with 100% coverage, there are many scenarios 
-that might not be tested. Thus, the focus should be on ensuring different usage 
-scenarios are tested, rather than ensuring a certain percentage of the code is 
-covered by tests. 
+test to be added. However, it is not recommended that code coverage is used
+as a metric. This is because, even with 100% coverage, there are many scenarios
+that might not be tested. Thus, the focus should be on ensuring different usage
+scenarios are tested, rather than ensuring a certain percentage of the code is
+covered by tests.
 
 ### Core
 
 TypedKeyMap :
+
 - (ThreadSafe and non-ThreadSafe) test each of the methods.
 
 Pipeline:
@@ -90,6 +91,7 @@ Pipeline:
 - test that Flow Data contains correct errors at end.
 
 PipelineBuilder and PipelineOptions:
+
 - check exceptional operation such as adding a closed Flow Element
 - check build from options
 - check Build from serialized options with abbreviated names
@@ -107,6 +109,7 @@ Flow Data:
 Flow Element:
 
 Create a Test Element and associated data
+
 - check correct process() logic
 - check for correct creation of associated data type
 - check for correct access following processing
@@ -123,11 +126,13 @@ Pipeline Overhead:
 
 Create a test Pipeline and check that the processing costs is within
 reasonable bound for the cases:
+
 - repeated execution of Pipeline
 - repeated execution of Pipeline with caching enabled on Engine
 - repeated execution of Pipeline with parallel Flow Data
 
 AspectEngine:
+
 - check Aspect Engine uses cache correctly
 - if lazy loading is implemented, check that it fires only at the right
   time and only once
@@ -135,6 +140,7 @@ AspectEngine:
 DataUpdateService:
 
 DataUpdate is a complex process with many options.
+
 - check that the options cannot be set inconsistently
 - check that the callbacks are fired on update completion successfully
 - check that Engine refresh is triggered on file update if configured
@@ -187,7 +193,7 @@ SetHeaders
 - check that the maximum iterations is observed
 - check that disallowed elements are not put in the output
 - check that the serialization is correct
-- 
+-
 
 ### JavaScriptBuilder
 
@@ -201,6 +207,7 @@ Some Aspects of these tests look rather like integration tests and ideally will
 require a [headless browser](https://en.wikipedia.org/wiki/Headless_browser) for execution.
 
 Things to check:
+
 - operation of the SetHeaders Engine
 - operation of the JSON and JavaScript Engines
   - operation of the JavaScript that is produced  

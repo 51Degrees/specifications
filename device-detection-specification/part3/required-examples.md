@@ -28,7 +28,7 @@ above features - see [Concrete Examples](#concrete-examples).
 
 ### Execution
 
-It MUST be possible to simply execute examples from command line/IDE as 
+It MUST be possible to simply execute examples from command line/IDE as
 expected by a user of the implementation language.
 
 There MUST be unit tests for examples, to verify that
@@ -42,7 +42,7 @@ The need for examples to be runnable as an application and as a test suggests
 that they are written with example code to be executed as a public method, and
 a common pattern is established across examples.
 
-It MUST be possible to programmatically supply any necessary configuration or parameters, such as cloud resource keys, or device detection license keys. 
+It MUST be possible to programmatically supply any necessary configuration or parameters, such as cloud resource keys, or device detection license keys.
 
 ### Legibility
 
@@ -58,6 +58,7 @@ API implementations, rather than them being accessible only in the
 context of examples.
 
 Some examples of helpers in the latter category:
+
 - a helper that creates a hash Engine to provide access to the data file
   metadata (date and data tier).
 - a helper that gets the value of a Property as a string, taking into account
@@ -148,8 +149,8 @@ Pipeline causes the elements added to it to be destroyed.
 ### Build from Configuration
 
 Reference implementation examples include illustration of creating a Pipeline
-from a configuration file. In XML or JSON, this configuration file can be used 
-to add, as a comment, a listing of all the possible options for the Pipeline 
+from a configuration file. In XML or JSON, this configuration file can be used
+to add, as a comment, a listing of all the possible options for the Pipeline
 and all Engines. This information is also available in sample files:
 
 TODO - these sample files are not yet publicly available, they are in
@@ -163,7 +164,7 @@ internal `develop` branches, but will be available at the following URLs in futu
 Some 51Degrees support queries relate to user confusion over the intended
 lifecycle of a Pipeline and Flow Data created from it.
 
-It's important to emphasize, in examples, that only one Pipeline instance is 
+It's important to emphasize, in examples, that only one Pipeline instance is
 needed for most use cases and that it can be created as a singleton,
 whose lifetime is often the same as the application that it is in.
 
@@ -201,7 +202,7 @@ when executed as a console application.
 
 Detailed inline comments in these examples introduce the use of Evidence and
 retrieval of Properties resulting from detection, as well as illustrating
-correct [lifecycle management](#pipeline-and-flowdata-lifecycle) of Pipeline
+correct [lifecycle management](#pipeline-and-flow-data-lifecycle) of Pipeline
 and Flow Data instances.
 
 See documentation

@@ -31,4 +31,3 @@ This feature is used to enable or assist with other features.
   the Evidence keys that the Engine accepts.
 - [web integration](web-integration.md#populating-evidence) - Data from a web
   request is automatically added to Evidence.
-

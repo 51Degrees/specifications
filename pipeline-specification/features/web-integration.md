@@ -27,7 +27,7 @@ Some common tasks that the web integration performs are:
 ## Pipeline configuration
 
 The web integration makes use of several Flow Elements in order to support
-[client-side](#javascript-properties) functionality.
+[client-side](#client-side-features) functionality.
 
 Where the web integration is responsible for creation of the Pipeline, it
 will also need to ensure that these additional Flow Elements are present.
@@ -82,12 +82,13 @@ However, it has no access to the web request itself. Consequently, the web
 integration logic will need to take this output and actually set the necessary response
 headers.
 
-Where the relevant headers are already set to some value, append the new 
+Where the relevant headers are already set to some value, append the new
 value, rather than replacing the existing value.
 
 ## Client-side features
 
 There are two major client-side features that the web integration provides:
+
 1. Enable the execution of JavaScript snippets which can be used to gather
    additional Evidence. Handle passing this data back to the Pipeline for
    processing.
@@ -112,6 +113,7 @@ already be accessible in client-side code through the JavaScript include that
 is discussed in the section above.
 
 Therefore, in order to meet this requirement, the JavaScript include will need to:
+
 1. Identify these JavaScript Property values
 2. Execute the snippets
 3. Call back to the server, including the results from the execution of the
@@ -171,7 +173,7 @@ on each line.
 
 ![JavaScript Properties Request Response](../images/JavascriptProperties-RequestResponse.png)
 
-###### Line 1: first request to JavaScript endpoint:
+###### Line 1: first request to JavaScript endpoint
 
 A client connecting to a web server that uses a Pipeline API with web
 integration will typically be directed to download a script such as
@@ -186,7 +188,7 @@ Properties are present, they will be executed. Any new pieces of Evidence
 produced because of processing these JavaScript Properties will be added to the
 parameters list. A request will then be sent to the callback URL.
 
-###### Line 2: first request to JSON endpoint:
+###### Line 2: first request to JSON endpoint
 
 As this is the first request, there is nothing in the session storage.
 Proxy and server caches will never cache this resource. On the server, the

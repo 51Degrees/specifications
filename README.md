@@ -33,6 +33,5 @@ products.
   and definitions in multiple places.
 - CI/CD scripts and the like are out of scope. However, implementers will need to be
   mindful of the requirement to have the ability to build and test the software
-  in a non-interactive CI/CD environment. See 51Degrees 
+  in a non-interactive CI/CD environment. See 51Degrees
   [CI/CD documentation](https://github.com/51Degrees/common-ci#readme) for more details.
-

@@ -42,7 +42,6 @@ complexity that it would require.
 
 ## Aspect data
 
-
 In contrast to Element Data, Aspect Data instances MUST be thread-safe. As the
 same instance might be used for multiple different calls to `Process` when
 the [caching](caching.md) feature is enabled.

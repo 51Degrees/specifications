@@ -17,9 +17,10 @@ To make it clear that the function is non-blocking when a cancellation token
 is supplied, we suggest considering a differently named function for that scenario.
 (For example, 'ProcessAsync').
 
-A decision on whether to implement will need to consider: 
+A decision on whether to implement will need to consider:
+
 - The time required to implement the feature
-- The impact on the API surface area 
-- Impact on documentation 
+- The impact on the API surface area
+- Impact on documentation
 - Impact on examples
 - What alternatives exist to achieve a similar goal (For example, timeouts)

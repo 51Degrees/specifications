@@ -3,10 +3,10 @@
 This document contains some notes on stylistic conventions to be observed
 in the specification, and doesn't form part of the specification itself.
 
-## Voice 
+## Voice
 
 51Degrees style guide says to adopt a friendly personal tone
-however this is a formal specification, so write in third person. 
+however this is a formal specification, so write in third person.
 
 - The 51Degrees implementation rather than "our"
 - It is recommended rather than we recommend.
@@ -15,11 +15,10 @@ however this is a formal specification, so write in third person.
 
 - use US English spelling
 - possibly hyphenated terms, render as follows:
-    - "start-up"
-    - "metadata"
-    - "website"
-    - "callback"
-
+  - "start-up"
+  - "metadata"
+  - "website"
+  - "callback"
 
 ## Capitalization
 
@@ -51,8 +50,8 @@ Defined Terms are Capitalized.
 - Resource Key
 - Aspect
 
-Where defined terms are introduced, in 
-[Conceptual overview](pipeline-specification/conceptual-overview.md) 
+Where defined terms are introduced, in
+[Conceptual overview](pipeline-specification/conceptual-overview.md)
 and introductory material, they are **emboldened** on first occurrence.
 
 Pluralized forms of Defined Terms are capitalized.
@@ -67,6 +66,7 @@ of a concept that has a Defined Term, the name of
 the class is used and rendered in monospace e.g. `FlowData`
 
 ## Tables
+
 - Bold column headers
 - Equal space columns
 
@@ -92,6 +92,7 @@ Refer to 51Degrees Style Guide.
 Refer to 51Degrees Glossary
 
 Some VSCode extensions that have proven useful:
+
 - Code Spell Checker
 - HTTP/s and relative link checker
 - Markdown All in One
@@ -100,6 +101,3 @@ Some VSCode extensions that have proven useful:
 ## Consistency
 
 Use the term "remote server" - not cloud or remote service
-
-
-

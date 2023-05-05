@@ -53,15 +53,17 @@ be added for each Property:
 
 Some Elements MUST be excluded from having their Properties added to the JSON.
 These are:
+
 - [Set Headers Element](set-headers-element.md)
 - [Cloud Request Engine](cloud-request-engine.md)
 - [Usage sharing element](usage-sharing-element.md)
 
-(The reference implementations have an exclusion list containing the key name 
+(The reference implementations have an exclusion list containing the key name
 of the elements to exclude.)
 
 The following top-level entries might also be populated in the
 final JSON output:
+
 - If the sequence number set by the [Sequence Element](sequence-element.md) is less
   than the maximum (specified by a constant set to 10 in the reference implementations)
   then get a list of the complete names of all JavaScript Properties. Add this to the
@@ -91,6 +93,7 @@ can be executed to gather this information.
 ```
 
 Result from a location lookup before any coordinates have been supplied.
+
 - The `javascript` Property contains the script to be executed to get the
   coordinate values.
 - The `javascriptdelayexecution` Property indicates that we don't want the

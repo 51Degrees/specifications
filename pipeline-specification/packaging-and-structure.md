@@ -76,4 +76,3 @@ For more details, see [automated testing](automated-testing.md).
 We recommend that for convenience, test data of some kind is distributed with
 library code and examples. We also recommend that alternative means of updating
 test data are provided.
-

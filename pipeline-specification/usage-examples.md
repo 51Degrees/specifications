@@ -46,16 +46,19 @@ be broken down into 4 steps:
    ```c#
    var flowData = pipeline.createFlowData();
    ```
+
 2. Add [Evidence](features/evidence.md):
 
    ```c#
    flowData.AddEvidence("query.evidence-key", "evidence value");
    ```
+
 3. Request the Pipeline to process the data:
 
    ```c#
    flowData.Process();
    ```
+
 4. Access the results:
 
    ```c#
@@ -64,4 +67,3 @@ be broken down into 4 steps:
 
    See [access to results](features/access-to-results.md) for more detail on
    the different ways to access results.
-

@@ -85,8 +85,8 @@ arrange that the Properties and values produced are compatible with each other
 so that the Engines can be substituted in the Pipeline without alteration to
 the consuming application.
 
-Various advanced features MAY be implemented that enable the user to configure 
-Engines with caches, carry out lazy evaluation of Property values or share 
+Various advanced features MAY be implemented that enable the user to configure
+Engines with caches, carry out lazy evaluation of Property values or share
 Engine instances between Pipelines.
 
 ![Illustration of Pipeline Flow](images/PipelineFlow.png)
