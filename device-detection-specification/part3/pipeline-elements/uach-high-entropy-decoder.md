@@ -36,20 +36,19 @@ available and falling back to Evidence values if they are not.
 See [adding Evidence values](../../../pipeline-specification/features/evidence.md#adding-evidence-values)
 for more details.
 
-| **Name**                    | **Type** | **Description**                                                                                 |
-|-----------------------------|----------|-------------------------------------------------------------------------------------------------|
-| sec-ch-ua                   | string   | The value of the `sec-ch-ua` HTTP header determined from the encoded Evidence                   |
-| sec-ch-ua-full-version-list | string   | The value of the `sec-ch-ua-full-version-list` HTTP header determined from the encoded Evidence |
-| sec-ch-ua-model             | string   | The value of the `sec-ch-ua-model` HTTP header determined from the encoded Evidence             |
-| sec-ch-ua-mobile            | string   | The value of the `sec-ch-ua-mobile` HTTP header determined from the encoded Evidence            |
-| sec-ch-ua-platform          | string   | The value of the `sec-ch-ua-platform` HTTP header determined from the encoded Evidence          |
-| sec-ch-ua-platform-version  | string   | The value of the `sec-ch-ua-platform-version` HTTP header determined from the encoded Evidence  |
+| **Name**                    | **Type** | **Description**                                                                                                                                                                                                                                                            |
+|-----------------------------|----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| sec-ch-ua                   | string   | The value of the `sec-ch-ua` HTTP header determined from the encoded Evidence                                                                                                                                                                                              |
+| sec-ch-ua-full-version-list | string   | The value of the `sec-ch-ua-full-version-list` HTTP header determined from the encoded Evidence                                                                                                                                                                            |
+| sec-ch-ua-model             | string   | The value of the `sec-ch-ua-model` HTTP header determined from the encoded Evidence                                                                                                                                                                                        |
+| sec-ch-ua-mobile            | string   | The value of the `sec-ch-ua-mobile` HTTP header determined from the encoded Evidence. Note that this value is a boolean in the UA-CH specification. However, as an HTTP header, it is a string (usually with the value `?0` or `?1`) and must be treated as a string here. |
+| sec-ch-ua-platform          | string   | The value of the `sec-ch-ua-platform` HTTP header determined from the encoded Evidence                                                                                                                                                                                     |
+| sec-ch-ua-platform-version  | string   | The value of the `sec-ch-ua-platform-version` HTTP header determined from the encoded Evidence                                                                                                                                                                             |
 
-<span style="color:yellow">
-- `sec-ch-ua-mobile` - is actually of type boolean, but in JSON can be expressed as numeric (0 or 1).  
-- `sec-ch-ua`, `sec-ch-ua-mobile` and `sec-ch-ua-platform` are low entropy client hints.  
-- maybe `sec-ch-ua-bitness` and `sec-ch-ua-architecture` should also be added to the high entropy list of hints, f.e. convertSUAtoUACH routine deals with them too, both are string type.  
-</span>
+It is worth highlighting that there are other client hints, such as
+`sec-ch-ua-bitness` and `sec-ch-ua-architecture`. However, these are
+not needed for device detection, so are not featured here.
+
 ## Process
 
 - Get the encoded value from Evidence for the [relevant keys](#accepted-evidence)

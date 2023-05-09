@@ -1,28 +1,7 @@
 # Required Examples
 
-## Features
-
-It is RECOMMENDED that the following features are demonstrated in examples:
-
-- On-Premise Device Detection
-- Cloud Device Detection
-- Native Key/TAC Detection
-- Build from Configuration
-- Use of Fluent Builder
-- Need for Resource Key for Cloud
-- Creation of Pipeline once only
-- Presentation of Evidence
-- Access to Properties strongly typed
-- Need to dispose every Flow Data
-- Match Metrics
-- Use of Web Integration
-- Use of Client Side detection
-- Obtaining "high entropy" Evidence
-- Offline Processing
-- Data Update
-
-The examples in the reference implementations demonstrate combinations of the
-above features - see [Concrete Examples](#concrete-examples).
+This section describes the user-runnable examples that MUST be implemented
+in order demonstrate usage of the API to the customer.
 
 ## Implementation Notes
 
@@ -42,7 +21,8 @@ The need for examples to be runnable as an application and as a test suggests
 that they are written with example code to be executed as a public method, and
 a common pattern is established across examples.
 
-It MUST be possible to programmatically supply any necessary configuration or parameters, such as cloud resource keys, or device detection license keys.
+It MUST be possible to programmatically supply any necessary configuration or
+parameters, such as cloud resource keys, or device detection license keys.
 
 ### Legibility
 
@@ -66,13 +46,15 @@ Some examples of helpers in the latter category:
 
 ### Code Comments
 
-We recommend extremely verbose and pedagogic comments as a module header and in
-the code of examples.
+We require extremely verbose comments as a module header in examples.
 
 51Degrees generates Web documentation ([for example](https://51degrees.com/documentation/_examples__device_detection__getting_started__console__on_premise.html))
 from reference implementation examples, using Doxygen. For the sake of
 readability of the source of the examples text intended for Doxygen
 generation is placed at the bottom of source files.
+
+In addition, it is recommended that the examples are very densely
+commented in order to help the user understand what it is doing.
 
 ### File References
 
@@ -184,32 +166,46 @@ no value in sharing those values with 51Degrees. In addition, though use of
 examples is likely to be statistically insignificant, it might nonetheless alter
 the calculations that are performed regarding current usage.
 
-For somewhat arbitrary reasons, reference implementations inhibit usage
-sharing for console examples, but enable it for web examples. Every example in
-which share usage is inhibited needs to have a comment saying that in normal
-operation the inhibiting code SHOULD be removed, which diminishes the clarity of the example.
+Reference implementations inhibit usage sharing for console examples by ensuring
+the [Usage Sharing Element](../../pipeline-specification/pipeline-elements/usage-sharing-element.md)
+is not added to the Pipeline, but enable it for web examples.
 
-<span style="color:yellow">Can we specify how is it inhibited?  Is there a special flag for the 
-ShareUsage element that tells it to ihibit sharing when set to true?</span>
+This is done because it has been observed that web
+examples are more frequently copied verbatim as a starting point for customer
+implementations. As usage sharing is so important, we want to ensure it is enabled
+by default in this scenario.
+
+Every example in which share usage is inhibited needs to have a comment saying
+that in normal operation usage sharing should be enabled by adding a Usage Sharing
+Element to the Pipeline.
 
 ## Concrete Examples
 
 These examples are provided in the reference implementations to illustrate
-[features](#features) mentioned.
+the following features:
 
-<span style="color:yellow">There is a back reference to this section from the [features](#features) section,
-  but this section creates a reference loop to features section.  This section should either contain some 
-concrete examples or not be referenced with this premise.</span>
+- On-Premise Device Detection
+- Cloud Device Detection
+- Native Key/TAC Detection
+- Build from Configuration
+- Use of Fluent Builder
+- Need for Resource Key for Cloud
+- Creation of Pipeline once only
+- Presentation of Evidence
+- Access to Properties strongly typed
+- Need to dispose every Flow Data
+- Match Metrics
+- Use of Web Integration
+- Use of Client Side detection
+- Obtaining "high entropy" Evidence
+- Offline Processing
+- Data Update
 
 ### Getting Started Console
 
-<span style="color:yellow">
-Maybe a better term to use would be "command line" instead of "console".
-</span>
-
 Examples MUST be provided that illustrate basic usage of the API for
 both Cloud and On-Prem, using fluent builder and options file configuration,
-when executed as a console application.
+when executed as a console (command line) application.
 
 Detailed inline comments in these examples introduce the use of Evidence and
 retrieval of Properties resulting from detection, as well as illustrating
