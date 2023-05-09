@@ -27,7 +27,7 @@ be used by the Device Detection Engines.
 This Element is only implemented for
 [.NET](https://github.com/51Degrees/device-detection-dotnet/blob/master/FiftyOne.DeviceDetection/FiftyOne.DeviceDetection/Uach/UachJsConversionElement.cs)
 at time of writing.
-The reference implementation writes to directly to Evidence, which will not
+The reference implementation writes directly to Evidence, which will not
 be possible if Evidence is immutable.
 Instead, the Element can output its values using Element Data as described
 in the table below.
@@ -45,6 +45,11 @@ for more details.
 | sec-ch-ua-platform          | string   | The value of the `sec-ch-ua-platform` HTTP header determined from the encoded Evidence          |
 | sec-ch-ua-platform-version  | string   | The value of the `sec-ch-ua-platform-version` HTTP header determined from the encoded Evidence  |
 
+<span style="color:yellow">
+- `sec-ch-ua-mobile` - is actually of type boolean, but in JSON can be expressed as numeric (0 or 1).  
+- `sec-ch-ua`, `sec-ch-ua-mobile` and `sec-ch-ua-platform` are low entropy client hints.  
+- maybe `sec-ch-ua-bitness` and `sec-ch-ua-architecture` should also be added to the high entropy list of hints, f.e. convertSUAtoUACH routine deals with them too, both are string type.  
+</span>
 ## Process
 
 - Get the encoded value from Evidence for the [relevant keys](#accepted-evidence)

@@ -32,7 +32,7 @@ It MUST be possible to simply execute examples from command line/IDE as
 expected by a user of the implementation language.
 
 There MUST be unit tests for examples, to verify that
-the example remains valid though various code changes. Since examples
+the example remains valid through various code changes. Since examples
 are primarily concerned with providing visual output at the time of execution
 it is often difficult to carry out verification of the results produced by the
 example, and it is likely to be sufficient for a test to show that the example
@@ -117,7 +117,7 @@ find the production date of the file.
 ### Cloud Device Detection
 
 Reference implementation examples illustrate use of Resource Keys to access
-the cloud service. A predefined link [such as](https://configure.51degrees.com/jqz435Nc)
+the cloud service. A predefined link such as [this one](https://configure.51degrees.com/jqz435Nc)
 can be created to create a Resource Key to provide access to the Properties
 used in the examples. For simplicity, it might be convenient for such a link to
 provide access to all free Properties.
@@ -189,12 +189,23 @@ sharing for console examples, but enable it for web examples. Every example in
 which share usage is inhibited needs to have a comment saying that in normal
 operation the inhibiting code SHOULD be removed, which diminishes the clarity of the example.
 
+<span style="color:yellow">Can we specify how is it inhibited?  Is there a special flag for the 
+ShareUsage element that tells it to ihibit sharing when set to true?</span>
+
 ## Concrete Examples
 
 These examples are provided in the reference implementations to illustrate
 [features](#features) mentioned.
 
+<span style="color:yellow">There is a back reference to this section from the [features](#features) section,
+  but this section creates a reference loop to features section.  This section should either contain some 
+concrete examples or not be referenced with this premise.</span>
+
 ### Getting Started Console
+
+<span style="color:yellow">
+Maybe a better term to use would be "command line" instead of "console".
+</span>
 
 Examples MUST be provided that illustrate basic usage of the API for
 both Cloud and On-Prem, using fluent builder and options file configuration,
