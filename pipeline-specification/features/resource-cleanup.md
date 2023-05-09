@@ -5,14 +5,15 @@
 There MUST be some mechanism to clean up system resources
 associated with various instances:
 
-| Type         | Description                                                                                                                             |
-|--------------|-----------------------------------------------------------------------------------------------------------------------------------------|
-| Element Data | If the instance contains any native (C/C++) resources, it will need to clean them up when triggered.                                            |
-| Flow Data    | Trigger clean up of contained Element Data instances.                                                                                   |
-| Flow Element | Clean up large in-memory data items, file handles, etc.                                                                                 |
-| Pipeline     | Trigger clean up of Flow Elements that it contains. This behavior is configurable to accommodate sharing of elements between Pipelines. |
+| Type         | Description                                                                                          |
+|--------------|------------------------------------------------------------------------------------------------------|
+| Element Data | If the instance contains any native (C/C++) resources, it will need to clean them up when triggered. |
+| Flow Data    | Trigger clean up of contained Element Data instances.                                                |
+| Flow Element | Clean up large in-memory data items, file handles, etc.                                              |
+| Pipeline     | Trigger clean up of Flow Elements that it contains.                                                  |
 
-Note: In most scenarios the user application is responsible for creating Flow Data from the Pipeline and for its later disposal.
+Note: In many scenarios the user application is responsible for creating
+Flow Data from the Pipeline and for its later disposal.
 However, see [web integration](web-integration.md) for further notes
 on where this is not the case.
 
@@ -20,44 +21,47 @@ on where this is not the case.
 
 ### Pipeline
 
-By default, Pipeline will clean up the Flow Elements it contains.
-However, there MUST be an option to disable this behavior.
+In general, the Pipeline is responsible for clean up of any Flow
+Elements it contains.
 
-This is needed for scenarios where single elements are added to multiple
-Pipelines.
-In this case, the user will take responsibility for cleanup of
-Flow Element resources. This can be made clear in comments and
-documentation around the use of this option.
+However, if the [multi Pipeline Elements](../advanced-features/multi-pipeline-elements.md)
+feature is implemented then there MUST be an option to disable
+this behavior. In this case, the user will take responsibility
+for cleanup of Flow Element resources. This can be made clear in
+comments and documentation around the use of this option.
 
 ### Flow Element
 
-Flow Elements can be very light-weight, but can also maintain significant
-internal resources.
-
-Similar to Element Data we have found native resources to be
-the primary problem area.
-
-There MUST be some mechanism to ensure that such resources are cleaned up
-when the Flow Element is no longer needed.
-
-Whether other Flow Elements need any specific cleanup logic is
-left up to implementers.
-
-### Element Data
+Flow Elements might be very light-weight, but might also maintain
+significant internal resources.
 
 In general, we have found that specific clean up of resources associated with
-Element Data instances is not needed as the garbage collector does a good
-enough job.
+Element Data instances is not needed as garbage collectors do a good enough
+job for most languages.
+
 However, there are two caveats to this:
 
-1. This will not be the case in all programming languages. Some profiling can
-   be done to ensure that cleanup is being done effectively in the absence of
-   specific cleanup logic.
+1. This will not be the case in all programming languages or all workloads.
+   Some profiling SHOULD be done to ensure that cleanup is being done effectively
+   in the absence of specific cleanup logic.
 2. Where the Element Data contains references to native (C/C++) resources
    the system needs assistance to tie the cleanup of the Element Data to
    the cleanup of these native resources. We have found that without this
    assistance, the system fails to clean resources up fast enough, leading to
-   resource starvation and low level memory exceptions.
+   resource starvation and low level memory exceptions. There MUST be a
+   mechanism to ensure such resources are cleaned up.
+
+### Element Data
+
+As with Flow Elements, we have found that the primary use case for
+specific resource cleanup logic is for Element Data instances that
+contain references to native C/C++ resources.
+
+There MUST be some mechanism to ensure that such resources are cleaned up
+when the Element Data is no longer needed.
+
+Other Element Data implementations SHOULD be profiled to see if cleanup
+logic is needed.
 
 #### Impact on caching
 
@@ -75,7 +79,7 @@ garbage collection will achieve.
 
 Cleanup of Flow Data might include any resources that it holds. However,
 the primary concern is to ensure that any Element Data instances that
-it holds that require cleanup are taken care of.
+require cleanup are taken care of.
 
 Element Data instances that do not require cleanup MUST be left alone
 in order for [result caching](caching.md) to work correctly.
