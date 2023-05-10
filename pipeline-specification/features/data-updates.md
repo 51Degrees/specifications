@@ -2,10 +2,10 @@
 
 ## Overview
 
-An on-premise Aspect Engine can require data that is independent of the
+An On-Premise Aspect Engine can require data that is independent of the
 logic of the Engine and that is periodically refreshed. For example,
 when new phones or browser versions are released, the Device Detection
-Engine will require a new data file in order to detect and populate
+Engine will require new data in order to detect and populate
 Property values for those new cases. The Data Update Service
 provides functionality for this.
 
@@ -15,19 +15,19 @@ to an instance of the Aspect Engine.
 
 It is possible that an Aspect Engine requires more than one data source [^1] and
 implementers can choose either to provide the data in a single unified way
-or to implement the Data Update service to allow for multiple file sources.
+or to implement the Data Update service to allow for multiple sources.
 
 ### Aspect Engine features
 
 In order to support this feature, Aspect Engines require
 some additional abilities:
 
-1. At configuration time, there MUST be a mechanism for supplying details about
-   the data sources that the Engine needs along with any information
-   and configuration options associated with updating it.
-2. The Engine MUST provide a mechanism to allow it to refresh,
-   (use an updated data source) on demand.
-3. The mechanism MUST be thread safe.
+- At configuration time, there MUST be a mechanism for supplying details about
+  the data sources that the Engine needs along with any information
+  and configuration options associated with updating it.
+- The Engine MUST provide a mechanism to allow it to refresh
+  (use an updated data source) on demand.
+  - This mechanism MUST be thread safe.
 
 The Pipeline that contains the Aspect Engine MUST still be capable of
 processing Flow Data with minimal
@@ -45,9 +45,9 @@ how up-to-date the current data is.
 From the point of view of the Data Update Service, Aspect Engines have several
 operational modes:
 
-- File Data Source, File Based Operation
-- File Data Source, Memory Based Operation
-- Memory Data Source, Memory Based Operation
+- File data source, file based operation
+- File data source, memory based operation
+- Memory data source, memory based operation
 
 Other operational modes are theoretically possible, such as an Aspect Engine's data residing
 in a relational database.
@@ -56,8 +56,8 @@ in a relational database.
 
 In this operational mode an Aspect Engine uses data that
 resides in the file system to support its operation. This might be because the
-data is too extensive to be loaded into memory or because of memory limitations
-in the system.
+data is too extensive to be loaded into memory or because the benefit of
+doing so is not considered worthwhile.
 
 ### File data source, memory based operation
 
@@ -110,23 +110,25 @@ If the current data contains a *data update expected* timestamp, then polling
 will not start until after that time. Options include the ability to control the remote
 endpoint and the polling frequency.
 
-As an optimization, the request for data MAY contain an *if modified since* HTTP
+As an optimization, the request for data MAY contain an `If-Modified-Since` HTTP
 header, containing the date of the current data file.
 
-If data is received that is newer than the current data, then the Aspect Engine
-is refreshed with the newly available data. In the case of
+If data is available that is newer than the current data, then it will be
+downloaded and used to refresh the Aspect Engine. In the case of
 file data source operation, the new data replaces
 the existing data, at the location configured for data files.
 
-51Degrees download servers have a request rate limiting feature which provides
-for a 429 HTTP Status (Too many requests) with a *Retry After* HTTP header
+51Degrees [download servers](http://51degrees.com/documentation/4.4/_info__distributor.html)
+have a request rate limiting feature which provides
+for a 429 HTTP Status (Too many requests) with a `Retry-After` HTTP header
 whose value can be used to reset polling.
 
 Rate limiting can be triggered
-in the event that a single user has multiple servers each of which is set to
+in the event that a single user has multiple servers, each of which is set to
 auto update. It is expected that users with multiple servers do not use
-this feature and that they obtain updated data once and distribute it to their
-various servers by other means.
+this mechanism. Instead, they would obtain updated data once, distribute it
+to their various servers by other means and then use the
+[update from file](#automatic-update-from-file) functionality.
 
 Configuration Groups:
 
@@ -155,11 +157,12 @@ The option allows for programmatic triggering of an update. The effect of a
 programmatic update is to initiate
 immediate polling of the remote HTTP server, where this option is enabled.
 
-If it is automatic update via HTTP is not enabled, for file data sources
-it causes immediate update, irrespective of whether Automatic Update
-from File is enabled.
+If automatic update via HTTP is not enabled and a file data source is specified
+then it causes immediate refresh of the Engine using the file at the configured
+location, irrespective of whether Automatic Update from File is enabled.
 
-For memory data sources, programmatic update MUST allow provision of the new memory data source.
+For memory data sources, programmatic update MUST allow provision of the new
+memory data source.
 
 Implementations MAY choose to provide options of Programmatic Update that
 distinguish a request for HTTP update as opposed to file update.
@@ -178,7 +181,7 @@ Configuration of the remote endpoint for download:
 
 - **dataUpdateUrl** - the remote URL
 - **urlFormatter** - URL customization
-- **useIfModifiedSince** - request data using if modified since HTTP header
+- **useIfModifiedSince** - request data using `If-Modified-Since` HTTP header
 - **decompressContent** - deprecated - always decompress content if it is compressed
 - **verifyMD5** - deprecated - always verify MD5 if an MD5 value is provided
 
@@ -198,8 +201,8 @@ Configuration of the locations that disk based operation is done from:
 - **createOperationalDataCopy** - create a copy of the data source, for operation
 - **operationalDataFileDirectory** - the directory for the data file copy
 
-For disk based operation it is necessary to create an Operational Data Copy [^2] if
-auto update via HTTP is enabled or if auto update from file is enabled. This is
+For disk based operation it is necessary to create an Operational Data Copy [^2]
+if auto update via HTTP is enabled or if auto update from file is enabled. This is
 to allow continued operation of the Aspect Engine with its present data file
 while a new data file is made available.
 
@@ -265,7 +268,7 @@ downloaded file is newer than the current file
 
 ## Update polling
 
-This section making an HTTP request to check for
+This section discusses making an HTTP request to check for
 updated data and handling the response.
 
 51Degrees Device Detection data files are supplied by the
@@ -314,10 +317,10 @@ relevant details (e.g. which Engine + data file the update is for)
 
 ### Messages at start-up
 
-| **Action**                            | **Message**                  |
-|---------------------------------------|------------------------------|
-| Running the update on start-up process | Updating on start-up          |
-| File system watcher created           | Creating file system watcher |
+| **Action**                             | **Message**                  |
+|----------------------------------------|------------------------------|
+| Running the update on start-up process | Updating on start-up         |
+| File system watcher created            | Creating file system watcher |
 
 ### Messages during operation
 
@@ -352,6 +355,7 @@ than a procedural update.
 | Attempting to update a data file that has no configured temporary file path                                                     | Error         | The data file '\<data file identifier\>' is checking for updates but does not have a temporary file path configured.                                                                         |
 | Some file system error occurs while copying a new data file                                                                     | Error         | An error occurred when copying a data file to replace the existing one at '\<path\>'.                                                                                                        |
 
-[^1] data sources are referred to as data files in the reference implementations.
+[^1] This is not currently the case, but was required for a discontinued
+Engine and may be needed again in the future.
 
 [^2] This is called *tempDataFile* in current reference implementations.

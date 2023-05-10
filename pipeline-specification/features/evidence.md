@@ -5,23 +5,18 @@
 Evidence is the name for the input values added to a Flow Data instance.
 
 It is stored as key-value pairs and is used by Flow Elements within the
-Pipeline and is immutable once created.
+Pipeline. Evidence is immutable once created.
 Keys MUST be case-insensitive and will usually be split into \<prefix\>.\<field\>.
 
 Currently, defined examples of keys are:
 
 - `header.user-agent`
 - `header.[header-name]`
-- `cookie.[cookie-name]`\*
+- `cookie.[cookie-name]` [^1]
 - `server.client-ip`
 - `server.host-ip`
 
 Any new Evidence keys can be defined in a similar manner.
-
-\* Note that the 'cookie' prefix is a bit of a special case as cookies are supplied
-to the web server using an HTTP header. Generally, 51Degrees Engines will not make
-use of `header.cookie`. Cookie values will usually need to be under `cookie.` keys in order to be
-used.
 
 The prefix indicates where the value has come from. Currently, defined prefixes are:
 
@@ -42,15 +37,17 @@ in the list above MUST be used.
 If any other prefixes are present then their order of precedence is alphabetical.
 This rule just ensures that any conflicts are resolved deterministically.
 For example the [Cloud Request Engine](../pipeline-elements/cloud-request-engine.md#processing)
+removes the prefix so must have a consistent mechanism to decide which value
+to use when clashes occur.
 
 ## Adding Evidence values
 
 Evidence is immutable. However, it might be desireable for some Flow Elements
 to add new values to Evidence for later elements to use.
 
-In order to allow for something similar this usage scenario, we suggest creating a helper function
-that will pull a value from an existing Element Data if available, or
-fallback to pulling it from Evidence if needed.
+In order to allow for something similar this usage scenario, it is suggested
+that a helper function is created that will pull a value from an existing
+Element Data if available, or fallback to pulling it from Evidence if needed.
 
 For example, if Device Detection Engine requests `query.sec-ch-ua-platform`
 from this function, it would return a Property value from any Element Data
@@ -63,3 +60,8 @@ an exception/error can be thrown.
 This function MAY be defined on Flow Data itself, as a separate helper, or
 both. That is an implementation detail that will depend on the language and
 design patterns being used.
+
+[^1] The 'cookie' prefix is a bit of a special case as cookies are supplied
+to the web server using an HTTP header. Generally, 51Degrees Engines will not make
+use of `header.cookie`. Cookie values will usually need to be under `cookie.` keys
+in order to be used.

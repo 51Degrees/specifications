@@ -2,7 +2,7 @@
 
 ## Summary
 
-Many Flow Elements have numerous configuration options, it is also possible
+Many Flow Elements have numerous configuration options. iIt is also possible
 to configure Pipelines in many ways.
 
 In order to make configuration as simple as possible for users, it is REQUIRED
@@ -14,7 +14,7 @@ languages.
 
 ## Pipelines
 
-- During construction, there MUST be the ability to add elements/Engines
+- During construction, there MUST be the ability to add Elements/Engines
   to Pipelines. These will run in sequence in the order they are added.
 - During construction, Pipelines MAY have the ability to add multiple
   elements/Engines that will run in parallel (where the language supports this -
@@ -43,7 +43,7 @@ This would create a Pipeline that performs the following processing:
   as would be used when configuring in code.
 - Where feasible, all configuration options available in code SHOULD be configurable
   via a file. The exceptions are usually options that take complex objects, which
-  cannot easily be defined in a text-based file.
+  cannot easily be represented in a text-based file format.
 
 ## Deserialization
 
@@ -62,8 +62,8 @@ To date, the following types are supported in configuration files for all langua
 
 ## Sample configuration files
 
-TODO - these sample files are not yet publicly available, they are in
-internal `develop` branches.
+These sample files show all configuration options across many 51Degrees Elements
+and include default values and links to descriptions of the options.
 
 [.NET](https://github.com/51Degrees/device-detection-dotnet/blob/master/Examples/sample-configuration.json)
 [Java](https://github.com/51Degrees/device-detection-java/blob/master/device-detection.examples/console/src/main/resources/gettingStartedOnPrem.xml)

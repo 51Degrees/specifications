@@ -6,7 +6,9 @@ This document contains details on the features associated with the Properties th
 are populated by Flow Elements.
 
 In this case, a 'Property' refers to a specific, named data field that can be
-set to different values.
+set to different values. This is the same conceptually as the
+[Property](../../data-model-specification/README.md#property) that is defined in
+the data model specification. (Although they have some different meta-data values)
 
 The Property value will be determined during the 'process' step that is performed
 by each Flow Element. This value will be stored within the Element Data,
@@ -22,7 +24,7 @@ specifically expected and supported throughout the API.
 The primary limitation is that these type values will need to be represented
 in JSON data.
 
-As such, the core types are:
+The core types are:
 
 - string
 - boolean
@@ -38,23 +40,24 @@ JSON encode/decode logic:
 
 ### The javascript type
 
-The javascript type is a custom type that simply represents a string.
-It is used to identify values that contain JavaScript snippets that are intended
-to be executed on the client device.
+The javascript type is a custom type that is used to identify values which contain
+JavaScript snippets that are intended to be executed on the client device.
 
-See [web integration](web-integration.md) for more detail.
+In JSON, this type is represented as a string.
+
+See [web integration](web-integration.md#javascript-snippets) for more detail.
 
 ## Null values
 
-Property values populated by Engines (as opposed to all Flow Elements)
+Property values populated by Engines (as opposed to Flow Elements in general)
 MUST be capable of having 'no value'.
 
-Where 'no value' is used, attempting to access the value MUST throw an
+Where 'no value' has been assigned, attempting to access the value MUST throw an
 error/exception with a customizable message explaining why the value is not set.
 
 This is similar to the [missing Property](#missing-properties) feature.
 In that case, the Property is not present in the result dataset at all. In this
-case, the Property is present in the result. However, the Flow Element has
+case, the Property is present in the result, but the Flow Element has
 chosen not to set its value for some reason.
 
 ## Property metadata

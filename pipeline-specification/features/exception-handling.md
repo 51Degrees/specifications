@@ -18,6 +18,9 @@ In all cases, standard language features SHOULD be used to
 let IDEs and users know what exceptions/errors a particular function can
 throw.
 
+Below, we review the various points that errors might occur and bubble
+up to the user.
+
 ## Process function
 
 One of the key points that failures can occur is in the 'Process' function.
@@ -39,7 +42,7 @@ and be called `SuppressProcessExceptions` or similar.
 ### Flow Elements
 
 Flow Elements can throw exceptions/errors freely, unless it makes
-sense for an element to handle a specific error internally.
+sense for an Element to handle a specific error internally.
 In general, it is the responsibility of the Pipeline to handle these for
 the user as described above.
 
