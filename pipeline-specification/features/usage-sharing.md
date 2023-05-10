@@ -1,15 +1,15 @@
 # Usage sharing
 
-Users of 51Degrees products have the option to send usage data to us.
+Users of the Pipeline API have the option to share data about their
+usage of the system.
 
-This process is very important to us, as well as to users, as it is
-used to help improve the accuracy of our products.
+This process is very important to engine providers and users as it is
+used to help improve the accuracy of products.
 
-For example, our Device Detection product relies on usage data from
-customers to give us a good view of what user-agents, client-hints, etc
-are active in the real world.
-This is a constantly evolving picture, so good quality data is
-essential.
+For example, the 51Degrees Device Detection product relies on usage data
+from customers to give a good view of what user-agents, client-hints, etc
+are active in the real world. This is a constantly evolving picture, so
+good quality data is essential.
 
 Data is shared in XML format, with multiple process requests aggregated
 to produce each payload.
