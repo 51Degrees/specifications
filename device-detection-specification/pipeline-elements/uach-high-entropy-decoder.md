@@ -33,7 +33,7 @@ Instead, the Element can output its values using Element Data as described
 in the table below.
 The Device Detection Engines MUST be capable of using these values if
 available and falling back to Evidence values if they are not.
-See [adding Evidence values](../../../pipeline-specification/features/evidence.md#adding-evidence-values)
+See [adding Evidence values](../../pipeline-specification/features/evidence.md#adding-evidence-values)
 for more details.
 
 | **Name**                    | **Type** | **Description**                                                                                                                                                                                                                                                            |

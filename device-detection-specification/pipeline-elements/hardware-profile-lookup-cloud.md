@@ -2,14 +2,14 @@
 
 ## Overview
 
-This [Cloud Aspect Engine](../../../pipeline-specification/conceptual-overview.md#cloud-aspect-engine)
+This [Cloud Aspect Engine](../../pipeline-specification/conceptual-overview.md#cloud-aspect-engine)
 enables the parsing of 'profile lookup' responses from the 51Degrees cloud service.
 
-See [here](../../../pipeline-specification/part3/pipeline-elements/cloud-request-engine.md)
+See [here](../../pipeline-specification/pipeline-elements/cloud-request-engine.md)
 for an overview of the data flow for Cloud Engines.
 
 Profile lookup allows the user to retrieve a list of property values for
-[profiles](../../pipeline-elements/device-detection-on-premise.md#profile)
+[profiles](../pipeline-elements/device-detection-on-premise.md#profile)
 where a given property has a value matching a supplied parameter.
 
 Currently, this capability is used for two use-cases:
@@ -51,7 +51,7 @@ that MUST also be catered for.
 ## Process
 
 The majority of the processing SHOULD be handled by the shared
-[Cloud Aspect Engine](../../../pipeline-specification/part3/pipeline-elements/cloud-aspect-engine.md#processing)
+[Cloud Aspect Engine](../../pipeline-specification/pipeline-elements/cloud-aspect-engine.md#processing)
 logic.
 
 This will just need to filter and parse the JSON provided by the Cloud Aspect

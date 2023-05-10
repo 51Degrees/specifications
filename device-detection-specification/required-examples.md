@@ -112,7 +112,7 @@ a test environment.
 ### Fluent Builders
 
 Reference implementation examples demonstrate the use of the simplified
-top-level builder for cloud and on-premise. Noting that [elsewhere](../../pipeline-specification/reference-implementation-notes.md)
+top-level builder for cloud and on-premise. Noting that [elsewhere](../pipeline-specification/reference-implementation-notes.md)
 we recommend considering the trade-off between the apparent simplicity of this
 approach and some disadvantages.
 
@@ -167,7 +167,7 @@ examples is likely to be statistically insignificant, it might nonetheless alter
 the calculations that are performed regarding current usage.
 
 Reference implementations inhibit usage sharing for console examples by ensuring
-the [Usage Sharing Element](../../pipeline-specification/pipeline-elements/usage-sharing-element.md)
+the [Usage Sharing Element](../pipeline-specification/pipeline-elements/usage-sharing-element.md)
 is not added to the Pipeline, but enable it for web examples.
 
 This is done because it has been observed that web
@@ -219,7 +219,7 @@ See documentation
 ### Getting Started Web
 
 These examples illustrate use of
-[Web integration](../../pipeline-specification/features/web-integration.md)
+[Web integration](../pipeline-specification/features/web-integration.md)
 for both Cloud and On-Premise
 by creating a Web page that can be accessed from a web server running in
 the example environment that is created during execution of the example.
