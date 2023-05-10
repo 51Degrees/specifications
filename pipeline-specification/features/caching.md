@@ -79,9 +79,12 @@ Other considerations when creating keys:
 
 The system SHOULD allow any cache conforming to a simple interface to be
 used.
-However, the default implementation will be a sharded LRU cache.
-This will ensure that memory use is always well-defined and that the cache
-can cope with concurrent requests reasonably well.
+
+In general, it has been observed that third-party caches such as Guava tend
+to be too slow for this scenario. Instead, the reference implementations use
+a custom sharded LRU cache. This ensures that memory use is always well-defined
+and that the cache can cope with concurrent requests reasonably well. Most
+importantly, it can be kept simple enough to be extremely performant.
 
 Configuration options:
 
@@ -93,7 +96,8 @@ Configuration options:
 [This article](https://medium.com/@yewang2018/lru-cache-design-8257850a69fe)
 describes the internals of such a cache. You can also review the
 [Java](https://github.com/51Degrees/pipeline-java/blob/master/pipeline.caching/src/main/java/fiftyone/caching/LruCacheBase.java)
-and [.NET](https://github.com/51Degrees/caching-dotnet/blob/master/FiftyOne.Caching/LruCacheBase.cs)
+, [.NET](https://github.com/51Degrees/caching-dotnet/blob/master/FiftyOne.Caching/LruCacheBase.cs)
+and [C](https://github.com/51Degrees/common-cxx/blob/main/cache.c)
 reference implementations.
 
 ## Data lifetime and concurrency issues
