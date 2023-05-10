@@ -11,7 +11,7 @@ missing data that would normally have been populated.
 
 The ability to cancel processing implies that the processing takes place
 on some background thread. However, the call to `flowdata.Process` is blocking
-unless a feature such as [lazy loading](lazy-loading.md) is being used.
+unless a feature such as [lazy loading](../advanced-features/lazy-loading.md) is being used.
 
 To make it clear that the function is non-blocking when a cancellation token
 is supplied, we suggest considering a differently named function for that scenario.

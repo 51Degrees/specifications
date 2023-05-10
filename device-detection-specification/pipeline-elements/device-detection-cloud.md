@@ -9,7 +9,7 @@ are populated in the Flow Data.
 
 This Engine is the Cloud Aspect Engine for Device Detection.
 
-See [here](../../../pipeline-specification/part3/pipeline-elements/cloud-request-engine.md)
+See [here](../../pipeline-specification/pipeline-elements/cloud-request-engine.md)
 for an overview of the data flow for Cloud Engines.
 
 ## Accepted Evidence
@@ -39,7 +39,7 @@ See [data model](../data-model.md) for more information.
 ## Process
 
 The majority of the processing SHOULD be handled by the shared
-[Cloud Aspect Engine](../../pipeline-specification/part3/pipeline-elements/cloud-aspect-engine.md#processing)
+[Cloud Aspect Engine](../../pipeline-specification/pipeline-elements/cloud-aspect-engine.md#processing)
 logic.
 
 This will just need to filter and parse the JSON provided by the Cloud Aspect

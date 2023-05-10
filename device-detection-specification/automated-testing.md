@@ -1,7 +1,7 @@
 # Automated Testing
 
 Device Detection automated testing follows the guidelines set out
-in [Pipeline Automated Testing](../pipeline-specification/part3/automated-testing.md)
+in [Pipeline Automated Testing](../pipeline-specification/automated-testing.md)
 and the general comments made there are not usually repeated here.
 
 ## Device Detection Cloud Engine

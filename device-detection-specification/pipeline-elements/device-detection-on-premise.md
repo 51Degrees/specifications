@@ -344,7 +344,6 @@ addition to all the configuration options defined for other features. For exampl
 | Concurrency               | [ConfigHash::setConcurrency()](https://github.com/51Degrees/device-detection-cxx/blob/main/src/hash/ConfigHash.hpp#L180)                            | Yes          | System processor count                                                                                                           | Set the expected number of concurrent operations using the Engine. This is used to configure internal caches to avoid excessive locking. It has no effect if these internal caches are not used. (For example, when using the 'MaxPerformance' profile)                                                                                                                                                     |
 
 [^1]: The default values for many configuration options comes from the native
-C/C++ code. You can find these defaults in the following files:
-
-- <https://github.com/51Degrees/common-cxx/blob/master/config.h>
-- <https://github.com/51Degrees/device-detection-cxx/blob/master/src/config-dd.h>
+C/C++ code. You can find these defaults in
+<https://github.com/51Degrees/common-cxx/blob/master/config.h> and
+<https://github.com/51Degrees/device-detection-cxx/blob/master/src/config-dd.h>

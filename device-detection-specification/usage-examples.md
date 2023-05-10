@@ -40,7 +40,7 @@ var pipeline = pipelineBuilder
 ```
 
 Device Detection Pipelines can also
-be [created from configuration](../pipeline-specification/features/build-from-configuration.md).
+be [created from configuration](../pipeline-specification/features/pipeline-configuration.md).
 
 ```c#
 var pipeline = pipelineBuilder

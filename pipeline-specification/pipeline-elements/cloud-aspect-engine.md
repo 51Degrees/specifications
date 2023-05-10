@@ -9,7 +9,7 @@ See the link above for an overview of how these Engines work together.
 At time of writing, there are 3 concrete Cloud Aspect Engine implementations:
 
 - [Device Detection](../../device-detection-specification/pipeline-elements/device-detection-cloud.md)
-- [Device Lookup (TAC and native key)](../../device-detection-specification/part3/pipeline-elements/hardware-profile-lookup-cloud.md)
+- [Device Lookup (TAC and native key)](../../device-detection-specification/pipeline-elements/hardware-profile-lookup-cloud.md)
 - [Location](https://github.com/51Degrees/location-dotnet/blob/master/FiftyOne.GeoLocation.Cloud/FlowElements/GeoLocationCloudEngine.cs)
   (Location is not yet included in this specification repository)
 

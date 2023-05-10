@@ -52,7 +52,7 @@ users to prevent them being added if they wish to do so.
 The web integration SHOULD automatically populate [Evidence](evidence.md) from
 the web request.
 
-It MAY use the Pipeline's [accepted Evidence](advertise-accepted-evidence.md)
+It MAY use the Pipeline's [accepted Evidence](advertize-accepted-evidence.md)
 feature to determine if individual values need to be added to Evidence or not.
 
 An alternative approach would be to wrap the web request structure itself as
