@@ -17,8 +17,6 @@ It is possible that an Aspect Engine requires more than one data source [^1] and
 implementers can choose either to provide the data in a single unified way
 or to implement the Data Update service to allow for multiple file sources.
 
-[^1] data sources are referred to as data files in the reference implementations
-
 ### Aspect Engine features
 
 In order to support this feature, Aspect Engines require
@@ -200,12 +198,10 @@ Configuration of the locations that disk based operation is done from:
 - **createOperationalDataCopy** - create a copy of the data source, for operation
 - **operationalDataFileDirectory** - the directory for the data file copy
 
-For disk based operation it is necessary to create an Operational Data Copy [^1] if
+For disk based operation it is necessary to create an Operational Data Copy [^2] if
 auto update via HTTP is enabled or if auto update from file is enabled. This is
 to allow continued operation of the Aspect Engine with its present data file
 while a new data file is made available.
-
-[^1] This is called *tempDataFile* in current reference implementations.
 
 Since creating a data file copy is necessary for disk based operation,
 implementations MAY choose not to provide control over
@@ -355,3 +351,7 @@ than a procedural update.
 | Error when calling RefreshData on Engine                                                                                        | Error         | An error occurred while applying a data file update to \<Engine type name\>. Error detail: \<error\>                                                                                         |
 | Attempting to update a data file that has no configured temporary file path                                                     | Error         | The data file '\<data file identifier\>' is checking for updates but does not have a temporary file path configured.                                                                         |
 | Some file system error occurs while copying a new data file                                                                     | Error         | An error occurred when copying a data file to replace the existing one at '\<path\>'.                                                                                                        |
+
+[^1] data sources are referred to as data files in the reference implementations.
+
+[^2] This is called *tempDataFile* in current reference implementations.
