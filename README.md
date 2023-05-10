@@ -11,6 +11,7 @@ products.
 |----------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|
 | [Pipeline Specification](pipeline-specification/README.md)                 | Specification for the Pipeline API and its operation. This covers core functionality.                                           |
 | [Device Detection Specification](device-detection-specification/README.md) | Specification for the Device Detection service. This builds on the concepts and features defined in the Pipeline specification. |
+| [Data Model Specification](data-model-specification/README.md)             | Details of the data model used by Device Detection and by other services in the future.                                         |
 
 ## Notes for implementers
 
