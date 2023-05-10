@@ -28,6 +28,10 @@ products.
   is also [a section](pipeline-specification/reference-implementation-notes.md)
   containing reflections on the architectural choices made when creating the
   Java and .NET versions. This could be helpful when designing future implementations.
+  - Two of the key features that informed major design decisions were support for
+    processing using native binaries and the ability to easily swap processing from
+    on-premise to cloud. In some cases, these feature prevented the implementations
+    from following more idiomatic approaches.
 - URLs in these specifications are fixed. Code comments SHOULD include
   references to these URLs in order to avoid re-writing the same descriptions
   and definitions in multiple places.
