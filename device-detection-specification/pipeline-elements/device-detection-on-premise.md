@@ -38,7 +38,9 @@ is often fiddly and can come with unexpected difficulties. As such, we generally
 use [SWIG](https://www.swig.org/) to help produce a wrapper for the target
 language. This takes care of the marshalling of data structures to and from
 C data structures but represents a performance overhead - see
-[Performance Guidance](#performance-guidance) below.
+[Performance Guidance](#performance-guidance) below. The implementor will still
+need to be familiar with the mechanisms that are used by the language to call
+native code.
 
 The C library is distributed in binary form for a restricted set of target
 environments [tested versions](https://51degrees.com/documentation/_info__tested_versions.html),
@@ -53,8 +55,9 @@ to determine the correct native binary to use based on the current
 operating system.
 
 In some cases, this capability is built into the packaging infrastructure
-(For example, .NET/NuGet). Some require additional code to be written to
-determine the correct binary at runtime (Java/Maven and Node/NPM). Others
+For example, [.NET/NuGet](https://github.com/51Degrees/device-detection-dotnet/blob/main/FiftyOne.DeviceDetection/FiftyOne.DeviceDetection.Hash.Engine.OnPremise/FiftyOne.DeviceDetection.Hash.Engine.OnPremise.csproj#L117).
+Some require additional code to be written to determine the correct binary
+at runtime (Java/Maven and Node/NPM). Others
 do not allow native binaries in packages at all (PHP/Composer).
 
 ### Reference implementation notes
@@ -62,7 +65,8 @@ do not allow native binaries in packages at all (PHP/Composer).
 The reference implementations bundle the cxx code in with the Java/.NET
 code and build it all together. This works well enough, but does come
 with the downside of adding significant complexity to the build process
-for customers who would often prefer to be able to consume pre-built native binaries (or not deal with native binaries at all).
+for customers who would often prefer to be able to consume pre-built
+native binaries (or not deal with native binaries at all).
 
 For future implementations, we recommend exploring the possibility of
 moving the native binary and target language wrapper to a separate
@@ -170,6 +174,11 @@ As such, steps SHOULD be taken to minimize this as much as possible:
   wins.
 - Whenever making a call to native code, be aware of the data that is being
   passed and check if there is anything that can be done to reduce it.
+- Some languages may be able to give/receive memory pointers directly.
+  Implementors are advised to investigate the feasibility of this approach
+  as it can be significantly faster. However, doing so requires a strong
+  understanding of how memory allocation and access works in both the Pipeline
+  language and native C code.
 - Finally, do not call native code at all if it can be avoided. For example, any
   values that will only change after a [data refresh](#refresh-data) can
   be stored in the Engine instance to avoid native calls for that value until
