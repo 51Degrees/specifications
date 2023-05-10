@@ -17,6 +17,7 @@ This specification is broken down into separate markdown files in multiple direc
 |-------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | features          | Descriptions of Pipeline API features                                                                                                                              |
 | advanced-features | Descriptions of Pipeline API features that are not implemented in all languages and/or do not always have strong enough justifications for the complexity they add |
+| future-features   | These are features that are not currently implemented in any language, but may be added in the future                                                              |
 | Pipeline-elements | Specifications for Flow Elements that are needed to provide core functionality                                                                                     |
 
 ## What is the Pipeline API?

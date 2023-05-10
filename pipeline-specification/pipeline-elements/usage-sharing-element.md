@@ -43,11 +43,8 @@ are:
 - ServerIP
 - Platform
 
-Note that there is a proposal to reduce the size of the usage sharing payload
-by moving these values to a `header` element rather than duplicating them in
-every `device` element.
-Implementing this will be a future enhancement as changes will first need
-to be made to 51Degrees' data collection infrastructure.
+Note that there is a [proposal](../future-features/usage-sharing-header.md) to
+avoid duplicating these values on every record.
 
 ## Processing
 
