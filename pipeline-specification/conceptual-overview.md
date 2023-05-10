@@ -156,10 +156,18 @@ See above for details of the features that
 Aspect Engines / Aspect Data have on top of standard Flow Element /
 Element Data.
 
+## On-Premise Engines
+
+**On-Premise Engines** perform processing using resources from
+the local system. This can often involve some additional data source
+such as the device detection
+[data file](../device-detection-specification/pipeline-elements/device-detection-on-premise.md#overview)
+that will need to be intermittently updated from a remote server.
+
 ## Cloud Engines
 
 The purpose of **Cloud Engines** is to offload processing that might otherwise
-be performed by an on-premise Aspect Engine to a remote service.
+be performed by an On-Premise Aspect Engine to a remote service.
 
 ### Cloud Request Engine
 
