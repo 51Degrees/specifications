@@ -17,6 +17,9 @@ It is possible that an Aspect Engine requires more than one data source [^1] and
 implementers can choose either to provide the data in a single unified way
 or to implement the Data Update service to allow for multiple sources.
 
+[^1]: This is not currently the case, but was required for a discontinued
+Engine and may be needed again in the future.
+
 ### Aspect Engine features
 
 In order to support this feature, Aspect Engines require
@@ -206,6 +209,8 @@ if auto update via HTTP is enabled or if auto update from file is enabled. This 
 to allow continued operation of the Aspect Engine with its present data file
 while a new data file is made available.
 
+[^2]: This is called *tempDataFile* in current reference implementations.
+
 Since creating a data file copy is necessary for disk based operation,
 implementations MAY choose not to provide control over
 *createOperationalDataCopy* since disallowing it when either update option
@@ -354,8 +359,3 @@ than a procedural update.
 | Error when calling RefreshData on Engine                                                                                        | Error         | An error occurred while applying a data file update to \<Engine type name\>. Error detail: \<error\>                                                                                         |
 | Attempting to update a data file that has no configured temporary file path                                                     | Error         | The data file '\<data file identifier\>' is checking for updates but does not have a temporary file path configured.                                                                         |
 | Some file system error occurs while copying a new data file                                                                     | Error         | An error occurred when copying a data file to replace the existing one at '\<path\>'.                                                                                                        |
-
-[^1] This is not currently the case, but was required for a discontinued
-Engine and may be needed again in the future.
-
-[^2] This is called *tempDataFile* in current reference implementations.

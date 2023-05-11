@@ -11,6 +11,9 @@ The intention is that this would allow a user to reduce the end-to-end time
 needed to process a given request. Particularly when large numbers of
 relatively slow engines are involved.
 
+This can be particularly important for high-throughput web servers where
+every ms matters.
+
 ## Drawbacks
 
 Allowing Elements to be executed in parallel adds some complexity to the
@@ -33,4 +36,5 @@ In addition, there are various factors that reduce the benefit from this feature
   the performance benefit could be marginal or possibly negative.
 - If users want to improve performance through concurrent processing, they can
   do so more effectively by creating Flow Data instances on separate threads and
-  calling process. This is exactly what web servers are doing anyway.
+  calling process. This is exactly what web servers are doing and could easily
+  be implemented for backend processing as well.

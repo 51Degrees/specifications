@@ -115,6 +115,11 @@ populated by the [cloud Device Detection Engine](device-detection-cloud.md)
 as well as the individual devices populated in the Element Data from
 the [hardware profile lookup Engine](hardware-profile-lookup-cloud.md).
 
+[^1]: The native implementations have some additional complexity
+in their code because of a plan to split Device Detection into 4
+separate Engines. This is obsolete and is not necessary in new
+implementations.
+
 ## Start-up activity
 
 On start-up, the native Engine needs to be created using the data file.
@@ -146,6 +151,15 @@ other Pipeline API features.
   - Do not immediately copy all the Property values from `ResultsHash`. By
     default, around 200 Properties will be populated, meaning 200+ calls to
     the native code marshalling values back and forth [^3].
+
+[^3]: Note the effect that
+holding the "un-managed" memory references (i.e. memory references that
+are not handled by language garbage collection) has on
+[caching](../../pipeline-specification/features/caching.md) and
+[resource cleanup](../../pipeline-specification/features/resource-cleanup.md).
+The reference implementations don't allow a cache to be
+added to this Engine because of the complexity this introduces, however
+end-users might be tempted to create their own cache of results.
 
 ### Performance guidance
 
@@ -220,6 +234,11 @@ On-premise Device Detection has two related metadata structures:
    that element. In the case of the Device Detection Engine, this list will include
    Property metadata derived from the data file metadata mentioned above.
 
+[^4]: Due to the structure of the data, this is not intended to support
+high-performance querying scenarios. For that use-case, customers are directed to our
+'csv' data file, which can be consumed and stored in a database or whatever other form
+is needed for querying.
+
 For details on the additional meta-data, see the
 [data model specification](../../data-model-specification/README.md).
 
@@ -267,26 +286,7 @@ addition to all the configuration options defined for other features. For exampl
 | Performance Profile       | [ConfigHash=>set\[ProfileName\]()](https://github.com/51Degrees/device-detection-cxx/blob/main/src/hash/ConfigHash.hpp#L104)                        | Yes          | Balanced. See [native code](https://github.com/51Degrees/device-detection-cxx/blob/master/src/hash/hash.c#L175) for definitions. | Set the performance profile to use when creating the Engine. Each profile has default values for various internal configuration options, as well as things like the use of predictive/performance graphs.                                                                                                                                                                                                   |
 | Concurrency               | [ConfigHash::setConcurrency()](https://github.com/51Degrees/device-detection-cxx/blob/main/src/hash/ConfigHash.hpp#L180)                            | Yes          | System processor count                                                                                                           | Set the expected number of concurrent operations using the Engine. This is used to configure internal caches to avoid excessive locking. It has no effect if these internal caches are not used. (For example, when using the 'MaxPerformance' profile)                                                                                                                                                     |
 
-[^1] The native implementations have some additional complexity
-in their code because of a plan to split Device Detection into 4
-separate Engines. This is obsolete and is not necessary in new
-implementations.
-
 [^2]: The default values for many configuration options comes from the native
 C/C++ code. You can find these defaults in
 <https://github.com/51Degrees/common-cxx/blob/master/config.h> and
 <https://github.com/51Degrees/device-detection-cxx/blob/master/src/config-dd.h>
-
-[^3] Note the effect that
-holding the "un-managed" memory references (i.e. memory references that
-are not handled by language garbage collection) has on
-[caching](../../pipeline-specification/features/caching.md) and
-[resource cleanup](../../pipeline-specification/features/resource-cleanup.md).
-The reference implementations don't allow a cache to be
-added to this Engine because of the complexity this introduces, however
-end-users might be tempted to create their own cache of results.
-
-[^4] Due to the structure of the data, this is not intended to support
-high-performance querying scenarios. For that use-case, customers are directed to our
-'csv' data file, which can be consumed and stored in a database or whatever other form
-is needed for querying.

@@ -13,8 +13,8 @@ the [usage examples](../pipeline-specification/usage-examples.md) there.
 
 There are several different ways that a Pipeline might be created. However, once
 created, usage SHOULD be as similar as possible.
-In particular, a cloud Pipeline MUST be a drop-in replacement for an on-premise
-Pipeline for performing Device Detection and querying the results.
+In particular, a cloud Engine MUST be a drop-in replacement for an on-premise
+Engine for performing Device Detection and querying the results.
 
 Creating an on-premise Device Detection Pipeline in code:
 
@@ -82,7 +82,7 @@ using(var flowdata = pipeline.CreateFlowData())
   // The Tac property is only available in the 'TAC' data file. As such
   // it is the least likely to be available.
   // If the TAC data file is being used, then all properties will be 
-  // available and this line should not throw an error.
+  // available and this line will not throw an error.
   var tac = flowData.Get<IDeviceData>().Tac;
 }
 ```
@@ -119,13 +119,14 @@ similar to the following in the HTML:
 ```
 
 For more details on the expected functionality see
-the [web integration](../pipeline-specification/features/web-integration.md)
+the [web integration](../pipeline-specification/features/web-integration.md#client-side-features)
 section of the Pipeline specification.
 
 ## Automatic data updates
 
 This Pipeline creation example demonstrates how to configure the Pipeline to
-[update](../pipeline-specification/features/data-updates.md) the Device Detection data file when needed:
+[update](../pipeline-specification/features/data-updates.md) the Device
+Detection data file when needed:
 
 ```c#
 // This parameter must be set to true for auto updates to work
@@ -148,7 +149,7 @@ For more detailed examples see:
 
 [Property metadata](../pipeline-specification/features/properties.md#property-metadata)
 MUST be exposed by the Device Detection Engine.
-Note that this information will be available for both cloud and On-premise Engines:
+Note that this information will be available for both cloud and on-premise Engines:
 
 ```c#
 foreach (var property in deviceDetectionEngine.Properties)

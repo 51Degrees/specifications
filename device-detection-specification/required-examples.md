@@ -66,7 +66,9 @@ when executed as an automated test as opposed to being run from an IDE.
 
 In the Java reference implementation the
 [FileFinder utility](https://github.com/51Degrees/pipeline-java/blob/master/pipeline.core/src/main/java/fiftyone/pipeline/util/FileFinder.java)
-is used to locate the file.
+is used to locate the file. .NET uses
+[extension methods](https://github.com/51Degrees/device-detection-dotnet/blob/main/Examples/ExampleBase/ExampleUtils.cs)
+to provide the same functionality.
 
 ### Test Data
 
@@ -111,22 +113,17 @@ a test environment.
 
 ### Fluent Builders
 
-Reference implementation examples demonstrate the use of the simplified
-top-level builder for cloud and on-premise. Noting that [elsewhere](../pipeline-specification/reference-implementation-notes.md)
-we recommend considering the trade-off between the apparent simplicity of this
-approach and some disadvantages.
+Reference implementation examples demonstrate the use of a simplified
+top-level builder for cloud and on-premise. However, this specification
+recommends [against](../pipeline-specification/reference-implementation-notes.md#the-pre-packaged-pipeline-builder)
+implementing such a builder unless various challenges are resolved.
 
-Additionally, assuming default values are needed
-this does simplify the examples. However, it has the disadvantage that users
-might not understand how to use the Pipeline builder and the various Engine
-builders in concert, and hence might not be aware of how they can configure
-Properties that are not exposed by the simplified builder, if they need to.
+Examples will need to demonstrate whichever techniques are available
+in the target language for the construction of Elements and Pipelines.
 
-It is RECOMMENDED that at least one example demonstrates this technique for
-creating a Pipeline and that it is made clear that the lifetime of the
-FlowElements added to the Pipeline will probably, in production environments, be controlled by the Pipeline
-they are added to (using `setAutoClose(true)`). In other words, destruction of the
-Pipeline causes the elements added to it to be destroyed.
+Examples MUST also demonstrate or at least document commonly used, but
+non-default settings. For example using `setSuppressProcessExceptions(true)`
+to prevent exceptions from crashing the process in production environments.
 
 ### Build from Configuration
 
@@ -134,9 +131,6 @@ Reference implementation examples include illustration of creating a Pipeline
 from a configuration file. In XML or JSON, this configuration file can be used
 to add, as a comment, a listing of all the possible options for the Pipeline
 and all Engines. This information is also available in sample files:
-
-TODO - these sample files are not yet publicly available, they are in
-internal `develop` branches, but will be available at the following URLs in future:
 
 [.NET](https://github.com/51Degrees/device-detection-dotnet/blob/master/Examples/sample-configuration.json)
 [Java](https://github.com/51Degrees/device-detection-java/blob/master/device-detection.examples/console/src/main/resources/gettingStartedOnPrem.xml)
@@ -161,7 +155,7 @@ being part of a "try-with-resources" construct.
 
 ### ShareUsage
 
-Since Evidence used in examples is already collected by 51Degrees there is
+Since Evidence used in examples has already collected by 51Degrees there is
 no value in sharing those values with 51Degrees. In addition, though use of
 examples is likely to be statistically insignificant, it might nonetheless alter
 the calculations that are performed regarding current usage.
@@ -170,12 +164,11 @@ Reference implementations inhibit usage sharing for console examples by ensuring
 the [Usage Sharing Element](../pipeline-specification/pipeline-elements/usage-sharing-element.md)
 is not added to the Pipeline, but enable it for web examples.
 
-This is done because it has been observed that web
-examples are more frequently copied verbatim as a starting point for customer
-implementations. As usage sharing is so important, we want to ensure it is enabled
-by default in this scenario.
+This is because it has been observed that web examples are more frequently copied
+verbatim as a starting point for customer implementations. As usage sharing is so
+important, we want to ensure it is enabled by default in this scenario.
 
-Every example in which share usage is inhibited needs to have a comment saying
+Every example in which usage sharing is inhibited needs to have a comment saying
 that in normal operation usage sharing should be enabled by adding a Usage Sharing
 Element to the Pipeline.
 
@@ -197,7 +190,7 @@ the following features:
 - Match Metrics
 - Use of Web Integration
 - Use of Client Side detection
-- Obtaining "high entropy" Evidence
+- Various mechanisms for Device Detection using User-Agent Client Hints
 - Offline Processing
 - Data Update
 

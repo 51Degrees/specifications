@@ -19,7 +19,8 @@ In practice, we have found that the primary use-case for caching is the
 This works well when cloud requests are being made for one product.
 (For example, Device Detection.) However, it becomes significantly less
 effective when the cloud request is being made for multiple products.
-At present, there are no plans to address this.
+At present, there are no plans to address this as most users only
+query one product at once.
 
 ## Process flow
 
@@ -52,15 +53,17 @@ concerns, error handling, other features, etc.
 
 ## Generation of keys
 
-All Flow Elements MUST [advertise](advertize-accepted-evidence.md) the
+All Flow Elements MUST [advertize](advertize-accepted-evidence.md) the
 Evidence keys that they make use of.
 You will need to use this to build a list of the relevant Evidence keys
 and values that are present in the Flow Data.
 
 Other considerations when creating keys:
 
-- Evidence values MUST always be added in the same Evidence key order.
-  For example, `query.user-agent` first, then `header.user-agent`, etc
+- Cache keys MUST always be generated deterministically. This means
+  that the order that Evidence values are considered must be the same each
+  time. See the [Evidence](evidence.md#overview) page for details on the
+  defined order of Evidence keys.
 
 - Comparison of Evidence keys MUST be case-insensitive. For example,
   the following keys are considered the same:
@@ -106,22 +109,23 @@ The cache stores the instance of Aspect Data that was generated based
 on the Evidence values in the key.
 
 Where [resource cleanup](resource-cleanup.md) is needed, the lifetime
-of such data objects is tied to the Flow Data that is generated for
-that request.
+of such data objects is usually tied to the Flow Data that is generated
+for that request.
 
-However, cached instances can persist long after the original Flow Data
-that resulted in their creation is gone.
+However, cached Aspect Data instances can persist long after the original
+Flow Data that resulted in their creation is gone.
 
-Consequently, if the Element Data produced by an Engine requires
+Consequently, if the Aspect Data produced by an Engine requires
 cleanup, then that Engine MUST NOT allow a cache to be added.
 
-In addition, this functionality can result in a scenario where the
+In addition, this functionality can result in a scenario where a single
 instance is accessed by multiple threads simultaneously.
-If access to the Element Data cannot be guaranteed to be thread-safe,
-then the Engine MUST NOT allow a cache to be added.
+If access to the properties of an Aspect Data implementation cannot be
+guaranteed to be thread-safe, then the corresponding Engine MUST NOT
+allow a cache to be added.
 
-Design note - There are various routes we could potentially take to allow
-caches to still work in the scenarios described above. (Creating a duplicate
-of the instance, reference counting to ensure cleanup happens, etc.)
-51Degrees has decided not to pursue these at present, so the current
+Design note - There are various routes that could potentially be explored
+to allow caches to still work in the scenarios described above. (Creating
+a duplicate of the instance, reference counting to ensure cleanup happens,
+etc.) 51Degrees has decided not to pursue these at present, so the current
 implementations simply do not support adding a cache in these cases.

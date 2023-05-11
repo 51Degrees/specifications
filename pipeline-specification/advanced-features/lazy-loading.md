@@ -26,11 +26,15 @@ specification against using such features. However, the implementation will need
 to be carefully considered in order to avoid falling into the trap of adding
 complexity for little real-world benefit.
 
-Note that there are many scenarios where lazy loading as described here will be
+There are many scenarios where lazy loading as described here will be
 ineffective. This is because several core Flow Elements make use of Properties
-populated by previous elements. (For example, Cloud Aspect Engines, JSON builder,
-set response headers.)
-If one of these elements is in a Pipeline and the Engine that is populating the
-value used by the element is configured for lazy loading, then the Engine's
+populated by previous elements. (For example,
+[Cloud Aspect Engines](../pipeline-elements/cloud-aspect-engine.md),
+[JSON builder](../pipeline-elements/json-builder.md) and
+[set response headers](../pipeline-elements/set-headers-element.md).)
+If one of these Elements is in a Pipeline and the Engine that is populating the
+value used by the Element is configured for lazy loading, then the Engine's
 process function will return immediately, but the element that makes use of its
 Property value will just need to wait for the background task to finish anyway.
+Consequently, the overall process function will not return any faster than it
+would without lazy loading enabled.
