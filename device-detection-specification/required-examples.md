@@ -133,7 +133,7 @@ to add, as a comment, a listing of all the possible options for the Pipeline
 and all Engines. This information is also available in sample files:
 
 [.NET](https://github.com/51Degrees/device-detection-dotnet/blob/master/Examples/sample-configuration.json)
-[Java](https://github.com/51Degrees/device-detection-java/blob/master/device-detection.examples/console/src/main/resources/gettingStartedOnPrem.xml)
+[Java](https://github.com/51Degrees/device-detection-java-examples/blob/master/console/src/main/resources/gettingStartedOnPrem.xml)
 
 ### Pipeline and Flow Data Lifecycle
 
