@@ -160,6 +160,9 @@ MissingPropertyService:
 - check unknown returned otherwise
 
 ### Engines.Fiftyone
+<span style="color:yellow">Just a note on consistency - this package is called 51Engines in the packaging-and-structure.md
+  Maybe worth renaming it either here or there. 
+</span>
 
 ShareUsage:
 

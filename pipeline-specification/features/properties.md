@@ -61,6 +61,12 @@ case, the Property is present in the result, but the Flow Element has
 chosen not to set its value for some reason.
 
 ## Property metadata
+<span style="color:yellow">
+  Could you please add a couple sentences on how exactly the property metadata should be
+  accessed.  Is it by property name - i.e. `element.getMetadataForProperty(propertyName)`
+  or should there be a method returning all metadata for all properties supported by a given element? 
+  i.e. `element.getAllMetadata()`. Or maybe link to the example in the reference implementation.
+</span>
 
 All [Flow Elements](../conceptual-overview.md#flow-element) MUST expose metadata
 describing details of the Properties that they can populate.
