@@ -69,6 +69,17 @@ In addition, it MUST be possible to get Property metadata at the Pipeline
 level for all Properties that can be populated by all Flow Elements in the
 Pipeline.
 
+In the reference implementations, the Elements and Pipeline expose a property
+that returns a list of meta-data for all properties. The user can then filter
+and store values as they need to.
+
+see reference implementations:
+
+- [C#](https://github.com/51Degrees/pipeline-dotnet/blob/master/FiftyOne.Pipeline.Core/FlowElements/FlowElementBase.cs#L111)
+- [Java](https://github.com/51Degrees/pipeline-java/blob/main/pipeline.core/src/main/java/fiftyone/pipeline/core/flowelements/FlowElementBase.java#L108)
+  (Java also provides a `getProperty` method that takes the string name of a
+  property, but this is not a required part of the spec)
+
 The table below describes the metadata that is available.
 
 | Property                 | Type                                    | Description                                                                                                                                                                                                                                                                                                          |

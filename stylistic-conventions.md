@@ -70,8 +70,8 @@ the class is used and rendered in monospace e.g. `FlowData`
 
 ## RFC 2119
 
-RFC 2119 terms are UPPER CASE when used with the meaning defined in RFC 2119.
-Avoid use of the same terms where they do not have the RFC 2119 meaning.
+[RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119) terms are UPPER CASE when used with the meaning defined in 
+RFC 2119. Avoid use of the same terms where they do not have the RFC 2119 meaning.
 
 MUST, SHOULD, MUST NOT, SHOULD NOT, MAY etc.
 
@@ -86,15 +86,18 @@ is that sentence case would have you say, for example,
 
 ## Checking adherence to conventions
 
-Refer to 51Degrees Style Guide.
-Refer to 51Degrees Glossary
+Refer to 51Degrees Style Guide [^1]  
+Refer to 51Degrees Glossary [^1]
+
+[^1]: These documents are not publicly accessible at present. This will be addressed
+and links added in the future.
 
 Some VSCode extensions that have proven useful:
 
-- Code Spell Checker
-- HTTP/s and relative link checker
-- Markdown All in One
-- Markdown Table Prettifier
+- [Code Spell Checker](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker)
+- [HTTP/s and relative link checker](https://marketplace.visualstudio.com/items?itemName=blackmist.LinkCheckMD)
+- [Markdown All in One](https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one)
+- [Markdown Table Prettifier](https://marketplace.visualstudio.com/items?itemName=darkriszty.markdown-table-prettify)
 
 ## Consistency
 
