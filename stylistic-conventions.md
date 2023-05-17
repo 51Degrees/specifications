@@ -86,7 +86,7 @@ is that sentence case would have you say, for example,
 
 ## Checking adherence to conventions
 
-Refer to 51Degrees Style Guide [^1]
+Refer to 51Degrees Style Guide [^1]  
 Refer to 51Degrees Glossary [^1]
 
 [^1]: These documents are not publicly accessible at present. This will be addressed
