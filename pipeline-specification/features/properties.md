@@ -8,7 +8,7 @@ are populated by Flow Elements.
 In this case, a 'Property' refers to a specific, named data field that can be
 set to different values. This is the same conceptually as the
 [Property](../../data-model-specification/README.md#property) that is defined in
-the data model specification. (Although they have some different meta-data values)
+the data model specification. (Although they have some different metadata values)
 
 The Property value will be determined during the 'process' step that is performed
 by each Flow Element. This value will be stored within the Element Data,
@@ -70,7 +70,7 @@ level for all Properties that can be populated by all Flow Elements in the
 Pipeline.
 
 In the reference implementations, the Elements and Pipeline expose a property
-that returns a list of meta-data for all properties. The user can then filter
+that returns a list of metadata for all properties. The user can then filter
 and store values as they need to.
 
 see reference implementations:

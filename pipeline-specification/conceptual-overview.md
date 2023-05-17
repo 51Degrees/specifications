@@ -145,7 +145,7 @@ of Flow Element with additional features and Properties:
 - [Results caching](features/caching.md)
 - [Data file automatic updates](features/data-updates.md)
 - [Missing Properties](features/properties.md#missing-properties)
-- [Additional Property meta-data](features/properties.md#aspect-property-metadata)
+- [Additional Property metadata](features/properties.md#aspect-property-metadata)
 
 ### Aspect data
 

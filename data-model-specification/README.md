@@ -27,7 +27,7 @@ The metadata associated with a Component is:
 |-----------------|---------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Id              | int                       | The unique id of the Component. This is a number and will remain the same when a data file is updated.                                                      |
 | Name            | string                    | The name of the Component that gives a more 'human' identifier than id. By convention, this is unique within the data file.                                 |
-| Default profile | `Profile`                 | The default Profile for the Component. This is used to provide Values for the Component's Properties when a Profile matching the @Evidence cannot be found. |
+| Default profile | `Profile`                 | The default Profile for the Component. This is used to provide Values for the Component's Properties when a Profile matching the Evidence cannot be found. |
 | Properties      | `IReadOnlyList<Property>` | The Properties associated with this Component.                                                                                                              |
 
 ## Property
@@ -37,7 +37,7 @@ can be assigned one or more potential Values.
 Profiles will generally have a single Value for each Property, though some Properties
 allow multiple Values to be assigned.
 
-See below for the full set of meta-data for each property.
+See below for the full set of metadata for each property.
 
 | **Name**          | **Type**                  | **Description**                                                                                                                                                                                                                          |
 |---------------|------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|

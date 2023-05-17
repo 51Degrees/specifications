@@ -239,7 +239,7 @@ high-performance querying scenarios. For that use-case, customers are directed t
 'csv' data file, which can be consumed and stored in a database or whatever other form
 is needed for querying.
 
-For details on the additional meta-data, see the
+For details on the additional metadata, see the
 [data model specification](../../data-model-specification/README.md).
 
 ### Match metric Properties
@@ -286,7 +286,7 @@ addition to all the configuration options defined for other features. For exampl
 | Performance Profile       | [ConfigHash=>set\[ProfileName\]()](https://github.com/51Degrees/device-detection-cxx/blob/main/src/hash/ConfigHash.hpp#L104)                        | Yes          | Balanced. See [native code](https://github.com/51Degrees/device-detection-cxx/blob/master/src/hash/hash.c#L175) for definitions. | Set the performance profile to use when creating the Engine. Each profile has default values for various internal configuration options, as well as things like the use of predictive/performance graphs.                                                                                                                                                                                                   |
 | Concurrency               | [ConfigHash::setConcurrency()](https://github.com/51Degrees/device-detection-cxx/blob/main/src/hash/ConfigHash.hpp#L180)                            | Yes          | System processor count                                                                                                           | Set the expected number of concurrent operations using the Engine. This is used to configure internal caches to avoid excessive locking. It has no effect if these internal caches are not used. (For example, when using the 'MaxPerformance' profile)                                                                                                                                                     |
 
-[^2]: The default values for many configuration options comes from the native
+[^2]: The default values for many configuration options come from the native
 C/C++ code. You can find these defaults in
 <https://github.com/51Degrees/common-cxx/blob/master/config.h> and
 <https://github.com/51Degrees/device-detection-cxx/blob/master/src/config-dd.h>
