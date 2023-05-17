@@ -200,7 +200,7 @@ Configuration of the frequency for checking of new content:
 
 Configuration of the locations that disk based operation is done from:
 
-- **dataSourceFileLocation** - where to load the data source fom
+- **dataSourceFileLocation** - where to load the data source from
 - **createOperationalDataCopy** - create a copy of the data source, for operation
 - **operationalDataFileDirectory** - the directory for the data file copy
 

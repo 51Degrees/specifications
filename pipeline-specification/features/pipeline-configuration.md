@@ -2,7 +2,7 @@
 
 ## Summary
 
-Many Flow Elements have numerous configuration options. iIt is also possible
+Many Flow Elements have numerous configuration options. It is also possible
 to configure Pipelines in many ways.
 
 In order to make configuration as simple as possible for users, it is REQUIRED
