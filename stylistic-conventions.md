@@ -86,15 +86,18 @@ is that sentence case would have you say, for example,
 
 ## Checking adherence to conventions
 
-Refer to 51Degrees Style Guide. <span style="color:yellow">a link to it would be helpful</span>
-Refer to 51Degrees Glossary <span style="color:yellow">a link to it would be helpful</span>
+Refer to 51Degrees Style Guide [^1]
+Refer to 51Degrees Glossary [^1]
+
+[^1]: These documents are not publicly accessible at present. This will be addressed
+and links added in the future.
 
 Some VSCode extensions that have proven useful:
 
-- Code Spell Checker <span style="color:yellow">a link to it would be helpful</span>
-- HTTP/s and relative link checker <span style="color:yellow">a link to it would be helpful</span>
-- Markdown All in One <span style="color:yellow">a link to it would be helpful</span>
-- Markdown Table Prettifier <span style="color:yellow">a link to it would be helpful</span>
+- [Code Spell Checker](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker)
+- [HTTP/s and relative link checker](https://marketplace.visualstudio.com/items?itemName=blackmist.LinkCheckMD)
+- [Markdown All in One](https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one)
+- [Markdown Table Prettifier](https://marketplace.visualstudio.com/items?itemName=darkriszty.markdown-table-prettify)
 
 ## Consistency
 

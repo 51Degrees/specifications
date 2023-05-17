@@ -74,7 +74,7 @@ Numerous additional tests exist (to a total of around 500, running to
 thousands of lines of code) in the reference implementations and the code of
 those implementations can be consulted for more details.
 
-### Core
+### FiftyOne.Pipeline.Core
 
 TypedKeyMap :
 
@@ -119,7 +119,7 @@ Lookup: The Java reference implementation allows interpolation of values
 (environment variables etc.) in Pipeline options files. Test for correct
 operation of the various items that can be interpolated.
 
-### Engines
+### FiftyOne.Pipeline.Engines
 
 Pipeline Overhead:
 
@@ -159,10 +159,7 @@ MissingPropertyService:
 - check that "not in resource" is returned for Cloud Engine
 - check unknown returned otherwise
 
-### Engines.Fiftyone
-<span style="color:yellow">Just a note on consistency - this package is called 51Engines in the packaging-and-structure.md
-  Maybe worth renaming it either here or there. 
-</span>
+### FiftyOne.Pipeline.Engines.Fiftyone
 
 ShareUsage:
 

@@ -44,15 +44,12 @@ set HTTP response headers.
 - The [Set Headers Element](../pipeline-elements/set-headers-element.md) MUST
   be present. If not, it MUST be added after all other elements.
 
-<span style="color:yellow">It seems that both JavaScript and Set Headers Element
-must be added after all other elements.  However there can only be one last element :) 
-Which one should be the last?</span>
+Note that Set Headers Element does not interact with JavaScript Builder Element,
+etc. Consequently, it doesn't matter which one is actually the last element,
+they just need to be added after any non-core Elements.
 
 For all of these elements, there MUST be configuration options to allow
-users to prevent them being added if they wish to do so.
-<span style="color:yellow">maybe it is better to say "to disable them" rather than
- "to prevent them being added", since elements will be added, but configuration option
-may exclude them from processing as needed - essentially disabling them</span>
+users to prevent them being added (or disable them) if they wish to do so.
 
 ## Populating Evidence
 

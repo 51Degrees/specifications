@@ -1,9 +1,6 @@
 # C# and Java implementation architecture notes
 
-This section discusses architectural Aspects of the reference implementations
-<span style="color:yellow">Perhaps "Aspects", should be decapitalized above, as it is not
-	a 51Degrees-specific concept, but rather an aspect in general.
-</span>
+This section discusses architectural aspects of the reference implementations
 (written in C# and Java) which were designed with extensibility in mind and
 to provide the basis for possible re-use in the creation of Flow Elements and
 Engines.
