@@ -65,5 +65,5 @@ To date, the following types are supported in configuration files for all langua
 These sample files show all configuration options across many 51Degrees Elements
 and include default values and links to descriptions of the options.
 
-[.NET](https://github.com/51Degrees/device-detection-dotnet/blob/master/Examples/sample-configuration.json)
+[.NET](https://github.com/51Degrees/device-detection-dotnet-examples/blob/main/Examples/sample-configuration.json)
 [Java](https://github.com/51Degrees/device-detection-java-examples/blob/master/console/src/main/resources/gettingStartedOnPrem.xml)

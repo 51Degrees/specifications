@@ -55,7 +55,7 @@ to determine the correct native binary to use based on the current
 operating system.
 
 In some cases, this capability is built into the packaging infrastructure
-For example, [.NET/NuGet](https://github.com/51Degrees/device-detection-dotnet/blob/main/FiftyOne.DeviceDetection/FiftyOne.DeviceDetection.Hash.Engine.OnPremise/FiftyOne.DeviceDetection.Hash.Engine.OnPremise.csproj#L117).
+For example, [.NET/NuGet](https://github.com/51Degrees/device-detection-dotnet/blob/main/FiftyOne.DeviceDetection.Hash.Engine.OnPremise/FiftyOne.DeviceDetection.Hash.Engine.OnPremise.csproj#L78).
 Some require additional code to be written to determine the correct binary
 at runtime (Java/Maven and Node/NPM). Others
 do not allow native binaries in packages at all (PHP/Composer).
