@@ -90,9 +90,13 @@ An example of the JSON response received from the server:
 
 ## Start-up activity
 
+There were design issues discovered and the design of start-up activity has been updated. 
+The implementation should follow the updated design for all APIs.  For historical purposes the previous design 
+is left as is below, and then changes explanations follow. 
+
+### Previous Design
 On start-up, the Engine will call its [configured](#configuration-options)
-`accessibleproperties` and `evidencekeys`
-endpoints, using the configured Resource Key.
+`accessibleproperties` and `evidencekeys` endpoints, using the configured Resource Key.
 
 The result from `accessibleproperties` will be used to populate a publicly
 accessible (read only) dictionary containing details of the data and
@@ -110,6 +114,32 @@ error as the Pipeline will be unable to function correctly.
 
 See [HTTP requests](#http-requests) for general details on
 HTTP request handling.
+
+### Updated Design
+
+#### Motivation for change 
+There was a problem with the old design. 
+
+We have discovered that customers encounter severe problems in case 51d cloud service, server machine or domain (cloud.51degrees.com)
+are down or unavailable.  In this case the `CloudRequestEngine`  constructor would not be able to obtain `eviddencekeys` or `accessibleproperties`
+and would throw an exception.  This can bring the whole customer service down especially in the [web integrations](../features/web-integration.md) where Pipeline functions as part of a request processing module/plugin (f.e. .NET Cloud/Framework-Web integration) - and the integration code does not even have an opportunity to properly catch the exceptions. 
+
+Of course construction should happen once, but there are service restarts and/or starts that might occur f.e. due to auto-scaling - so construction can happen undeterministically and 
+the customer can end up with an unitializable pipeline under the above circumstance.
+
+However there is already a feature [`SuppressProcessExceptions`](../features/exception-handling.md) - this is a configuration flag that tells Pipeline
+to not throw exceptions during processing.  We wanted to use this flag and extend its effect on this scenario when `evidencekeys` or `accessibleproperties` can 
+not be obtained due to host being down or due to other reasons.  
+
+### Changes
+The above motivation led to the following design decision.  `evidencekeys`, `accessibleproperties` or any future dependence on cloud.51degrees.com 
+(or any other external service) - must be made **lazy** and obtained (once and then cached) only at the point of first use!  In particular they must be made initialized
+within the scope of a (Web)Pipeline.Process method call.  
+
+That way if the host is down and any exception is thrown - the `SuppressProcessExceptions`, if it was specified
+in the Pipeline configuration, would take effect and the exceptions would be suppressed and logged rather than throwing and bringing the customer service down. 
+**Thus there is no particular start up activity, but any "start-up" properties should be made lazy for this element.**
+Throwing exceptions if either of these lazy properties fails to initialize still holds, however they now will be thrown in the context of Process() and not constructor.  
 
 ## Processing
 

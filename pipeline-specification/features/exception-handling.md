@@ -37,7 +37,11 @@ There MUST be an option to modify this behavior to just add these errors
 to the errors collection and [log](logging.md) them (I.e. don't throw an
 exception/error at the end of processing). This option will be available
 when the [Pipeline is created](../conceptual-overview.md#pipeline-builder)
-and be called `SuppressProcessExceptions` or similar.
+and be called `SuppressProcessExceptions` (**note the plural ending `s`**).
+
+This property MUST be exposed as a public property as part of the `Pipeline` public interface as
+`IsSuppressProcessExceptions` - for Pipeline wrappers such as `WebPipeline` to be able to use it
+as well to make a decision on whether the exceptions should be suppressed and logged during processing.
 
 ### Flow Elements
 
@@ -103,4 +107,6 @@ Can be thrown by the [CloudRequestEngine](../pipeline-elements/cloud-request-eng
 following requests to a cloud service. MUST be populated with details
 relevant to the failure (For example, when a 429 error occurs, include the
 value of the 'Retry-After' header in the exception message so that
-the user can act on it)
+the user can act on it).  The underlying exceptions should be passed as part of it.  F.e. if there was an error 
+parsing a JSON response from the server - that exception should be added into `CloudRequestException` and 
+passed outwards for either logging or handling.
