@@ -34,9 +34,18 @@ Cloud Aspect Engines do not intrinsically contain Property metadata, they
 derive that from the Cloud Request Engine that precedes them in
 the Pipeline.
 
-The Cloud Request Engine [requests](cloud-request-engine.md#start-up-activity)
-this information on start-up. Each Cloud Aspect Engine accesses that
-data to obtain Property metadata relating to the Properties that it populates.
+Each Cloud Aspect Engine accesses that data to obtain Property metadata relating 
+to the Properties that it populates.
+
+The Cloud Request Engine does not [request](cloud-request-engine.md#start-up-activity)
+this information on start-up, but instead treats it as lazily initialized data - that 
+MUST be initialized only close to the time of first use.  In case it fails to initialize
+and the exceptions are suppressed - then the attempt will be made to do so on subsequent call
+to get these properties.  
+
+Cloud Aspect Engine thus MUST NOT cache the Property metadata and instead SHOULD always 
+treat it as lazily initialized failable data.  This is due to a [re-designed
+start-up behavior](cloud-request-engine.md#updated-design) of Cloud Request Engine.
 
 ## Processing
 

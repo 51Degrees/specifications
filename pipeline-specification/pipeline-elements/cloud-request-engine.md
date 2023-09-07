@@ -49,8 +49,8 @@ for more information.
 
 Accepted Evidence is dependent on the supplied Resource Key.
 
-[On start-up](#start-up-activity), the Engine will make a request to its
-remote server to get this information.
+The Engine will make a request to its remote server to get this information.  This should be 
+treated is failable lazy loaded data, see the [redesigned start-up activity](#updated-design).
 
 ## Element Data
 
