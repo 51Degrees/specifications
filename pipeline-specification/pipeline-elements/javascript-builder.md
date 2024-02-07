@@ -33,8 +33,8 @@ operate as efficiently as possible.
 
 ## Process
 
-The [Mustache](https://mustache.github.io/) template used by reference implementations is available at
-[GitHub](https://github.com/51Degrees/pipeline-dotnet/blob/master/FiftyOne.Pipeline.Elements/FiftyOne.Pipeline.JavaScriptBuilderElement/Templates/JavaScriptResource.mustache)
+The [Mustache](https://mustache.github.io/) template used by all implementations is available at
+[GitHub](https://github.com/51Degrees/javascript-templates/blob/main/JavaScriptResource.mustache).
 There is no requirement that this template or Mustache is used. However,
 any new variant would need to reproduce the capabilities of the existing script.
 
