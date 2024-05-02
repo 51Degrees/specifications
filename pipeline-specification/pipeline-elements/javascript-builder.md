@@ -18,6 +18,7 @@ following features:
 - `header.host`
 - `header.protocol`
 - `query.fod-js-object-name`
+- `query.fod-js-enable-cookies`
 
 ## Start-up activity
 
@@ -63,6 +64,8 @@ first be determined:
    - Use the text after `query.` as the key.
    - Pass keys and values in the form needed by the template (don't forget
      URL encoding, etc. if needed).
+8. If cookies are enabled from the `query.fod-js-enable-cookies` Evidence value.
+   If it's not present or blank, use the value specified in the configuration.
 
 The parameters to the existing template are:
 
@@ -75,7 +78,7 @@ The parameters to the existing template are:
 | \_supportsPromises     | False. Unless Device Detection is in the Pipeline and the ‘Promise’ Property returns ‘Full’ | If true, the script will use Promises                                                                                                    |
 | \_url                  | Item 6 above                                                                                | The callback url to use when javascript Properties are executed on the client-side.                                                      |
 | \_parameters           | Item 7 above                                                                                | Any query parameters in Evidence, these can be relayed in callbacks to the cloud service.                                                |
-| \_enableCookies        | From configuration                                                                          | If false, the script will automatically delete any cookies prefixed with `51D_` after evaluating Properties.                             |
+| \_enableCookies        | Item 8 above                                                                                | If false, the script will automatically use session storage instead of writing any cookies prefixed with `51D_` after evaluating Properties.                             |
 | \_updateEnabled        | Will usually be true if \_url is set                                                        | If true, the JavaScript will include functionality to make callbacks to the server after evaluating JavaScript Properties.               |
 | \_hasDelayedProperties | True if the JSON contains the text `delayexecution`                                         | If true, the JavaScript will include functionality to support Properties where execution of the JavaScript will be delayed until needed. |
 
@@ -130,4 +133,4 @@ as a previous result can then be retrieved from session storage.
 | SetEndpoint      | string   | [Empty string] | The endpoint that a request will be sent to once additional Evidence is available from client-side execution. This endpoint MUST return JSON data in the same form as the JSON embedded within the JavaScript |
 | SetObjectName    | String   | fod            | The name of the JavaScript object created in the global scope on the client                                                                                                                                   |
 | SetMinify        | Bool     | True           | Enable or disable minification of the Javascript that is produced                                                                                                                                             |
-| SetEnableCookies | Bool     | True           | True if results of client-side processing can be retained in cookies so that they are sent by default in subsequent requests                                                                                  |
+| SetEnableCookies | Bool     | True           | True if results of client-side processing can be retained in cookies so that they are sent by default in subsequent requests. If false, session storage will be used instead                                |
