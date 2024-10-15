@@ -191,6 +191,14 @@ Second, there are several scenarios that SHOULD cause an error to be thrown:
 Similarly to the `errors` array, any entries in the `warnings` array in the
 response MUST be logged as warnings.
 
+### Request throttling
+
+If getting a response from cloud server somehow (e.g. due to network damage or an attack) becomes slow (potentially leading to timeouts), the requests from consumers could get stuck (e.g. awaiting on the lock to read value of `evidencekeys`), which would cripple user experience and might even lead to exhausting server resources (e.g. RAM or socket connections).
+
+To prevent this from happenning, once a significant amount of requests fail within a short time span, the engine may enter "recovery period" and bypass sending the requests, directly signalling about the temporary unavailability of the element (and the whole pipeline as a result).
+
+In case of ASP.NET Framework integration such errors will be suppressed -- as though under the effect of [`SuppressProcessExceptions`](../features/exception-handling.md) -- making the FlowData available, but without any usable data (except errors).
+
 ## Configuration options
 
 These are the configuration options that are unique to this Engine. They
@@ -198,12 +206,15 @@ are in addition to all the configuration options defined for other features.
 For example,
 [caching](../../pipeline-specification/features/caching.md)
 
-| **Name**             | **Type** | **Default**                                               | **Description**                                                                                                                                                                           |
-|----------------------|----------|-----------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| EndPoint             | string   | <https://cloud.51degrees.com/api/v4/>                     | The base URL for the cloud service. This will be suffixed with `json`, `accessibleproperties` or `evidencekeys` to form the complete URLs for the various endpoints called by the Engine. |
-| DataEndPoint         | string   | <https://cloud.51degrees.com/api/v4/JSON>                 | The URL for the cloud service data end point                                                                                                                                              |
-| PropertiesEndPoint   | string   | <https://cloud.51degrees.com/api/v4/accessibleProperties> | The URL for the cloud service Properties end point                                                                                                                                        |
-| EvidenceKeysEndPoint | string   | <https://cloud.51degrees.com/api/v4/Evidencekeys>         | The URL for the cloud service Evidence keys end point                                                                                                                                     |
-| ResourceKey          | string   | null                                                      | The Resource Key to use when making requests to the cloud service                                                                                                                         |
-| TimeoutSeconds       | integer  | 100                                                       | The timeout to use when making requests to the cloud service                                                                                                                              |
-| CloudRequestOrigin   | string   | null                                                      | The value to set the 'Origin' header to when making requests to the cloud service                                                                                                         |
+| **Name**                | **Type** | **Default**                                               | **Description**                                                                                                                                                                           |
+|-------------------------|----------|-----------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| EndPoint                | string   | <https://cloud.51degrees.com/api/v4/>                     | The base URL for the cloud service. This will be suffixed with `json`, `accessibleproperties` or `evidencekeys` to form the complete URLs for the various endpoints called by the Engine. |
+| DataEndPoint            | string   | <https://cloud.51degrees.com/api/v4/JSON>                 | The URL for the cloud service data end point                                                                                                                                              |
+| PropertiesEndPoint      | string   | <https://cloud.51degrees.com/api/v4/accessibleProperties> | The URL for the cloud service Properties end point                                                                                                                                        |
+| EvidenceKeysEndPoint    | string   | <https://cloud.51degrees.com/api/v4/Evidencekeys>         | The URL for the cloud service Evidence keys end point                                                                                                                                     |
+| ResourceKey             | string   | null                                                      | The Resource Key to use when making requests to the cloud service                                                                                                                         |
+| TimeoutSeconds          | integer  | 100                                                       | The timeout to use when making requests to the cloud service                                                                                                                              |
+| CloudRequestOrigin      | string   | null                                                      | The value to set the 'Origin' header to when making requests to the cloud service                                                                                                         |
+| FailuresToEnterRecovery | integer  | 10                                                        | How many requests to cloud server should fail within `FailuresWindowSeconds` for the engine to enter "recovery period"                                                                    |
+| FailuresWindowSeconds   | integer  | 100                                                       | How fast the number of failed requests should reach `FailuresToEnterRecovery` for the engine to enter "recovery period"                                                                   |
+| RecoverySeconds         | double   | 60.0                                                      | How long the recovery period is. Set to zero or negative to disable.                                                                                                                      |
