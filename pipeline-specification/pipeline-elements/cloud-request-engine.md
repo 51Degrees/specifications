@@ -197,7 +197,7 @@ If getting a response from cloud server somehow (e.g. due to network damage or a
 
 To prevent this from happenning, once a significant amount of requests fail within a short time span, the engine may enter "recovery period" and bypass sending the requests, directly signalling about the temporary unavailability of the element (and the whole pipeline as a result).
 
-In case of ASP.NET Framework integration such errors will be suppressed -- as though under the effect of [`SuppressProcessExceptions`](../features/exception-handling.md) -- making the FlowData available, but without any usable data (except errors).
+In case of ASP.NET Core / ASP.NET Framework integrations such errors will be suppressed -- as though under the effect of [`SuppressProcessExceptions`](../features/exception-handling.md) -- making the FlowData available, but without any usable data (except errors).
 
 ## Configuration options
 
