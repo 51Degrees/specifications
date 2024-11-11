@@ -49,7 +49,7 @@ for more information.
 
 Accepted Evidence is dependent on the supplied Resource Key.
 
-The Engine will make a request to its remote server to get this information.  This should be 
+The Engine will make a request to its remote server to get this information.  This should be
 treated is failable lazy loaded data, see the [redesigned start-up activity](#updated-design).
 
 ## Element Data
@@ -90,11 +90,12 @@ An example of the JSON response received from the server:
 
 ## Start-up activity
 
-There were design issues discovered and the design of start-up activity has been updated. 
-The implementation should follow the updated design for all APIs.  For historical purposes the previous design 
-is left as is below, and then changes explanations follow. 
+There were design issues discovered and the design of start-up activity has been updated.
+The implementation should follow the updated design for all APIs.  For historical purposes the previous design
+is left as is below, and then changes explanations follow.
 
 ### Previous Design
+
 On start-up, the Engine will call its [configured](#configuration-options)
 `accessibleproperties` and `evidencekeys` endpoints, using the configured Resource Key.
 
@@ -117,28 +118,30 @@ HTTP request handling.
 
 ### Updated Design
 
-#### Motivation for change 
-There was a problem with the old design. 
+#### Motivation for change
+
+There was a problem with the old design.
 
 We have discovered that customers encounter severe problems in case 51d cloud service, server machine or domain (cloud.51degrees.com)
 are down or unavailable.  In this case the `CloudRequestEngine`  constructor would not be able to obtain `eviddencekeys` or `accessibleproperties`
-and would throw an exception.  This can bring the whole customer service down especially in the [web integrations](../features/web-integration.md) where Pipeline functions as part of a request processing module/plugin (f.e. .NET Cloud/Framework-Web integration) - and the integration code does not even have an opportunity to properly catch the exceptions. 
+and would throw an exception.  This can bring the whole customer service down especially in the [web integrations](../features/web-integration.md) where Pipeline functions as part of a request processing module/plugin (f.e. .NET Cloud/Framework-Web integration) - and the integration code does not even have an opportunity to properly catch the exceptions.
 
-Of course construction should happen once, but there are service restarts and/or starts that might occur f.e. due to auto-scaling - so construction can happen undeterministically and 
+Of course construction should happen once, but there are service restarts and/or starts that might occur f.e. due to auto-scaling - so construction can happen undeterministically and
 the customer can end up with an unitializable pipeline under the above circumstance.
 
 However there is already a feature [`SuppressProcessExceptions`](../features/exception-handling.md) - this is a configuration flag that tells Pipeline
-to not throw exceptions during processing.  We wanted to use this flag and extend its effect on this scenario when `evidencekeys` or `accessibleproperties` can 
+to not throw exceptions during processing.  We wanted to use this flag and extend its effect on this scenario when `evidencekeys` or `accessibleproperties` can
 not be obtained due to host being down or due to other reasons.  
 
 ### Changes
-The above motivation led to the following design decision.  `evidencekeys`, `accessibleproperties` or any future dependence on cloud.51degrees.com 
+
+The above motivation led to the following design decision.  `evidencekeys`, `accessibleproperties` or any future dependence on cloud.51degrees.com
 (or any other external service) - must be made **lazy** and obtained (once and then cached) only at the point of first use!  In particular they must be made initialized
 within the scope of a (Web)Pipeline.Process method call.  
 
 That way if the host is down and any exception is thrown - the `SuppressProcessExceptions`, if it was specified
-in the Pipeline configuration, would take effect and the exceptions would be suppressed and logged rather than throwing and bringing the customer service down. 
-**Thus there is no particular start up activity, but any "start-up" properties should be made lazy for this element.**
+in the Pipeline configuration, would take effect and the exceptions would be suppressed and logged rather than throwing and bringing the customer service down.
+**Thus, there is no particular start up activity, but any "start-up" properties should be made lazy for this element.**
 Throwing exceptions if either of these lazy properties fails to initialize still holds, however they now will be thrown in the context of Process() and not constructor.  
 
 ## Processing
@@ -188,6 +191,15 @@ Second, there are several scenarios that SHOULD cause an error to be thrown:
 Similarly to the `errors` array, any entries in the `warnings` array in the
 response MUST be logged as warnings.
 
+### Recovery Mode
+**Note:** currently supported by .NET implementation only.
+
+If responses from the cloud server become slow due to issues like network disruptions or potential attacks, this could result in timeouts, causing consumer requests to stall (e.g., waiting on a lock to access evidencekeys). Such a situation could degrade user experience and potentially deplete server resources (e.g., RAM or socket connections).
+
+To mitigate this risk, if a significant number of request failures occur within a brief period, the engine can enter a "recovery period." During this phase, requests are bypassed, and a direct signal is sent indicating the temporary unavailability of the element (and the entire pipeline), preventing further strain on the system.
+
+In case of ASP.NET Core / ASP.NET Framework integrations such errors will be suppressed -- as though under the effect of [`SuppressProcessExceptions`](../features/exception-handling.md) -- making the FlowData available, but without any usable data (except errors).
+
 ## Configuration options
 
 These are the configuration options that are unique to this Engine. They
@@ -195,12 +207,15 @@ are in addition to all the configuration options defined for other features.
 For example,
 [caching](../../pipeline-specification/features/caching.md)
 
-| **Name**             | **Type** | **Default**                                               | **Description**                                                                                                                                                                           |
-|----------------------|----------|-----------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| EndPoint             | string   | <https://cloud.51degrees.com/api/v4/>                     | The base URL for the cloud service. This will be suffixed with `json`, `accessibleproperties` or `evidencekeys` to form the complete URLs for the various endpoints called by the Engine. |
-| DataEndPoint         | string   | <https://cloud.51degrees.com/api/v4/JSON>                 | The URL for the cloud service data end point                                                                                                                                              |
-| PropertiesEndPoint   | string   | <https://cloud.51degrees.com/api/v4/accessibleProperties> | The URL for the cloud service Properties end point                                                                                                                                        |
-| EvidenceKeysEndPoint | string   | <https://cloud.51degrees.com/api/v4/Evidencekeys>         | The URL for the cloud service Evidence keys end point                                                                                                                                     |
-| ResourceKey          | string   | null                                                      | The Resource Key to use when making requests to the cloud service                                                                                                                         |
-| TimeoutSeconds       | integer  | 100                                                       | The timeout to use when making requests to the cloud service                                                                                                                              |
-| CloudRequestOrigin   | string   | null                                                      | The value to set the 'Origin' header to when making requests to the cloud service                                                                                                         |
+| **Name**                | **Type** | **Default**                                               | **Description**                                                                                                                                                                           |
+|-------------------------|----------|-----------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| EndPoint                | string   | <https://cloud.51degrees.com/api/v4/>                     | The base URL for the cloud service. This will be suffixed with `json`, `accessibleproperties` or `evidencekeys` to form the complete URLs for the various endpoints called by the Engine. |
+| DataEndPoint            | string   | <https://cloud.51degrees.com/api/v4/JSON>                 | The URL for the cloud service data end point                                                                                                                                              |
+| PropertiesEndPoint      | string   | <https://cloud.51degrees.com/api/v4/accessibleProperties> | The URL for the cloud service Properties end point                                                                                                                                        |
+| EvidenceKeysEndPoint    | string   | <https://cloud.51degrees.com/api/v4/Evidencekeys>         | The URL for the cloud service Evidence keys end point                                                                                                                                     |
+| ResourceKey             | string   | null                                                      | The Resource Key to use when making requests to the cloud service                                                                                                                         |
+| TimeoutSeconds          | integer  | 2                                                         | The timeout to use when making requests to the cloud service                                                                                                                              |
+| CloudRequestOrigin      | string   | null                                                      | The value to set the 'Origin' header to when making requests to the cloud service                                                                                                         |
+| FailuresToEnterRecovery | integer  | 10                                                        | The number of request failures that must occur within the timeframe defined by `FailuresWindowSeconds` for the engine to transition into a "recovery period."                             |
+| FailuresWindowSeconds   | integer  | 100                                                       | The time frame in seconds within which the number of failed requests must reach the threshold set by FailuresToEnterRecovery for the engine to enter a "recovery period."                 |
+| RecoverySeconds         | double   | 60.0                                                      | The duration of the recovery period in seconds. Set this to zero or a negative value to disable the recovery period.                                                                      | 
