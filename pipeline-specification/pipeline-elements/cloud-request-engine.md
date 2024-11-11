@@ -141,7 +141,7 @@ within the scope of a (Web)Pipeline.Process method call.
 
 That way if the host is down and any exception is thrown - the `SuppressProcessExceptions`, if it was specified
 in the Pipeline configuration, would take effect and the exceptions would be suppressed and logged rather than throwing and bringing the customer service down.
-**Thus there is no particular start up activity, but any "start-up" properties should be made lazy for this element.**
+**Thus, there is no particular start up activity, but any "start-up" properties should be made lazy for this element.**
 Throwing exceptions if either of these lazy properties fails to initialize still holds, however they now will be thrown in the context of Process() and not constructor.  
 
 ## Processing
@@ -214,8 +214,8 @@ For example,
 | PropertiesEndPoint      | string   | <https://cloud.51degrees.com/api/v4/accessibleProperties> | The URL for the cloud service Properties end point                                                                                                                                        |
 | EvidenceKeysEndPoint    | string   | <https://cloud.51degrees.com/api/v4/Evidencekeys>         | The URL for the cloud service Evidence keys end point                                                                                                                                     |
 | ResourceKey             | string   | null                                                      | The Resource Key to use when making requests to the cloud service                                                                                                                         |
-| TimeoutSeconds          | integer  | 2                                                       | The timeout to use when making requests to the cloud service                                                                                                                              |
+| TimeoutSeconds          | integer  | 2                                                         | The timeout to use when making requests to the cloud service                                                                                                                              |
 | CloudRequestOrigin      | string   | null                                                      | The value to set the 'Origin' header to when making requests to the cloud service                                                                                                         |
-| FailuresToEnterRecovery | integer  | 10                                                        | The number of request failures that must occur within the timeframe defined by `FailuresWindowSeconds` for the engine to transition into a "recovery period."                                                                    |
-| FailuresWindowSeconds   | integer  | 100                                                       | The time frame in seconds within which the number of failed requests must reach the threshold set by FailuresToEnterRecovery for the engine to enter a "recovery period."                                                                   |
+| FailuresToEnterRecovery | integer  | 10                                                        | The number of request failures that must occur within the timeframe defined by `FailuresWindowSeconds` for the engine to transition into a "recovery period."                             |
+| FailuresWindowSeconds   | integer  | 100                                                       | The time frame in seconds within which the number of failed requests must reach the threshold set by FailuresToEnterRecovery for the engine to enter a "recovery period."                 |
 | RecoverySeconds         | double   | 60.0                                                      | How long the recovery period is. Set to zero or negative to disable.                                                                                                                      |
