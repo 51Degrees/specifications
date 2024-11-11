@@ -191,11 +191,12 @@ Second, there are several scenarios that SHOULD cause an error to be thrown:
 Similarly to the `errors` array, any entries in the `warnings` array in the
 response MUST be logged as warnings.
 
-### Request throttling
+### Recovery Mode
+**Note:** currently supported by .NET implementation only.
 
-If getting a response from cloud server somehow (e.g. due to network damage or an attack) becomes slow (potentially leading to timeouts), the requests from consumers could get stuck (e.g. awaiting on the lock to read value of `evidencekeys`), which would cripple user experience and might even lead to exhausting server resources (e.g. RAM or socket connections).
+If responses from the cloud server become slow due to issues like network disruptions or potential attacks, this could result in timeouts, causing consumer requests to stall (e.g., waiting on a lock to access evidencekeys). Such a situation could degrade user experience and potentially deplete server resources (e.g., RAM or socket connections).
 
-To prevent this from happenning, once a significant amount of requests fail within a short time span, the engine may enter "recovery period" and bypass sending the requests, directly signalling about the temporary unavailability of the element (and the whole pipeline as a result).
+To mitigate this risk, if a significant number of request failures occur within a brief period, the engine can enter a "recovery period." During this phase, requests are bypassed, and a direct signal is sent indicating the temporary unavailability of the element (and the entire pipeline), preventing further strain on the system.
 
 In case of ASP.NET Core / ASP.NET Framework integrations such errors will be suppressed -- as though under the effect of [`SuppressProcessExceptions`](../features/exception-handling.md) -- making the FlowData available, but without any usable data (except errors).
 
@@ -213,8 +214,8 @@ For example,
 | PropertiesEndPoint      | string   | <https://cloud.51degrees.com/api/v4/accessibleProperties> | The URL for the cloud service Properties end point                                                                                                                                        |
 | EvidenceKeysEndPoint    | string   | <https://cloud.51degrees.com/api/v4/Evidencekeys>         | The URL for the cloud service Evidence keys end point                                                                                                                                     |
 | ResourceKey             | string   | null                                                      | The Resource Key to use when making requests to the cloud service                                                                                                                         |
-| TimeoutSeconds          | integer  | 100                                                       | The timeout to use when making requests to the cloud service                                                                                                                              |
+| TimeoutSeconds          | integer  | 2                                                       | The timeout to use when making requests to the cloud service                                                                                                                              |
 | CloudRequestOrigin      | string   | null                                                      | The value to set the 'Origin' header to when making requests to the cloud service                                                                                                         |
-| FailuresToEnterRecovery | integer  | 10                                                        | How many requests to cloud server should fail within `FailuresWindowSeconds` for the engine to enter "recovery period"                                                                    |
-| FailuresWindowSeconds   | integer  | 100                                                       | How fast the number of failed requests should reach `FailuresToEnterRecovery` for the engine to enter "recovery period"                                                                   |
+| FailuresToEnterRecovery | integer  | 10                                                        | The number of request failures that must occur within the timeframe defined by `FailuresWindowSeconds` for the engine to transition into a "recovery period."                                                                    |
+| FailuresWindowSeconds   | integer  | 100                                                       | The time frame in seconds within which the number of failed requests must reach the threshold set by FailuresToEnterRecovery for the engine to enter a "recovery period."                                                                   |
 | RecoverySeconds         | double   | 60.0                                                      | How long the recovery period is. Set to zero or negative to disable.                                                                                                                      |
