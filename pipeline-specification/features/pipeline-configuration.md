@@ -33,6 +33,10 @@ This would create a Pipeline that performs the following processing:
 - When s1 is finished, p1 and p2 are started in parallel.
 - When both p1 and p2 are complete, s2 is started.
 
+### Elements Built in Parallel
+
+When building from configuration, elements are built in parallel in order to decrease start up time. This is because no element builder should rely on another other element builder. The element order established in the configuration and then preserved when building in parallel. 
+
 ## Flow Elements
 
 - Elements/Engines MAY have configuration options to customize the
