@@ -89,6 +89,10 @@ Note that the list of accepted Evidence keys is not case-sensitive -
 i.e. `header.user-agent` and `header.User-Agent` would both be
 accepted.
 
+### Hardcoded Evidence Keys
+
+Besides evidence keys loaded from the data file - there may be some hardcoded evidence keys specified in code.  Thus Evidence Key Filter of a language-specific Engine Flow Element is populated from 2 sources: `getKeys` that returns keys from the data file + hardcoded Evidence Keys specific to the implementation language (which should not be typical) or common for all of them.
+
 ## Element Data
 
 The list of Properties that can be populated by this Engine is determined
@@ -290,3 +294,40 @@ addition to all the configuration options defined for other features. For exampl
 C/C++ code. You can find these defaults in
 <https://github.com/51Degrees/common-cxx/blob/master/config.h> and
 <https://github.com/51Degrees/device-detection-cxx/blob/master/src/config-dd.h>
+
+## UACH High Entropy Values as Evidence
+
+There are 3 common ways to represent User Agent Client Hints:
+- [HTTP header map](https://wicg.github.io/ua-client-hints/)
+- getHighEntropyValues() JS API call result in JSON format
+- Structured User Agent Object from OpenRTB 2.6
+
+Links:
+- [getHighEntropyValues()](https://developer.mozilla.org/en-US/docs/Web/API/NavigatorUAData/getHighEntropyValues)
+- [device.sua](https://51degrees.com/blog/openrtb-structured-user-agent-and-user-agent-client-hints)
+- [OpenRTB 2.6 spec](https://github.com/InteractiveAdvertisingBureau/openrtb2.x/blob/main/2.6.md#objectuseragent)
+
+ 51Degrees historically used HTTP header map to represent User-Agent Client Hints and expected the evidence to
+ be provided as HTTP headers (or same name query parameters).  The header
+ names in question are:
+ - Sec-CH-UA
+ - Sec-CH-UA-Platform
+ - Sec-CH-UA-Mobile
+ - Sec-CH-UA-Model
+ - Sec-CH-UA-Full-Version-List
+ - Sec-CH-UA-Platform-Version
+ - Sec-CH-UA-Arch
+ - Sec-CH-UA-Bitness
+
+In v.4.4 there was a separate flow element that did UACH conversion from getHighEntropyValues() representation into standard HTTP header representation, from which device detection was done.  
+
+As it was a flow element - it had a drawback that it needed to be implemented for each language seprately.
+
+Starting with v.4.5 the native device detection library directly processes these evidence keys:
+
+- `query.51d_gethighenropyvalues`
+- `cookie.51d_gethighenropyvalues`
+- `query.51d_structureduseragent`
+- `cookie.51d_structureduseragent`
+
+Internally it converts them to a standard HTTP header representation of UACH, but it is an implementation detail.  The main caveat is that the language-specific Device Detection Engine Flow Element needs to allow the above in the Evidence Key Filter.

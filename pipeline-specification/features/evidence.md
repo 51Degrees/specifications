@@ -65,3 +65,9 @@ design patterns being used.
 to the web server using an HTTP header. Generally, 51Degrees Engines will not make
 use of `header.cookie`. Cookie values will usually need to be under `cookie.` keys
 in order to be used.
+
+## Evidence Key Filter
+
+Each Flow Element defines an Evidence Key Filter which is a predicate function object that takes an evidence key as a param and returns true if it can be processed by a given Flow Element, otherwise False and such evidence will be ignored.
+
+Device Detection has a related concept called "Accepted Evidence". That is a list of all evidence keys that it can process and it loads them from the data source on start up.  However evidence key filter can be more complicated and may include evidence keys both loaded from the data source and defined in the code.

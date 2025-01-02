@@ -1,3 +1,5 @@
+**DEPRECATED IN v.4.5, left for reference only**
+
 # UA-CH high entropy decoder
 
 ## Overview
