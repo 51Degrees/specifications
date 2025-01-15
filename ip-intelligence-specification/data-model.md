@@ -72,6 +72,34 @@ This type will extend `IGeoData`.
 | -------- | ---- |
 | MNC | `int` |
 
+### Example
+
+As an example, take the MCC component. The rough implementation would look like:
+
+```{cs}
+class MccData : IWeightedAspectData, IMccData
+{
+    int Mcc { get; }
+    float Weighting { get; }
+}
+```
+
+And the engine would return a type of:
+
+```{cs}
+class IpIntelligenceData : IMultiWeightedAspectData IIpIntelligenceData
+{
+    // Contains all profiles
+    IReadOnlyList<IWeightedAspectData> Profiles { get; }
+
+    // Gets the MCC values
+    IReadOnlyList<IWeightedValue<int>> Mcc { get; }
+
+    // Contains only the MCC profiles
+    IReadOnlyList<IMccData> MccProfiles { get; }
+}
+```
+
 ## Data File Structure
 
 Data files follow the standard 51Degrees data file structure, with the addition
