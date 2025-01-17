@@ -126,11 +126,15 @@ group structure is as follows:
 | Property | Type |
 | -------- | ---- |
 | Count | `short` |
+| Profiles | WeightedProfile[] |
+
+Where `WeightedProfile` is 
+| Property | Type |
+| -------- | ---- |
+| Profile Id | `int` |
 | Profile Offset | `int` |
 | Weighting | `float` |
-| ... | ... |
 
-where offset and weighting are repeated to form an array of size `Count`.
 Count is the number of profile offsets and weightings that follow.
 
 ## Property Metadata
