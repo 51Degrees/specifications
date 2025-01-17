@@ -38,12 +38,6 @@ If there is only one profile for a component, then this just has a weighting of 
 
 The Aspect Data contained in the multi Aspect Data consists of the following 4 types:
 
-#### IP
-| Property | Type |
-| -------- | ---- |
-| Ip | `string` |
-| IpV6 | `string ` |
-
 #### Network
 
 | Property | Type |
@@ -52,6 +46,7 @@ The Aspect Data contained in the multi Aspect Data consists of the following 4 t
 | IpRangeEnd | `string` |
 | Name | `string` |
 | Owner | `string` |
+| Asn | `int` |
 
 #### Location
 
@@ -59,11 +54,24 @@ The Aspect Data contained in the multi Aspect Data consists of the following 4 t
 | -------- | ---- |
 | Latitude | `float` |
 | Longitude | `float` |
-| Areas | `IReadOnlyList<WktString>` |
+| Areas | `WktString` |
 | AccuracyRadius | `int` |
 
 Location also includes all properties from the existing location results model.
 This type will extend [`IGeoData`](https://github.com/51Degrees/location-dotnet/blob/main/FiftyOne.GeoLocation.Core/Data/IGeoData.cs).
+
+The only properties from `IGeoData` which are populated are:
+- Town
+- County
+- Region
+- State
+- ZipCode
+- Country
+- CountryCode
+- CountryCode3
+- TimeZoneOffset
+
+The rest will return null values with an appropriate null value reason.
 
 The `WktString` type is defined in `pipeline-core`, see [WKT Type](#wkt-type).
 
@@ -100,7 +108,7 @@ class IpIntelligenceData : IMultiWeightedAspectData IIpIntelligenceData
 {
     // Contains all profiles
     //  Defined in IMultiWeightedAspectData
-    IReadOnlyList<IWeightedAspectData<IWeightedAspectData>> Profiles { get; }
+    IReadOnlyList<IWeightedAspectData> Profiles { get; }
 
     // Gets the MCC values
     // Defined in IIpIntelligenceData
@@ -124,21 +132,16 @@ of profile groups. See [Hash dataset](https://github.com/51Degrees/device-detect
 A profile is pointed to by an integer offset. This is the same as existing data 
 files. In the case where this offset is negative, it points to a group of
 profiles instead. Profile groups exist in a separate collection, and a profile
-group structure is as follows:
+group structure is an array of `WeightedProfile`, where `WeightedProfile` is:
 
 | Property | Type |
 | -------- | ---- |
-| Count | `short` |
-| Profiles | WeightedProfile[] |
-
-Where `WeightedProfile` is 
-| Property | Type |
-| -------- | ---- |
-| Profile Id | `int` |
 | Profile Offset | `int` |
 | Weighting | `float` |
 
-Count is the number of profile offsets and weightings that follow.
+The number of profiles which make up a group is not written. However, with
+the axiom that weightings add up to 1 for a component, profiles are read until
+the total weighting is 1, signifying that the array is complete.
 
 ## Property Metadata
 
@@ -167,14 +170,25 @@ Each Property SHOULD return
 an [Aspect Property value](../pipeline-specification/features/properties.md#null-values)
 in order to support exposing the reason that a value is not set.
 
-Additionally, values SHOULD be returned along with their weights. Meaning the
-introduction of the `IWeightedValue<T>` type, with the following properties:
+Additionally, values MUST be returned along with their weights when fetched
+from the `IMultiWeightedAspectData`. Meaning the introduction of the 
+`IWeightedValue<T>` type, with the following properties:
 
 | Property | Type |
 | -------- | ---- |
 | Value | `T` |
 | Weighting | `float` |
 
-There are some cases where a weighting is not appropriate for a property.
-For example, the IP component contains only the IP, which will always be 
-a single value.
+For example:
+```{cs}
+// All weighted values for a property
+IAspectPropertyValue<IWeightedValue<int>> allValues = flowData
+    .Get<IpIntelligenceData>()
+    .MCC;
+// Compared to finding the highest weighted value for
+// a property
+IAspectPropertyValue<int> firstValue = flowData
+    .Get<IpIntelligenceData>()
+    .MccProfiles[0]
+    .MCC;
+```
