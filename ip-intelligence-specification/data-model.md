@@ -38,17 +38,20 @@ If there is only one profile for a component, then this just has a weighting of 
 
 The Aspect Data contained in the multi Aspect Data consists of the following 4 types:
 
-#### Network
-
+#### IP
 | Property | Type |
 | -------- | ---- |
 | Ip | `string` |
 | IpV6 | `string ` |
+
+#### Network
+
+| Property | Type |
+| -------- | ---- |
 | IpRangeStart | `string` |
 | IpRangeEnd | `string` |
 | Name | `string` |
 | Owner | `string` |
-
 
 #### Location
 
@@ -56,13 +59,13 @@ The Aspect Data contained in the multi Aspect Data consists of the following 4 t
 | -------- | ---- |
 | Latitude | `float` |
 | Longitude | `float` |
-| Areas | `IReadOnlyList<IArea>` |
+| Areas | `IReadOnlyList<WktString>` |
 | AccuracyRadius | `int` |
 
 Location also includes all properties from the existing location results model.
 This type will extend [`IGeoData`](https://github.com/51Degrees/location-dotnet/blob/main/FiftyOne.GeoLocation.Core/Data/IGeoData.cs).
 
-The `IArea` type is defined in `pipeline-core`, see [Area Type](#area-type).
+The `WktString` type is defined in `pipeline-core`, see [WKT Type](#wkt-type).
 
 #### MCC
 
@@ -109,7 +112,7 @@ class IpIntelligenceData : IMultiWeightedAspectData IIpIntelligenceData
 }
 ```
 
-The same applies to the other 3 components.
+The same applies to the other 4 components.
 
 ## Data File Structure
 
@@ -145,28 +148,14 @@ contained within the data file. See [device-detection dotnet engine](https://git
 For cloud implementations, the metadata associated with properties is
 fetched from the cloud service. See [CloudAspectEngineBase](https://github.com/51Degrees/pipeline-dotnet/blob/main/FiftyOne.Pipeline.CloudRequestEngine/FlowElements/CloudAspectEngineBase.cs).
 
-## Area Type
+## WKT Type
 
-A new property type for the IP Intelligence Engine is the `IArea` interface.
+A new property type for the IP Intelligence Engine is the `WktString` interface.
 This uses a WKT/WKB shape (see https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry).
 
 This comes from the data file in WKB format. And is interpreted to a more useable
-form, as the interface `IShape` which has the following properties:
-
-| Property | Type |
-| -------- | ---- |
-| Points   | `IReadOnlyList<IPoint>` |
-
-and `IPoint` is a coordinate (also represented in the WKB format) with the
-properties:
-
-| Property | Type |
-| -------- | ---- |
-| X | `float` |
-| Y | `float` |
-
-An `IArea` is one of many forms that an `IShape` can describe. For example,
-a single line, or coordinate.
+form, as the interface `WktString` which extends string, and contains a WKT
+format string.
 
 Implementation adheres to the [OGC 06-103r4](https://www.ogc.org/publications/standard/sfa/) standard.
 
@@ -187,4 +176,5 @@ introduction of the `IWeightedValue<T>` type, with the following properties:
 | Weighting | `float` |
 
 There are some cases where a weighting is not appropriate for a property.
-For example, the Ip property.
+For example, the IP component contains only the IP, which will always be 
+a single value.
