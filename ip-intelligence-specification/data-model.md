@@ -11,7 +11,7 @@ All Engines MUST populate data objects that
 implement [Aspect Data](../pipeline-specification/conceptual-overview.md#aspect-data)
 as defined in the Pipeline specification.
 
-## Element Data
+## User Facing Structure
 
 Element data returned by an IP Intelligence Engine MUST implement the
 `IMultiWeightedAspectData` interface.
@@ -21,6 +21,8 @@ This interface extends `IAspectData` contains the following:
 | -------- | ---- |
 | Profiles | `IReadOnlyList<T> where T : IWeightedAspectData` |
 
+Each property MUST also be exposed as a [weighted value](../pipeline-specification/features/weighted-values.md) 
+
 This list of individual Aspect Data are weighted, by implementing the `IWeightedAspectData`
 interface which has the following:
 
@@ -28,13 +30,17 @@ interface which has the following:
 | -------- | ---- |
 | Weighting | `float` |
 
-
 The weightings of all Aspect Data for each component MUST add up to 1. So for 4 Components,
 the total would be 4.
 
 If there is only one profile for a component, then this just has a weighting of 1.
 
 ### Component Types
+
+There are multiple components per data file, and the weightings for the profiles for
+each are not necessarily the same across all component results.
+Therefore the components are treated separately when getting values and their weightings.
+This does not mean that the properties are not exposed in the same way.
 
 The Aspect Data contained in the multi Aspect Data consists of the following 4 types:
 
@@ -107,10 +113,11 @@ And the engine would return a type of:
 class IpIntelligenceData : IMultiWeightedAspectData IIpIntelligenceData
 {
     // Contains all profiles
-    //  Defined in IMultiWeightedAspectData
+    // Defined in IMultiWeightedAspectData
     IReadOnlyList<IWeightedAspectData> Profiles { get; }
 
     // Gets the MCC values
+    // This is the accessor that most callers will use
     // Defined in IIpIntelligenceData
     IReadOnlyList<IWeightedValue<int>> Mcc { get; }
 
@@ -122,10 +129,18 @@ class IpIntelligenceData : IMultiWeightedAspectData IIpIntelligenceData
 
 The same applies to the other 4 components.
 
-## Data File Structure
+## Internal Data File Structure
 
 Data files follow the standard 51Degrees data file structure, with the addition
-of profile groups. See [Hash dataset](https://github.com/51Degrees/device-detection-cxx/blob/main/src/hash/hash.h#L295).
+of profile groups. See [Hash dataset](https://github.com/51Degrees/device-detection-cxx/blob/main/src/hash/hash.h#L295). Meaning that collections and headers are common,
+and logic from [common-cxx](https://github.com/51Degrees/common-cxx) should be used.
+Collections shared with Hash are:
+- values (named strings in Hash as only string values are used)
+- properties
+- profiles
+- components
+
+See [general data model](../data-model-specification/README.md) for more info.
 
 ### Profile Groups
 
