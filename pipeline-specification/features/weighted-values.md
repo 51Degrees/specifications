@@ -8,7 +8,7 @@ full picture of which are most likely when a single value is not certain.
 For example, when returning a location based on IP address evidence, there
 can be multiple locations with different probabilities.
 
-## Accessing Weighted Values
+## Accessing
 
 Given an example `IElementData` implementation `IExampleData` which contains a property
 `ExampleProperty`
@@ -32,5 +32,17 @@ foreach (var weightedValue in values)
 {
     float weighting = weightedValue.Weighting;
     string value = weightedValue.Value;
+}
+```
+
+## Serializing 
+
+When serializing weighted values, they are represented like:
+```js
+{
+    "WeightedPropertyName": [
+        { "Weighting": 0.9, "Value": "value 1" },
+        { "Weighting": 0.1, "Value": "value 2" }
+    ]
 }
 ```
