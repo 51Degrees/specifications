@@ -16,7 +16,7 @@ as defined in the Pipeline specification.
 Element data returned by an IP Intelligence Engine MUST extend
 `IAspectData`.
 
-Each property MUST also be exposed as a [weighted value](../pipeline-specification/features/weighted-values.md) 
+Each property MUST also be exposed as a [weighted value](../pipeline-specification/features/weighted-values.md)
 
 ### Properties
 
@@ -49,7 +49,7 @@ interface IIpIntelligenceData
 ## WKT Type
 
 A new property type for the IP Intelligence Engine is the `WktString` interface.
-This uses a WKT/WKB shape (see https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry).
+This uses a WKT/WKB shape (see <https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry>).
 
 This comes from the data file in WKB format. And is interpreted to a more useable
 form, as the interface `WktString` which extends string, and contains a WKT
@@ -66,7 +66,7 @@ an [Aspect Property value](../pipeline-specification/features/properties.md#null
 in order to support exposing the reason that a value is not set.
 
 Additionally, values MUST be returned along with their weights when fetched
-from the `IAspectData`. Meaning the introduction of the 
+from the `IAspectData`. Meaning the introduction of the
 `IWeightedValue<T>` type, with the following properties:
 
 | Property | Type |
@@ -75,6 +75,7 @@ from the `IAspectData`. Meaning the introduction of the
 | Weighting | `float` |
 
 For example:
+
 ```{cs}
 // All weighted values for a property
 IAspectPropertyValue<IWeightedValue<int>> allValues = flowData
@@ -94,6 +95,7 @@ Data files follow the standard 51Degrees data file structure, with the addition
 of profile groups. See [Hash dataset](https://github.com/51Degrees/device-detection-cxx/blob/main/src/hash/hash.h#L295). Meaning that collections and headers are common,
 and logic from [common-cxx](https://github.com/51Degrees/common-cxx) should be used.
 Collections shared with Hash are:
+
 - values (named strings in Hash as only string values are used)
 - properties
 - profiles
@@ -103,7 +105,7 @@ See [general data model](../data-model-specification/README.md) for more info.
 
 ### Profile Groups
 
-A profile is pointed to by an integer offset. This is the same as existing data 
+A profile is pointed to by an integer offset. This is the same as existing data
 files. In the case where this offset is negative, it points to a group of
 profiles instead. Profile groups exist in a separate collection, and a profile
 group structure is an array of `WeightedProfile`, where `WeightedProfile` is:

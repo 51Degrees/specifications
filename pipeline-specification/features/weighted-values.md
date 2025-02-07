@@ -14,18 +14,21 @@ Given an example `IElementData` implementation `IExampleData` which contains a p
 `ExampleProperty`
 
 1. Get the value in the standard way described in [access-to-results](./access-to-results.md):
+
 ```c#
 IExampleData data;
 IReadOnlyList<IWeightedValue<string>> values = data.ExampleProperty;
 ```
 
 2. Fetch the most likely value. The values are ordered from highest to lowest probability:
+
 ```c#
 IReadOnlyList<IWeightedValue<string>> values;
 string mostLikelyValue = values[0].Value;
 ```
 
 3. Get the probabilities of each value:
+
 ```c#
 IReadOnlyList<IWeightedValue<string>> values;
 foreach (var weightedValue in values)
@@ -35,9 +38,10 @@ foreach (var weightedValue in values)
 }
 ```
 
-## Serializing 
+## Serializing
 
 When serializing weighted values, they are represented like:
+
 ```js
 {
     "WeightedPropertyName": [
