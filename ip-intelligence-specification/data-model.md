@@ -136,21 +136,5 @@ This does not mean that the properties are not exposed in the same way.
 
 The results contained in the combined result consists of the following 2 types:
 
-#### Network
-
-| Property | Type |
-| -------- | ---- |
-| IpRangeStart | `string` |
-| IpRangeEnd | `string` |
-| Name | `string` |
-| Owner | `string` |
-| Asn | `int` |
-
-#### Location
-
-| Property | Type |
-| -------- | ---- |
-| Latitude | `float` |
-| Longitude | `float` |
-| Areas | `WktString` |
-| AccuracyRadius | `int` |
+- [Network](https://github.com/51Degrees/common-metadata/tree/main/Properties/Network)
+- [Location](https://github.com/51Degrees/common-metadata/tree/main/Properties/Location)
