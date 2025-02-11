@@ -113,11 +113,10 @@ group structure is an array of `WeightedProfile`, where `WeightedProfile` is:
 | Property | Type |
 | -------- | ---- |
 | Profile Offset | `int` |
-| Weighting | `float` |
+| Weighting | `ushort` |
 
 The number of profiles which make up a group is not written. However, with
-the axiom that weightings add up to 1 for a component, profiles are read until
-the total weighting is 1, signifying that the array is complete.
+the axiom that weightings add up to ushort.max for a component, profiles are read until the total raw weighting is ushort.max, signifying that the array is complete.
 
 ## Property Metadata
 
