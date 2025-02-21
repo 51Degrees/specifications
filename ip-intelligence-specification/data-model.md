@@ -115,6 +115,10 @@ group structure is an array of `WeightedProfile`, where `WeightedProfile` is:
 | Profile Offset | `int` |
 | Weighting | `ushort` |
 
+As the value `0` is already used for a profile offset, the profile group offsets start
+at `-1`, meaning that the offsets must be incremented by `1` to get the actual offset
+in the profile groups collection.
+
 The number of profiles which make up a group is not written. However, with
 the axiom that weightings add up to ushort.max for a component, profiles are read until the total raw weighting is ushort.max, signifying that the array is complete.
 
