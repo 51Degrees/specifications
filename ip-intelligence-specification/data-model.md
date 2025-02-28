@@ -105,9 +105,8 @@ See [general data model](../data-model-specification/README.md) for more info.
 
 ### Profile Groups
 
-A profile is pointed to by an integer offset. This is the same as existing data
-files. In the case where this offset is negative, it points to a group of
-profiles instead. Profile groups exist in a separate collection, and a profile
+A profile is pointed to by an integer offset by going through the profile offsets collection. This is the same as existing data
+files. For a profile group, the offsets collection is not required. Profile groups exist in a separate collection, and a profile
 group structure is an array of `WeightedProfile`, where `WeightedProfile` is:
 
 | Property | Type |
@@ -115,8 +114,17 @@ group structure is an array of `WeightedProfile`, where `WeightedProfile` is:
 | Profile Offset | `int` |
 | Weighting | `ushort` |
 
+The value returned after evaluating the graph is a ulong. The possibilities for a returned value are:
+
+| Scenario | Meaning | Access Path |
+| -------- | ------- | ----------- |
+| The value is less than the number of nodes in the nodes collection (`value < totalNodes`)| The node is not a leaf, so does not point to either a profile, or a profile group (see [ipi-graph](https://github.com/51degrees/ipi-graph-cxx)) | N/A |
+| The value is greater than, or equal to, the number of nodes, but is less than the number of profiles after subtracting the number of nodes (`value >= totalNodes && value - totalNodes < totalProfiles`) | The value, minus the number of nodes in the nodes collection, is an index in the profile offsets collection | `offsetIndex = value - totalNodes`<br/>`offset = offsets[offsetIndex]`<br/>`profile = profiles[profileOffset]` |
+| The value is greater than the number of nodes, and is greater than, or equal to, the number of profiles after subtracting the number of nodes (`value > totalNodes && value - totalNodes >= totalProfiles`) | The value, minus the number of nodes and profiles, is the index of the first weighted profile in the profile groups collection | `groupIndex = value - totalNodes - totalProfiles`<br/>`firstWeightedProfileOfGroup = profileGroups[groupIndex]` |
+
 The number of profiles which make up a group is not written. However, with
 the axiom that weightings add up to ushort.max for a component, profiles are read until the total raw weighting is ushort.max, signifying that the array is complete.
+
 
 ## Property Metadata
 
