@@ -5,6 +5,11 @@
 This folder structure contains a language agnostic specification for the IP
 Intelligence Engine that can be used by
 the [51Degrees v4 Pipeline API](../pipeline-specification/README.md).
+
+The IPI Intelligence Engine provides information on the network and location
+properties associated with an IP address. Returned properties can range from
+the owner of the IP range, to the city in which the IP is being used in.
+
 We aim to avoid specific details of classes, interfaces, methods or the like.
 The focus is on the behavior rather than the method by which that behavior is
 achieved. This allows implementers to choose an architectural approach that is
