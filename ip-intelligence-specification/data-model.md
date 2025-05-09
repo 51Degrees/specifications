@@ -67,9 +67,9 @@ interface IIpIntelligenceData
 ## Internal Data File Structure
 
 Data files follow the standard 51Degrees data file structure, with the addition
-of profile groups. See [Hash dataset](https://github.com/51Degrees/device-detection-cxx/blob/main/src/hash/hash.h#L295). Meaning that collections and headers are common,
+of profile groups. Meaning that collections and headers are common,
 and logic from [common-cxx](https://github.com/51Degrees/common-cxx) should be used.
-Collections shared with Hash are:
+Collections shared with [Hash dataset](https://github.com/51Degrees/device-detection-cxx/blob/main/src/hash/hash.h#L295) are:
 
 - values (named strings in Hash as only string values are used)
 - properties
@@ -93,7 +93,7 @@ The value returned after evaluating the graph is a ulong. The possibilities for 
 
 | Scenario | Meaning | Access Path |
 | -------- | ------- | ----------- |
-| The value is less than the number of nodes in the nodes collection (`value < totalNodes`)| The node is not a leaf, so does not point to either a profile, or a profile group (see [ipi-graph](https://github.com/51degrees/ipi-graph-cxx)) | N/A |
+| The value is less than the number of nodes in the nodes collection (`value < totalNodes`)| The node is not a leaf, so does not point to either a profile, or a profile group (see [ip-graph-cxx](https://github.com/51degrees/ip-graph-cxx)) | N/A |
 | The value is greater than, or equal to, the number of nodes, but is less than the number of profiles after subtracting the number of nodes (`value >= totalNodes && value - totalNodes < totalProfiles`) | The value, minus the number of nodes in the nodes collection, is an index in the profile offsets collection | `offsetIndex = value - totalNodes`<br/>`offset = offsets[offsetIndex]`<br/>`profile = profiles[profileOffset]` |
 | The value is greater than the number of nodes, and is greater than, or equal to, the number of profiles after subtracting the number of nodes (`value > totalNodes && value - totalNodes >= totalProfiles`) | The value, minus the number of nodes and profiles, is the index of the first weighted profile in the profile groups collection | `groupIndex = value - totalNodes - totalProfiles`<br/>`firstWeightedProfileOfGroup = profileGroups[groupIndex]` |
 
@@ -104,7 +104,7 @@ the axiom that weightings add up to ushort.max for a component, profiles are rea
 ## Property Metadata
 
 For on-premise implementations, the metadata associated with properties is
-contained within the data file. See [device-detection dotnet engine](https://github.com/51Degrees/device-detection-dotnet/blob/main/FiftyOne.DeviceDetection.Hash.Engine.OnPremise/FlowElements/DeviceDetectionHashEngine.cs) and [device-detection cxx metadata](https://github.com/51Degrees/device-detection-cxx/blob/main/src/hash/MetaDataHash.hpp)
+contained within the data file. See [ip-intelligence dotnet engine](https://github.com/51Degrees/ip-intelligence-dotnet/blob/main/FiftyOne.IpIntelligence.Engine.OnPremise/FlowElements/IpiOnPremiseEngine.cs) and [ip-intelligence cxx metadata](https://github.com/51Degrees/ip-intelligence-cxx/blob/main/src/MetaDataIpi.hpp)
 
 For cloud implementations, the metadata associated with properties is
 fetched from the cloud service. See [CloudAspectEngineBase](https://github.com/51Degrees/pipeline-dotnet/blob/main/FiftyOne.Pipeline.CloudRequestEngine/FlowElements/CloudAspectEngineBase.cs).
