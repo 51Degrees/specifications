@@ -67,7 +67,7 @@ native binaries (or not deal with native binaries at all).
 
 For future implementations, we recommend exploring the possibility of
 moving the native binary and target language wrapper to a separate
-repository and package from the target language Device Detection Engine
+repository and package from the target language IP Intelligence Engine
 logic.
 
 ## Accepted Evidence
@@ -94,9 +94,7 @@ source that is used.
 
 It is essential that the Element Data instance populated by this
 On-premise Engine is interface compatible with the Element Data
-populated by the [cloud Device Detection Engine](device-detection-cloud.md)
-as well as the individual devices populated in the Element Data from
-the [hardware profile lookup Engine](hardware-profile-lookup-cloud.md).
+populated by the IP Intelligence engine.
 
 ## Start-Up Activity
 
@@ -180,7 +178,7 @@ for this Engine will perform the following tasks:
 - Call the necessary functions on the C++ Engine in order to acquire
   metadata about the Engine that is dependent on the data file:
   - [accepted Evidence](#accepted-evidence)
-  - [Device Detection metadata](#metadata)
+  - [IP Intelligence metadata](#metadata)
   - data file publish date
   - expected publish date of next data file
   - data file type
