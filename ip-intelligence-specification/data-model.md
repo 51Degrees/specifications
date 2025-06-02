@@ -69,7 +69,7 @@ interface IIpIntelligenceData
 Data files follow the standard 51Degrees data file structure, with the addition
 of profile groups. Meaning that collections and headers are common,
 and logic from [common-cxx](https://github.com/51Degrees/common-cxx) should be used.
-Collections shared with [Hash dataset](https://github.com/51Degrees/device-detection-cxx/blob/main/src/hash/hash.h#L295) are:
+Collection definitions shared with [Hash dataset](https://github.com/51Degrees/device-detection-cxx/blob/main/src/hash/hash.h#L295) are:
 
 - values (named strings in Hash as only string values are used)
 - properties
