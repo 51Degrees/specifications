@@ -9,93 +9,103 @@ The Translation Engine translates values from one source Flow Element using a tr
 
 ## Features
 
-- Allow one or more translation engines to be added to the same pipeline. e.g. In parallel, one Translation engine could sit after both a device detection element and another could sit behind an ip intelligence element. 
+- Allow one or more translation engines to be added to the same pipeline. e.g. In parallel, one Translation engine could sit after a device detection element and another could sit behind an ip intelligence element. 
 
 ## Components
 - `ITranslationEngine` | `TranslationEngine`: Provides the main logic, performing a translation based on the translation provided.
 - `TranlationEngineBuilder`: Provides methods to build a TranslationEngine, either though code or from configuration.
 - `ITranslationElementData` | `TranslationElementData`: The Element data for the `TranslationEngine`. This holds the translated values. 
 
-## Translation Element responsibilities and behavior
+## Translation Element Responsibilities and Behavior
 
 ### `TranslationEngine`
-- Calls service to Load resources (for example embedded files) and exposes sources by name.
-- Reads source values from the source flow element data.
-- Resolves target translation from evidence keys.
-- Uses translation source(s) published by the source engine.
-- Writes translated properties to its own element data
+- Loads resources (translation text files) and stores them for lookup. These could also be ingested from some other format if there is a suitable use case,
+- Reads source values from the source Flow Element Data,
+- Resolves target translation from Evidence keys,
+- Uses translation source(s) to transate the source value,
+- Writes translated properties to its own Element Data.
 
-1. A Translation Engine has exactly one source element key (`SourceElementDataKey`).
-2. It translates one or more named properties from that source element.
+### Key Considerations
+1. A Translation Engine has exactly one source Element key (`SourceElementDataKey`),
+2. It translates one or more named properties from that source Element,
 3. Output properties are explicitly mapped per translation
-   (`SourceProperty` -> `DestinationProperty`).
-4. Output values are written under the Translation Engine element data key.
-5. Multiple Translation Engines can exist in one pipeline if each uses a unique element data key.
-6. Supported source value types are:
+   (`SourceProperty` -> `DestinationProperty`),
+4. Multiple Translation Engines can exist in one pipeline, and share the same output Element Data,
+5. Supported source value types are:
    - string
    - list/collection of strings
-7. Language is resolved from an ordered list of evidence keys; first available key wins.
-
 
 ## Sources
 
-Sources should be stored in the `translations` folder as Embedded resources
-hwoever the full path can be supplied to load them in configuration. 
-Source files can be provided as one file per translation Language files for example:
+Sources should follow the naming convention `[x].[locale].yml` (`yml` or `yaml` are both acceptable)
+where `x` can be anything (e.g. `countries`)]
+and `locale` is the language locale code (e.g. `en_GB`).
 
-- `en_GB.yaml`
-- `en_ES.yaml`
+Source files are provided as one file per translation Language files for example:
+
+- `en_GB.yml`
+- `es_ES.yml`
 
 Each file contains source-to-destination entries for one translation.
+For example:
+```
+England: Angleterre
+```
 
+Note that the key is not necessarily always the same. In the above example, the key is the English word.
+However, the key could be another language, or even an ISO country code for example.
 
 ## Accepted evidence
 
 The engine only uses evidence for language selection.
 
-Typical evidence keys:
+Accepted evidence keys (in order of precidence):
 
 - `query.translation`
+- `query.accept-language`
 - `header.accept-language`
 
 > e.g "en_GB"
 
+The highest preference language in the highest preference evidence key is used.
+
 ## Element Data
 
-Translated values are stored in the engine's own Element Data.
+Translated values are stored in the `TranslationElementData`.
 
-The elementdata can be retrieved from the flowdata like so: 
+The ElementData can be retrieved from the Flow Data like so: 
 - `flowdata.Get<ITranslationData>()`
 
 If source property `Country` is mapped to destination property
 `CountryTranslated`, the data can be retrieved with strongly typed accessors like so:
 
-- `flowData.Get("translation")["CountryTranslated"]`
+- `flowData.Get<ITranslatedData>()["CountryTranslated"]`
 
 
 ## Processing
 
 Construction: 
-1. Calls a resource service that pulls in embedded resource files from the `Translations` folder.
-2. Builds translation lookups. These are keyed on the file names which will match the evidence provided.
+1. Reads the files provided,
+2. Builds translation lookups. These are keyed on the language from the file names which will match the evidence provided.
 
-Per request, the engine:
+Per request, the Eengine:
 
-1. Iterates configured translations by source property.
-2. Reads source property value.
+1. Iterates configured translations by source property,
+2. Reads source property value,
 3. If value is string:
    - translate single value
 4. If value is list of strings:
    - translate each item
-   - keep original item where no mapping exists.
-5. Writes translated value to translation element data using destination property name.
+5. Writes translated value to translation Element Data using destination property name,
 
-## Behavior in the same pipeline
+Note: If translation is not available for the word, or language, a "no value" is the result. With an
+appropriate no value message.
 
-Pipelines can support multiple simultaneous translation contexts by using:
+## Behavior of Multiple Engines
 
-- multiple Translation Engine instances with different element data keys, and/or
-- different evidence key precedence per engine.
+Pipelines can support multiple simultaneous translation contexts by using
+multiple Translation Engine instances. Both write to the same Element Data, meaning it
+must be thread safe.
 
 ## Configuration
 
@@ -123,10 +133,24 @@ The Translation Engine should be configurable using simple values:
           {
             "SourceProperty": "Country",
             "DestinationProperty": "CountryTranslated",
-          },
+          }
+        ]
+      }
+    },
+
+    {
+      "BuilderName": "TranslationEngine",
+      "BuildParameters": {
+        "SourceElementDataKey": "ip-intelligence",
+        "Sources": [
+          "countrycode-langs/en_GB.yaml",
+          "countrycode-langs/fr_Fr.yaml",
+          "countrycode-langs/es_ES.yaml"
+        ],
+        "Translations": [
           {
-            "SourceProperty": "CountryCodes",
-            "DestinationProperty": "CountryCodesTranslated",
+            "SourceProperty": "CountryCode",
+            "DestinationProperty": "CountryCodeTranslated",
           }
         ]
       }
@@ -138,11 +162,20 @@ The Translation Engine should be configurable using simple values:
 ## Example (dotnet code)
 
 ```c#
-var translationEngine = new TranslationEngineBuilder(loggerFactory)
-    .AddTranslation(new Translation("Country", "CountryTranslated"))
-    .AddTranslations([
-      ("CountryCodes", "CountryCodesTranslated"),
-      ])
-    .Build();
+var countryTranslation = new TranslationEngineBuilder(loggerFactory)
+   .AddSources([
+          "country-langs/en_GB.yaml",
+          "country-langs/fr_Fr.yaml",
+          "country-langs/es_ES.yaml"])
+   .AddSourceElementDataKey("ip-intelligence")
+   .AddTranslation("Country", "CountryTranslated")
+   .Build();
+var countryCodeTranslation = new TranslationEngineBuilder(loggerFactory)
+   .AddSources([
+          "countrycode-langs/en_GB.yaml",
+          "countrycode-langs/fr_Fr.yaml",
+          "countrycode-langs/es_ES.yaml"])
+   .AddTranslation("CountryCode", "CountryCodesTranslated")
+   .Build();
 ```
 
