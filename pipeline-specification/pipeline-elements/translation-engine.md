@@ -30,6 +30,8 @@ It is intended to work alongside a dedicated translation-source element that pro
 6. Supported source value types are:
    - string
    - list/collection of strings
+   - Any string wrapped in `IWeightedValue<string>`
+   - Any string or above type wrapped in `AspectPropertyValue<>`
 7. Language is resolved from an ordered list of evidence keys; first available key wins.
 8. A translation is a source-property mapping that can translate a string for a target language.
 9.  Translation source retrieval is handled by a separate source element.
@@ -38,7 +40,7 @@ It is intended to work alongside a dedicated translation-source element that pro
 ## Sources
 
 Sources should be stored in the `translations` folder as Embedded resources
-hwoever the full path can be supplied to load them in configuration. 
+however the full path can be supplied to load them in configuration. 
 Source files can be provided as one file per translation Language files for example:
 
 - `en_GB.yaml`
