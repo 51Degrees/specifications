@@ -145,8 +145,7 @@ The Translation Engine is configurable using jsonConfiguration:
         "Translations": [
           {
             "SourceProperty": "Country",
-            "DestinationProperty": "CountryTranslated",
-            "Translation": "en_GB"
+            "DestinationProperty": "CountryTranslated"
           }
         ]
       }
@@ -163,8 +162,7 @@ The Translation Engine is configurable using jsonConfiguration:
         "Translations": [
           {
             "SourceProperty": "CountryCode",
-            "DestinationProperty": "CountryCodeTranslated",
-            "Translation": "en_GB"
+            "DestinationProperty": "CountryCodeTranslated"
           }
         ]
       }
