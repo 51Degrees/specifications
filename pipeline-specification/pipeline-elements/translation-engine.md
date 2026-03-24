@@ -45,6 +45,20 @@ Sources should follow the naming convention `[x].[locale].yml` (`yml` or `yaml` 
 where `x` can be anything (e.g. `countries`)
 and `locale` is the language locale code (e.g. `en_GB`).
 
+Sources can be provided in two ways:
+
+1. **As file paths** - The builder reads files from disk, supporting wildcards:
+   ```csharp
+   .AddSource("countries/*.yml")
+   .AddSource("countryCodes.en_GB.yaml")
+   ```
+
+2. **As file contents** - A dictionary keyed by filename, where the value is the YAML content:
+   ```csharp
+   .AddSource("countries.en_GB.yml", "England: Angleterre\nScotland: Ecosse")
+   ```
+   This is useful for engines with built-in data (e.g., embedded resources).
+
 Source files are provided as one file per translation Language, for example:
 
 - `countries.en_GB.yml`
