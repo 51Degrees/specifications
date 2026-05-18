@@ -20,6 +20,19 @@ This specification is broken down into separate markdown files in multiple direc
 | future-features   | These are features that are not currently implemented in any language, but may be added in the future                                                              |
 | Pipeline-elements | Specifications for Flow Elements that are needed to provide core functionality                                                                                     |
 
+## Pipeline element specifications
+
+Defined element specifications include:
+
+- [Cloud Request Engine](pipeline-elements/cloud-request-engine.md)
+- [Cloud Aspect Engine](pipeline-elements/cloud-aspect-engine.md)
+- [JSON Builder](pipeline-elements/json-builder.md)
+- [JavaScript Builder](pipeline-elements/javascript-builder.md)
+- [Sequence Element](pipeline-elements/sequence-element.md)
+- [Set Headers Element](pipeline-elements/set-headers-element.md)
+- [Translation Engine](pipeline-elements/translation-engine.md)
+- [Usage Sharing Element](pipeline-elements/usage-sharing-element.md)
+
 ## What is the Pipeline API?
 
 51Degrees Pipeline provides a framework within which input data is transformed
