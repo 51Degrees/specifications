@@ -1,0 +1,6 @@
+{
+  "exclude": [
+    "^pipeline-specification/features/properties\\.md$",
+    "^pipeline-specification/pipeline-elements/json-builder\\.md$"
+  ]
+}
