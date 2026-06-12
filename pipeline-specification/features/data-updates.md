@@ -121,7 +121,7 @@ downloaded and used to refresh the Aspect Engine. In the case of
 file data source operation, the new data replaces
 the existing data, at the location configured for data files.
 
-51Degrees [download servers](http://51degrees.com/documentation/4.4/_info__distributor.html)
+51Degrees [download servers](https://51degrees.com/documentation/_info__distributor.html?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=pipeline-specification-features-data-updates.md&utm_term=automatic-update-via-http)
 have a request rate limiting feature which provides
 for a 429 HTTP Status (Too many requests) with a `Retry-After` HTTP header
 whose value can be used to reset polling.
@@ -277,7 +277,7 @@ This section discusses making an HTTP request to check for
 updated data and handling the response.
 
 51Degrees Device Detection data files are supplied by the
-[Distributor](http://51degrees.com/documentation/_info__distributor.html)
+[Distributor](https://51degrees.com/documentation/_info__distributor.html?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=pipeline-specification-features-data-updates.md&utm_term=update-polling)
 web API. The capabilities of the data update service align with those of
 the Distributor. However, the service MUST be capable of using other sources
 as well. For example, a simple static URL that just supplies a file.

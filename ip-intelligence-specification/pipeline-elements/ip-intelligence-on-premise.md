@@ -11,7 +11,7 @@ This Engine also requires an IPI data file, which comes in two variations:
   Contains a highly restricted set of Properties and is updated
   around once per month.
 - **Enterprise** - Downloaded from
-  [Distributor](http://51degrees.com/documentation/_info__distributor.html).
+  [Distributor](https://51degrees.com/documentation/_info__distributor.html?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=ip-intelligence-specification-pipeline-elements-ip-intelligence-on-premise.md&utm_term=overview).
   Requires a license key for download and is usually updated Monday-Thursday. Includes all Properties
 
 ## Native component
@@ -40,9 +40,9 @@ need to be familiar with the mechanisms that are used by the language to call
 native code.
 
 The C library is distributed in binary form for a restricted set of target
-environments [tested versions](https://51degrees.com/documentation/_info__tested_versions.html),
+environments [tested versions](https://51degrees.com/documentation/_info__tested_versions.html?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=ip-intelligence-specification-pipeline-elements-ip-intelligence-on-premise.md&utm_term=native-component),
 with a number of assumptions about the availability
-of [dependencies](https://51degrees.com/documentation/_info__dependencies.html).
+of [dependencies](https://51degrees.com/documentation/_info__dependencies.html?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=ip-intelligence-specification-pipeline-elements-ip-intelligence-on-premise.md&utm_term=native-component).
 
 ### Selecting The Correct Binary
 
