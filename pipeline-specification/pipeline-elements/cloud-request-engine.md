@@ -41,8 +41,8 @@ taken in many scenarios.
 A Resource Key is a token that serves both to authenticate a request to the
 remote server and to specify which Property values are returned in the
 result. Resource Keys are created using the
-[51Degrees Configurator](https://51degrees.com/documentation/_concepts__configurator.html).
-See [Resource Key documentation](https://51degrees.com/documentation/_info__resource_keys.html)
+[51Degrees Configurator](https://51degrees.com/documentation/_concepts__configurator.html?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=pipeline-specification-pipeline-elements-cloud-request-engine.md&utm_term=resource-key).
+See [Resource Key documentation](https://51degrees.com/documentation/_info__resource_keys.html?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=pipeline-specification-pipeline-elements-cloud-request-engine.md&utm_term=resource-key)
 for more information.
 
 ## Accepted Evidence

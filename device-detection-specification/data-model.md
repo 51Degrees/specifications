@@ -31,7 +31,7 @@ data file. As such, they are subject to change over time.
 For weakly typed languages, this is usually less of an issue as developers in
 these ecosystems are generally more used to the idea of discovering Properties
 at runtime. However, there will need to be clear signposting to locations such as
-the [Property dictionary](https://51degrees.com/developers/property-dictionary)
+the [Property dictionary](https://51degrees.com/developers/property-dictionary?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=device-detection-specification-data-model.md&utm_term=dynamic-property-recommendations)
 in order to help discover what Properties are available.
 
 For strongly typed languages, this is partially handled by being able to access

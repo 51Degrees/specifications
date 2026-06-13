@@ -24,7 +24,7 @@ IP Intelligence uses **IP address evidence** with these accepted evidence keys (
 
 ### Properties Available
 
-IP Intelligence provides network and location properties as defined in the [51Degrees Property Dictionary](https://51degrees.com/developers/property-dictionary):
+IP Intelligence provides network and location properties as defined in the [51Degrees Property Dictionary](https://51degrees.com/developers/property-dictionary?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=ip-intelligence-specification-required-examples.md&utm_term=properties-available):
 
 **Network Properties:**
 - `IpRangeStart`/`IpRangeEnd` - Start/end of the IP range

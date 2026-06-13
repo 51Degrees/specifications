@@ -6,8 +6,8 @@ This Element is part of the system that allows Device Detection to use
 values from the User-Agent Client Hints (UA-CH) JavaScript API rather
 that the UA-CH HTTP headers.
 
-51Degrees has [blogs](https://51degrees.com/blog/implementing-user-agent-client-hints)
-and [documentation](https://51degrees.com/documentation/_device_detection__features__u_a_c_h__javascript.html)
+51Degrees has [blogs](https://51degrees.com/blog/implementing-user-agent-client-hints?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=device-detection-specification-pipeline-elements-uach-high-entropy-decoder.md&utm_term=overview)
+and [documentation](https://51degrees.com/documentation/_device_detection__features__u_a_c_h__javascript.html?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=device-detection-specification-pipeline-elements-uach-high-entropy-decoder.md&utm_term=overview)
 with more information on this.
 
 The Device Detection Engines will only work if Evidence values are provided

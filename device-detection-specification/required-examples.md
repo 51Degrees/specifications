@@ -48,7 +48,7 @@ Some examples of helpers in the latter category:
 
 We require extremely verbose comments as a module header in examples.
 
-51Degrees generates Web documentation ([for example](https://51degrees.com/documentation/_examples__device_detection__getting_started__console__on_premise.html))
+51Degrees generates Web documentation ([for example](https://51degrees.com/documentation/_examples__device_detection__getting_started__console__on_premise.html?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=device-detection-specification-required-examples.md&utm_term=code-comments))
 from reference implementation examples, using Doxygen. For the sake of
 readability of the source of the examples text intended for Doxygen
 generation is placed at the bottom of source files.
@@ -101,7 +101,7 @@ find the production date of the file.
 ### Cloud Device Detection
 
 Reference implementation examples illustrate use of Resource Keys to access
-the cloud service. A predefined link such as [this one](https://configure.51degrees.com/jqz435Nc)
+the cloud service. A predefined link such as [this one](https://configure.51degrees.com/jqz435Nc?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=device-detection-specification-required-examples.md&utm_term=cloud-device-detection)
 can be created to create a Resource Key to provide access to the Properties
 used in the examples. For simplicity, it might be convenient for such a link to
 provide access to all free Properties.
@@ -206,8 +206,8 @@ correct [lifecycle management](#pipeline-and-flow-data-lifecycle) of Pipeline
 and Flow Data instances.
 
 See documentation
-[cloud](https://51degrees.com/documentation/_examples__device_detection__getting_started__console__cloud.html),
-[on-premise](https://51degrees.com/documentation/_examples__device_detection__getting_started__console__on_premise.html)
+[cloud](https://51degrees.com/documentation/_examples__device_detection__getting_started__console__cloud.html?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=device-detection-specification-required-examples.md&utm_term=getting-started-console),
+[on-premise](https://51degrees.com/documentation/_examples__device_detection__getting_started__console__on_premise.html?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=device-detection-specification-required-examples.md&utm_term=getting-started-console)
 
 ### Getting Started Web
 
@@ -223,15 +223,15 @@ to collect Evidence directly from the client and present it to the server.
 
 The example SHOULD illustrate various techniques for obtaining "high entropy
 values" for presentation to the origin server as well as to the 51degrees
-cloud service. See [Implementing User Agent Client Hints](https://51degrees.com/blog/implementing-user-agent-client-hints).
+cloud service. See [Implementing User Agent Client Hints](https://51degrees.com/blog/implementing-user-agent-client-hints?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=device-detection-specification-required-examples.md&utm_term=getting-started-web).
 
 There is a wide choice of server-side Web frameworks, the reference
 implementations illustrate basic ASP.NET Core and ASP.NET Framework usage for
 C# and basic Servlet usage in Java.
 
 See documentation
-[cloud](https://51degrees.com/documentation/_examples__device_detection__getting_started__web__cloud.html),
-[on-premise](https://51degrees.com/documentation/_examples__device_detection__getting_started__web__on_premise.html)
+[cloud](https://51degrees.com/documentation/_examples__device_detection__getting_started__web__cloud.html?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=device-detection-specification-required-examples.md&utm_term=getting-started-web),
+[on-premise](https://51degrees.com/documentation/_examples__device_detection__getting_started__web__on_premise.html?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=device-detection-specification-required-examples.md&utm_term=getting-started-web)
 
 ### TAC / Native Key Lookup
 
@@ -242,8 +242,8 @@ These examples require the user to obtain a license key in order to
 configure an appropriate Resource Key.
 
 See documentation
-[TAC](https://51degrees.com/documentation/_examples__device_detection__tac_lookup__cloud.html),
-[Native key](https://51degrees.com/documentation/_examples__device_detection__native_key_lookup__cloud.html)
+[TAC](https://51degrees.com/documentation/_examples__device_detection__tac_lookup__cloud.html?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=device-detection-specification-required-examples.md&utm_term=tac-native-key-lookup),
+[Native key](https://51degrees.com/documentation/_examples__device_detection__native_key_lookup__cloud.html?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=device-detection-specification-required-examples.md&utm_term=tac-native-key-lookup)
 
 ### Match Metrics
 
@@ -252,7 +252,7 @@ into the detection process and confidence in the output. A key point of this
 example is to illustrate that reducing the number of Properties requested
 can reduce the time for detection.
 
-[See documentation](https://51degrees.com/documentation/_examples__device_detection__match_metrics__on_premise_hash.html)
+[See documentation](https://51degrees.com/documentation/_examples__device_detection__match_metrics__on_premise_hash.html?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=device-detection-specification-required-examples.md&utm_term=match-metrics)
 
 ### Metadata
 
@@ -260,8 +260,8 @@ It is RECOMMENDED that implementors illustrate the retrieval of Evidence keys,
 Properties, components and profiles from the on-premise, and
 Properties and Evidence keys for cloud.
 
-See documentation [on-premise](https://51degrees.com/documentation/_examples__device_detection__metadata__on_premise_hash.html),
-[cloud](https://51degrees.com/documentation/_examples__device_detection__metadata__cloud.html).
+See documentation [on-premise](https://51degrees.com/documentation/_examples__device_detection__metadata__on_premise_hash.html?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=device-detection-specification-required-examples.md&utm_term=metadata),
+[cloud](https://51degrees.com/documentation/_examples__device_detection__metadata__cloud.html?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=device-detection-specification-required-examples.md&utm_term=metadata).
 
 ### Performance Options
 
@@ -273,14 +273,14 @@ which are commented out in the example.
 Implementors might consider illustrating the differences between the various
 combinations of options.
 
-[See documentation](https://51degrees.com/documentation/_examples__device_detection__offline_processing__on_premise_hash.html)
+[See documentation](https://51degrees.com/documentation/_examples__device_detection__offline_processing__on_premise_hash.html?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=device-detection-specification-required-examples.md&utm_term=performance-options)
 
 ### Performance Benchmark
 
 Reference implementations contain a Performance Benchmark which is somewhat
 similar to the ["Offline Processing" example](#performance-options).
 
-[See documentation](https://51degrees.com/documentation/_examples__device_detection__performance__on_premise_hash.html)
+[See documentation](https://51degrees.com/documentation/_examples__device_detection__performance__on_premise_hash.html?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=device-detection-specification-required-examples.md&utm_term=performance-benchmark)
 Java tab.
 
 ### Data Update
@@ -296,4 +296,4 @@ SHOULD illustrate:
 - update on start-up
 - programmatic (non-automatic) update
 
-[See documentation](https://51degrees.com/documentation/_examples__device_detection__data_file_updates__automatic.html)
+[See documentation](https://51degrees.com/documentation/_examples__device_detection__data_file_updates__automatic.html?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=device-detection-specification-required-examples.md&utm_term=data-update)
