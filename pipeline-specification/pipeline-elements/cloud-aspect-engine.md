@@ -37,15 +37,7 @@ the Pipeline.
 Each Cloud Aspect Engine accesses that data to obtain Property metadata relating 
 to the Properties that it populates.
 
-The Cloud Request Engine does not [request](cloud-request-engine.md#start-up-activity)
-this information on start-up, but instead treats it as lazily initialized data - that 
-MUST be initialized only close to the time of first use.  In case it fails to initialize
-and the exceptions are suppressed - then the attempt will be made to do so on subsequent call
-to get these properties.  
-
-Cloud Aspect Engine thus MUST NOT cache the Property metadata and instead SHOULD always 
-treat it as lazily initialized failable data.  This is due to a [re-designed
-start-up behavior](cloud-request-engine.md#updated-design) of Cloud Request Engine.
+The Cloud Request Engine resolves this information when it is [built](cloud-request-engine.md#start-up-activity), so a Cloud Aspect Engine built after it can read the accessible Properties and populate its Property metadata at build time. If the Cloud Request Engine cannot be built (for example because the cloud is unavailable), that failure surfaces when the Pipeline is built rather than on first use, so a built Cloud Aspect Engine always has its metadata.
 
 ## Processing
 

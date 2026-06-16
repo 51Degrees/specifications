@@ -50,7 +50,7 @@ for more information.
 Accepted Evidence is dependent on the supplied Resource Key.
 
 The Engine will make a request to its remote server to get this information.  This should be
-treated is failable lazy loaded data, see the [redesigned start-up activity](#updated-design).
+treated as data that the Engine resolves when it is built, see the [start-up activity](#start-up-activity).
 
 ## Element Data
 
@@ -90,59 +90,77 @@ An example of the JSON response received from the server:
 
 ## Start-up activity
 
-There were design issues discovered and the design of start-up activity has been updated.
-The implementation should follow the updated design for all APIs.  For historical purposes the previous design
-is left as is below, and then changes explanations follow.
+There were design issues with a previous revision of this specification, and the
+design of start-up activity has been corrected. The implementation should follow
+the corrected design below for all APIs. The withdrawn "lazy" design and the
+reasons it was wrong are kept at the end for context.
 
-### Previous Design
+### Corrected design (discovery at build time)
 
-On start-up, the Engine will call its [configured](#configuration-options)
-`accessibleproperties` and `evidencekeys` endpoints, using the configured Resource Key.
+On start-up the Engine resolves, for the configured Resource Key, the accessible
+Properties (from the [configured](#configuration-options) `accessibleproperties`
+endpoint) and the accepted Evidence keys (from `evidencekeys`). This happens when
+the Engine is built (in its builder or constructor), not lazily on first use, so
+a built Engine is fully initialised and immediately ready to process Flow Data.
 
-The result from `accessibleproperties` will be used to populate a publicly
-accessible (read only) dictionary containing details of the data and
-Properties that are expected to be returned by the cloud service for this
-Resource Key.
+The result from `accessibleproperties` populates a publicly accessible (read
+only) collection describing the data and Properties expected from the cloud
+service for this Resource Key. [Cloud Aspect Engines](cloud-aspect-engine.md) use
+it to populate their Property metadata collections. The result from `evidencekeys`
+populates the [accepted Evidence](#accepted-evidence) for the Engine.
 
-This information will then be used by [Cloud Aspect Engines](cloud-aspect-engine.md)
-to populate their Property metadata collections.
+If either request fails, building the Engine MUST fail with a critical error, as
+the Pipeline cannot function correctly without this information. See
+[HTTP requests](#http-requests) for general details on HTTP request handling.
 
-The result from `evidencekeys` will be used to populate the
-[accepted Evidence](#accepted-evidence) for this Engine.
+### Resilience without lazy loading
 
-If either of these requests fails, the Engine MUST throw a critical
-error as the Pipeline will be unable to function correctly.
+The concern that originally motivated lazy loading (an outage of the 51Degrees
+cloud must not bring the customer service down) is met without deferring
+discovery.
 
-See [HTTP requests](#http-requests) for general details on
-HTTP request handling.
+- Building the Engine surfaces a discovery failure as an ordinary, catchable
+  error (a returned error, or an exception that the integration constructs the
+  Pipeline inside and can handle). The application controls when construction
+  happens, so it can retry, back off or degrade. This differs from the situation
+  lazy loading worried about, where construction happened implicitly in a place
+  that could not catch the error.
+- Implementations SHOULD allow an Engine to be built from a previously obtained,
+  persisted copy of the discovery results (the accepted Evidence keys and the
+  accessible Properties, which depend only on the Resource Key). When supplied,
+  the builder uses it and makes no cloud request, so the Pipeline can be built
+  offline and a short-lived or frequently-restarted host (for example a serverless
+  or edge / WebAssembly runtime) need not call the cloud on every cold start. The
+  persisted copy is read back from the builder after a successful build.
 
-### Updated Design
+### Why the lazy design was withdrawn
 
-#### Motivation for change
+A previous revision deferred the `accessibleproperties` and `evidencekeys`
+requests to the first `Process` call ("lazy" discovery), so that a
+[`SuppressProcessExceptions`](../features/exception-handling.md) Pipeline could
+absorb a cloud outage at start-up rather than failing construction.
 
-There was a problem with the old design.
+That design has been withdrawn. It was a mistake, because it left a "built" Engine
+that was not actually ready to process Flow Data.
 
-We have discovered that customers encounter severe problems in case 51d cloud service, server machine or domain (cloud.51degrees.com)
-are down or unavailable.  In this case the `CloudRequestEngine`  constructor would not be able to obtain `eviddencekeys` or `accessibleproperties`
-and would throw an exception.  This can bring the whole customer service down especially in the [web integrations](../features/web-integration.md) where Pipeline functions as part of a request processing module/plugin (f.e. .NET Cloud/Framework-Web integration) - and the integration code does not even have an opportunity to properly catch the exceptions.
+- Construction no longer meant ready. A built Engine reported an empty
+  accepted-Evidence filter and empty Property metadata until its first `Process`,
+  which is a broken abstraction.
+- Consumers that read the Engine when the Pipeline is assembled, before any
+  `Process`, saw nothing. The pipeline-wide accepted-Evidence filter (used for the
+  web `Vary` header) and the SetHeaders element read the Engine's advertised keys
+  and Properties at Pipeline-build time, so under lazy loading they were empty, and
+  features such as the client-hints `Accept-CH` headers did not work on the first
+  request.
+- Metadata introspection before the first `Process` returned wrong, empty answers.
 
-Of course construction should happen once, but there are service restarts and/or starts that might occur f.e. due to auto-scaling - so construction can happen undeterministically and
-the customer can end up with an unitializable pipeline under the above circumstance.
+### Impact on implementations
 
-However there is already a feature [`SuppressProcessExceptions`](../features/exception-handling.md) - this is a configuration flag that tells Pipeline
-to not throw exceptions during processing.  We wanted to use this flag and extend its effect on this scenario when `evidencekeys` or `accessibleproperties` can
-not be obtained due to host being down or due to other reasons.  
-
-### Changes
-
-The above motivation led to the following design decision.  `evidencekeys`, `accessibleproperties` or any future dependence on cloud.51degrees.com
-(or any other external service) - must be made **lazy** and obtained (once and then cached) only at the point of first use!  In particular they must be made initialized
-within the scope of a (Web)Pipeline.Process method call.  
-
-That way if the host is down and any exception is thrown - the `SuppressProcessExceptions`, if it was specified
-in the Pipeline configuration, would take effect and the exceptions would be suppressed and logged rather than throwing and bringing the customer service down.
-**Thus, there is no particular start up activity, but any "start-up" properties should be made lazy for this element.**
-Throwing exceptions if either of these lazy properties fails to initialize still holds, however they now will be thrown in the context of Process() and not constructor.  
+Every SDK that adopted the withdrawn lazy design MUST move the `accessibleproperties`
+and `evidencekeys` requests back to Engine construction and remove the first-use
+deferral, so that a built Engine is ready to process. This is a small, localised
+change to the Cloud Request Engine. Adding the optional persisted-state constructor
+described above is recommended so the resilience properties are retained.
 
 ## Processing
 
