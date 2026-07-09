@@ -86,6 +86,25 @@ implementation.
 Implementations MAY choose to report an error when inconsistent configuration
 options are chosen.
 
+### Automatic update master switch
+
+The **autoUpdate** option is the master switch for all *automatic* update
+activity. When it is disabled, none of the ongoing automatic update mechanisms
+run, regardless of how they are individually configured:
+
+- *Automatic update via HTTP* (polling) does not take place.
+- *Automatic update from File* (file system watching) does not take place, even
+  if a file system watcher is otherwise configured.
+
+In other words, both automatic mechanisms below require **autoUpdate** to be
+enabled. This master switch only governs *automatic* activity - it does not
+disable *Programmatic update*, which remains available for triggering an update
+manually (see [Programmatic update](#programmatic-update)).
+
+Configuration Groups:
+
+- *General config*
+
 ### Update on start-up
 
 This option provides for checking for data from an HTTP server on start-up
@@ -108,6 +127,9 @@ Configuration Groups:
 
 This option provides for periodic ongoing checking of an HTTP server
 for the availability of an updated data source.
+
+This is an automatic update mechanism, so it only operates when the
+[autoUpdate master switch](#automatic-update-master-switch) is enabled.
 
 If the current data contains a *data update expected* timestamp, then polling
 will not start until after that time. Options include the ability to control the remote
@@ -135,6 +157,7 @@ to their various servers by other means and then use the
 
 Configuration Groups:
 
+- *General config*
 - *HTTP config*
 - *Polling config*
 - *Operational file config*
@@ -145,6 +168,11 @@ This option allows users to obtain new data files by whatever means they choose,
 and have the Aspect Engine refresh by detection of a new file in the file system
 at the location configured for the data file.
 
+This is an automatic update mechanism, so it only operates when the
+[autoUpdate master switch](#automatic-update-master-switch) is enabled. With
+autoUpdate disabled, no file system watcher is created and changes to the data
+file on disk are not detected automatically.
+
 Any timestamp contained in the data source is not taken into consideration,
 operation depends on the operational environment reporting file system changes
 and whatever file is found is used as the data source for the restarted
@@ -153,6 +181,11 @@ Aspect Engine.
 If the operational environment does not support file system watching events,
 implementors might need to use polling to determine changes and have
 due regard to file system load when setting polling frequency.
+
+Configuration Groups:
+
+- *General config*
+- *Operational file config*
 
 ### Programmatic update
 
@@ -177,6 +210,16 @@ Configuration Groups:
 - *Operational file config*
 
 ## Configuration groups
+
+### General config
+
+Configuration that governs update activity as a whole:
+
+- **autoUpdate** - master switch for automatic updates. When disabled, neither
+  automatic update via HTTP (polling) nor automatic update from file (file system
+  watching) takes place, regardless of their individual configuration.
+  Programmatic (manual) update is not affected. See
+  [Automatic update master switch](#automatic-update-master-switch).
 
 ### HTTP config
 
@@ -231,16 +274,18 @@ in this configuration is set for memory data source operation.
   - if newer or there is no local file,
     - save new file
   - load file
-- if disk data source, configure file watcher, if requested
-- configure HTTP update polling, if requested
+- if autoUpdate is enabled (see [master switch](#automatic-update-master-switch)):
+  - if disk data source, configure file watcher, if requested
+  - configure HTTP update polling, if requested
 - continue
 
 ### Other start-up
 
 - check operational data configuration consistency
 - load data from memory or file
-- if disk data source, configure file watcher, if requested
-- configure HTTP update polling, if requested
+- if autoUpdate is enabled (see [master switch](#automatic-update-master-switch)):
+  - if disk data source, configure file watcher, if requested
+  - configure HTTP update polling, if requested
 - continue
 
 ### newBufferAvailable (from memory, via remote)
