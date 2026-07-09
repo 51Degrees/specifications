@@ -96,8 +96,7 @@ run, regardless of how they are individually configured:
 - *Automatic update from File* (file system watching) does not take place, even
   if a file system watcher is otherwise configured.
 
-In other words, both automatic mechanisms below require **autoUpdate** to be
-enabled. This master switch only governs *automatic* activity - it does not
+This master switch only governs *automatic* activity - it does not
 disable *Programmatic update*, which remains available for triggering an update
 manually (see [Programmatic update](#programmatic-update)).
 
