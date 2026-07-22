@@ -49,8 +49,9 @@ for more information.
 
 Accepted Evidence is dependent on the supplied Resource Key.
 
-The Engine will make a request to its remote server to get this information.  This should be
-treated is failable lazy loaded data, see the [redesigned start-up activity](#updated-design).
+The Engine will make a request to its remote server to get this information.  The Engine
+resolves it when it is built, retrying on first use only after a transient failure, see the
+[start-up activity](#start-up-activity).
 
 ## Element Data
 
@@ -90,59 +91,110 @@ An example of the JSON response received from the server:
 
 ## Start-up activity
 
-There were design issues discovered and the design of start-up activity has been updated.
-The implementation should follow the updated design for all APIs.  For historical purposes the previous design
-is left as is below, and then changes explanations follow.
+There were design issues with a previous revision of this specification, and the
+design of start-up activity has been revised. The implementation should follow
+the revised design below for all APIs. The withdrawn fully lazy design and the
+reasons it was wrong are kept at the end for context.
 
-### Previous Design
+### Revised design (eager discovery at build time, transient-failure fallback)
 
-On start-up, the Engine will call its [configured](#configuration-options)
-`accessibleproperties` and `evidencekeys` endpoints, using the configured Resource Key.
+On start-up the Engine resolves, for the configured Resource Key, the accessible
+Properties (from the [configured](#configuration-options) `accessibleproperties`
+endpoint) and the accepted Evidence keys (from `evidencekeys`). The Engine MUST
+attempt both discovery requests when it is built (in its builder or constructor),
+and MAY make them in parallel, so that in the normal case a built Engine is fully
+initialised and immediately ready to process Flow Data.
 
-The result from `accessibleproperties` will be used to populate a publicly
-accessible (read only) dictionary containing details of the data and
-Properties that are expected to be returned by the cloud service for this
-Resource Key.
+The result from `accessibleproperties` populates a publicly accessible (read
+only) collection describing the data and Properties expected from the cloud
+service for this Resource Key. [Cloud Aspect Engines](cloud-aspect-engine.md) use
+it to populate their Property metadata collections. The result from `evidencekeys`
+populates the [accepted Evidence](#accepted-evidence) for the Engine.
 
-This information will then be used by [Cloud Aspect Engines](cloud-aspect-engine.md)
-to populate their Property metadata collections.
+How a discovery failure at build time is handled depends on its class:
 
-The result from `evidencekeys` will be used to populate the
-[accepted Evidence](#accepted-evidence) for this Engine.
+- **Definitive configuration errors** - an HTTP 4xx response to a discovery
+  request (for example an invalid Resource Key) - MUST fail the build with a
+  critical error. Retrying with the same configuration can never succeed, so
+  the Engine fails fast with a clear error at start-up instead of surfacing the
+  misconfiguration on the first request.
+- **Transient failures** - the service unreachable (DNS or connection failure),
+  a timeout, or an HTTP 5xx response - MUST NOT fail the build. The Engine MUST
+  log a warning, complete the build, and retry discovery on first use. Failures
+  of those first-use retries are process-time failures, so
+  [`SuppressProcessExceptions`](../features/exception-handling.md) applies to
+  them as to any other processing error.
 
-If either of these requests fails, the Engine MUST throw a critical
-error as the Pipeline will be unable to function correctly.
+A temporary cloud outage at construction time therefore cannot prevent the
+application from starting, while a misconfiguration surfaces immediately.
 
-See [HTTP requests](#http-requests) for general details on
-HTTP request handling.
+See [HTTP requests](#http-requests) for general details on HTTP request handling.
 
-### Updated Design
+### Consequences for consumers of the Engine
 
-#### Motivation for change
+When discovery succeeds at build time (the normal case), consumers that read the
+Engine while the Pipeline is assembled - the pipeline-wide accepted-Evidence
+filter (used for the web `Vary` header), the SetHeaders element (client-hints
+`Accept-CH`), and Property-metadata introspection - see correct, complete data
+before the first request.
 
-There was a problem with the old design.
+After a transient discovery failure, the built Engine advertises empty accepted
+Evidence and empty Property metadata until a first-use retry succeeds. Consumers
+of this information therefore MUST tolerate it being temporarily absent and MUST
+NOT permanently cache an empty result obtained before discovery has completed.
 
-We have discovered that customers encounter severe problems in case 51d cloud service, server machine or domain (cloud.51degrees.com)
-are down or unavailable.  In this case the `CloudRequestEngine`  constructor would not be able to obtain `eviddencekeys` or `accessibleproperties`
-and would throw an exception.  This can bring the whole customer service down especially in the [web integrations](../features/web-integration.md) where Pipeline functions as part of a request processing module/plugin (f.e. .NET Cloud/Framework-Web integration) - and the integration code does not even have an opportunity to properly catch the exceptions.
+### Resilience
 
-Of course construction should happen once, but there are service restarts and/or starts that might occur f.e. due to auto-scaling - so construction can happen undeterministically and
-the customer can end up with an unitializable pipeline under the above circumstance.
+The concern that originally motivated lazy loading (an outage of the 51Degrees
+cloud must not bring the customer service down) is met by the transient-failure
+fallback above rather than by deferring all discovery.
 
-However there is already a feature [`SuppressProcessExceptions`](../features/exception-handling.md) - this is a configuration flag that tells Pipeline
-to not throw exceptions during processing.  We wanted to use this flag and extend its effect on this scenario when `evidencekeys` or `accessibleproperties` can
-not be obtained due to host being down or due to other reasons.  
+In addition, implementations SHOULD allow an Engine to be built from a
+previously obtained, persisted copy of the discovery results (the accepted
+Evidence keys and the accessible Properties, which depend only on the Resource
+Key). When supplied, the builder uses it and makes no cloud request, so the
+Pipeline can be built offline and a short-lived or frequently-restarted host
+(for example a serverless or edge / WebAssembly runtime) need not call the
+cloud on every cold start. The persisted copy is read back from the builder
+after a successful build. At the time of writing no implementation provides
+this yet.
 
-### Changes
+### Why the fully lazy design was withdrawn
 
-The above motivation led to the following design decision.  `evidencekeys`, `accessibleproperties` or any future dependence on cloud.51degrees.com
-(or any other external service) - must be made **lazy** and obtained (once and then cached) only at the point of first use!  In particular they must be made initialized
-within the scope of a (Web)Pipeline.Process method call.  
+A previous revision deferred the `accessibleproperties` and `evidencekeys`
+requests to the first `Process` call ("lazy" discovery) unconditionally, so
+that a [`SuppressProcessExceptions`](../features/exception-handling.md)
+Pipeline could absorb a cloud outage at start-up rather than failing
+construction.
 
-That way if the host is down and any exception is thrown - the `SuppressProcessExceptions`, if it was specified
-in the Pipeline configuration, would take effect and the exceptions would be suppressed and logged rather than throwing and bringing the customer service down.
-**Thus, there is no particular start up activity, but any "start-up" properties should be made lazy for this element.**
-Throwing exceptions if either of these lazy properties fails to initialize still holds, however they now will be thrown in the context of Process() and not constructor.  
+That design has been withdrawn, because it left a "built" Engine that was not
+ready to process Flow Data even when the cloud was perfectly healthy:
+
+- Construction did not mean ready. A built Engine reported an empty
+  accepted-Evidence filter and empty Property metadata until its first `Process`,
+  which is a broken abstraction.
+- Consumers that read the Engine when the Pipeline is assembled, before any
+  `Process`, saw nothing. The pipeline-wide accepted-Evidence filter (used for the
+  web `Vary` header) and the SetHeaders element read the Engine's advertised keys
+  and Properties at Pipeline-build time, so under lazy loading they were empty, and
+  features such as the client-hints `Accept-CH` headers did not work on the first
+  request.
+- Metadata introspection before the first `Process` returned wrong, empty answers.
+- It hid configuration errors: an invalid Resource Key only surfaced on the
+  first request, in whatever context happened to trigger it, instead of at
+  start-up.
+
+The revised design keeps first-use retry only as the fallback path for
+transient outages; it is no longer the normal start-up behaviour.
+
+### Impact on implementations
+
+Every SDK that adopted the withdrawn lazy design MUST warm discovery at Engine
+construction as described above: attempt both requests at build time, fail the
+build on a definitive configuration error, and fall back to first-use retry
+only after a transient failure. This is a small, localised change to the Cloud
+Request Engine. Adding the optional persisted-state constructor described
+above is recommended so a Pipeline can also be built entirely offline.
 
 ## Processing
 
