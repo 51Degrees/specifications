@@ -37,7 +37,18 @@ the Pipeline.
 Each Cloud Aspect Engine accesses that data to obtain Property metadata relating 
 to the Properties that it populates.
 
-The Cloud Request Engine resolves this information when it is [built](cloud-request-engine.md#start-up-activity), so a Cloud Aspect Engine built after it can read the accessible Properties and populate its Property metadata at build time. If the Cloud Request Engine cannot be built (for example because the cloud is unavailable), that failure surfaces when the Pipeline is built rather than on first use, so a built Cloud Aspect Engine always has its metadata.
+The Cloud Request Engine normally resolves this information when it is
+[built](cloud-request-engine.md#start-up-activity), so a Cloud Aspect Engine
+built after it can read the accessible Properties and populate its Property
+metadata at build time. A definitive configuration error (such as an invalid
+Resource Key) fails the Pipeline build rather than surfacing on first use.
+
+However, after a transient failure (for example the cloud temporarily
+unreachable at build time) the Cloud Request Engine still builds and retries
+discovery on first use. A Cloud Aspect Engine therefore MUST treat the Property
+metadata as failable, lazily-completed data: it MUST tolerate the metadata
+being temporarily absent and MUST NOT permanently cache an empty result
+obtained before the Cloud Request Engine's discovery has completed.
 
 ## Processing
 
