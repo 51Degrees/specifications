@@ -5,6 +5,11 @@ values that other Flow Elements in the Pipeline have already produced,
 following rules written in a script, and stores the results in its own
 Element Data.
 
+The Element handles Properties that follow simply from Properties
+already in the Flow Data. Anything more involved is written as an
+ordinary Flow Element in code, which is the way such work is done today,
+and the Element is deliberately not a replacement for writing one.
+
 *This page was produced with AI assistance on 1 September 2026 and needs
 human review before it is treated as settled.*
 
@@ -19,8 +24,6 @@ human review before it is treated as settled.*
   text.
 - `Check`: A named true or false test defined in a script, which rules
   can then count or refer to by name.
-- `Three-valued`: A test can be true, false or unknown, where unknown
-  means a Property the test needs was not available on that request.
 - `SourceProperty`: A Property produced by another Element, named in a
   script as `elementDataKey.PropertyName`, for example
   `device.IsCrawler`.
@@ -108,12 +111,10 @@ ordered Element list and, for each source Property, confirms that an
 Element earlier in the Pipeline has the Element Data key and lists the
 Property in its Property metadata.
 
-- A required Property with no supplier fails the Pipeline build, with a
+- A source Property with no supplier fails the Pipeline build, with a
   message naming the Property and naming any Element later in the
   Pipeline that would have supplied the Property had the ordering been
   different.
-- An optional Property with no supplier is logged at information level,
-  and the Property is absent on every request.
 - Two Elements in one Pipeline producing the same derived Property name
   fail the Pipeline build in the same check.
 
@@ -126,22 +127,49 @@ absent otherwise. A value that does not convert is absent as well, and
 values are never coerced loosely, so the strings `N/A`, `Unknown` and an
 empty string never become false or zero.
 
-Every source Property is required unless the script lists the Property
-under `Optional`.
+There is one rule and it holds for every source Property a script names,
+which is that the Property is either there or it is not.
 
-- **A required Property that is absent** makes the output a value that
-  has no value, carrying a message that names every absent required
-  Property rather than only the first, along with the reason each one
-  was not available and the usual causes. This uses the existing
-  no-value mechanism, being `AspectPropertyValue` with `NoValueMessage`
-  in .NET and the equivalent in each other language, which the
-  Translation Element already uses for a source Property without a
-  value. No new `MissingPropertyReason` value is needed and that
-  enumeration does not change.
-- **An optional Property that is absent** makes every condition naming
-  the Property unknown, and the script decides what unknown means
-  through `Present`, through the counts of evaluated and failed checks,
-  and through rule order.
+- **Where every source Property a script names is available**, the
+  checks and then the rules run, and the script chooses a value.
+- **Where any one of them is absent**, the Element writes a value that
+  has no value, and reading that value raises the language's existing
+  no-value error.
+
+Evaluation is therefore two-valued, because every check and every rule
+condition is either true or false and the rules only ever run once every
+source Property has been read.
+
+The no-value message names every absent Property rather than only the
+first, and for each one says what the Element that supplies the Property
+reported, in this shape.
+
+> Derived property 'HumanConfidence' has no value because 2 source
+> properties were not available. 'device.BrowserReleaseYear' (element
+> 'device' has no value for 'BrowserReleaseYear': \<the source no-value
+> message where there is one, otherwise 'property not present on this
+> request'\>). 'ip.HumanProbability' (...). Usual causes are the element
+> that supplies the property not being in the pipeline, the property
+> being excluded in the engine configuration, the property not being
+> included in the resource key, or JavaScript that populates the
+> property not having run yet.
+
+Where exactly one Property is absent the count reads `1 source property
+was not available`, and where more than one is absent the count reads
+`<n> source properties were not available`.
+
+The Element uses the existing no-value mechanism, being
+`AspectPropertyValue` with `NoValueMessage` in .NET and the equivalent
+in each other language, which the Translation Element already uses for a
+source Property without a value. No new `MissingPropertyReason` value is
+needed and that enumeration does not change.
+
+Every script ends in an `Else` rule, which validation enforces, so a
+script whose source Properties have all been read always chooses a
+value and there is no path where no rule matched. The `DefaultValue` a
+script gives in its output block is metadata carried through to the
+Property definition, and nothing reads that default while a request is
+being processed.
 
 ### Logging and exposed metadata
 
@@ -150,10 +178,8 @@ the format, the source and the output Property. At debug level, one
 entry per script prints the compiled model as canonical JSON, with
 PascalCase keys, two-space indent, literal types preserved, and the
 inferred types and computed dependencies included, so that anyone
-holding the log can reconstruct what was evaluated without the file. At
-Pipeline build, one information line names each optional Property that
-has no supplier. A deprecated script logs a warning carrying the note
-the author left.
+holding the log can reconstruct what was evaluated without the file. A
+deprecated script logs a warning carrying the note the author left.
 
 The Element's Property metadata list carries one entry per script with
 the name, the value type as the language's type, the category from the
@@ -249,8 +275,9 @@ strongly typed accessors like so:
 
 - `flowData.Get<IDerivedPropertyData>().GetAs<IAspectPropertyValue<string>>("HumanConfidence")`
 
-Where a required source Property was absent, the returned value has no
-value, and the no-value message names every absent required Property.
+Where any source Property the script names was absent, the returned
+value has no value, and the no-value message names every Property that
+could not be read.
 
 ## Processing
 
@@ -267,9 +294,9 @@ Per request, the Element:
 2. Fills a fixed-size slot array with each Property's converted value
    and its state, being available or absent along with the reason for
    the absence,
-3. For each script, evaluates the required-Property check, then the
-   checks, then the rules in order, taking the value of the first rule
-   whose condition is true,
+3. For each script, confirms that every source Property the script names
+   was read, then evaluates the checks, then the rules in order, taking
+   the value of the first rule whose condition is true,
 4. Writes one value, or one no-value carrying a message, per script into
    the `derived` Element Data.
 
@@ -349,10 +376,10 @@ using (var flowData = pipeline.CreateFlowData())
 ```
 
 The `HumanConfidence` script used above reads `device.IsCrawler`,
-`device.IsHeadless`, `device.WebDriver`, `device.IsVisible`,
 `device.BrowserReleaseYear`, `device.BrowserReleaseAge` and
-`ip.HumanProbability`, and returns one of `High`, `Medium`, `Low` or
-`Unknown`. The device detection Engine supplies the Properties under
-`device` and the IP intelligence Engine supplies the Property under
-`ip`, so both Engines are added to the Pipeline ahead of the Derived
-Property Element.
+`ip.HumanProbability`, and returns one of `High`, `Medium` or `Low`.
+Naming a Property in a script makes the Property necessary, so a script
+names only Properties that are in the data. The device detection Engine
+supplies the Properties under `device` and the IP intelligence Engine
+supplies the Property under `ip`, so both Engines are added to the
+Pipeline ahead of the Derived Property Element.
