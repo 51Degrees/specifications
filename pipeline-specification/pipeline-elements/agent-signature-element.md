@@ -458,7 +458,13 @@ A card reaches the result in two ways:
    same address checks as every other fetched address, because although
    the registry's own address is configured by the operator, the lines
    are whatever the registry served, and a line that fails the checks is
-   dropped. Each card is fetched once and indexed by its `jwks_uri`. When a signature
+   dropped. Each card is fetched once and indexed by its `jwks_uri`. The
+   registries are read once for the life of the process, so a registry or
+   card that cannot be fetched at that read, for any reason, is not
+   retried until the process restarts. Implementations MUST document this
+   to users, because unlike a key directory fetch, which is retried and
+   recovers on its own, a failure here persists after the fault is dealt
+   with, and only the card Properties are affected. When a signature
    of type `directory` or `jwks_uri` resolves to a key address that matches
    an indexed card, the card Properties are populated from that card.
 
