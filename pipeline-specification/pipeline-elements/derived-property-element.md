@@ -104,16 +104,28 @@ The Element cannot see the rest of the Pipeline when the Element is
 built, so source Property availability is checked when the Pipeline adds
 the Element, through the call every language's Flow Element base already
 receives (`AddPipeline` in .NET). At that point the Element walks the
-ordered Element list and, for each source Property, confirms that an
-Element earlier in the Pipeline has the Element Data key and lists the
-Property in its Property metadata.
+Element list and, for each source Property, confirms that some Element in
+the Pipeline has the Element Data key and lists the Property in its
+Property metadata.
 
-- A source Property with no supplier fails the Pipeline build, with a
-  message naming the Property and naming any Element later in the
-  Pipeline that would have supplied the Property had the ordering been
-  different.
+- A source Property no Element in the Pipeline supplies fails the
+  Pipeline build, with a message naming the Property.
 - Two Elements in one Pipeline producing the same derived Property name
-  fail the Pipeline build in the same check.
+  fail the Pipeline build in the same check, and so do two Elements
+  replacing the same Property of another Element.
+
+**Where an Element sits in the Pipeline is not judged.** A Pipeline
+reports the Elements it holds flattened, with the members of a group that
+runs in parallel placed after every Element at the top level, so a
+position in that list does not say what ran before what. An
+implementation that judges position fails Pipelines that are correct,
+including one that runs its source Engines in parallel and adds this
+Element after that group.
+
+Nothing is lost, because a source Property that has not been written by
+the time the Element runs is a source Property that cannot be read, which
+the one rule below already answers. The derived Property has no value and
+the message names the Property that was missing.
 
 ### Absent and invalid source Properties
 
