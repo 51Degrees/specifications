@@ -383,3 +383,71 @@ names only Properties that are in the data. The device detection Engine
 supplies the Properties under `device` and the IP intelligence Engine
 supplies the Property under `ip`, so both Engines are added to the
 Pipeline ahead of the Derived Property Element.
+
+## The cloud
+
+The 51Degrees cloud serves a derived Property by running this same
+Element inside its own Pipeline, rather than by carrying an evaluator of
+its own. That is the whole reason the Element is a normal Flow Element
+with no data file, no resource key and no network call.
+
+### Position in the Pipeline
+
+The Element goes after every Element that supplies a source Property the
+script names, and before the JSON Builder that writes the response. In
+the 51Degrees cloud that means after the device detection and IP
+intelligence Engines and before `CloudJsonBuilderElement`.
+
+The Element checks its own position when it is added to the Pipeline and
+fails the build naming the Property and the Element that would have
+supplied it, so a cloud service configured in the wrong order does not
+start rather than returning an empty Property on every request.
+
+### The response
+
+The JSON Builder walks every Element Data on the Flow Data rather than
+only the Aspect Engines, so the derived Element Data is carried with no
+change to the JSON Builder. Keys are lower cased there, so a script whose
+output Property is `HumanConfidence` appears as:
+
+```json
+"derived": { "humanconfidence": "High" }
+```
+
+Where a source Property was not available, the Property is null and the
+usual no-value key carries the reason, which is how a cloud customer is
+told why rather than being left with a silently absent Property:
+
+```json
+"derived": {
+  "humanconfidence": null,
+  "humanconfidencenullreason": "Derived property 'HumanConfidence' has no value because 1 source property was not available. 'device.BrowserReleaseYear' (element 'device' held 'Unknown' which cannot be read as int). ..."
+}
+```
+
+A cloud implementation MUST carry the no-value message rather than
+dropping the Property, because a derived Property that is simply absent
+gives a customer nothing to act on.
+
+### What a cloud implementation owes
+
+1. The Element Data key `derived` MUST map to the cloud component whose
+   vendor id is `derived`, so that the response and the Property listing
+   both carry the Property under the component it belongs to.
+2. The Property MUST be listed against the products that carry it, so
+   that a resource key can select it in the same way as any other
+   Property.
+3. The component SHOULD declare the source Properties as dependencies,
+   so that a customer whose resource key carries the derived Property but
+   not one of its sources is told before they see an empty Property.
+4. The conformance cases in the shared script repository SHOULD be run
+   through the cloud end to end, evidence in and JSON out, which is what
+   proves that a cloud answer and a self-hosted answer agree.
+
+### Ownership of the rule
+
+A cloud served band and a customer served band are different products
+and should be described as such. A Property computed in the cloud is for
+the customer who wants an answer without owning a rule, and this Element
+with the customer's own script is for the customer who wants to own the
+rule and see it. Both should exist.
