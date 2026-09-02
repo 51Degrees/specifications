@@ -454,8 +454,11 @@ A card reaches the result in two ways:
    the status is Unverified with reason `DirectoryUnavailable`.
 2. One or more registries of cards are configured. A registry is a plain
    text document listing one card address per line, where a `#` starts a
-   comment and blank lines are skipped, and every address MUST be `https`.
-   Each card is fetched once and indexed by its `jwks_uri`. When a signature
+   comment and blank lines are skipped. Each listed address MUST pass the
+   same address checks as every other fetched address, because although
+   the registry's own address is configured by the operator, the lines
+   are whatever the registry served, and a line that fails the checks is
+   dropped. Each card is fetched once and indexed by its `jwks_uri`. When a signature
    of type `directory` or `jwks_uri` resolves to a key address that matches
    an indexed card, the card Properties are populated from that card.
 
