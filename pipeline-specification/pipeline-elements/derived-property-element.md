@@ -10,9 +10,6 @@ already in the Flow Data. Anything more involved is written as an
 ordinary Flow Element in code, which is the way such work is done today,
 and the Element is deliberately not a replacement for writing one.
 
-*This page was produced with AI assistance on 1 September 2026 and needs
-human review before it is treated as settled.*
-
 ## Terms
 - `Script`: One YAML or JSON file describing how one output Property is
   computed. A script names the Property it produces, names the source
