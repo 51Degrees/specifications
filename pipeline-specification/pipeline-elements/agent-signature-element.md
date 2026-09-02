@@ -318,9 +318,20 @@ strict form, such as one writing a space after a parameter semicolon.
   IPv6 address is, keeps its brackets and only a port after the closing
   bracket is removed.
 - `@scheme` is the value of `header.protocol` lowercased.
-- `@target-uri`, `@method`, `@path` and `@query` cannot be rebuilt, because
-  the request line is not in the Evidence today. A signature covering any of
-  them reports Unverified with reason `ComponentUnavailable`.
+- `@method` is the value of `server.request-method`. `@path` is the value
+  of `server.request-path`. `@query` is the value of
+  `server.request-query` with a leading `?` added, and where the key is
+  present with an empty value the component is `?` alone, as RFC 9421
+  section 2.2.7 requires. `@target-uri` is assembled from the scheme, the
+  authority, the path and the query. These four Evidence keys are defined
+  in [web integration](../features/web-integration.md#populating-evidence),
+  and the values are the request line byte for byte, because one changed
+  byte makes a valid signature read as invalid. Where a covered component
+  names an Evidence key the request does not carry, the signature reports
+  Unverified with reason `ComponentUnavailable`, which is also the answer
+  in an implementation whose web integration does not yet supply the
+  request line (the .NET web integration does not today, tracked in
+  [pipeline-dotnet #374](https://github.com/51Degrees/pipeline-dotnet/issues/374)).
 
 A signature covering `@authority` and `signature-agent`, which is what the
 protocol draft's own example and the published test vectors do, can always
