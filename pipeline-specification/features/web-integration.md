@@ -73,6 +73,29 @@ and the Evidence names they would be associated with.
 - Public client IP. Key is `server.client-ip`
 - Request protocol. Can come from the request itself or headers such as
   `X-Origin-Proto` or `X-Forwarded-Proto`. Key is `header.protocol`
+- Request method. Key is `server.request-method`
+- Request path. Key is `server.request-path`
+- Request query string, whole and undecoded. Key is `server.request-query`
+
+The three request line values (`server.request-method`,
+`server.request-path` and `server.request-query`) MUST be supplied
+exactly as they appeared on the request line, byte for byte, with no
+decoding and no normalisation. The
+[Agent Signature Element](../pipeline-elements/agent-signature-element.md)
+rebuilds the parts of a request that a signature covers and checks the
+signature against the rebuilt text, so one changed byte makes a valid
+signature read as invalid. This is also why the query string is carried
+whole under `server.request-query` as well as decoded into the
+`query.[parameter name]` pairs, because the decoded pairs lose the
+ordering and encoding of the original and cannot rebuild it. An
+integration that supplies these keys MUST supply all three on every
+request, with `server.request-query` empty when the request has no
+query string, so that an absent key always means the integration does
+not supply the request line rather than that the request had no query.
+A web integration that populates Evidence through the Pipeline's
+[accepted Evidence](advertize-accepted-evidence.md) feature only adds
+these values when an element in the Pipeline asks for them, so a
+Pipeline without such an element carries no new values.
 
 ## Setting response headers
 

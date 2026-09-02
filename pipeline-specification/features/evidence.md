@@ -15,6 +15,15 @@ Currently, defined examples of keys are:
 - `cookie.[cookie-name]` [^1]
 - `server.client-ip`
 - `server.host-ip`
+- `server.request-method`
+- `server.request-path`
+- `server.request-query`
+
+The three `server.request-` keys carry the request line exactly as it
+was sent, byte for byte with no decoding, because signature
+verification rebuilds covered parts of the request exactly. See
+[web integration](web-integration.md#populating-evidence) for the
+detail.
 
 Any new Evidence keys can be defined in a similar manner.
 
