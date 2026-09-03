@@ -26,6 +26,7 @@ Defined element specifications include:
 
 - [Cloud Request Engine](pipeline-elements/cloud-request-engine.md)
 - [Cloud Aspect Engine](pipeline-elements/cloud-aspect-engine.md)
+- [Agent Signature Element](pipeline-elements/agent-signature-element.md)
 - [Derived Property Element](pipeline-elements/derived-property-element.md)
 - [JSON Builder](pipeline-elements/json-builder.md)
 - [JavaScript Builder](pipeline-elements/javascript-builder.md)
