@@ -407,10 +407,17 @@ script names, and before the JSON Builder that writes the response. In
 the 51Degrees cloud that means after the device detection and IP
 intelligence Engines and before `CloudJsonBuilderElement`.
 
-The Element checks its own position when it is added to the Pipeline and
-fails the build naming the Property and the Element that would have
-supplied it, so a cloud service configured in the wrong order does not
-start rather than returning an empty Property on every request.
+The Element does not judge that position, for the reason given under
+[The Pipeline check](#the-pipeline-check). The 51Degrees cloud is the
+example that proves the point, because it runs its device detection and
+IP intelligence Engines in a parallel group, and a Pipeline reports the
+members of such a group after every Element at the top level, so an
+implementation judging position would refuse this correct Pipeline.
+
+An Element placed too late is not silently wrong. Every source Property
+it needed has still not been written when it runs, so the derived
+Property has no value and the message names those Properties, which is
+the same answer the one rule gives for any unavailable source.
 
 ### The response
 
