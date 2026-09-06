@@ -20,8 +20,14 @@ for the Usage with the highest usage granted rather than with the bits.
 | Match Key          | `MatchKey`         | `getMatchKey()`         | `matchKey`         | `match_key`           | `getMatchKey()`         | `match_key()`           |
 
 The Usage and the Type are named values in every language, being an
-enumeration or the nearest equivalent, and never bare integers. The Usage
-value additionally maps to the `id.usage` string the remote server uses.
+enumeration or the nearest equivalent, and never bare integers.
+
+A package MUST also map the Usage to the `id.usage` string the remote
+server uses, being `non-marketing`, `standard` and `personalized`, so that
+an application can send back the usage it read without spelling the values
+out itself. Java, Node, Python, PHP and Rust each expose that mapping on
+the Usage value. .NET does not, which is a gap rather than a difference of
+design, recorded as pipeline-dotnet issue 399.
 
 Reading an identifier and verifying its signature are separate questions, and
 a package MUST answer them separately, so that no caller can mistake a
