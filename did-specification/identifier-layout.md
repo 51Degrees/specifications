@@ -34,10 +34,10 @@ the day. A receiver reads how old an identifier is from this field, and it
 is one of the few checks a receiver can make without calling anyone, so a
 field that only moves at midnight makes every identifier issued that day
 look equally fresh and hides a replay made hours after the original. The
-cloud service stated midnight until 8 September 2026, so identifiers issued
-before then carry a date that is up to a day earlier than the moment they
-were made, and a receiver judging age on such an identifier MUST allow for
-that.
+cloud service stated midnight in releases up to and including 4.4.33, so
+identifiers those releases issued carry a date up to a day earlier than the
+moment they were made, and a receiver judging age on such an identifier MUST
+allow for that.
 
 The Envelope is signed, so a 51Did package MUST create instances only by
 reading bytes that are already a complete Envelope. A caller cannot assemble
