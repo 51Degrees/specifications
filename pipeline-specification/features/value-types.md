@@ -3,11 +3,52 @@
 
 Values within a data file can be stored and returned in different formats.
 
-Sometimes values can just be stored as strings, and are parsed before being returned as the intended type (e.g. integer). This enables having mixed types, like `"Unknown"` in an int property.
+Sometimes values can just be stored as strings, and are parsed before being returned as the intended type (e.g. integer). This enables having mixed types, like `"Unknown"` in an int property. See [values stored as strings](#values-stored-as-strings) for how a caller reads the stored value in that case.
 
 Other times, values can be stored in space optimized formats so that the value being represented takes up less space in the data file, and is converted when being returned.
 
 
+
+### Values stored as strings
+
+A parsed value cannot always represent what the data holds. A stored string
+that is not one of the declared type's values still has to be returned as
+that type, so the accessor answers with something the data never said.
+
+`"Unknown"` in a Boolean Property is the case that matters. A device
+detection data file holds `"Unknown"` for the Properties the 51Degrees
+JavaScript populates, meaning the JavaScript has not run, and the Boolean
+accessor answers `false`. That `false` is indistinguishable from a `false`
+the data really holds, so a caller cannot tell a measurement that was taken
+from one that was never taken, and anything reading the Property draws a
+conclusion the data does not support.
+
+Where a Flow Element holds values as strings, it MAY expose them. Where it
+does:
+
+- It MUST expose them through a capability a caller can test for at run
+  time, such as an interface, rather than by changing what the typed
+  accessor returns.
+- The stored value MUST be returned as an Aspect Property Value of string,
+  so that a Property which is absent, which has no value, or which the
+  request is not entitled to is reported in exactly the way it is through
+  every other accessor. See [null
+  values](properties.md#null-values) and [missing
+  Properties](properties.md#missing-properties).
+- Offering the stored value MUST NOT change what any existing accessor
+  returns for the same Property on the same request.
+- It MUST return the value as it was stored, and MUST NOT compose a string
+  from a parsed value. A caller asking for the stored value is asking what
+  the data said, so a string built from the parsed type would answer the
+  question the caller was trying to avoid.
+
+Where a Flow Element does not hold values as strings, or holds them but
+chooses not to expose them, it MUST NOT be required to offer this. A caller
+MUST therefore test for the capability and MUST behave correctly where it
+is absent, which for most callers means using the typed accessor as before.
+
+A Property whose declared type is string is unaffected, since the stored
+value and the parsed value are the same.
 
 ### Azimuth
 

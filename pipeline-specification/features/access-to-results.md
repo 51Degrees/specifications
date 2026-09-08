@@ -61,3 +61,17 @@ Below are the mechanisms for getting Properties:
    ```c#
    IAspectPropertyValue<bool> propertyValue = deviceData.IsMobile;
    ```
+
+3. Where an Element Data instance holds Property values as strings and parses
+   them into the type each Property declares, it SHOULD be possible to get the
+   stored string for a Property as well as the parsed value. For example:
+
+   ```c#
+   IAspectPropertyValue<string> stored =
+       ((IProvidesValuesAsString)deviceData).GetValueAsString("isvisible");
+   ```
+
+   This is offered alongside the accessors above and never instead of them.
+   See [values stored as
+   strings](value-types.md#values-stored-as-strings) for when a caller needs
+   it and for what an implementation offering it MUST do.
