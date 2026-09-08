@@ -13,6 +13,7 @@ products.
 | [Device Detection Specification](device-detection-specification/README.md) | Specification for the Device Detection service. This builds on the concepts and features defined in the Pipeline specification. |
 | [IP Intelligence Specification](ip-intelligence-specification/README.md) | Specification for the IP Intelligence service. This builds on the concepts and features defined in the Pipeline specification. |
 | [Data Model Specification](data-model-specification/README.md)             | Details of the data model used by Device Detection and by other services in the future.                                         |
+| [51Did Specification](did-specification/README.md)                         | The 51Degrees identifier, its byte structure and the surface every 51Did package exposes.                                        |
 
 ## Notes for implementers
 
