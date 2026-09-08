@@ -28,6 +28,17 @@ The date and the signature change on every call, which is why two envelopes
 for the same inputs are not equal, and why comparison is done on the Match
 Key instead.
 
+The date is the minute the issuer made the Envelope. An issuer MUST state
+that moment to the minute and MUST NOT round it to a coarser unit such as
+the day. A receiver reads how old an identifier is from this field, and it
+is one of the few checks a receiver can make without calling anyone, so a
+field that only moves at midnight makes every identifier issued that day
+look equally fresh and hides a replay made hours after the original. The
+cloud service stated midnight until 8 September 2026, so identifiers issued
+before then carry a date that is up to a day earlier than the moment they
+were made, and a receiver judging age on such an identifier MUST allow for
+that.
+
 The Envelope is signed, so a 51Did package MUST create instances only by
 reading bytes that are already a complete Envelope. A caller cannot assemble
 one, because an unsigned identifier would be indistinguishable from a signed
