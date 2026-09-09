@@ -19,28 +19,24 @@ for the Usage with the highest usage granted rather than with the bits.
 | License Id         | `LicenseId`        | `getLicenseId()`        | `licenseId`        | `license_id`          | `getLicenseId()`        | `license_id()`          |
 | Match Key          | `MatchKey`         | `getMatchKey()`         | `matchKey`         | `match_key`           | `getMatchKey()`         | `match_key()`           |
 | Terms              | `Terms`            | `getTerms()`            | `terms`            | `terms`               | `getTerms()`            | `terms()`               |
-| Terms Index        | `TermsIndex`       | `getTermsIndex()`       | `termsIndex`       | `terms_index`         | `getTermsIndex()`       | `terms_index()`         |
-| Terms Url          | `TermsUrl`         | `getTermsUrl()`         | `termsUrl`         | `terms_url`           | `getTermsUrl()`         | `terms_url()`           |
 
 The Usage and the Type are named values in every language, being an
 enumeration or the nearest equivalent, and never bare integers.
 
-The Terms is a named value like the Usage and the Type, the Terms Index is
-the byte behind it, and the Terms Url is the address it stands for, all as
-set out in [Identifier layout](identifier-layout.md#terms).
+The Terms answers with the address of the document the identifier was
+created under, as set out in [Identifier
+layout](identifier-layout.md#terms). The package turns the index into the
+address, so a caller never handles the byte.
 
-A package MUST answer with no address where the index is zero, or where the
-index is one it does not know, using whatever that language uses for
-absence, and it MUST NOT answer with an empty string or with an address
-built from the index.
+A package MUST answer with no address where the index is zero, and where
+the index is one it does not know, using whatever that language uses for
+absence rather than an empty string. It MUST NOT build an address from an
+index it does not know, since that would name a document it cannot know
+exists.
 
-The Terms Index is the one place this specification asks for a raw value,
-and it is asked for because a package will meet an index added after it was
-released. Without the index such a caller has a named value meaning unknown
-and no way to find out what it stands for, so it can neither look the
-document up by hand nor report which index it could not read. The Terms
-therefore has a value for an index the package does not know, and that value
-MUST be distinct from the one for zero.
+This is the only member added. Nothing already on this page changes, so a
+caller written against an earlier release keeps working without being
+touched.
 
 A package MUST also map the Usage to the `id.usage` string the remote
 server uses, being `non-marketing`, `standard` and `personalized`, so that

@@ -233,13 +233,18 @@ identifier cannot carry Terms that a package could find.
 
 #### An index a package does not know
 
-A package will meet an index added after it was released. It MUST report the
-index, MUST answer with no address for it, and MUST NOT treat it as zero.
-Zero says no terms are stated, whilst an unknown index says terms are stated
-that this package cannot name, and a receiver that confused the two would
-read an identifier created under terms as one created under none. A caller
-meeting an unknown index SHOULD treat the identifier as covered by terms it
-cannot yet read, and either update the package or refuse the identifier.
+A package will meet an index added after it was released, and it cannot
+compose an address for one, since the address comes from the table rather
+than from the number. It MUST answer with no address and MUST NOT build one
+from the index.
+
+A caller therefore cannot tell an index the package does not know from an
+index of zero, because both answer with no address. That is deliberate,
+since the two lead a caller to the same place, being that the identifier
+does not tell them the terms and they have to look elsewhere. What must
+never happen is a package composing an address for an index it does not
+know, because that names a document it cannot know exists and a receiver
+would record having accepted terms nobody wrote.
 
 #### What zero does and does not mean
 
