@@ -75,6 +75,16 @@ Key as a Terms of zero, which says the terms are not stated in the
 identifier, so the two cases mean the same thing and neither needs telling
 apart from the other.
 
+A reader takes the first byte after the Match Key as the Terms whatever
+wrote it, and nothing in the payload says which field that byte belongs
+to. An identifier issued before this change that carried a creator context
+section would therefore have the first byte of that section read as a
+Terms index, and would report whatever that byte happens to be. This is
+accepted rather than defended against, because the creator context was
+never in production use, and it is the reason the byte can be placed here
+at all. Anything issuing an identifier with a context section MUST write
+the Terms byte before it.
+
 ### License Id
 
 The License Id is the raw value of the four bytes. On an identifier carrying
