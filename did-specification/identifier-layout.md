@@ -69,21 +69,13 @@ remote server that issued the identifier. A package therefore applies a lower
 bound to the payload length and never an upper one, and it exposes the same
 four fields whatever follows them.
 
-An identifier issued before the Terms existed has a payload that ends at
-the Match Key. A reader MUST treat a payload with no byte after the Match
-Key as a Terms of zero, which says the terms are not stated in the
-identifier, so the two cases mean the same thing and neither needs telling
-apart from the other.
+A reader MUST treat a payload with no byte after the Match Key as a Terms
+of zero, which says the terms are not stated in the identifier.
 
-A reader takes the first byte after the Match Key as the Terms whatever
-wrote it, and nothing in the payload says which field that byte belongs
-to. An identifier issued before this change that carried a creator context
-section would therefore have the first byte of that section read as a
-Terms index, and would report whatever that byte happens to be. This is
-accepted rather than defended against, because the creator context was
-never in production use, and it is the reason the byte can be placed here
-at all. Anything issuing an identifier with a context section MUST write
-the Terms byte before it.
+Nothing in the payload says which field a byte belongs to, so a reader
+takes the first byte after the Match Key as the Terms whatever wrote it.
+An issuer writing a creator context section MUST therefore write the Terms
+byte before it.
 
 ### License Id
 
@@ -260,8 +252,6 @@ zero, since a marketing identifier is always created under a document.
 | `10`            | Hashed Email  | 32-byte SHA-256           | Derived from the caller-supplied email and salt.     |
 | `11`            | Reserved      | Read as the bytes present | Not yet assigned.                                    |
 
-Identifiers issued before the type bits were defined carry zeroes there and
-so read as Probabilistic, which is the type they are. A reader encountering
-the reserved type MUST NOT refuse the identifier, and SHOULD unpack the
-header fields and expose the remaining payload bytes as they are, so that an
-identifier of a type added later still reads.
+A reader encountering the reserved type MUST NOT refuse the identifier, and
+SHOULD unpack the header fields and expose the remaining payload bytes as
+they are, so that an identifier of a type added later still reads.
