@@ -61,12 +61,19 @@ of the Match Key that follows.
 | 1          | 4          | License Id.                                                          |
 | 5          | 32         | Match Key, a SHA-256, for the Probabilistic and Hashed Email types.  |
 | 5          | 16         | Match Key, a GUID, for the Random type.                              |
+| after Match Key | 1     | Terms. See below.                                                    |
 
-A payload MAY be longer than the fields above. Bytes after the Match Key
-carry a creator context section whose contents and lengths belong to the
+A payload MAY be longer than the fields above. Bytes after the Terms carry
+a creator context section whose contents and lengths belong to the
 remote server that issued the identifier. A package therefore applies a lower
 bound to the payload length and never an upper one, and it exposes the same
-three fields whatever follows them.
+four fields whatever follows them.
+
+An identifier issued before the Terms existed has a payload that ends at
+the Match Key. A reader MUST treat a payload with no byte after the Match
+Key as a Terms of zero, which says the terms are not stated in the
+identifier, so the two cases mean the same thing and neither needs telling
+apart from the other.
 
 ### License Id
 
@@ -128,6 +135,66 @@ Bit 3 says how the Usage was arrived at, being derived from a consent string
 the caller sent when the bit is set, and stated by the caller directly when
 it is not. Both are legitimate, and the bit says nothing about which Usage
 the identifier carries.
+
+### Terms
+
+The Terms says which terms document the identifier was created under, so
+that the terms travel with the identifier instead of alongside it.
+
+The byte is an index into the table below and is not a version number. An
+index is used so that a later document can live at any address, rather than
+only at an address this specification could compose from a number.
+
+| **Index** | **Document**                         | **Address**                 |
+|-----------|--------------------------------------|-----------------------------|
+| `0`       | Not stated in the identifier         | None                        |
+| `1`       | Model Terms for Marketing, version 2 | `https://m4ow.uk/mtm/2.txt` |
+
+This table is the whole of the definition. A new terms document is a new
+index added here, and every package has to be released to know it, which is
+the cost of a receiver being able to trust what it reads. An index MUST NOT
+be reused or repointed once published, because an identifier issued under it
+is meant to stay readable years later, and repointing an index rewrites what
+a past identifier says it agreed to.
+
+A package MUST answer with the address for an index it knows, and MUST NOT
+fetch it. The receiver decides what to do with the address.
+
+The index rather than the address is carried because an address is long, and
+because a receiver has to know the exact document in force when the
+identifier was made. An index that maps to one immutable document can be
+checked years later, where an address whose contents can be edited cannot.
+
+#### An index a package does not know
+
+A package will meet an index added after it was released. It MUST report the
+index, MUST answer with no address for it, and MUST NOT treat it as zero.
+Zero says no terms are stated, whilst an unknown index says terms are stated
+that this package cannot name, and a receiver that confused the two would
+read an identifier created under terms as one created under none. A caller
+meeting an unknown index SHOULD treat the identifier as covered by terms it
+cannot yet read, and either update the package or refuse the identifier.
+
+#### What zero does and does not mean
+
+Zero does not mean the identifier is unrestricted. It means only that this
+identifier does not carry the answer, so the answer has to come from
+somewhere else, being the Terms Document Locator in an OpenRTB request or
+whatever the surrounding protocol provides. **Carrying the Terms does not
+remove the need to carry a Terms Document Locator where a protocol has
+one.** Where both are present and they disagree, a receiver SHOULD treat the
+identifier's own value as the one that describes the identifier, since it is
+inside the signature and the accompanying data is not.
+
+The Usage says where an identifier may go and the Terms says under which
+document it was created. They answer different questions and a receiver
+needs both. An identifier created for non-marketing carries zero, since the
+Model Terms govern marketing use and a non-marketing identifier is not
+created under them, and it is still barred from a demand source by its
+Usage.
+
+The remote server MUST NOT issue a marketing identifier whose Terms is zero,
+since a marketing identifier is always created under a document.
 
 ### Type
 
