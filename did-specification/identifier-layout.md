@@ -157,6 +157,26 @@ be reused or repointed once published, because an identifier issued under it
 is meant to stay readable years later, and repointing an index rewrites what
 a past identifier says it agreed to.
 
+Every package MUST use these names for the values, cased the way that
+language cases the members of an enumeration, so that two packages describe
+one thing the same way.
+
+| **Index**     | **Name**                  |
+|---------------|---------------------------|
+| `0`           | Not Stated                |
+| `1`           | Model Terms For Marketing 2 |
+| anything else | Unknown                   |
+
+So .NET and Rust write `NotStated`, `ModelTermsForMarketing2` and
+`Unknown`, whilst Java and Python write `NOT_STATED`,
+`MODEL_TERMS_FOR_MARKETING_2` and `UNKNOWN`. Where a language already has
+its own settled form for the Usage and the Type values, that form wins,
+because the new members have to read as though they were always there.
+
+The name carries the version of the document rather than leaving it to the
+address alone, so that a reader of the code can see which document is meant
+without following a link.
+
 A package MUST answer with the address for an index it knows, and MUST NOT
 fetch it. The receiver decides what to do with the address.
 
@@ -164,6 +184,15 @@ The index rather than the address is carried because an address is long, and
 because a receiver has to know the exact document in force when the
 identifier was made. An index that maps to one immutable document can be
 checked years later, where an address whose contents can be edited cannot.
+
+#### The Reserved type
+
+The Reserved type has no defined Match Key length, so a reader takes every
+byte after the header as the Match Key and no byte is left for the Terms.
+An identifier of that type therefore reads as index 0, which is correct
+under the rule above and needs no special handling. Whoever assigns that
+type has to fix its Match Key length, and until they do a Reserved
+identifier cannot carry Terms that a package could find.
 
 #### An index a package does not know
 
