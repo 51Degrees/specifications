@@ -61,12 +61,27 @@ of the Match Key that follows.
 | 1          | 4          | License Id.                                                          |
 | 5          | 32         | Match Key, a SHA-256, for the Probabilistic and Hashed Email types.  |
 | 5          | 16         | Match Key, a GUID, for the Random type.                              |
+| 37 or 21   | 1          | Terms, at the byte after the Match Key. See below.                   |
 
-A payload MAY be longer than the fields above. Bytes after the Match Key
-carry a creator context section whose contents and lengths belong to the
+A payload MAY be longer than the fields above. Bytes after the Terms carry
+a creator context section whose contents and lengths belong to the
 remote server that issued the identifier. A package therefore applies a lower
 bound to the payload length and never an upper one, and it exposes the same
-three fields whatever follows them.
+four fields whatever follows them.
+
+The Terms sits at the byte after the Match Key, so its offset follows from
+the Type, being 37 where the Match Key is 32 bytes and 21 where it is 16. A
+reader MUST take that offset from the Match Key length it read and never
+from a constant, because a constant is right for one Type and silently
+wrong for the other.
+
+A reader MUST treat a payload with no byte after the Match Key as a Terms
+of zero, which says the terms are not stated in the identifier.
+
+Nothing in the payload says which field a byte belongs to, so a reader
+takes the first byte after the Match Key as the Terms whatever wrote it.
+An issuer writing a creator context section MUST therefore write the Terms
+byte before it.
 
 ### License Id
 
@@ -90,8 +105,43 @@ same thing.
 |----------|--------------------|--------------------------------------------------------------------------|
 | 0 to 2   | Usage              | The usage the identifier was created for. See below.                     |
 | 3        | Usage from consent | Set when the Usage was derived from a consent string the caller sent.    |
-| 4 to 5   | Unused             | Zero as issued. A reader MUST ignore these bits rather than refuse them. |
+| 4 to 5   | Version            | Which layout the Payload follows. See below.                             |
 | 6 to 7   | Type               | The identifier type, which fixes the length of the Match Key.            |
+
+### Version
+
+Bits 4 and 5 say which layout the Payload follows. The Envelope has a
+version of its own at its first byte, and that one versions the Envelope.
+This one versions the Payload, which is everything this page defines after
+it.
+
+| **Bits 4 to 5** | **Version** | **Meaning**                                     |
+|-----------------|-------------|-------------------------------------------------|
+| `00`            | 0           | The layout on this page.                        |
+| `01`            | 1           | Not assigned.                                   |
+| `10`            | 2           | Not assigned.                                   |
+| `11`            | 3           | Not assigned, and the last this field can hold. |
+
+The issuer MUST write the version of the layout it wrote. Today that is 0.
+
+**A reader MUST refuse a Payload whose version it does not know.** It MUST
+report it the way it reports a Payload it cannot read, naming the version
+it found, and it MUST NOT read the fields as though the version were 0. A
+later version exists precisely because a field moved, so reading it under
+the old layout returns values that are wrong rather than absent, which is
+worse than refusing.
+
+Reading the version is therefore not optional. A version that nothing
+checks protects nothing, because the first identifier carrying a new
+layout would be misread by every package that ignored the field, which is
+the outcome the version exists to prevent.
+
+The field holds four values and three of them are unassigned. Whoever
+assigns version 3 has to say how the flags are extended beyond it, since
+that value is the last this byte can express and a fifth layout needs a
+further byte. That is a decision for then rather than now, and it is
+possible only because a reader of version 0 refuses what it does not know
+rather than guessing.
 
 ### Usage
 
@@ -129,6 +179,116 @@ the caller sent when the bit is set, and stated by the caller directly when
 it is not. Both are legitimate, and the bit says nothing about which Usage
 the identifier carries.
 
+### Terms
+
+The Terms says which terms document the identifier was created under, so
+that the terms travel with the identifier instead of alongside it.
+
+The byte is an index into the table below and is not a version number. An
+index is used so that a later document can live at any address, rather than
+only at an address this specification could compose from a number.
+
+| **Index** | **Document**                         | **Address**                 |
+|-----------|--------------------------------------|-----------------------------|
+| `0`       | Not stated in the identifier         | None                        |
+| `1`       | Model Terms for Marketing, version 2 | `https://m4ow.uk/mtm/2.txt` |
+
+This table is the whole of the definition. A new terms document is a new
+index added here, and every package has to be released to know it, which is
+the cost of a receiver being able to trust what it reads. An index MUST NOT
+be reused or repointed once published, because an identifier issued under it
+is meant to stay readable years later, and repointing an index rewrites what
+a past identifier says it agreed to.
+
+Every package MUST use these names for the values, cased the way that
+language cases the members of an enumeration, so that two packages describe
+one thing the same way.
+
+| **Index**     | **Name**                  |
+|---------------|---------------------------|
+| `0`           | Not Stated                |
+| `1`           | Model Terms For Marketing 2 |
+| anything else | Unknown                   |
+
+So .NET and Rust write `NotStated`, `ModelTermsForMarketing2` and
+`Unknown`, whilst Java and Python write `NOT_STATED`,
+`MODEL_TERMS_FOR_MARKETING_2` and `UNKNOWN`. Where a language already has
+its own settled form for the Usage and the Type values, that form wins,
+because the new members have to read as though they were always there.
+
+The name carries the version of the document rather than leaving it to the
+address alone, so that a reader of the code can see which document is meant
+without following a link.
+
+A package MUST answer with the address for an index it knows, and MUST NOT
+fetch it. The receiver decides what to do with the address.
+
+The index rather than the address is carried because an address is long, and
+because a receiver has to know the exact document in force when the
+identifier was made. An index that maps to one immutable document can be
+checked years later, where an address whose contents can be edited cannot.
+
+#### The Reserved type
+
+The Reserved type has no defined Match Key length, so a reader takes every
+byte after the header as the Match Key and no byte is left for the Terms.
+An identifier of that type therefore reads as index 0, which is correct
+under the rule above and needs no special handling. Whoever assigns that
+type has to fix its Match Key length, and until they do a Reserved
+identifier cannot carry Terms that a package could find.
+
+#### An index a package does not know
+
+A package will meet an index added after it was released, and it cannot
+compose an address for one, since the address comes from the table rather
+than from the number. It MUST answer with no address and MUST NOT build one
+from the index.
+
+A caller therefore cannot tell an index the package does not know from an
+index of zero, because both answer with no address. That is deliberate,
+since the two lead a caller to the same place, being that the identifier
+does not tell them the terms and they have to look elsewhere. What must
+never happen is a package composing an address for an index it does not
+know, because that names a document it cannot know exists and a receiver
+would record having accepted terms nobody wrote.
+
+#### What zero does and does not mean
+
+Zero does not mean the identifier is unrestricted. It means only that this
+identifier does not carry the answer, so the answer has to come from
+somewhere else, being the Terms Document Locator in an OpenRTB request or
+whatever the surrounding protocol provides. **Carrying the Terms does not
+remove the need to carry a Terms Document Locator where a protocol has
+one.** Where both are present and they disagree, a receiver SHOULD treat the
+identifier's own value as the one that describes the identifier, since it is
+inside the signature and the accompanying data is not.
+
+The Usage says where an identifier may go and the Terms says under which
+document it was created. They answer different questions and a receiver
+needs both.
+
+#### What the issuer writes
+
+| **Usage**                | **Terms written** |
+|--------------------------|-------------------|
+| Non-marketing            | `0`               |
+| Standard marketing       | `1`               |
+| Personalized marketing   | `1`               |
+
+A non-marketing identifier carries zero because the Model Terms govern
+marketing use and a non-marketing identifier is not created under them. It
+is still barred from a demand source by its Usage, so zero here is not a
+relaxation.
+
+A marketing identifier carries the index of the document in force when it
+was created, which today is `1`, being the Model Terms for Marketing
+version 2. When a later document is published it gains an index and the
+issuer writes that instead, and identifiers already issued keep saying what
+they were created under.
+
+The remote server MUST NOT issue a marketing identifier whose Terms is
+zero, since a marketing identifier is always created under a document.
+
 ### Type
 
 | **Bits 6 to 7** | **Type**      | **Match Key**             | **Meaning**                                         |
@@ -138,8 +298,6 @@ the identifier carries.
 | `10`            | Hashed Email  | 32-byte SHA-256           | Derived from the caller-supplied email and salt.     |
 | `11`            | Reserved      | Read as the bytes present | Not yet assigned.                                    |
 
-Identifiers issued before the type bits were defined carry zeroes there and
-so read as Probabilistic, which is the type they are. A reader encountering
-the reserved type MUST NOT refuse the identifier, and SHOULD unpack the
-header fields and expose the remaining payload bytes as they are, so that an
-identifier of a type added later still reads.
+A reader encountering the reserved type MUST NOT refuse the identifier, and
+SHOULD unpack the header fields and expose the remaining payload bytes as
+they are, so that an identifier of a type added later still reads.
