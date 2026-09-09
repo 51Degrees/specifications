@@ -227,13 +227,29 @@ inside the signature and the accompanying data is not.
 
 The Usage says where an identifier may go and the Terms says under which
 document it was created. They answer different questions and a receiver
-needs both. An identifier created for non-marketing carries zero, since the
-Model Terms govern marketing use and a non-marketing identifier is not
-created under them, and it is still barred from a demand source by its
-Usage.
+needs both.
 
-The remote server MUST NOT issue a marketing identifier whose Terms is zero,
-since a marketing identifier is always created under a document.
+#### What the issuer writes
+
+| **Usage**                | **Terms written** |
+|--------------------------|-------------------|
+| Non-marketing            | `0`               |
+| Standard marketing       | `1`               |
+| Personalized marketing   | `1`               |
+
+A non-marketing identifier carries zero because the Model Terms govern
+marketing use and a non-marketing identifier is not created under them. It
+is still barred from a demand source by its Usage, so zero here is not a
+relaxation.
+
+A marketing identifier carries the index of the document in force when it
+was created, which today is `1`, being the Model Terms for Marketing
+version 2. When a later document is published it gains an index and the
+issuer writes that instead, and identifiers already issued keep saying what
+they were created under.
+
+The remote server MUST NOT issue a marketing identifier whose Terms is
+zero, since a marketing identifier is always created under a document.
 
 ### Type
 
