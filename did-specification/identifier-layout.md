@@ -99,8 +99,43 @@ same thing.
 |----------|--------------------|--------------------------------------------------------------------------|
 | 0 to 2   | Usage              | The usage the identifier was created for. See below.                     |
 | 3        | Usage from consent | Set when the Usage was derived from a consent string the caller sent.    |
-| 4 to 5   | Unused             | Zero as issued. A reader MUST ignore these bits rather than refuse them. |
+| 4 to 5   | Version            | Which layout the Payload follows. See below.                             |
 | 6 to 7   | Type               | The identifier type, which fixes the length of the Match Key.            |
+
+### Version
+
+Bits 4 and 5 say which layout the Payload follows. The Envelope has a
+version of its own at its first byte, and that one versions the Envelope.
+This one versions the Payload, which is everything this page defines after
+it.
+
+| **Bits 4 to 5** | **Version** | **Meaning**                                     |
+|-----------------|-------------|-------------------------------------------------|
+| `00`            | 0           | The layout on this page.                        |
+| `01`            | 1           | Not assigned.                                   |
+| `10`            | 2           | Not assigned.                                   |
+| `11`            | 3           | Not assigned, and the last this field can hold. |
+
+The issuer MUST write the version of the layout it wrote. Today that is 0.
+
+**A reader MUST refuse a Payload whose version it does not know.** It MUST
+report it the way it reports a Payload it cannot read, naming the version
+it found, and it MUST NOT read the fields as though the version were 0. A
+later version exists precisely because a field moved, so reading it under
+the old layout returns values that are wrong rather than absent, which is
+worse than refusing.
+
+Reading the version is therefore not optional. A version that nothing
+checks protects nothing, because the first identifier carrying a new
+layout would be misread by every package that ignored the field, which is
+the outcome the version exists to prevent.
+
+The field holds four values and three of them are unassigned. Whoever
+assigns version 3 has to say how the flags are extended beyond it, since
+that value is the last this byte can express and a fifth layout needs a
+further byte. That is a decision for then rather than now, and it is
+possible only because a reader of version 0 refuses what it does not know
+rather than guessing.
 
 ### Usage
 

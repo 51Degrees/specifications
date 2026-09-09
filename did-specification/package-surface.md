@@ -49,6 +49,14 @@ out itself. Java, Node, Python, PHP and Rust each expose that mapping on
 the Usage value. .NET does not, which is a gap rather than a difference of
 design, recorded as pipeline-dotnet issue 399.
 
+A package MUST refuse a Payload whose version it does not know, reporting it
+the way it reports one it cannot read and naming the version it found, as
+set out in [Identifier layout](identifier-layout.md#version). It MUST NOT
+expose the version as a member of its own, because a caller has nothing to
+decide with it. Either the package understood the layout, in which case the
+members above are the answer, or it did not, in which case there is no
+identifier to expose members for.
+
 Reading an identifier and verifying its signature are separate questions, and
 a package MUST answer them separately, so that no caller can mistake a
 structurally valid identifier for a genuine one.
