@@ -61,13 +61,19 @@ of the Match Key that follows.
 | 1          | 4          | License Id.                                                          |
 | 5          | 32         | Match Key, a SHA-256, for the Probabilistic and Hashed Email types.  |
 | 5          | 16         | Match Key, a GUID, for the Random type.                              |
-| after Match Key | 1     | Terms. See below.                                                    |
+| 37 or 21   | 1          | Terms, at the byte after the Match Key. See below.                   |
 
 A payload MAY be longer than the fields above. Bytes after the Terms carry
 a creator context section whose contents and lengths belong to the
 remote server that issued the identifier. A package therefore applies a lower
 bound to the payload length and never an upper one, and it exposes the same
 four fields whatever follows them.
+
+The Terms sits at the byte after the Match Key, so its offset follows from
+the Type, being 37 where the Match Key is 32 bytes and 21 where it is 16. A
+reader MUST take that offset from the Match Key length it read and never
+from a constant, because a constant is right for one Type and silently
+wrong for the other.
 
 A reader MUST treat a payload with no byte after the Match Key as a Terms
 of zero, which says the terms are not stated in the identifier.
