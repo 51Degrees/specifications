@@ -136,6 +136,15 @@ checks protects nothing, because the first identifier carrying a new
 layout would be misread by every package that ignored the field, which is
 the outcome the version exists to prevent.
 
+What the version does not protect is the meaning of a field that has not
+moved. Redefining a row of the [Terms](#terms) table would move nothing,
+so the version would stay 0, every reader would accept the payload and
+every one of them would answer with the new meaning for an identifier
+issued under the old one. Nothing in the format catches that. The rule
+that an index is never reused or repointed is what stands in the way, and
+it is a rule people keep rather than a mechanism that catches them when
+they do not.
+
 The field holds four values and three of them are unassigned. Whoever
 assigns version 3 has to say how the flags are extended beyond it, since
 that value is the last this byte can express and a fifth layout needs a
