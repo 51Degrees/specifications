@@ -1,0 +1,38 @@
+name: Nightly Pipeline
+
+# Runs at 01:00 UTC, the same time as every other 51Degrees repository, and
+# hands each pull request that is eligible for automation to the shared
+# common-ci workflow, which checks the pull request merged into main and
+# merges it when the check passes. Until this existed a specification change
+# sat until somebody merged it by hand.
+#
+# Eligibility is decided centrally by common-ci steps/get-pull-requests.ps1,
+# being a pull request that is not a draft, has no review still requested, has
+# no review that is anything other than an approval, and either is approved by
+# somebody with write access or was raised by somebody with write access.
+#
+# This repository holds specifications written in Markdown, so there is
+# nothing to compile and nothing to install. The check that matters is the
+# link lint, which utm-link-lint.yml already runs on each pull request and
+# which ci/run-unit-tests.ps1 runs again here against the merged result.
+
+on:
+  workflow_dispatch:
+    inputs:
+      dryrun:
+        type: boolean
+        default: false
+  schedule:
+    - cron: '0 1 * * *'
+
+jobs:
+  PullRequests:
+    name: Nightly Pull Requests
+    uses: 51Degrees/common-ci/.github/workflows/nightly-pull-requests.yml@main
+    with:
+      repo-name: ${{ github.event.repository.name }}
+      org-name: ${{ github.event.repository.owner.login }}
+      dryrun: ${{ inputs.dryrun || false }}
+      skip-compare-performance: true
+    secrets:
+      token: ${{ secrets.ACCESS_TOKEN }}
