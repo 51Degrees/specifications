@@ -101,12 +101,12 @@ same thing.
 
 ## Flags byte
 
-| **Bits** | **Field**          | **Meaning**                                                             |
-|----------|--------------------|--------------------------------------------------------------------------|
-| 0 to 2   | Usage              | The usage the identifier was created for. See below.                     |
-| 3        | Usage from consent | Set when the Usage was derived from a consent string the caller sent.    |
-| 4 to 5   | Version            | Which layout the Payload follows. See below.                             |
-| 6 to 7   | Type               | The identifier type, which fixes the length of the Match Key.            |
+| **Bits** | **Field**         | **Meaning**                                                                          |
+|----------|-------------------|---------------------------------------------------------------------------------------|
+| 0 to 2   | Usage             | The usage the identifier was created for. See below.                                  |
+| 3        | Usage is indirect | Set when the Usage was worked out from another signal rather than stated by the caller. |
+| 4 to 5   | Version           | Which layout the Payload follows. See below.                                          |
+| 6 to 7   | Type              | The identifier type, which fixes the length of the Match Key.                         |
 
 ### Version
 
@@ -163,7 +163,7 @@ marketing identifier also carries the non-marketing bit.
 
 | **Bits 0 to 2** | **Usage**     | **Meaning**                                                                               |
 |-----------------|---------------|---------------------------------------------------------------------------------------------|
-| `000`           | None          | No usage bit is set. The remote server does not issue this.                                  |
+| `000`           | Refused       | Not a usage. A reader MUST refuse the Payload, as set out below.                              |
 | `001`           | Non-marketing | Created for use that is not marketing.                                                       |
 | `011`           | Standard      | Standard marketing, being targeting unrelated to the person's browsing or interactions.      |
 | `111`           | Personalized  | Personalized marketing, being targeting related to the person's browsing or interactions.    |
@@ -175,17 +175,33 @@ non-marketing, which is the wrong way round for a data protection decision.
 This is why a package exposes a named Usage and does not expose the flags
 byte, as set out in [Package surface](package-surface.md).
 
-A value with no bit set is not issued by the remote server, so an identifier
-carrying it came from somewhere else or is damaged, and a caller SHOULD treat
-it as an identifier that may not be passed on.
+**A reader MUST refuse a Payload whose usage bits are all clear.** Every
+usage the remote server accepts sets bit 0, and the server writes no flags
+byte without one, so an identifier carrying `000` did not come from it and is
+damaged or forged. A reader MUST report it the way it reports a Payload it
+cannot read, and MUST NOT offer it as a fourth Usage. There is nothing a
+caller could usefully do with such a value, since the only safe answer to it
+is not to pass the identifier on, which is what a refusal already gives, and
+a fourth value is one more case every caller has to remember to handle.
 
 The names match the `id.usage` values the remote server accepts and reports,
 being `non-marketing`, `standard` and `personalized`.
 
-Bit 3 says how the Usage was arrived at, being derived from a consent string
-the caller sent when the bit is set, and stated by the caller directly when
-it is not. Both are legitimate, and the bit says nothing about which Usage
-the identifier carries.
+Bit 3 says how the Usage was arrived at. It is clear when the caller stated
+the Usage directly, and set when the issuer worked the Usage out from some
+other signal the caller sent. Today the only such signal is a consent string,
+so today the bit is set only when the Usage was derived from one, but the
+field records direct against indirect rather than consent strings as such,
+and a later signal of another kind sets the same bit. Both are legitimate,
+and the bit says nothing about which Usage the identifier carries.
+
+The bit was first described as meaning a consent string specifically. It
+has only ever been set in that case, so every identifier issued under the
+earlier wording is described correctly by this one, and the change widens
+the meaning without moving the field. That is why the Payload version is
+unchanged, and it is not the kind of redefinition the
+[Version](#version) section warns against, which is one that gives an
+existing identifier a different answer.
 
 ### Terms
 
