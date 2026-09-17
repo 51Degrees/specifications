@@ -147,6 +147,18 @@ Where no name is configured, the name is `fod`. A configured name that is
 not valid, including an empty one, MUST be refused when the element is
 built, using the language's usual configuration error.
 
+## More than one script on a page
+
+A page SHOULD carry one client script. Each script creates its own object,
+runs its own round and creates its own identifier.
+
+Where a page carries two, because they are built with different object names
+and different resource keys, both hear an answer announced on the window and
+both refresh, so the visitor's answer costs two rounds and produces two
+identifiers. That is what independent scripts do, and a script does not check
+which object an announcement names. A page that wants one identifier carries
+one script.
+
 ## Configuration options
 
 | **Name**         | **Type** | **Default**    | **Description**                                                                                                                                                                                               |
