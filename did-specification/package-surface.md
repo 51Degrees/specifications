@@ -14,14 +14,23 @@ for the Usage with the highest usage granted rather than with the bits.
 | **Field**          | **.NET**           | **Java**                | **Node**           | **Python**            | **PHP**                 | **Rust**                |
 |--------------------|--------------------|-------------------------|--------------------|-----------------------|-------------------------|-------------------------|
 | Usage              | `Usage`            | `getUsage()`            | `usage`            | `usage`               | `getUsage()`            | `usage()`               |
-| Usage from consent | `UsageFromConsent` | `isUsageFromConsent()`  | `usageFromConsent` | `usage_from_consent`  | `isUsageFromConsent()`  | `usage_from_consent()`  |
+| Usage is indirect  | `UsageIsIndirect`  | `isUsageIndirect()`     | `usageIsIndirect`  | `usage_is_indirect`   | `isUsageIndirect()`     | `usage_is_indirect()`   |
 | Type               | `Type`             | `getType()`             | `type`             | `type`                | `getType()`             | `id_type()`             |
 | License Id         | `LicenseId`        | `getLicenseId()`        | `licenseId`        | `license_id`          | `getLicenseId()`        | `license_id()`          |
 | Match Key          | `MatchKey`         | `getMatchKey()`         | `matchKey`         | `match_key`           | `getMatchKey()`         | `match_key()`           |
 | Terms              | `Terms`            | `getTerms()`            | `terms`            | `terms`               | `getTerms()`            | `terms()`               |
 
 The Usage and the Type are named values in every language, being an
-enumeration or the nearest equivalent, and never bare integers.
+enumeration or the nearest equivalent, and never bare integers. The Usage has
+exactly three values, being non-marketing, standard and personalized. There
+is no value for an identifier with no usage bit set, because a package MUST
+refuse such a Payload, reporting it the way it reports one it cannot read, as
+set out in [Identifier layout](identifier-layout.md#usage).
+
+"Usage is indirect" answers whether the issuer worked the Usage out from a
+signal other than the caller stating it. It was named "Usage from consent"
+until the field was restated as direct against indirect, and the old name is
+not kept, so every package exposes the name in this table and no other.
 
 The Terms answers with the address of the document the identifier was
 created under, as set out in [Identifier
