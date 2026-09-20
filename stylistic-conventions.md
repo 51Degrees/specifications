@@ -47,6 +47,7 @@ Defined Terms are Capitalized.
 - [Evidence](pipeline-specification/features/evidence.md)
 - [Property](pipeline-specification/features/properties.md)
 - [Resource Key](pipeline-specification/pipeline-elements/cloud-request-engine.md#resource-key)
+- [License Key](pipeline-specification/pipeline-elements/cloud-request-engine.md#license-key)
 
 Where defined terms are introduced, in
 [Conceptual overview](pipeline-specification/conceptual-overview.md)

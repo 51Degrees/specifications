@@ -36,7 +36,14 @@ of the number of different Aspects that are involved. This is important
 for performance as the HTTP request time is the majority of the time
 taken in many scenarios.
 
-## Resource Key
+## Credentials
+
+A request to the remote server is authenticated with either a Resource Key or
+a License Key. Which of the two is supplied also decides whether the Engine
+has to be told which Properties to ask for, because the two credentials carry
+different information.
+
+### Resource Key
 
 A Resource Key is a token that serves both to authenticate a request to the
 remote server and to specify which Property values are returned in the
@@ -45,6 +52,85 @@ result. Resource Keys are created using the
 See [Resource Key documentation](https://51degrees.com/documentation/_info__resource_keys.html?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=pipeline-specification-pipeline-elements-cloud-request-engine.md&utm_term=resource-key)
 for more information.
 
+A Resource Key is public by design, because it travels to the browser inside
+a script URL, so everything the key carries is given away on every request
+made with it. A caller that runs only on the server and does not need the key
+in the browser SHOULD therefore use a License Key instead and name the
+Properties it wants, so that the credential stays on the server and each
+request returns only what that request needs.
+
+The Resource Key is sent to the remote server using the key `resource`.
+
+### License Key
+
+A License Key is the credential held by the server and never published to the
+browser. Unlike a Resource Key it names no Properties of its own, so a caller
+that authenticates with a License Key alone MUST also supply the list of
+Properties it wants. See [Requested Properties](#requested-properties).
+
+The License Key is sent to the remote server using the key `license`. It MAY
+be sent alongside a Resource Key, in which case it adds the products it grants
+to those the Resource Key already carries, so the set of accessible Properties
+widens.
+
+### Requested Properties
+
+Requested Properties is the list of Properties the caller wants in the
+response. It is sent to the remote server using the key `values`, as a comma
+separated list of fully qualified Property names, for example
+`device.ismobile,device.iscrawler`.
+
+The remote server honors that list only when the request authenticates with a
+License Key alone. Whenever a Resource Key is present the list is ignored and
+the response is exactly what the Resource Key carries, so naming Properties
+alongside a Resource Key has no effect at all.
+
+This was measured against `cloud.51degrees.com`, asking for one Property and
+varying only the credential. The exact counts depend on the keys used, so two
+separate measurements are given:
+
+| **Measurement**   | **Credential** | **Properties returned** | **Bytes** |
+|-------------------|----------------|-------------------------|-----------|
+| 20 September 2026 | Resource Key   | 15                      | 488       |
+| 20 September 2026 | License Key    | 1                       | 37        |
+| 21 September 2026 | Resource Key   | 17                      | 2,313     |
+| 21 September 2026 | License Key    | 1                       | 42        |
+
+In the second measurement the Resource Key response was byte for byte
+identical to the same request sent with no `values` at all, which is the
+clearest statement that the list was ignored.
+
+### Accepted combinations
+
+The following table gives every combination and whether it is valid. "Yes" in
+the Requested Properties column means a non-empty list. A value that is empty
+or is only whitespace counts as absent.
+
+| **Resource Key** | **License Key** | **Requested Properties** | **Valid** | **Reason**                                                                             |
+|------------------|-----------------|--------------------------|-----------|----------------------------------------------------------------------------------------|
+| Yes              | No              | No                       | Yes       | The Resource Key already states which Properties it carries.                           |
+| Yes              | Yes             | No                       | Yes       | The License Key adds the products it grants to those the Resource Key carries.         |
+| No               | Yes             | Yes                      | Yes       | The License Key names no Properties, so the caller names the ones it wants.            |
+| No               | Yes             | No                       | **No**    | The remote server answers 400 to such a request, so every request would fail.          |
+| Yes              | Either          | Yes                      | **No**    | The list is ignored while a Resource Key is present, so the response would not narrow. |
+| No               | No              | Either                   | **No**    | There is nothing to authenticate with, and the remote server answers 401.              |
+
+An Engine MUST refuse an invalid combination when it is built, in its builder
+or constructor, rather than when a request is made. Two reasons:
+
+- A License Key with no Requested Properties would otherwise fail every single
+  request the Engine ever made. Catching it at build time turns a complete
+  failure in production into one configuration error that a deployment sees
+  once, before it serves anybody.
+- Refusing at build time means the [Cloud Aspect Engines](cloud-aspect-engine.md)
+  that follow always receive an answer, so a mistake in configuration never
+  surfaces on the path that serves a request.
+
+The error raised MUST explain why the combination cannot work rather than
+restating the rule. For example, a list of Properties supplied alongside a
+Resource Key is refused because the remote server ignores the list, so the
+caller would believe the response had narrowed when it had not.
+
 ## Accepted Evidence
 
 Accepted Evidence is dependent on the supplied Resource Key.
@@ -52,6 +138,9 @@ Accepted Evidence is dependent on the supplied Resource Key.
 The Engine will make a request to its remote server to get this information.  The Engine
 resolves it when it is built, retrying on first use only after a transient failure, see the
 [start-up activity](#start-up-activity).
+
+The `evidencekeys` request needs no credential, so an Engine built on a
+License Key alone still resolves its accepted Evidence in the normal way.
 
 ## Element Data
 
@@ -130,6 +219,27 @@ application from starting, while a misconfiguration surfaces immediately.
 
 See [HTTP requests](#http-requests) for general details on HTTP request handling.
 
+### Discovery under a License Key
+
+The `accessibleproperties` endpoint requires a Resource Key. Measured against
+`cloud.51degrees.com` on 21 September 2026, it answers 401 to a request
+carrying a License Key and no Resource Key, with the message that a Resource
+Key is required.
+
+An Engine built on a License Key alone therefore has no accessible Properties
+to resolve. It MUST NOT treat that 401 as a definitive configuration error and
+fail the build. It MUST skip the `accessibleproperties` request altogether,
+start with an empty set of accessible Properties, and still resolve its
+accepted Evidence from `evidencekeys` as described above.
+
+The consequence for [Cloud Aspect Engines](cloud-aspect-engine.md) is that
+under a License Key they expose no Property metadata, although the data itself
+still flows, because each of them already reads the response JSON and infers
+the type of each value from the value it finds. Implementations MUST NOT
+manufacture Property metadata from the [Requested Properties](#requested-properties)
+list instead, because the type of each Property would be unknown and a wrong
+type is worse than none.
+
 ### Consequences for consumers of the Engine
 
 When discovery succeeds at build time (the normal case), consumers that read the
@@ -205,8 +315,19 @@ request to the server using the filtered Evidence. The HTTP API used for access 
 
 The server can handle Evidence in a number of different forms, but where
 possible, URL-encoded form data will be used. This is constructed
-by adding the Resource Key value using the key `resource`, then adding
-all the values from the Flow Data Evidence.
+by adding the [credentials](#credentials) that were configured, being the
+Resource Key using the key `resource` and the License Key using the key
+`license`, then the [Requested Properties](#requested-properties) using the
+key `values` where a list was configured, then adding all the values from the
+Flow Data Evidence.
+
+The remote server advertises `query.values`, `query.resource` and
+`query.license` among its accepted Evidence keys, so a value in the Flow Data
+Evidence could otherwise collide with the credentials and the Property list
+the Engine is already sending. Evidence whose key strips to `values`,
+`resource` or `license` MUST therefore be left out of the request, because
+sending it would put a second field of the same name in the request with no
+way for either side to know which one applied.
 
 When Evidence is added, its prefix MUST be removed.
 For example, `query.user-agent` becomes `user-agent`.
@@ -214,6 +335,40 @@ This means that conflicts can occur when there are Evidence values for the same
 key with different prefixes. Where there are conflicts, the precedence order
 defined in [Evidence](../features/evidence.md) MUST be used to
 determine which value to send to the remote server.
+
+### Properties the remote server did not return
+
+A Property that the credential does not cover is dropped from the response
+without being named, so an Engine has to notice the difference itself.
+
+Measured against `cloud.51degrees.com` on 21 September 2026, with a License
+Key and a list of Properties:
+
+- A Property the License Key does not cover, asked for **on its own**, answers
+  200 carrying a top-level `errors` list that says the requested Properties
+  are not included in the subscription.
+- The same Property asked for **alongside a Property the License Key does
+  cover** answers 200 carrying the covered Property, with **no `errors` list
+  and nothing at all naming the Property that was dropped**.
+
+An Engine that sent a list of Requested Properties MUST therefore compare what
+it asked for against what came back, and report the difference. The comparison
+MUST be case insensitive, because the remote server lowercases Property names
+in its response, so `Device.IsMobile` is answered as `ismobile`. A Property
+that is present but null MUST count as answered rather than dropped, because
+such a Property carries a `nullreason` beside it explaining why it has no
+value on this request, which is a different matter from entitlement.
+
+The report MUST be made once rather than on every request, because the answer
+cannot change while the credential and the list stay the same, and it MUST say
+plainly that the Properties are not covered by the credential rather than
+suggesting a fault. This report MUST NOT fail the request, because the
+Properties that were covered came back and are usable. The first case above,
+where the response does carry a top-level `errors` list, is handled by the
+existing rule in [HTTP requests](#http-requests) and still raises an error.
+
+An Engine authenticating on a Resource Key sends no list, so there is nothing
+to compare and this costs it nothing.
 
 See [HTTP requests](#http-requests) for general details on
 HTTP request handling.
@@ -265,7 +420,9 @@ For example,
 | DataEndPoint            | string   | <https://cloud.51degrees.com/api/v4/JSON>                 | The URL for the cloud service data end point                                                                                                                                              |
 | PropertiesEndPoint      | string   | <https://cloud.51degrees.com/api/v4/accessibleProperties> | The URL for the cloud service Properties end point                                                                                                                                        |
 | EvidenceKeysEndPoint    | string   | <https://cloud.51degrees.com/api/v4/Evidencekeys>         | The URL for the cloud service Evidence keys end point                                                                                                                                     |
-| ResourceKey             | string   | null                                                      | The Resource Key to use when making requests to the cloud service                                                                                                                         |
+| ResourceKey             | string   | null                                                      | The Resource Key to use when making requests to the cloud service. See [Credentials](#credentials) for which combinations are valid.                                                      |
+| LicenseKey              | string   | null                                                      | The License Key to use when making requests to the cloud service. See [Credentials](#credentials) for which combinations are valid.                                                       |
+| RequestedProperties     | list     | empty                                                     | The Properties to ask the cloud service for, as fully qualified names. Required with a License Key alone and MUST NOT be supplied with a Resource Key. See [Requested Properties](#requested-properties). |
 | TimeoutSeconds          | integer  | 2                                                         | The timeout to use when making requests to the cloud service                                                                                                                              |
 | CloudRequestOrigin      | string   | null                                                      | The value to set the 'Origin' header to when making requests to the cloud service                                                                                                         |
 | FailuresToEnterRecovery | integer  | 10                                                        | The number of request failures that must occur within the timeframe defined by `FailuresWindowSeconds` for the engine to transition into a "recovery period."                             |
