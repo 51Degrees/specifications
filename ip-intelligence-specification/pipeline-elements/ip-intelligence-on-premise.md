@@ -133,9 +133,13 @@ holding the "un-managed" memory references (i.e. memory references that
 are not handled by language garbage collection) has on
 [caching](../../pipeline-specification/features/caching.md) and
 [resource cleanup](../../pipeline-specification/features/resource-cleanup.md).
-The reference implementations don't allow a cache to be
-added to this Engine because of the complexity this introduces, however
-end-users might be tempted to create their own cache of results.
+A results cache is not supported for this Engine at present, because of the
+complexity of coordinating the lifetime and thread safety of a result with
+the underlying C code, which owns the memory that the result reads its
+values from. This will be addressed in a future version. Until then, callers
+who need a cache can use the cache implementations that the Pipeline
+provides to maintain their own, storing the values they read rather than
+the result.
 
 ### Value Retrieval
 
