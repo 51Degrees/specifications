@@ -157,9 +157,22 @@ holding the "un-managed" memory references (i.e. memory references that
 are not handled by language garbage collection) has on
 [caching](../../pipeline-specification/features/caching.md) and
 [resource cleanup](../../pipeline-specification/features/resource-cleanup.md).
-The reference implementations don't allow a cache to be
-added to this Engine because of the complexity this introduces, however
-end-users might be tempted to create their own cache of results.
+A results cache is not supported for this Engine at present, because of the
+complexity of coordinating the lifetime and thread safety of a result with
+the underlying C code, which owns the memory that the result reads its
+values from. This will be addressed in a future version. Until then, callers
+who need a cache can use the cache implementations that the Pipeline
+provides to maintain their own, storing the values they read rather than
+the result.
+Measurements on the IP Intelligence On-Premise Engine, whose results read
+values the same way, in MaxPerformance with an Enterprise data file, on eight
+threads with a cache of 10,000 entries, show what a results cache
+is worth. When 88% of requests repeated evidence already in the cache, the
+Engine answered 11 times as many requests per second when every value was
+read, and 2.4 times as many when three values were read. When no evidence
+repeated, the cache cost about 10% of throughput. The benefit therefore
+depends on how often evidence repeats and on how many values each request
+reads.
 
 ### Performance guidance
 
