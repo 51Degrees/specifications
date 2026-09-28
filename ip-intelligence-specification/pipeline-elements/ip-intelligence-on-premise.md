@@ -140,6 +140,14 @@ values from. This will be addressed in a future version. Until then, callers
 who need a cache can use the cache implementations that the Pipeline
 provides to maintain their own, storing the values they read rather than
 the result.
+Measurements on this Engine in MaxPerformance with an Enterprise data file,
+on eight threads with a cache of 10,000 entries, show what a results cache
+is worth. When 88% of requests repeated evidence already in the cache, the
+Engine answered 11 times as many requests per second when every value was
+read, and 2.4 times as many when three values were read. When no evidence
+repeated, the cache cost about 10% of throughput. The benefit therefore
+depends on how often evidence repeats and on how many values each request
+reads.
 
 ### Value Retrieval
 
