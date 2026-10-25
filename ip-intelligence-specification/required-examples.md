@@ -10,13 +10,18 @@ IP Intelligence examples follow the same general principles as [device detection
 
 IP Intelligence uses **IP address evidence** with these accepted evidence keys (as defined in data files):
 
-**Primary evidence keys:**
+**Primary evidence keys**, in the data file's priority order:
+- `query.true-client-ip-51d` - 51Degrees-specific true client IP
+- `server.true-client-ip-51d` - 51Degrees-specific true client IP from server variables
+- `query.client-ip-51d` - 51Degrees-specific client IP
+- `server.client-ip-51d` - 51Degrees-specific client IP from server variables
 - `query.client-ip` - Standard client IP from query parameters (most common)
-- `server.client-ip` - Client IP from server variables  
-- `query.client-ip-51d` - 51Degrees-specific client IP (may have priority)
-- `server.client-ip-51d` - 51Degrees-specific server client IP
-- `query.true-client-ip-51d` - 51Degrees-specific true client IP (highest priority)
-- `server.true-client-ip-51d` - 51Degrees-specific server true client IP
+- `server.client-ip` - Client IP from server variables
+
+When a request carries more than one of these, the Engine uses one value,
+every `query` key before any `server` key and the data file's order within a
+prefix, as [choosing the IP address](pipeline-elements/ip-intelligence-on-premise.md#choosing-the-ip-address)
+describes.
 
 **Evidence formats:**
 - IPv4: `"203.0.113.1"`

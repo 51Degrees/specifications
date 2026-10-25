@@ -76,7 +76,8 @@ This Engine determines the accepted Evidence keys on data refresh based
 on values in the data source.
 
 After loading the data source into the native code, call the `getKeys`
-function to return a list of the accepted Evidence keys.
+function to return a list of the accepted Evidence keys, in the order the
+native code tries them (see [choosing the IP address](#choosing-the-ip-address)).
 These values will then need to be stored to prevent repeated calls to the
 native code.
 
@@ -136,6 +137,24 @@ are not handled by language garbage collection) has on
 The reference implementations don't allow a cache to be
 added to this Engine because of the complexity this introduces, however
 end-users might be tempted to create their own cache of results.
+
+### Choosing the IP address
+
+The data file lists the client IP keys in priority order, for example
+`true-client-ip-51d`, then `client-ip-51d`, then `client-ip`, and the Engine
+accepts each of them under both the `query` and the `server` prefix. When the
+Evidence holds more than one of these keys, the native code uses one value,
+chosen in this order:
+
+1. The `query` keys, in the data file's order.
+2. Only when no `query` key supplied an address, the `server` keys, in the
+   data file's order.
+
+The prefix is decided first, as the
+[Evidence precedence](../../pipeline-specification/features/evidence.md#overview)
+requires, and the data file's order decides between keys under one prefix.
+So `query.client-ip` is used ahead of `server.true-client-ip-51d`. The
+Property values in the result describe that one address.
 
 ### Value Retrieval
 
