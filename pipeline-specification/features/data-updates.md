@@ -329,10 +329,10 @@ keeps that file current without further configuration:
 | pollingInterval | 30 minutes |
 | randomization | up to 10 minutes |
 | dataUpdateUrl | `https://distributor.51degrees.com/api/v2/download`, with the URL formatter adding `LicenseKeys`, `Download=True` and `Type`, where the type is `HashV41` for a Device Detection Hash data file and `IPIV41` for an IP Intelligence data file |
-| License key | not required to build the Engine, and the Distributor refuses a poll without one |
+| License key | required before the Engine builds with autoUpdate or updateOnStartup on, because the Distributor serves nothing without one. The build fails with a configuration error that names the option to turn off. A configuration may say that no key is required, for an update source that serves the file without one |
 
 An application that cannot supply a license key, such as one running the free
-Lite data file, turns autoUpdate off.
+Lite data file, turns autoUpdate off before it builds the Engine.
 
 ## Update polling
 
