@@ -148,9 +148,15 @@ other Pipeline API features.
   that is being used for the On-premise Engine.
   - Pass the `ResultsHash` instance so it can be used when Property values
     are requested.
-  - Do not immediately copy all the Property values from `ResultsHash`. By
-    default, around 200 Properties will be populated, meaning 200+ calls to
-    the native code marshalling values back and forth [^3].
+  - The Element Data MUST read a Property value from `ResultsHash` only when
+    that Property is requested, and MUST NOT copy Property values out of
+    `ResultsHash` while the Engine processes the Flow Data. By default,
+    around 200 Properties will be populated, so copying them all means 200+
+    calls to the native code marshalling values back and forth on every
+    request, whether or not the caller reads them [^3].
+  - The Element Data MAY keep a value once it has been read, so that a
+    second request for the same Property does not call the native code
+    again.
 
 [^3]: Note the effect that
 holding the "un-managed" memory references (i.e. memory references that

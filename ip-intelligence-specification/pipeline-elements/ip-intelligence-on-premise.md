@@ -124,9 +124,15 @@ other Pipeline API features.
   that is being used for the On-premise Engine.
   - Pass the `ResultsIpi` instance so it can be used when Property values
     are requested.
-  - Do not immediately copy all the Property values from `ResultsIpi`. By
-    default, around 200 Properties will be populated, meaning 200+ calls to
-    the native code marshalling values back and forth [^3].
+  - The Element Data MUST read a Property value from `ResultsIpi` only when
+    that Property is requested, and MUST NOT copy Property values out of
+    `ResultsIpi` while the Engine processes the Flow Data. Copying every
+    Property means a call to the native code for each one, marshalling
+    values back and forth, and conversions the caller may never need, such
+    as writing a geometry value as text, on every request [^3].
+  - The Element Data MAY keep a value once it has been read, so that a
+    second request for the same Property does not call the native code
+    again.
 
 [^3]: Note the effect that
 holding the "un-managed" memory references (i.e. memory references that
