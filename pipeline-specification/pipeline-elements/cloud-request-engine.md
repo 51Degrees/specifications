@@ -399,13 +399,29 @@ Similarly to the `errors` array, any entries in the `warnings` array in the
 response MUST be logged as warnings.
 
 ### Recovery Mode
-**Note:** currently supported by .NET implementation only.
+**Note:** currently supported by the .NET and Rust implementations.
 
 If responses from the cloud server become slow due to issues like network disruptions or potential attacks, this could result in timeouts, causing consumer requests to stall (e.g., waiting on a lock to access evidencekeys). Such a situation could degrade user experience and potentially deplete server resources (e.g., RAM or socket connections).
 
 To mitigate this risk, if a significant number of request failures occur within a brief period, the engine can enter a "recovery period." During this phase, requests are bypassed, and a direct signal is sent indicating the temporary unavailability of the element (and the entire pipeline), preventing further strain on the system.
 
 In case of ASP.NET Core / ASP.NET Framework integrations such errors will be suppressed -- as though under the effect of [`SuppressProcessExceptions`](../features/exception-handling.md) -- making the FlowData available, but without any usable data (except errors).
+
+#### Failures that count
+
+The recovery period belongs to the engine, so it is shared by every request
+the engine handles. A failure counts towards `FailuresToEnterRecovery` only
+when it says the cloud service is in trouble, being:
+
+- a request that did not complete, such as a timeout or a connection failure
+- a response with a status of 500 or more
+- a response with a status of 429 (Too Many Requests)
+- a response with a success status whose body could not be used
+
+Any other status from 400 to 499 answers the content of that one request, such
+as Evidence the service will not accept, and MUST NOT count. Otherwise one
+visitor sending a few such requests could start a recovery period that stops
+every visitor's requests reaching the cloud service, and keep it going.
 
 ## Configuration options
 
