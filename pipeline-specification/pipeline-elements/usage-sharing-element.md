@@ -61,8 +61,22 @@ The complete XML document MUST contain a `<Devices>` root element with
 each `<Device>` element containing the details related to a request.
 
 Multiple `<Device>` elements will be batched up as part of each message.
-The number of items per batch is configurable using the
-[minimum entries per message](#configuration-options) setting.
+The size of each batch is set by the
+[minimum entries per message and take timeout](#configuration-options)
+settings, as follows.
+
+1. A message is started once the queue holds the minimum entries per message.
+2. Entries are taken from the queue for it, waiting up to the take timeout for
+   each one, until a wait ends with no entry or the message holds twice the
+   minimum entries per message.
+3. The message is sent.
+
+A message therefore holds from the minimum entries per message to twice that
+number. The one exception is the final message sent when the element is
+disposed, which holds whatever is left in the queue (see [Cleanup](#cleanup)).
+With a take timeout of zero, a message takes only the entries already queued.
+The take timeout only applies while a message is being filled, so an element
+with an empty queue does not wake up to check it.
 
 In the snippet below:
 
