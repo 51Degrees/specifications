@@ -54,7 +54,7 @@ Additional properties may include: `Address`, `County`, `Suburb`, `ZipCode`
 
 Examples MUST be implemented for these available language implementations:
 
-- **C/C++** - On-premise via ip-intelligence-cxx
+- **C/C++** - On-premise via 51degrees-cxx
 - **.NET (C#)** - On-premise and Cloud via ip-intelligence-dotnet  
 - **Go** - On-premise via ip-intelligence-go
 
