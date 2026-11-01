@@ -22,20 +22,18 @@ added by [51degrees-cxx#66](https://github.com/51Degrees/51degrees-cxx/pull/66).
 ### Index of profiles by value
 
 When the native data set is initialized, it builds an index from each value of
-the required Properties to the profiles holding that value. The index is part
-of the data set. When the data is refreshed, the new data set builds its own
-index from the new data file, and the index of the data set it replaces is
-freed with that data set.
+the Properties the caller names to the profiles holding that value. The index
+is part of the data set. No Property is indexed unless the caller names it,
+whatever the performance profile. A named Property is indexed whether or not
+it is a required Property, so a caller does not need to require a Property to
+look up its values. A name that the data file has no Property of indexes
+nothing.
 
-The index is built when the property value index option of the configuration
-is enabled. This is the same option that controls the native index of
-Property values for each profile, so the two indexes are built together. The
-InMemory and HighPerformance performance profiles of the C API enable the
-option. The C++ performance profiles leave it as it is, and it is disabled by
-default, so an implementation that uses the C++ or SWIG interface MUST enable
-it with `setPropertyValueIndex` for the lookup to use the index.
+When the data is refreshed, the new data set indexes the same Properties from
+the new data file, and the index of the data set it replaces is freed with
+that data set.
 
-Without the index, or for a Property that is not required, the lookup reads
+Without the index, or for a Property that was not named, the lookup reads
 every profile and returns the same profiles more slowly.
 
 ### Results
@@ -51,13 +49,13 @@ on-premise Engine as the `51D_ProfileIds` Evidence.
 
 ### What each language exposes
 
-| **Language**                          | **Lookup**                                                                                                     | **Returns**                                                                  |
-|---------------------------------------|----------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|
-| C                                     | `fiftyoneDegreesHashGetProfileIdsForPropertyAndValue`                                                          | The number of profiles, with their ids set in an array the caller provides   |
-| C                                     | `fiftyoneDegreesHashIterateProfilesForPropertyAndValue`                                                        | Each profile, passed to a callback                                           |
-| C++                                   | `EngineHash::getProfileIdsForPropertyValue`                                                                    | A `std::vector<uint32_t>` of profile ids                                     |
-| C#, Java, Node.js, Python and PHP     | `getProfileIdsForPropertyValue` on `EngineHashSwig`, with `setPropertyValueIndex` on `ConfigHashSwig`          | A `VectorUInt32Swig` of profile ids                                          |
-| Go and Rust                           | `fiftyoneDegreesHashGetProfileIdsForPropertyAndValue`, called through their bindings to the C API              | The profile ids, as for C                                                    |
+| **Language**                      | **Properties to index**                                                                                                          | **Lookup**                                                                                        | **Returns**                                                                |
+|-----------------------------------|----------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
+| C                                 | `fiftyoneDegreesHashInitManagerFromFileWithIndexedProperties` or `fiftyoneDegreesHashInitManagerFromMemoryWithIndexedProperties` | `fiftyoneDegreesHashGetProfileIdsForPropertyAndValue`                                             | The number of profiles, with their ids set in an array the caller provides |
+| C                                 | As above                                                                                                                         | `fiftyoneDegreesHashIterateProfilesForPropertyAndValue`                                           | Each profile, passed to a callback                                         |
+| C++                               | `ConfigHash::setIndexedProperties`                                                                                               | `EngineHash::getProfileIdsForPropertyValue`                                                       | A `std::vector<uint32_t>` of profile ids                                   |
+| C#, Java, Node.js, Python and PHP | `setIndexedProperties` on `ConfigHashSwig`                                                                                       | `getProfileIdsForPropertyValue` on `EngineHashSwig`                                               | A `VectorUInt32Swig` of profile ids                                        |
+| Go and Rust                       | The C init functions, called through their bindings to the C API                                                                 | `fiftyoneDegreesHashGetProfileIdsForPropertyAndValue`, called through their bindings to the C API | The profile ids, as for C                                                  |
 
 The languages built on SWIG get these once their wrapper is generated again
 from the interface in 51degrees-cxx. In .NET the `NativeEngine` and
@@ -85,10 +83,10 @@ proposes.
 ## Start-up activity
 
 The Device Detection on-premise Engine whose data this Engine uses SHOULD be
-created with the property value index option enabled, so that the native
-index is built when its data set is initialized. An Engine of this kind
-SHOULD use the native lookup rather than processing every hardware profile
-at start-up.
+created with the NativeModel and TAC Properties named to index, so that the
+native index is built when its data set is initialized. An Engine of this
+kind SHOULD use the native lookup rather than processing every hardware
+profile at start-up.
 
 ## Process
 
@@ -104,10 +102,12 @@ at start-up.
 ## Refresh data
 
 When the data of the Device Detection on-premise Engine is refreshed, the
-native component builds the index for the new data file. Nothing more is
-needed from this Engine.
+native component indexes the same Properties again from the new data file.
+Nothing more is needed from this Engine.
 
 ## Configuration options
 
 There are no configuration options associated with this Engine beyond those
-of the Device Detection on-premise Engine.
+of the Device Detection on-premise Engine, where the Indexed Properties
+[configuration option](device-detection-on-premise.md#configuration-options)
+names the Properties to index.
