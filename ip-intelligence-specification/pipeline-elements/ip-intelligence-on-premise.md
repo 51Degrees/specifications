@@ -162,6 +162,99 @@ requires, and the data file's order decides between keys under one prefix.
 So `query.client-ip` is used ahead of `server.true-client-ip-51d`. The
 Property values in the result describe that one address.
 
+### Address forms
+
+One IP address can be written in more than one form, and the form decides which
+address it is. An IPv4 address and an ordinary IPv6 address are looked up as
+written. The Engine MUST look up the three forms that hold an IPv4 address as
+the following table says, so that one address gets the same Property values in
+every language.
+
+| **Form**             | **Example**        | **Defined by**                                                                          | **Looked up as**           |
+|----------------------|--------------------|-----------------------------------------------------------------------------------------|----------------------------|
+| IPv4-mapped IPv6     | `::ffff:8.8.8.8`   | [RFC 4291 section 2.5.5.2](https://www.rfc-editor.org/rfc/rfc4291.html#section-2.5.5.2) | The IPv4 address `8.8.8.8` |
+| IPv4-compatible IPv6 | `::8.8.8.8`        | [RFC 4291 section 2.5.5.1](https://www.rfc-editor.org/rfc/rfc4291.html#section-2.5.5.1) | An IPv6 address            |
+| IPv4-embedded IPv6   | `64:ff9b::8.8.8.8` | [RFC 6052](https://www.rfc-editor.org/rfc/rfc6052.html)                                 | An IPv6 address            |
+
+#### IPv4-mapped addresses
+
+[RFC 4291 section 2.5.5.2](https://www.rfc-editor.org/rfc/rfc4291.html#section-2.5.5.2)
+says this form "is used to represent the addresses of IPv4 nodes as IPv6
+addresses".
+[RFC 4038 section 4.2](https://www.rfc-editor.org/rfc/rfc4038.html#section-4.2),
+which RFC 4291 names as the background on its use, says "the IPv6 address
+::FFFF:x.y.z.w represents the IPv4 address x.y.z.w." Servers report this form
+because, under
+[RFC 3493 section 3.7](https://www.rfc-editor.org/rfc/rfc3493.html#section-3.7),
+an IPv6 socket that accepts a connection from an IPv4 node returns the address
+of that node encoded this way.
+[RFC 6890 section 2.2.3](https://www.rfc-editor.org/rfc/rfc6890.html#section-2.2.3)
+and the current
+[IANA registry](https://www.iana.org/assignments/iana-ipv6-special-registry/iana-ipv6-special-registry.xhtml)
+list `::ffff:0:0/96` as not globally reachable, so the block is not a network
+with Property values of its own.
+
+So an IPv4-mapped address is its IPv4 address. Every way of giving the address,
+such as `::ffff:808:808`, `0:0:0:0:0:ffff:808:808` and its 16 bytes, MUST get
+the same Property values as `8.8.8.8`, including the Properties that report an
+IP range. The native code does this on every lookup, so an implementation does
+not need to change the address before passing it on.
+
+Where an implementation reports the address of the client in the `Ip` and
+`IpV6` Properties, `Ip` MUST report `8.8.8.8` and `IpV6` MUST have no value.
+
+Language runtimes recognize this form, and an implementation that reads an
+address for itself SHOULD use what its runtime provides rather than comparing
+text.
+
+| **Language** | **What the runtime does with `::ffff:8.8.8.8`**                                                                                                                    |
+|--------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| .NET         | `IPAddress.IsIPv4MappedToIPv6` is true and `MapToIPv4()` gives `8.8.8.8`. `MapToIPv4()` takes the last four bytes of any IPv6 address, so check the former first. |
+| Java         | `InetAddress.getByName` returns an `Inet4Address` for `8.8.8.8`.                                                                                                   |
+| Go           | `net.IP.To4()` and `netip.Addr.Unmap()` give `8.8.8.8`.                                                                                                            |
+| Rust         | `Ipv6Addr::to_ipv4_mapped()` and `IpAddr::to_canonical()` give `8.8.8.8`.                                                                                          |
+| Python       | `ipaddress.IPv6Address.ipv4_mapped` gives `8.8.8.8`.                                                                                                               |
+| Node.js      | `net.BlockList` matches the address against a rule for `8.8.8.8`.                                                                                                  |
+| PHP          | `inet_pton` gives the 16 bytes and there is no call for the IPv4 address, so compare the first 12 bytes.                                                           |
+
+None of these treats `::8.8.8.8` or `64:ff9b::8.8.8.8` as an IPv4 address.
+
+#### IPv4-compatible addresses
+
+[RFC 4291 section 2.5.5.1](https://www.rfc-editor.org/rfc/rfc4291.html#section-2.5.5.1)
+deprecates this form and says "New or updated implementations are not required
+to support this address type". The Engine MUST NOT look up such an address as
+the IPv4 address it holds.
+
+#### IPv4-embedded addresses
+
+[RFC 6052](https://www.rfc-editor.org/rfc/rfc6052.html) defines this form, and
+the Engine follows RFC 6052 by treating these as IPv6 addresses.
+[Section 1.3](https://www.rfc-editor.org/rfc/rfc6052.html#section-1.3) defines
+an address translator as "any entity that has to derive an IPv4 address from an
+IPv6 address or vice versa". The Engine has no need to derive one, so it is not
+an address translator. The prefix can also be one that an organization chose for
+itself, in any of the lengths that
+[section 2.2](https://www.rfc-editor.org/rfc/rfc6052.html#section-2.2) allows,
+so the form cannot in general be recognized from the address alone. The Engine
+MUST NOT look up such an address as the IPv4 address it holds. The address gets
+what the data file holds for that IPv6 address, which is no value where the file
+holds nothing for it.
+
+#### Addresses below the lowest key
+
+An address below the lowest key in a graph has no profile for the component of
+that graph, rather than the profile of an unrelated address. This is decided for
+each graph, so an address can be below the lowest key of one graph and have a
+profile in another. The result is what any address gets when the data file holds
+nothing for it. A Property that is mandatory with a default value reads as that
+default, any other Property has no value, with the null profile reason, and the
+lookup raises no error.
+
+A data file SHOULD hold a key at the bottom of each graph that leads to a
+profile with no values, so that this case does not arise. The Property values
+are the same with or without that key.
+
 ### Value Retrieval
 
 When retrieving values from the IPI native code, values always come with an
