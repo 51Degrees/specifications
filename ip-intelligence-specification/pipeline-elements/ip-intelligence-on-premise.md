@@ -207,15 +207,15 @@ Language runtimes recognize this form, and an implementation that reads an
 address for itself SHOULD use what its runtime provides rather than comparing
 text.
 
-| **Language** | **What the runtime does with `::ffff:8.8.8.8`**                                                                                                                    |
-|--------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| .NET         | `IPAddress.IsIPv4MappedToIPv6` is true and `MapToIPv4()` gives `8.8.8.8`. `MapToIPv4()` takes the last four bytes of any IPv6 address, so check the former first. |
-| Java         | `InetAddress.getByName` returns an `Inet4Address` for `8.8.8.8`.                                                                                                   |
-| Go           | `net.IP.To4()` and `netip.Addr.Unmap()` give `8.8.8.8`.                                                                                                            |
-| Rust         | `Ipv6Addr::to_ipv4_mapped()` and `IpAddr::to_canonical()` give `8.8.8.8`.                                                                                          |
-| Python       | `ipaddress.IPv6Address.ipv4_mapped` gives `8.8.8.8`.                                                                                                               |
-| Node.js      | `net.BlockList` matches the address against a rule for `8.8.8.8`.                                                                                                  |
-| PHP          | `inet_pton` gives the 16 bytes and there is no call for the IPv4 address, so compare the first 12 bytes.                                                           |
+| **Language** | **What the runtime does with `::ffff:8.8.8.8`**                                                                                                                             |
+|--------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| .NET         | `IPAddress.IsIPv4MappedToIPv6` is true and `MapToIPv4()` gives `8.8.8.8`. Check `IsIPv4MappedToIPv6` first, as `MapToIPv4()` takes the last four bytes of any IPv6 address. |
+| Java         | `InetAddress.getByName` returns an `Inet4Address` for `8.8.8.8`.                                                                                                            |
+| Go           | `net.IP.To4()` and `netip.Addr.Unmap()` give `8.8.8.8`.                                                                                                                     |
+| Rust         | `Ipv6Addr::to_ipv4_mapped()` and `IpAddr::to_canonical()` give `8.8.8.8`.                                                                                                   |
+| Python       | `ipaddress.IPv6Address.ipv4_mapped` gives `8.8.8.8`.                                                                                                                        |
+| Node.js      | `net.BlockList` matches the address against a rule for `8.8.8.8`.                                                                                                           |
+| PHP          | `inet_pton` gives the 16 bytes and there is no call for the IPv4 address, so compare the first 12 bytes.                                                                    |
 
 None of these treats `::8.8.8.8` or `64:ff9b::8.8.8.8` as an IPv4 address.
 
