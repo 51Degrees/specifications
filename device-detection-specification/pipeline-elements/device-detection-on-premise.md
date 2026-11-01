@@ -167,6 +167,35 @@ The reference implementations don't allow a cache to be
 added to this Engine because of the complexity this introduces, however
 end-users might be tempted to create their own cache of results.
 
+### Finding Properties
+
+Each data set the native code loads holds what is needed to find a Property
+quickly. It is built when the data file is loaded and freed with the data set,
+so a [data refresh](#refresh-data) replaces it together with the data, and a
+refresh that fails keeps both.
+
+The position of a Property in the required Properties of a data set depends on
+that data set, because the native code sorts the required Properties by name. A
+data refresh moves a Property's position when, for example, the new data file
+no longer has a Property that sorts before it.
+
+- An implementation MUST NOT keep an index of its own that is derived from a
+  data set, such as a map from Property names to positions, an array of the
+  positions of the Properties it reads, or a record of which Properties a data
+  set has. Such an index has to be rebuilt after every data refresh, and it
+  gives the wrong answer whenever it is used with results from a different data
+  set.
+- An implementation MUST find a Property through the `ResultsHash` instance it
+  reads from, which holds the data set the results came from, for example by
+  passing the Property name to `containsProperty` or to the `getValueAs`
+  methods.
+- An Engine created with only the Properties it reads evaluates only the graphs
+  those Properties need. Where an implementation also chooses the graphs to
+  evaluate for each request, it MUST name the Properties rather than give their
+  positions. The native Device Detection code does not yet take names for this,
+  so until it does an implementation SHOULD create the Engine with only the
+  Properties it reads instead.
+
 ### Performance guidance
 
 We have found that the main performance bottleneck is usually the process
@@ -190,6 +219,8 @@ As such, steps SHOULD be taken to minimize this as much as possible:
   values that will only change after a [data refresh](#refresh-data) can
   be stored in the Engine instance to avoid native calls for that value until
   a refresh occurs. Note the possible clean-up consequences that this implies.
+  This does not apply to the positions of Properties, which MUST be found
+  through the results as [finding Properties](#finding-properties) describes.
 
 ## Refresh data
 

@@ -167,6 +167,37 @@ Property values in the result describe that one address.
 When retrieving values from the IPI native code, values always come with an
 associated weighting. This should be reflected in the `Element Data` implementation returned by the implementation. For more details, see [data model](../data-model.md).
 
+### Finding Properties
+
+Each data set the native code loads holds what is needed to find a Property
+quickly. It is built when the data file is loaded and freed with the data set,
+so a [data refresh](#refresh-data) replaces it together with the data, and a
+refresh that fails keeps both.
+
+The position of a Property in the required Properties of a data set depends on
+that data set, because the native code sorts the required Properties by name. A
+data refresh moves a Property's position when, for example, the new data file
+no longer has a Property that sorts before it.
+
+- An implementation MUST NOT keep an index of its own that is derived from a
+  data set, such as a map from Property names to positions or an array of the
+  positions of the Properties it reads. Such an index has to be rebuilt after
+  every data refresh, and it gives another Property's value whenever it is used
+  with results from a different data set.
+- An implementation MUST find a Property through the `ResultsIpi` instance it
+  reads from, which holds the data set the results came from. The position
+  found then matches those results, including results created before a data
+  refresh.
+- An implementation SHOULD pass the name of a Property as UTF-8 bytes it
+  prepares once, to `getRequiredPropertyIndex` or `copyValueAsUTF8StringByName`
+  on `ResultsIpi`, rather than converting the name to a native string for every
+  read.
+- An Engine created with only the Properties it reads evaluates only the graphs
+  those Properties need. Where an implementation also chooses the graphs to
+  evaluate for each request, it MUST name the Properties in the call to
+  `process`, which finds them in the data set of the new results, and MUST NOT
+  give their positions.
+
 ### Performance Guidance
 
 We have found that the main performance bottleneck is usually the process
@@ -190,6 +221,8 @@ As such, steps SHOULD be taken to minimize this as much as possible:
   values that will only change after a [data refresh](#refresh-data) can
   be stored in the Engine instance to avoid native calls for that value until
   a refresh occurs. Note the possible clean-up consequences that this implies.
+  This does not apply to the positions of Properties, which MUST be found
+  through the results as [finding Properties](#finding-properties) describes.
 
 ## Refresh Data
 
