@@ -79,7 +79,7 @@ Examples use IP address evidence files:
 
 ### Weighted Values
 
-Unlike Device Detection, IP Intelligence properties return **weighted values** due to the probabilistic nature of IP geolocation data. Examples MUST demonstrate accessing both the value and its associated weighting:
+Unlike Device Detection, IP Intelligence properties return **[weighted values](../pipeline-specification/features/weighted-values.md)**, and a property with a single answer returns it with a weighting of 1. Examples MUST demonstrate accessing both the value and its associated weighting:
 
 ```csharp
 var country = ipData.RegisteredCountry;
