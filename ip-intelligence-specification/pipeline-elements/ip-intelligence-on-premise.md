@@ -169,35 +169,61 @@ associated weighting. This should be reflected in the `Element Data` implementat
 
 ### Finding Properties
 
-Each data set the native code loads holds what is needed to find a Property
-quickly. It is built when the data file is loaded and freed with the data set,
-so a [data refresh](#refresh-data) replaces it together with the data, and a
-refresh that fails keeps both.
+The Engine is created with the names of the Properties an implementation
+reads, or with none to have every Property of the data file. The position of a
+Property is the index of its name in the names the Engine was created with, so
+it does not depend on the data file. A [data refresh](#refresh-data) keeps
+every position, and a Property the new data file lacks keeps its position and
+reads as a Property the data set does not have, with the invalid Property
+reason, until a later data file has it again.
 
-The position of a Property in the required Properties of a data set depends on
-that data set, because the native code sorts the required Properties by name. A
-data refresh moves a Property's position when, for example, the new data file
-no longer has a Property that sorts before it.
-
-- An implementation MUST NOT keep an index of its own that is derived from a
-  data set, such as a map from Property names to positions or an array of the
-  positions of the Properties it reads. Such an index has to be rebuilt after
-  every data refresh, and it gives another Property's value whenever it is used
-  with results from a different data set.
-- An implementation MUST find a Property through the `ResultsIpi` instance it
-  reads from, which holds the data set the results came from. The methods of
-  `ResultsIpi` that take a Property name, such as `getValueAsUTF8String` and
-  the `getValuesAs` methods, find the name in that data set, including for
-  results created before a data refresh.
+- An implementation that created the Engine with names MAY read a Property by
+  its position, being the index of its name in the list it gave, or by its
+  name. It MUST NOT keep a map of its own from names to positions, such as one
+  built from the data set, as the native code gives each name its position.
+- An Engine created with no names has no positions. Its methods that take a
+  position return no value, with the invalid Property reason, so an
+  implementation MUST read the Properties of such an Engine by name, through
+  the `ResultsIpi` methods that take a Property name.
+- `getAvailableProperties`, `getPropertyName` and the Engine's
+  `getRequiredProperties` follow the names the Engine was created with, in
+  that order. `getProperties` lists the Properties the data set has, sorted by
+  name, so its order is not the order of the positions.
 - `copyValueAsUTF8String` takes only a position, as it is for the fastest
-  read, and no form of it takes a Property name. An implementation that calls
-  it MUST give a position from the data set of the same `ResultsIpi` instance,
-  such as one found by going through that instance's Properties with
-  `getAvailableProperties` and `getPropertyName`, because a data refresh can
-  move positions.
-- An Engine created with only the Properties it reads evaluates only the graphs
-  those Properties need, so an implementation SHOULD create the Engine with
-  only the Properties it reads.
+  read, and no form of it takes a Property name. The position is the index of
+  the Property in the names the Engine was created with.
+- An Engine created with only the Properties an implementation reads lets the
+  Balanced configuration hold what they read in memory, so an implementation
+  SHOULD create the Engine with only those Properties.
+
+### Reading graphs
+
+`process` walks no graph. The native code walks the graph of a component when a
+Property of that component is first read from a `ResultsIpi` instance, against
+the data set that instance holds, and walks it once for that instance. A lookup
+that reads a few Properties walks only the graphs of their components, whatever
+Properties the Engine was created with, and a data refresh between `process`
+and the read does not change the answer.
+
+A failure to read a graph from the data file is reported by the read that
+walked it, which throws in C++ and the languages built on it. That component is
+not walked again for the instance, so its Properties then read as if it had no
+profile.
+
+### Results and threads
+
+A `ResultsIpi` instance is used by one thread at a time, because reading a
+value writes into it, and the first read of a Property of a component walks the
+component's graph. Different `ResultsIpi` instances can be used on different
+threads at once, and the Engine can be shared.
+
+Aspect Data SHOULD be thread safe, as
+[thread safety](../../pipeline-specification/features/thread-safety.md)
+describes, so Aspect Data that reads its values from a `ResultsIpi` instance
+SHOULD let one thread at a time read that instance, for example by holding a
+lock for each read. An Engine whose Aspect Data lets several threads read
+one instance at once MUST NOT allow a
+[cache](../../pipeline-specification/features/caching.md) to be added.
 
 ### Performance Guidance
 
@@ -222,8 +248,9 @@ As such, steps SHOULD be taken to minimize this as much as possible:
   values that will only change after a [data refresh](#refresh-data) can
   be stored in the Engine instance to avoid native calls for that value until
   a refresh occurs. Note the possible clean-up consequences that this implies.
-  This does not apply to the positions of Properties, which MUST be found
-  through the results as [finding Properties](#finding-properties) describes.
+  Positions need no such store, as each is the index of a Property in the
+  names the Engine was created with, as
+  [finding Properties](#finding-properties) describes.
 
 ## Refresh Data
 
