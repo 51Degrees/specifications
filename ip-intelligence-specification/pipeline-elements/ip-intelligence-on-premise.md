@@ -185,18 +185,19 @@ no longer has a Property that sorts before it.
   every data refresh, and it gives another Property's value whenever it is used
   with results from a different data set.
 - An implementation MUST find a Property through the `ResultsIpi` instance it
-  reads from, which holds the data set the results came from. The position
-  found then matches those results, including results created before a data
-  refresh.
-- An implementation SHOULD pass the name of a Property as UTF-8 bytes it
-  prepares once, to `getRequiredPropertyIndex` or `copyValueAsUTF8StringByName`
-  on `ResultsIpi`, rather than converting the name to a native string for every
-  read.
+  reads from, which holds the data set the results came from. The methods of
+  `ResultsIpi` that take a Property name, such as `getValueAsUTF8String` and
+  the `getValuesAs` methods, find the name in that data set, including for
+  results created before a data refresh.
+- `copyValueAsUTF8String` takes only a position, as it is for the fastest
+  read, and no form of it takes a Property name. An implementation that calls
+  it MUST give a position from the data set of the same `ResultsIpi` instance,
+  such as one found by going through that instance's Properties with
+  `getAvailableProperties` and `getPropertyName`, because a data refresh can
+  move positions.
 - An Engine created with only the Properties it reads evaluates only the graphs
-  those Properties need. Where an implementation also chooses the graphs to
-  evaluate for each request, it MUST name the Properties in the call to
-  `process`, which finds them in the data set of the new results, and MUST NOT
-  give their positions.
+  those Properties need, so an implementation SHOULD create the Engine with
+  only the Properties it reads.
 
 ### Performance Guidance
 

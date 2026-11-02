@@ -190,11 +190,8 @@ no longer has a Property that sorts before it.
   passing the Property name to `containsProperty` or to the `getValueAs`
   methods.
 - An Engine created with only the Properties it reads evaluates only the graphs
-  those Properties need. Where an implementation also chooses the graphs to
-  evaluate for each request, it MUST name the Properties rather than give their
-  positions. The native Device Detection code does not yet take names for this,
-  so until it does an implementation SHOULD create the Engine with only the
-  Properties it reads instead.
+  those Properties need, so an implementation SHOULD create the Engine with
+  only the Properties it reads.
 
 ### Performance guidance
 
