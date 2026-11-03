@@ -26,6 +26,8 @@ describes.
 **Evidence formats:**
 - IPv4: `"203.0.113.1"`
 - IPv6: `"2001:db8::1"`
+- IPv4-mapped IPv6: `"::ffff:203.0.113.1"`, which is the IPv4 address `203.0.113.1`, as
+  [address forms](pipeline-elements/ip-intelligence-on-premise.md#address-forms) describes
 
 ### Properties Available
 
