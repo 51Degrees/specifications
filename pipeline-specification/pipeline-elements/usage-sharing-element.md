@@ -132,7 +132,7 @@ Currently, the defined attributes are:
 - truncated - Indicates that the original evidence value was too long. The
   value in the XML does not include all characters from the original.
 
-See the [ReplacedString](https://github.com/51Degrees/pipeline-java/blob/master/pipeline.engines.fiftyone/src/main/java/fiftyone/pipeline/engines/fiftyone/flowelements/ShareUsageElement.java#L485)
+See the [ReplacedString](https://github.com/51Degrees/51degrees-java/blob/main/pipeline/pipeline.engines.fiftyone/src/main/java/fiftyone/pipeline/engines/fiftyone/flowelements/ShareUsageElement.java#L485)
 function in Java for an example of this.
 
 ### Request detail

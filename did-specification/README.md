@@ -36,7 +36,7 @@ distinct because callers make different decisions at each one.
   [Package surface](package-surface.md).
 - The packages that implement this specification are
   [pipeline-dotnet](https://github.com/51Degrees/pipeline-dotnet),
-  [pipeline-java](https://github.com/51Degrees/pipeline-java),
+  [51degrees-java](https://github.com/51Degrees/51degrees-java),
   [pipeline-node](https://github.com/51Degrees/pipeline-node),
   [pipeline-python](https://github.com/51Degrees/pipeline-python),
   [pipeline-php-did](https://github.com/51Degrees/pipeline-php-did) and
