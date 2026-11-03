@@ -38,7 +38,7 @@ distinct because callers make different decisions at each one.
   [pipeline-dotnet](https://github.com/51Degrees/pipeline-dotnet),
   [pipeline-java](https://github.com/51Degrees/pipeline-java),
   [pipeline-node](https://github.com/51Degrees/pipeline-node),
-  [pipeline-python](https://github.com/51Degrees/pipeline-python),
+  [51degrees-python](https://github.com/51Degrees/51degrees-python),
   [pipeline-php-did](https://github.com/51Degrees/pipeline-php-did) and
   [rust](https://github.com/51Degrees/rust). The .NET package is the
   reference implementation.
