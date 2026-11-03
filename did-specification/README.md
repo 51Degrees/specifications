@@ -35,11 +35,11 @@ distinct because callers make different decisions at each one.
   their public surface. The reasoning is in
   [Package surface](package-surface.md).
 - The packages that implement this specification are
-  [pipeline-dotnet](https://github.com/51Degrees/pipeline-dotnet),
+  [51degrees-dotnet](https://github.com/51Degrees/51degrees-dotnet),
   [51degrees-java](https://github.com/51Degrees/51degrees-java),
   [51degrees-node](https://github.com/51Degrees/51degrees-node),
-  [pipeline-python](https://github.com/51Degrees/pipeline-python),
-  [pipeline-php-did](https://github.com/51Degrees/pipeline-php-did) and
+  [51degrees-python](https://github.com/51Degrees/51degrees-python),
+  [51degrees-php](https://github.com/51Degrees/51degrees-php) and
   [51degrees-rust](https://github.com/51Degrees/51degrees-rust). The .NET
   package is the reference implementation.
 - Code comments SHOULD link to the sections here rather than repeat the

@@ -52,7 +52,7 @@ to determine the correct native binary to use based on the current
 operating system.
 
 In some cases, this capability is built into the packaging infrastructure
-For example, [.NET/NuGet](https://github.com/51Degrees/ip-intelligence-dotnet/blob/main/FiftyOne.IpIntelligence.Engine.OnPremise/FiftyOne.IpIntelligence.Engine.OnPremise.csproj).
+For example, [.NET/NuGet](https://github.com/51Degrees/51degrees-dotnet/blob/main/ip-intelligence/Engine.OnPremise/FiftyOne.IpIntelligence.Engine.OnPremise.csproj).
 Some require additional code to be written to determine the correct binary
 at runtime (Java/Maven and Node/NPM). Others
 do not allow native binaries in packages at all (PHP/Composer).

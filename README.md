@@ -24,7 +24,7 @@ products.
   fluent builder to create instances. However, a Node.JS developer would not
   normally use this approach.
 - [Java](https://github.com/51Degrees/51degrees-java/tree/main/pipeline) and
-  [.NET](https://github.com/51Degrees/pipeline-dotnet) are considered the reference
+  [.NET](https://github.com/51Degrees/51degrees-dotnet/tree/main/pipeline) are considered the reference
   implementations. At least one of these SHOULD be reviewed by the reader to
   see what a real-world implementation of the specification looks like. There
   is also [a section](pipeline-specification/reference-implementation-notes.md)
