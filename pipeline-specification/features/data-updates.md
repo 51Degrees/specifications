@@ -356,7 +356,7 @@ to the data update URL when needed.
 The reference implementations use a 'URL formatter' class. Below are the
 implementations used for calls made to the Distributor.
 
-- [.NET FiftyOneUrlFormatter](https://github.com/51Degrees/pipeline-dotnet/blob/master/FiftyOne.Pipeline.Engines.FiftyOne/Data/FiftyOneUrlFormatter.cs)
+- [.NET FiftyOneUrlFormatter](https://github.com/51Degrees/51degrees-dotnet/blob/main/pipeline/Engines.FiftyOne/Data/FiftyOneUrlFormatter.cs)
 - [Java FiftyOneUrlFormatter](https://github.com/51Degrees/51degrees-java/blob/main/pipeline/pipeline.engines.fiftyone/src/main/java/fiftyone/pipeline/engines/fiftyone/data/FiftyOneUrlFormatter.java)
 
 If a new data file is downloaded, the date of the downloaded data is

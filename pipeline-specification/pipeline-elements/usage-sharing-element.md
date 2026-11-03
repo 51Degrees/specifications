@@ -150,7 +150,7 @@ Response will be a 200 on success. Anything else is a failure.
 When failures occur, the status code and content of the response MUST be logged
 to aid troubleshooting.
 
-See the [BuildAndSendXml](https://github.com/51Degrees/pipeline-dotnet/blob/master/FiftyOne.Pipeline.Engines.FiftyOne/FlowElements/ShareUsageElement.cs#L104) method in C# for an example of this.
+See the [BuildAndSendXml](https://github.com/51Degrees/51degrees-dotnet/blob/main/pipeline/Engines.FiftyOne/FlowElements/ShareUsageElement.cs#L117) method in C# for an example of this.
 
 ## Session tracking
 
