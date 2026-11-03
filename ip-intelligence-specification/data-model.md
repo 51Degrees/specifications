@@ -118,5 +118,7 @@ This does not mean that the properties are not exposed in the same way.
 
 The results contained in the combined result consists of the following 2 types:
 
-- [Network](https://github.com/51Degrees/common-metadata/tree/main/Properties/Network)
-- [Location](https://github.com/51Degrees/common-metadata/tree/main/Properties/Location)
+- Network
+- Location
+
+The properties of each are listed in the [property dictionary](https://51degrees.com/developers/property-dictionary?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=ip-intelligence-specification-data-model.md&utm_term=property-dictionary).
