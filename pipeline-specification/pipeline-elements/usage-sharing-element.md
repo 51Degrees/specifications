@@ -57,100 +57,118 @@ A background thread can then be used to consume items from this queue,
 adding them to the XML payload and sending it once it contains the
 configured quantity of data.
 
-The complete XML document MUST contain a `<Devices>` root element with
-each `<Device>` element containing the details related to a request.
+The complete XML document MUST be written exactly as this section describes,
+so that the same Evidence gives the same bytes in every language when run on
+the same host. The only exceptions are `DateSent` and the values that name
+the runtime, being `Version`, `Language`, `LanguageVersion`, `Platform` and
+the `FlowElement` text.
 
-Multiple `<Device>` elements will be batched up as part of each message.
-The number of items per batch is configurable using the
-[minimum entries per message](#configuration-options) setting.
+### The document
 
-In the snippet below:
+1. The document is UTF-8 and starts with the byte order mark EF BB BF.
+2. The XML declaration `<?xml version="1.0" encoding="utf-8"?>` follows, with
+   no `standalone` attribute.
+3. The root element is `<Devices>`, holding one `<Device>` element for each
+   record.
+4. Nothing is written between elements, so there is no indentation and no
+   line break anywhere in the document.
 
-- Text in CAPS represent variable values.
-- Things in [square brackets] are optional
+Multiple `<Device>` elements are batched in each message. The number of items
+per batch is set by the [minimum entries per message](#configuration-options)
+option.
+
+### The record
+
+Each `<Device>` holds these elements in this order.
+
+| **Element**       | **Content**                                                                                                                                                                                                                    |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `SessionId`       | The value of the `query.session-id` Evidence                                                                                                                                                                                   |
+| `Sequence`        | The value of the `query.sequence` Evidence as a 32-bit integer in decimal, or `0` when it is absent or does not parse                                                                                                          |
+| `DateSent`        | The time the record was written, in UTC, formatted `yyyy-MM-ddTHH:mm:ss` on a 24-hour clock, for example `2026-11-02T14:05:09`                                                                                                 |
+| `ClientIP`        | The value of the `server.client-ip` Evidence                                                                                                                                                                                   |
+| `Version`         | The version of the Pipeline core package                                                                                                                                                                                       |
+| `Product`         | `Pipeline`                                                                                                                                                                                                                     |
+| `FlowElement`     | One for each Flow Element in the Pipeline, in Pipeline order, holding the element's fully qualified type name                                                                                                                  |
+| `Language`        | The name of the language, for example `dotnet`                                                                                                                                                                                 |
+| `LanguageVersion` | The version of the language runtime                                                                                                                                                                                            |
+| `ServerIP`        | The first address the server's host name resolves to that is IPv4 and is not `127.0.0.1`, otherwise the first that is neither `127.0.0.1` nor `::1`, otherwise empty. The usage sharing element works it out once and keeps it |
+| `Platform`        | The name and version of the operating system                                                                                                                                                                                   |
+| Evidence entries  | One for each shared Evidence entry, as described below. The [accepted Evidence](#accepted-evidence) decides which are shared                                                                                                   |
+| `BadSchema`       | `true`, written only when a character was replaced in a name or value of this record                                                                                                                                           |
+
+`SessionId`, `Sequence`, `DateSent` and `ClientIP` are always written. An
+element with no content, such as `SessionId` when `query.session-id` is
+absent, is written as `<SessionId />`, with a space before the slash. The
+keys `query.session-id`, `query.sequence` and `server.client-ip` are matched
+without regard to case and are not written again as Evidence entries.
+
+### Evidence entries
+
+1. Each shared Evidence key is split at its first `.` into a prefix and a
+   field. The entry is an element named by the prefix exactly as the key has
+   it, with a `Name` attribute holding the field exactly as the key has it,
+   and the value in a CDATA section, for example
+   `<header Name="User-Agent"><![CDATA[Mozilla/5.0]]></header>`.
+2. A key that has no `.`, or that starts with `.`, is written as an element
+   named by the whole key, with the value as element text rather than CDATA.
+3. Entries are grouped by prefix. The prefixes come in the order each first
+   appears in the Evidence, and the entries within a prefix in the order the
+   Evidence holds them. Nothing is sorted.
+
+### Names and values
+
+1. A value longer than 10,000 characters, counted in UTF-16 code units, is
+   replaced by the text `[TRUNCATED BY USAGE SHARING]` and a single space,
+   followed by the value's first 10,000 code units.
+2. After that, in each name and value, every character from U+0000 to U+001F
+   other than tab (U+0009), line feed (U+000A) and carriage return (U+000D) is
+   replaced by `\x` and the character's code as four lowercase hexadecimal
+   digits, for example `\x001f`, and the record gains
+   `<BadSchema>true</BadSchema>` after its Evidence entries.
+3. Inside CDATA, `]]>` is written as `]]]]><![CDATA[>`, which closes the
+   section after `]]` and opens another before `>`.
+4. In an attribute value, `&`, `<`, `>` and `"` are written as `&amp;`,
+   `&lt;`, `&gt;` and `&quot;`. In element text, `&`, `<` and `>` are written
+   the same way. No other character is escaped, so tab, line feed and carriage
+   return are written as they are.
+
+### Example
+
+With no session id, no client IP and these Evidence entries, in this order,
+
+- `header.User-Agent` = `Mozilla/5.0`
+- `header.X-Test` = `a]]>b`
+- `query.51D_Test` = `x`, U+0001, `y`
+
+the record is the following, shown on several lines here only for reading,
+with `...` standing for the elements from `Version` to `Platform`.
 
 ```xml
-<Device>
-  <SessionId>SESSION_ID</SessionId> 
-  <Sequence>SEQUENCE</Sequence> 
-  <DateSent>DATE_SENT</DateSent> 
-  <Version>API_VERSION</Version> 
-  <Product>API_NAME</Product>  
-  <FlowElement>ELEMENT1</FlowElement> 
-  <FlowElement>ELEMENT2</FlowElement>  
-  <Language>LANG</Language> 
-  <LanguageVersion>LANG_VERSION</LanguageVersion> 
-  <ClientIP>IP_ADDRESS</ClientIP> 
-  <ServerIP>IP_ADDRESS</ServerIP> 
-  <Platform>PLATFORM PLATFORM_VER SERVICE_PACK</Platform> 
-  <!--Each evidence value is represented as an entry in the form:--> 
-  <PREFIX [escaped=true] [truncated=true] Name="FIELD">VALUE</PREFIX> 
-  <!--For example:--> 
-  <Header Name="user-agent">USER_AGENT</Header> 
-  <Header Name="host">HOST</Header>
-  <Cookie Name="51d_screenpixelsheight">SCREEN_HEIGHT</Cookie> 
-</Device> 
+<Device><SessionId /><Sequence>0</Sequence>
+<DateSent>2026-11-02T14:05:09</DateSent><ClientIP />...
+<header Name="User-Agent"><![CDATA[Mozilla/5.0]]></header>
+<header Name="X-Test"><![CDATA[a]]]]><![CDATA[>b]]></header>
+<query Name="51D_Test"><![CDATA[x\x0001y]]></query>
+<BadSchema>true</BadSchema></Device>
 ```
-
-- **SessionId** – A GUID generated by the [Sequence Element](sequence-element.md)
-  used to identify a set of Evidence originating from the same source where
-  multiple requests are initiated to resolve the JSON payload for
-  updated Evidence, e.g. client-side overrides or geo location.
-- **Sequence** – An integer paired with the SessionId which is incremented
-  each time the sequence value is seen in Evidence to identify the number
-  of requests in a session. (This incrementing is handled by the Sequence Element)
-- **DateSent** - The date that the xml was constructed in UTC and formatted
-  as: yyyy-mm-ddThh:nn:ss
-- **Version** - The version of the Pipeline that is being used to generate
-  the xml. E.g. “4.0”
-- **Product** - The name of the product that is generating the xml. For
-  example, “Pipeline”
-- **FlowElement** – An xml element exists for each FlowElement in the
-  Pipeline. The text contains the fully qualified class name of the FlowElement.
-- **Language** - The name of the language/framework within which the
-  Pipeline is running.
-- **LanguageVersion** - The version number of the language/framework
-  within which the Pipeline is running.
-- **ClientIP** - Public IP address of the client that sent the request to
-  this server.
-- **ServerIP** - IP address of the server where the xml is being generated.
-- **Platform** - The platform name, version and service pack if available.
-- **Evidence** – The Evidence that is shared will be determined by the
-  [accepted Evidence](#accepted-evidence).
-
-Evidence values can be extremely long, or contain characters that are not
-permitted in XML. In order to handle this, some mechanism MUST be implemented
-to sanitize the values before they are added to the XML.
-
-Where changes need to be made to the value, attributes are added to the XML
-element for that Evidence entry to let the reader know the value was modified.
-
-Currently, the defined attributes are:
-
-- escaped - Indicates that the original evidence value included invalid
-  characters, which have been replaced with escaped ones.
-- truncated - Indicates that the original evidence value was too long. The
-  value in the XML does not include all characters from the original.
-
-See the [ReplacedString](https://github.com/51Degrees/pipeline-java/blob/master/pipeline.engines.fiftyone/src/main/java/fiftyone/pipeline/engines/fiftyone/flowelements/ShareUsageElement.java#L485)
-function in Java for an example of this.
 
 ### Request detail
 
-When sending the data, use the following details:
+When sending the data, use the following details.
 
-- URL configurable using the [share usage URL](#configuration-options) option.
-- POST request
-- XML content written to the body of the request using GZip compression
-- HTTP Headers:
-  - content-encoding = gzip
-  - content-type = text/xml
+- The URL is set by the [share usage URL](#configuration-options) option.
+- A POST request.
+- The whole document, compressed with GZip, as the body.
+- The HTTP headers `content-encoding: gzip` and `content-type: text/xml`.
 
-Response will be a 200 on success. Anything else is a failure.
-When failures occur, the status code and content of the response MUST be logged
+The response is a 200 on success, and anything else is a failure. When a
+failure occurs, the status code and the content of the response MUST be logged
 to aid troubleshooting.
 
-See the [BuildAndSendXml](https://github.com/51Degrees/pipeline-dotnet/blob/master/FiftyOne.Pipeline.Engines.FiftyOne/FlowElements/ShareUsageElement.cs#L104) method in C# for an example of this.
+See
+[ShareUsageElement](https://github.com/51Degrees/51degrees-dotnet/blob/main/pipeline/Engines.FiftyOne/FlowElements/ShareUsageElement.cs)
+in .NET for an example.
 
 ## Session tracking
 
