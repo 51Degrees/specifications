@@ -46,12 +46,16 @@ When serializing weighted values, they are represented like:
 
 ```js
 {
-    "WeightedPropertyName": [
-        { "RawWeighting": 32768, "Value": "value 1" },
-        { "RawWeighting": 32767, "Value": "value 2" }
+    "weightedpropertyname": [
+        { "rawweighting": 32768, "value": "value 1" },
+        { "rawweighting": 32767, "value": "value 2" }
     ]
 }
 ```
+
+The keys are lower case, as the 51Degrees implementation of the
+[JSON Builder Element](../pipeline-elements/json-builder.md) writes them, and
+Cloud Engines read weighted values from the remote server in this form.
 
 The raw weighting is stored as a 16-bit unsigned integer (aka [ushort](https://learn.microsoft.com/en-us/dotnet/api/system.uint16.maxvalue?view=netstandard-2.0)).
 
