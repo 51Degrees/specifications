@@ -31,6 +31,9 @@ some additional abilities:
 - The Engine MUST provide a mechanism to allow it to refresh
   (use an updated data source) on demand.
   - This mechanism MUST be thread safe.
+  - If the updated data source cannot be used, the refresh MUST fail with an
+    error, and the Engine MUST go on using the data source it had, so that
+    processing is unaffected.
 
 The Pipeline that contains the Aspect Engine MUST still be capable of
 processing Flow Data with minimal
@@ -292,6 +295,8 @@ in this configuration is set for memory data source operation.
 Probably can't compare dates so load whatever we have:
 
 - load buffer
+  - on fail, the Engine keeps the data it had, and the failure is logged and
+    reported as for newFileAvailable
 
 ### newFileAvailable (via remote or file watcher)
 
@@ -301,9 +306,12 @@ downloaded file is newer than the current file
 - pause file watcher, if any
 - pause update polling, if any
 - load file
-- resume polling, if any
-- resume file watcher, if any
-- trigger onUpdateCallbacks
+  - on fail, the Engine keeps the data it had. Log the failure as
+    [errors](#errors) describes, and report the failure, not success, to
+    onUpdateCallbacks
+- resume polling, if any, whether or not the file loaded
+- resume file watcher, if any, whether or not the file loaded
+- trigger onUpdateCallbacks, if the file loaded
 
 ### Programmatic update
 
@@ -403,8 +411,9 @@ relevant details (e.g. which Engine + data file the update is for)
 ### Errors
 
 There are several possible causes of errors within the data update service.
-As this is a background service, any failures will need to be
-caught and logged, rather than being lost or causing process failures.
+As this is a background service, any failure MUST be caught and logged,
+rather than being lost or ending the process. A failure MUST NOT stop later
+checks for updates, so a later good data file is still applied.
 
 These messages MUST also be consistent across languages to make life easier
 for 51Degrees support.
