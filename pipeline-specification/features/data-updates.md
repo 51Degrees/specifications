@@ -383,6 +383,12 @@ available to help diagnose issues that might arise.
 All major actions SHOULD be logged at the appropriate level along with
 relevant details (e.g. which Engine + data file the update is for)
 
+The URL a data update request is sent to carries the license keys in its
+query. Wherever a message below names the \<url\>, it is the URL with the
+license keys removed or replaced by a placeholder, because a license key MUST
+NOT appear in a log entry or an error message (see
+[logging](logging.md#license-keys)).
+
 ### Messages at start-up
 
 | **Action**                             | **Message**                  |
