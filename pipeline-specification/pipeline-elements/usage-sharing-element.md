@@ -132,7 +132,7 @@ Currently, the defined attributes are:
 - truncated - Indicates that the original evidence value was too long. The
   value in the XML does not include all characters from the original.
 
-See the [ReplacedString](https://github.com/51Degrees/pipeline-java/blob/master/pipeline.engines.fiftyone/src/main/java/fiftyone/pipeline/engines/fiftyone/flowelements/ShareUsageElement.java#L485)
+See the [ReplacedString](https://github.com/51Degrees/51degrees-java/blob/main/pipeline/pipeline.engines.fiftyone/src/main/java/fiftyone/pipeline/engines/fiftyone/flowelements/ShareUsageElement.java#L485)
 function in Java for an example of this.
 
 ### Request detail
@@ -150,7 +150,7 @@ Response will be a 200 on success. Anything else is a failure.
 When failures occur, the status code and content of the response MUST be logged
 to aid troubleshooting.
 
-See the [BuildAndSendXml](https://github.com/51Degrees/pipeline-dotnet/blob/master/FiftyOne.Pipeline.Engines.FiftyOne/FlowElements/ShareUsageElement.cs#L104) method in C# for an example of this.
+See the [BuildAndSendXml](https://github.com/51Degrees/51degrees-dotnet/blob/main/pipeline/Engines.FiftyOne/FlowElements/ShareUsageElement.cs#L117) method in C# for an example of this.
 
 ## Session tracking
 

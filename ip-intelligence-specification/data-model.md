@@ -104,10 +104,10 @@ the axiom that weightings add up to ushort.max for a component, profiles are rea
 ## Property Metadata
 
 For on-premise implementations, the metadata associated with properties is
-contained within the data file. See [ip-intelligence dotnet engine](https://github.com/51Degrees/ip-intelligence-dotnet/blob/main/FiftyOne.IpIntelligence.Engine.OnPremise/FlowElements/IpiOnPremiseEngine.cs) and [ip-intelligence cxx metadata](https://github.com/51Degrees/51degrees-cxx/blob/main/src/ipi/MetaDataIpi.hpp)
+contained within the data file. See [ip-intelligence dotnet engine](https://github.com/51Degrees/51degrees-dotnet/blob/main/ip-intelligence/Engine.OnPremise/FlowElements/IpiOnPremiseEngine.cs) and [ip-intelligence cxx metadata](https://github.com/51Degrees/51degrees-cxx/blob/main/src/ipi/MetaDataIpi.hpp)
 
 For cloud implementations, the metadata associated with properties is
-fetched from the cloud service. See [CloudAspectEngineBase](https://github.com/51Degrees/pipeline-dotnet/blob/main/FiftyOne.Pipeline.CloudRequestEngine/FlowElements/CloudAspectEngineBase.cs).
+fetched from the cloud service. See [CloudAspectEngineBase](https://github.com/51Degrees/51degrees-dotnet/blob/main/pipeline/CloudRequestEngine/FlowElements/CloudAspectEngineBase.cs).
 
 ### Component Types
 
@@ -118,5 +118,7 @@ This does not mean that the properties are not exposed in the same way.
 
 The results contained in the combined result consists of the following 2 types:
 
-- [Network](https://github.com/51Degrees/common-metadata/tree/main/Properties/Network)
-- [Location](https://github.com/51Degrees/common-metadata/tree/main/Properties/Location)
+- Network
+- Location
+
+The properties of each are listed in the [property dictionary](https://51degrees.com/developers/property-dictionary?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=ip-intelligence-specification-data-model.md&utm_term=property-dictionary).

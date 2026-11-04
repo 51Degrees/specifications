@@ -65,9 +65,9 @@ to the current working directory when the example is executed - especially
 when executed as an automated test as opposed to being run from an IDE.
 
 In the Java reference implementation the
-[FileFinder utility](https://github.com/51Degrees/pipeline-java/blob/master/pipeline.core/src/main/java/fiftyone/pipeline/util/FileFinder.java)
+[FileFinder utility](https://github.com/51Degrees/51degrees-java/blob/main/pipeline/pipeline.core/src/main/java/fiftyone/pipeline/util/FileFinder.java)
 is used to locate the file. .NET uses
-[extension methods](https://github.com/51Degrees/device-detection-dotnet-examples/blob/main/Examples/ExampleBase/ExampleUtils.cs)
+[extension methods](https://github.com/51Degrees/51degrees-dotnet/blob/main/examples/device-detection/ExampleBase/ExampleUtils.cs)
 to provide the same functionality.
 
 ### Test Data
@@ -132,8 +132,8 @@ from a configuration file. In XML or JSON, this configuration file can be used
 to add, as a comment, a listing of all the possible options for the Pipeline
 and all Engines. This information is also available in sample files:
 
-[.NET](https://github.com/51Degrees/device-detection-dotnet-examples/blob/main/Examples/sample-configuration.json)
-[Java](https://github.com/51Degrees/device-detection-java-examples/blob/master/console/src/main/resources/gettingStartedOnPrem.xml)
+[.NET](https://github.com/51Degrees/51degrees-dotnet/blob/main/examples/device-detection/sample-configuration.json)
+[Java](https://github.com/51Degrees/51degrees-java/blob/main/examples/device-detection/console/src/main/resources/gettingStartedOnPrem.xml)
 
 ### Pipeline and Flow Data Lifecycle
 
