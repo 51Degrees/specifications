@@ -130,7 +130,9 @@ row as the reference implementation names them.
 Lists in a message are joined with a comma and no space, for example
 `Premium,Enterprise`. The messages are those the reference implementation
 gives. An implementation SHOULD give the same text, and MAY add to each link
-the campaign parameters its own repository requires.
+the campaign parameters its own repository requires. The type name in the
+first row is each implementation's own name for the Engine, so it differs
+between languages, and a comparison of messages across languages ignores it.
 
 ### Deciding the reason
 
@@ -156,10 +158,10 @@ does, in this order, using the first that applies.
    2. The Engine is a Cloud Engine that has loaded its Property metadata. It
       gives `ProductNotAccessibleWithResourceKey` when the metadata lists no
       Properties, and `PropertyNotAccessibleWithResourceKey` otherwise.
-   3. The Engine's Element Data has a typed accessor for a Property of the
-      requested name, compared ignoring case. It gives
-      `DataFileUpgradeRequired`, with `Unknown` as the data tiers when the
-      metadata does not list the Property.
+   3. The Engine's metadata does not list the Property, and the Engine's
+      Element Data has a typed accessor for a Property of the requested name,
+      compared ignoring case. It gives `DataFileUpgradeRequired`, with
+      `Unknown` as the data tiers.
    4. Otherwise the reason is `Unknown`.
 
 The reference implementation is
