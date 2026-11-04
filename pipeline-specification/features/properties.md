@@ -115,11 +115,55 @@ When the user attempts to access a Property that is defined for an Engine, but
 does not exist in the result set for some reason, the system MUST throw an
 error/exception with a message explaining why the Property is not available.
 
-This could be any of the following reasons:
+This could be any of the following reasons, named in the second line of each
+row as the reference implementation names them.
 
-| Reason                                  | Notes           | Message                                                                                                                                                                                                                                                                                                              | Parameters                                                                                             |
-|-----------------------------------------|-----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
-| Not available in the current data file  | On-premise only | Property '{0}' not found in data for element '{1}'. This is because your license and/or data file does not include this Property. The Property is available with the {2} license/data.                                                                                                                               | 0. Property name<br/>1. element name<br/>2. comma-separated list of data file/license types            |
-| Property excluded in configuration      | On-premise only | Property '{0}' not found in data for element '{1}'. This is because the Property has been excluded when configuring the Engine.                                                                                                                                                                                      | 0. Property name<br/>1. element name                                                                   |
-| Product not included with Resource Key  | Cloud only      | Property '{0}' not found in data for element '{1}'. This is because your Resource Key does not include access to any Properties under '{2}'. For more details on Resource Keys, see our explainer: https://51degrees.com/documentation/_info__resource_keys.html                                                   | 0. Property name<br/>1. element name<br/>2. product name                                               |
-| Property not included with Resource Key | Cloud only      | Property '{0}' not found in data for element '{1}'. This is because your Resource Key does not include access to this Property. Properties that are included for this key under '{2}' are {3}. For more details on Resource Keys, see our explainer: https://51degrees.com/documentation/_info__resource_keys.html | 0. Property name<br/>1. element name<br/>2. product name<br/>3. comma-separated list of Property names |
+| **Reason**                                                                         | **Message**                                                                                                                                                                                                                                                                | **Parameters**                                                                                                                                                                                              |
+|------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Not available in the current data file<br/>`DataFileUpgradeRequired`               | Property '{0}' not found in data for element '{1}'. This is because your license or data file does not include this property. It is available with the {2} license/data for the {3}. To upgrade, see https://51degrees.com/pricing.                                        | 0. Property name<br/>1. Data Key of the Engine<br/>2. data tiers where the Property is present, from its metadata, or `Unknown` when the metadata does not list the Property<br/>3. type name of the Engine |
+| Property excluded in configuration<br/>`PropertyExcludedFromEngineConfiguration`   | Property '{0}' not found in data for element '{1}'. This is because the property has been excluded when configuring the engine.                                                                                                                                            | 0. Property name<br/>1. Data Key of the Engine                                                                                                                                                              |
+| Product not included with Resource Key<br/>`ProductNotAccessibleWithResourceKey`   | Property '{0}' not found in data for element '{1}'. This is because your resource key does not include access to any properties under '{1}'. Check or create a resource key with the properties you need in the configurator at https://configure.51degrees.com.           | 0. Property name<br/>1. Data Key of the Engine                                                                                                                                                              |
+| Property not included with Resource Key<br/>`PropertyNotAccessibleWithResourceKey` | Property '{0}' not found in data for element '{1}'. This is because your resource key does not include access to this property. The properties included for your key under '{1}' are {2}. Check or change your key in the configurator at https://configure.51degrees.com. | 0. Property name<br/>1. Data Key of the Engine<br/>2. names of the Properties in the Engine's metadata                                                                                                      |
+| Request to the remote server failed<br/>`CloudRequestFailed`                       | Property '{0}' not found in data for element '{1}'. This is because an upstream cloud request failed, so no data was available to populate the property.                                                                                                                   | 0. Property name<br/>1. Data Key of the first Engine, or `Unknown` when there is none                                                                                                                       |
+| Unknown<br/>`Unknown`                                                              | Property '{0}' not found in data for element '{1}'. The reason for this is unknown. Please check that the aspect and property name are correct.                                                                                                                            | 0. Property name<br/>1. Data Key of the Engine                                                                                                                                                              |
+
+Lists in a message are joined with a comma and no space, for example
+`Premium,Enterprise`. The messages are those the reference implementation
+gives. An implementation SHOULD give the same text, and MAY add to each link
+the campaign parameters its own repository requires.
+
+### Deciding the reason
+
+An implementation SHOULD decide the reason as the reference implementation
+does, in this order, using the first that applies.
+
+1. When a Cloud Aspect Engine populated the Element Data, and the Cloud
+   Request Engine has no response for this Flow Data because its request to
+   the remote server failed, the reason is `CloudRequestFailed`. The message
+   names the Data Key of the first Engine that populates the Element Data, or
+   `Unknown` when there is none.
+2. Otherwise each Engine that populates the Element Data is checked in turn,
+   as step 3 describes. The first Engine to give a reason other than
+   `Unknown` decides the reason and the message. When every Engine gives
+   `Unknown`, the message names the last Engine checked.
+3. For one Engine, the reason is the first of these that applies.
+   1. The Engine has loaded its Property metadata, and the metadata lists a
+      Property whose name is exactly the requested name, including case. An
+      On-premise Engine whose data file tier is not among the Property's data
+      tiers where present gives `DataFileUpgradeRequired`. Otherwise a
+      Property that is not available gives
+      `PropertyExcludedFromEngineConfiguration`.
+   2. The Engine is a Cloud Engine that has loaded its Property metadata. It
+      gives `ProductNotAccessibleWithResourceKey` when the metadata lists no
+      Properties, and `PropertyNotAccessibleWithResourceKey` otherwise.
+   3. The Engine's Element Data has a typed accessor for a Property of the
+      requested name, compared ignoring case. It gives
+      `DataFileUpgradeRequired`, with `Unknown` as the data tiers when the
+      metadata does not list the Property.
+   4. Otherwise the reason is `Unknown`.
+
+The reference implementation is
+[`MissingPropertyService`](https://github.com/51Degrees/51degrees-dotnet/blob/main/pipeline/Engines/Services/MissingPropertyService.cs)
+and, for Cloud Engines,
+[`MissingPropertyServiceCloud`](https://github.com/51Degrees/51degrees-dotnet/blob/main/pipeline/CloudRequestEngine/Services/MissingPropertyServiceCloud.cs),
+with the text in [`Messages.resx`](https://github.com/51Degrees/51degrees-dotnet/blob/main/pipeline/Engines/Messages.resx).
