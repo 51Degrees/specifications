@@ -62,12 +62,14 @@ first be determined:
    script always parses. A session id is written into the script inside
    quotes, so a session id that does not match `^[A-Za-z0-9-]{1,64}$` MUST
    be rendered as an empty string.
-6. If protocol, host and endpoint are all set, then generate a URL in the
-   following format: `[protocol]://[host][endpoint]`, with exactly one `/`
-   between the host and the endpoint. The protocol and host can come from
-   Evidence, and the template writes the URL inside a single-quoted
-   JavaScript string, so the URL MUST be checked and encoded as described
-   under [Callback URL](#callback-url) before it is passed to the template.
+6. If protocol, host and endpoint are all set, meaning none of them is empty
+   or only whitespace, then generate a URL in the following format:
+   `[protocol]://[host][endpoint]`, adding a `/` between the host and the
+   endpoint when neither has one and removing one when both do. The protocol
+   and host can come from Evidence, and the template writes the URL inside a
+   single-quoted JavaScript string, so the URL MUST be checked and encoded as
+   described under [Callback URL](#callback-url) before it is passed to the
+   template.
 7. The JavaScript might need to make call backs to the server. A list of any
    query parameters that will be included in those calls needs to be created.
    This can be done by looking at the query entries in the existing Evidence:
@@ -175,10 +177,15 @@ rules before it is passed to the template.
      ([RFC 3986 section 2.3](https://www.rfc-editor.org/rfc/rfc3986#section-2.3)).
      Nothing but a port may follow the closing bracket.
    - A name made of labels separated by `.`, optionally ending in `.`, where
-     every label holds at least one character and only letters, digits, `-`
-     and `_`. Letters and digits outside ASCII are allowed, and every other
-     character outside ASCII is not. An IPv4 address in dotted decimal meets
-     this rule.
+     every label holds at least one character and only ASCII letters, digits,
+     `-` and `_`. An IPv4 address in dotted decimal meets this rule. A host
+     holding any character outside ASCII fails, because the Host header's
+     syntax allows only ASCII
+     ([RFC 9110 section 7.2](https://www.rfc-editor.org/rfc/rfc9110#section-7.2),
+     [RFC 3986 section 3.2.2](https://www.rfc-editor.org/rfc/rfc3986#section-3.2.2))
+     and RFC 3986 asks for an internationalized name in its IDNA form. A
+     configured internationalized host MUST therefore be given as A-labels
+     ([RFC 5890 section 2.3.2.1](https://www.rfc-editor.org/rfc/rfc5890#section-2.3.2.1)).
 5. A port, where present, is `:` followed by nothing or by digits whose value
    is no more than 65535.
 6. A URL that fails any of rules 1 to 5 MUST NOT be passed to the template,
