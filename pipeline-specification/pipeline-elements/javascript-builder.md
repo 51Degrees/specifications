@@ -63,8 +63,11 @@ first be determined:
    quotes, so a session id that does not match `^[A-Za-z0-9-]{1,64}$` MUST
    be rendered as an empty string.
 6. If protocol, host and endpoint are all set, then generate a URL in the
-   following format: `[protocol]://[host][endpoint]`. Ensure that values
-   with/without leading/trailing slashes are handled correctly.
+   following format: `[protocol]://[host][endpoint]`, with exactly one `/`
+   between the host and the endpoint. The protocol and host can come from
+   Evidence, and the template writes the URL inside a single-quoted
+   JavaScript string, so the URL MUST be checked and encoded as described
+   under [Callback URL](#callback-url) before it is passed to the template.
 7. The JavaScript might need to make call backs to the server. A list of any
    query parameters that will be included in those calls needs to be created.
    This can be done by looking at the query entries in the existing Evidence:
@@ -146,6 +149,51 @@ the following:
 Where no name is configured, the name is `fod`. A configured name that is
 not valid, including an empty one, MUST be refused when the element is
 built, using the language's usual configuration error.
+
+## Callback URL
+
+The protocol and host of the callback URL come from the `header.protocol`
+and `header.host` Evidence values unless they are configured, so whoever
+makes the request supplies them. The URL MUST therefore meet the following
+rules before it is passed to the template.
+
+1. The protocol MUST be a scheme as
+   [RFC 3986 section 3.1](https://www.rfc-editor.org/rfc/rfc3986#section-3.1)
+   defines one, being a letter followed by any number of letters, digits,
+   `+`, `-` and `.`.
+2. The authority is the host value up to its first `/`, `?` or `#`. Anything
+   after that point is written after the authority and before the endpoint,
+   encoded as rule 8 says.
+3. The authority MAY start with user information, which ends at the first
+   `@`. What follows the first `@` is the host and an optional port, so a
+   second `@` fails rule 4.
+4. The host MUST be one of the following.
+   - An IPv6 address in square brackets, as
+     [RFC 3986 section 3.2.2](https://www.rfc-editor.org/rfc/rfc3986#section-3.2.2)
+     defines one, optionally followed inside the brackets by `%25` and a zone
+     identifier of one or more unreserved characters
+     ([RFC 3986 section 2.3](https://www.rfc-editor.org/rfc/rfc3986#section-2.3)).
+     Nothing but a port may follow the closing bracket.
+   - A name made of labels separated by `.`, optionally ending in `.`, where
+     every label holds at least one character and only letters, digits, `-`
+     and `_`. Letters and digits outside ASCII are allowed, and every other
+     character outside ASCII is not. An IPv4 address in dotted decimal meets
+     this rule.
+5. A port, where present, is `:` followed by nothing or by digits whose value
+   is no more than 65535.
+6. A URL that fails any of rules 1 to 5 MUST NOT be passed to the template,
+   so the script is produced without callback functionality. An error SHOULD
+   be logged the first time, written so that the URL cannot start a new log
+   line.
+7. ASCII letters in the protocol and the host MUST be written in lower case.
+8. In the user information, in anything after the authority, and in the
+   endpoint, every byte of the UTF-8 encoding that is a control character,
+   is outside ASCII, is a space, or is one of `"`, `'`, `<`, `>`, `\`, `^`,
+   `` ` ``, `{`, `|` and `}` MUST be percent-encoded, as MUST a `%` that is
+   not followed by two hexadecimal digits.
+
+These rules accept fewer hosts than RFC 3986 does, because the host is
+written into a script rather than sent in an HTTP request.
 
 ## More than one script on a page
 
