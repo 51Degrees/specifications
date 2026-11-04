@@ -159,10 +159,13 @@ and `header.host` Evidence values unless they are configured, so whoever
 makes the request supplies them. The URL MUST therefore meet the following
 rules before it is passed to the template.
 
-1. The protocol MUST be a scheme as
-   [RFC 3986 section 3.1](https://www.rfc-editor.org/rfc/rfc3986#section-3.1)
-   defines one, being a letter followed by any number of letters, digits,
-   `+`, `-` and `.`.
+1. The protocol MUST be `http` or `https`, compared ignoring case. The script
+   uses the URL only with `fetch` and `XMLHttpRequest`, and the Fetch
+   Standard's [scheme fetch](https://fetch.spec.whatwg.org/#scheme-fetch)
+   gives a network error for every scheme but `about`, `blob`, `data`,
+   `file`, `http` and `https`, of which only `http` and `https` can reach a
+   server. A configured protocol that is neither MUST be refused when the
+   element is built, using the language's usual configuration error.
 2. The authority is the host value up to its first `/`, `?` or `#`. Anything
    after that point is written after the authority and before the endpoint,
    encoded as rule 8 says.
