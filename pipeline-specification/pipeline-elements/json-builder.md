@@ -59,9 +59,13 @@ These are:
 - [Set Headers Element](set-headers-element.md)
 - [Cloud Request Engine](cloud-request-engine.md)
 - [Usage sharing element](usage-sharing-element.md)
+- The JSON Builder Element itself, whose Element Data the reference
+  implementations add to the Flow Data before they build the JSON.
 
 The reference implementations achieve this with a hard-coded exclusion list which
-contains the Data Key of the elements to exclude.
+contains the Data Key of the elements to exclude, being `set-headers`,
+`cloud-response` and `json-builder`. The usage sharing element adds no Element
+Data to the Flow Data, so it needs no entry in that list.
 
 The following top-level entries might also be populated in the
 final JSON output:
