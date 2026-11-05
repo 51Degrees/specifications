@@ -218,9 +218,15 @@ load balancer. A hash that is keyed afresh in each process, such as .NET's
 revalidation never matches and it gets the full response every time.
 
 A response to a request whose processing recorded errors is the one exception
-to the table above. It MUST carry `Cache-Control: no-cache` and MUST NOT carry
-an ETag. A browser may keep a `no-cache` response as long as it asks the server
-before using it again, and it asks with the ETag it kept. With no ETag it has
+to the table above. It MUST carry `Cache-Control: private, no-cache` and MUST
+NOT carry an ETag. `private` keeps the response out of shared caches, as the
+table's value does for every other response, because a shared cache may
+otherwise store a response made for one visitor
+([RFC 9111 section 5.2.2.7](https://www.rfc-editor.org/rfc/rfc9111#section-5.2.2.7),
+[section 3](https://www.rfc-editor.org/rfc/rfc9111#section-3)). A browser may
+keep a `no-cache` response as long as it asks the server before using it again
+([section 5.2.2.4](https://www.rfc-editor.org/rfc/rfc9111#section-5.2.2.4)),
+and it asks with the ETag it kept. With no ETag it has
 nothing to revalidate with, so its next request gets a full response, built
 once processing works again, rather than a 304 that keeps the faulty one. A
 request whose 'If-None-Match' header matches still gets its 304 while
