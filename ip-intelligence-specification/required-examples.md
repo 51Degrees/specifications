@@ -77,12 +77,16 @@ IP Intelligence uses `.ipi` data files. The free ones are linked from the
 
 Examples follow the device detection rules for
 [on-premise examples](../device-detection-specification/required-examples.md#on-premise-device-detection).
-Given no arguments or settings, an example uses the Lite data file, or the Asn
-data file where its subject is the network, and downloads it when it is
-missing. It asks for Properties only the Enterprise data file holds, such as
-`Latitude`, `Longitude` and `Areas`, says of each one the data file in use
-cannot give that it needs the Enterprise data file, and once gives a link to
-the contact page to ask for a copy.
+Given no arguments or settings, an example that shows location or
+registration Properties uses the Lite data file, and so does one whose purpose
+needs the Enterprise data file, such as a compare, metrics or country overlap
+example. A performance, reload or update example, whose Properties do not
+matter to what it shows, uses the Asn data file, which is far smaller to
+download. An example downloads its file when it is missing. It asks for
+Properties only the Enterprise data file holds, such as `Latitude`,
+`Longitude` and `Areas`, says of each one the data file in use cannot give
+that it needs the Enterprise data file, and once gives a link to the contact
+page to ask for a copy.
 
 ### Test Data
 
