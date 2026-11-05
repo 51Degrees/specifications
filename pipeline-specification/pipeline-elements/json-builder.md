@@ -13,9 +13,9 @@ the JavaScript builder element.
 ## Accepted Evidence
 
 This Element accepts no Evidence, so its Evidence key filter is empty. Its
-inputs are the current set of Element Data instances in the Flow Data and the
-sequence number that the [Sequence Element](sequence-element.md) writes back to
-the Evidence (see [Sequence number](#sequence-number)).
+inputs are the current set of Element Data instances in the Flow Data, and the
+sequence number produced by the [Sequence Element](sequence-element.md) (see
+[Sequence number](#sequence-number)).
 
 ## Start-up activity
 
@@ -82,22 +82,30 @@ final JSON output:
 
 ### Sequence number
 
-The Element reads the sequence number from the `query.sequence` Evidence value
-as an integer. This is the value that the [Sequence Element](sequence-element.md)
-writes back to the Evidence, so a Pipeline that includes the JSON Builder
-Element needs a Sequence Element before it. Where the
+The Element uses the sequence number produced by the
+[Sequence Element](sequence-element.md), which is the `sequence` value in that
+Element's Element Data. A Pipeline that includes the JSON Builder Element
+therefore needs a Sequence Element before it. Where the
 [web integration](../features/web-integration.md#pipeline-configuration) creates
 the Pipeline, it adds both.
 
-If the Evidence holds no integer value for `query.sequence` when the Element
-runs, the Element MUST fail with an error and MUST NOT set its JSON value. The
-error SHOULD say that a Sequence Element needs to be placed before the JSON
-Builder Element in the Pipeline. The Pipeline handles the error as described in
+The .NET and Java implementations read the sequence number from the
+`query.sequence` Evidence instead, where their Sequence Elements write it back
+as an integer (see [Sequence Element](sequence-element.md#process)).
+
+If no Sequence Element has produced a sequence number when the Element runs,
+the Element MUST fail with an error and MUST NOT set its JSON value. The error
+SHOULD say that a Sequence Element needs to be placed before the JSON Builder
+Element in the Pipeline. The Pipeline handles the error as described in
 [exception handling](../features/exception-handling.md#process-function).
 
-The value is missing when no Sequence Element ran before the JSON Builder
-Element. It is also missing when `query.sequence` holds the string taken from a
-query string, because no Sequence Element converted it to an integer.
+A `query.sequence` value taken from a query string is the Sequence Element's
+input rather than a sequence number it has produced, so it does not count as
+one. Where Evidence holds typed values, as it does in the .NET and Java
+implementations, the Element MAY accept an integer that a caller added to
+`query.sequence` without a Sequence Element, as those implementations do.
+Where Evidence holds only text, a value that a caller added cannot be told
+apart from one taken from a query string, so the Element MUST NOT accept it.
 
 ### Examples
 
