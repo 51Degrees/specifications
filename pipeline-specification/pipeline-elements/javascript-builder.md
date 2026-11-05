@@ -159,8 +159,9 @@ and `header.host` Evidence values unless they are configured, so whoever
 makes the request supplies them. The URL MUST therefore meet the following
 rules before it is passed to the template.
 
-1. The protocol MUST be `http` or `https`, compared ignoring case. The script
-   uses the URL only with `fetch` and `XMLHttpRequest`, and the Fetch
+1. The protocol MUST be `http` or `https`, compared ignoring ASCII case
+   only, so that a letter outside ASCII never matches one inside it. The
+   script uses the URL only with `fetch` and `XMLHttpRequest`, and the Fetch
    Standard's [scheme fetch](https://fetch.spec.whatwg.org/#scheme-fetch)
    gives a network error for every scheme but `about`, `blob`, `data`,
    `file`, `http` and `https`, of which only `http` and `https` can reach a
