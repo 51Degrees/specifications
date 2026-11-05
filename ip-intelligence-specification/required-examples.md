@@ -52,24 +52,43 @@ Additional properties may include: `Address`, `County`, `Suburb`, `ZipCode`
 
 ### Available Implementations
 
-Examples MUST be implemented for these available language implementations:
+Examples MUST be implemented in every implementation of IP Intelligence, each
+in its own repository:
 
-- **C/C++** - On-premise via 51degrees-cxx
-- **.NET (C#)** - On-premise and Cloud via ip-intelligence-dotnet  
-- **Go** - On-premise via ip-intelligence-go
-
-**Note**: Node.js, Python, Java, and PHP implementations do not currently exist for IP Intelligence.
+- **C/C++** - [51degrees-cxx](https://github.com/51Degrees/51degrees-cxx)
+- **.NET (C#)** - [51degrees-dotnet](https://github.com/51Degrees/51degrees-dotnet)
+- **Go** - [51degrees-go](https://github.com/51Degrees/51degrees-go)
+- **Java** - [51degrees-java](https://github.com/51Degrees/51degrees-java)
+- **Node.js** - [51degrees-node](https://github.com/51Degrees/51degrees-node)
+- **PHP** - [51degrees-php](https://github.com/51Degrees/51degrees-php)
+- **Python** - [51degrees-python](https://github.com/51Degrees/51degrees-python)
+- **Rust** - [51degrees-rust](https://github.com/51Degrees/51degrees-rust)
+- **nginx and Varnish modules** - [51degrees-nginx](https://github.com/51Degrees/51degrees-nginx) and [51degrees-varnish](https://github.com/51Degrees/51degrees-varnish)
 
 ### Data Files
 
-IP Intelligence uses `.ipi` data files:
-- **Lite data file**: `51Degrees-LiteV41.ipi` (free, available from GitHub)
-- **Enterprise data file**: Contact 51Degrees sales team for access (Distributor not yet available for IP Intelligence)
+IP Intelligence uses `.ipi` data files. The free ones are linked from the
+`ip-intelligence` folder of the [data repository](https://github.com/51Degrees/data):
+- **Lite data file**: `51Degrees-LiteV41.ipi`, giving `RegisteredCountry`,
+  `RegisteredName` and `RegisteredOwner`
+- **Asn data file**: `51Degrees-IPIV4AsnIpiV41.ipi`, giving `Asn` and `AsnName`
+- **Enterprise data file**: every other Property, from the
+  [51Degrees contact page](https://51degrees.com/contact-us?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=ip-intelligence-specification-required-examples.md&utm_term=data-files)
+
+Examples follow the device detection rules for
+[on-premise examples](../device-detection-specification/required-examples.md#on-premise-device-detection).
+Given no arguments or settings, an example uses the Lite data file, or the Asn
+data file where its subject is the network, and downloads it when it is
+missing. It asks for Properties only the Enterprise data file holds, such as
+`Latitude`, `Longitude` and `Areas`, says of each one the data file in use
+cannot give that it needs the Enterprise data file, and once gives a link to
+the contact page to ask for a copy.
 
 ### Test Data
 
 Examples use IP address evidence files:
-- **evidence.yml** - YAML formatted file containing test IP addresses
+- **evidence.yml** - YAML formatted file containing 20,000 random IPv4 and IPv6
+  addresses, in the `ip-intelligence` folder of the data repository
 - Format example:
   ```yaml
   - server.client-ip: "203.0.113.1"
