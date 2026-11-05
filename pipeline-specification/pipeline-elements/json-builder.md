@@ -12,8 +12,10 @@ the JavaScript builder element.
 
 ## Accepted Evidence
 
-This Element uses no Evidence, its only input is the current set of
-Element Data instances in the Flow Data.
+This Element accepts no Evidence, so its Evidence key filter is empty. Its
+inputs are the current set of Element Data instances in the Flow Data and the
+sequence number that the [Sequence Element](sequence-element.md) writes back to
+the Evidence (see [Sequence number](#sequence-number)).
 
 ## Start-up activity
 
@@ -77,6 +79,25 @@ final JSON output:
     present.
 - Add any errors from the Flow Data errors collection to the result. This is structured
   as a string array of the error messages under the top-level key `errors`.
+
+### Sequence number
+
+The Element reads the sequence number from the `query.sequence` Evidence value
+as an integer. This is the value that the [Sequence Element](sequence-element.md)
+writes back to the Evidence, so a Pipeline that includes the JSON Builder
+Element needs a Sequence Element before it. Where the
+[web integration](../features/web-integration.md#pipeline-configuration) creates
+the Pipeline, it adds both.
+
+If the Evidence holds no integer value for `query.sequence` when the Element
+runs, the Element MUST fail with an error and MUST NOT set its JSON value. The
+error SHOULD say that a Sequence Element needs to be placed before the JSON
+Builder Element in the Pipeline. The Pipeline handles the error as described in
+[exception handling](../features/exception-handling.md#process-function).
+
+The value is missing when no Sequence Element ran before the JSON Builder
+Element. It is also missing when `query.sequence` holds the string taken from a
+query string, because no Sequence Element converted it to an integer.
 
 ### Examples
 
