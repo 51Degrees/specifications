@@ -80,6 +80,7 @@ The engine only uses evidence for language selection.
 Accepted evidence keys (in order of precidence):
 
 - `query.translation`
+- `query.accept-language`
 - `header.accept-language`
 
 The evidence value itself can be provided in 3 ways:
