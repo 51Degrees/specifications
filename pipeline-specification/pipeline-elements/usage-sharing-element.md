@@ -8,12 +8,34 @@ feature.
 The accepted Evidence for share usage is unusual as it cannot simply be a
 list of accepted keys like most Flow Elements.
 
-Instead, it is a filter function that will need to return false (i.e. not shared)
-for any key where:
+Instead, it is a filter function. The prefix of a key is everything before
+its first `.` and the field is everything after it, so a field can itself
+contain a `.`. Keys are compared without regard to case.
 
-- Prefix = `header.` and field is in a user-configurable block list
-  (by default, this block list SHOULD include the `cookies` HTTP header).
+The filter function MUST return false (i.e. not shared) for these keys,
+matched as the whole key or after a `.`, whatever the configuration and even
+when all Evidence is shared:
+
+- `id.email`, which is a raw email address.
+- `id.salt`, which is the salt used to make hashed email identifiers.
+- `request-query`, which is the whole query string. Sharing it would undo the
+  rules for query string parameters below.
+- `request-path`, which is the path of the request. Sharing it makes each page
+  a visitor opens look like a new session to the
+  [session tracking](#session-tracking), and the path is the part of a URL most
+  likely to carry a name or an identifier a site has put in it.
+
+So `query.id.email` and `server.request-path` are never shared, while
+`query.valid.email` is an ordinary query string parameter.
+
+Unless all Evidence is shared, it MUST also return false for any key where:
+
+- Prefix = `header.` and field is `cookie`, the HTTP header that carries every
+  cookie ([RFC 6265 section 5.4](https://www.rfc-editor.org/rfc/rfc6265#section-5.4)).
+  The cookies starting `51D_` are shared as their own `cookie.` Evidence.
+- Prefix = `header.` and field is in a user-configurable block list.
 - Prefix = `cookie.` and field does not start with `51D_`
+- Prefix = `session.` and field does not start with `51D_`
 - Prefix = `query.` and field does not start with `51D_` and is not in a
   user-configurable allow list of query string parameters that will be
   shared.
@@ -216,8 +238,8 @@ it will need to handle cleanup a little more carefully than other elements.
 |-----------------------------------|-----------------------|--------------|------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------|
 | Included query string parameters  | yes                   | yes          | All query string and HTTP form parameters starting with `51D_` are shared.   | Allows the user to include specific query string or HTTP form parameters in the usage data that is shared.                   |
 | Share all query string parameters | yes                   | yes          | false                                                                        | If this flag is set, all query string and HTTP form parameters will be shared.                                               |
-| Share all Evidence                | yes                   | yes          | false                                                                        | If this flag is set, all Evidence values will be shared.                                                                     |
-| Blocked HTTP headers              | yes                   | yes          | All HTTP headers are shared except for cookies that do not start with `51D_` | Allows the user to exclude specific HTTP headers that they do not want to share.                                             |
+| Share all Evidence                | yes                   | yes          | false                                                                        | If this flag is set, all Evidence values will be shared, apart from the keys that are never shared.                          |
+| Blocked HTTP headers              | yes                   | yes          | All HTTP headers are shared except `Cookie`                                  | Allows the user to exclude specific HTTP headers that they do not want to share.                                             |
 | Ignore Flow Data Evidence filter  | yes                   | yes          | not set                                                                      | Allows the user to block a request from being shared if the specified criteria are met.                                      |
 | Share percentage                  | yes                   | yes          | 1.0                                                                          | Used to set the approximate proportion of requests that will be shared. A value of 1 means that 100% of requests are shared. |
 | Minimum entries per message       | yes                   | yes          | 50                                                                           | The number of requests that will be added to a usage sharing payload before it is sent.                                      |
