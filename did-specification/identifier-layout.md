@@ -99,6 +99,36 @@ envelopes differ, so it is the value to use as a cache or de-duplication key,
 and the value to compare when asking whether two identifiers stand for the
 same thing.
 
+#### Hashed Email match key
+
+The Match Key of a Hashed Email identifier is the SHA-256 of these bytes, in
+order:
+
+1. The length of the salt in bytes, as one byte.
+2. The salt.
+3. The address part of the email, lowercased, as UTF-8.
+
+The length byte comes first so that no two pairs of email and salt give the
+same bytes to hash, as they could if the salt were simply followed by the
+email. The salt is at most 64 bytes, so its length always fits the one byte.
+
+The address part is the `addr-spec` of the email read as a `mailbox` under
+[RFC 5322 section 3.4](https://www.rfc-editor.org/rfc/rfc5322#section-3.4),
+being `local-part "@" domain`. A display name, the angle brackets around the
+address and any comments are not part of it, so `Tom <User@Example.COM>` and
+`user@example.com` give the same Match Key. Whitespace around the email is
+ignored. The issuer MUST accept every `mailbox`, MAY accept other forms from
+which it can read one address part, and MUST NOT create a Hashed Email
+identifier from an email in which it cannot find one.
+
+Lowercasing uses the simple case mappings of the Unicode Character Database,
+which map each character to exactly one character.
+
+For example, the salt `36 9C` and the email `Tom <User@Example.COM>` give the
+bytes `02 36 9C` followed by the UTF-8 of `user@example.com`, and the Match
+Key
+`747e0f5f09ae03849ce0fc00c0579a2c8bf0b1a3146ca2e8f47c6b6e12e35287`.
+
 ## Flags byte
 
 | **Bits** | **Field**         | **Meaning**                                                                          |
