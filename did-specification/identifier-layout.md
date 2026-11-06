@@ -64,12 +64,14 @@ it would read bytes other than the ones issued.
 A text MUST use one alphabet. The two differ only in the characters for the
 values 62 and 63, being `+` and `/` in the standard alphabet and `-` and `_` in the
 URL-safe one, so a package MUST refuse a text holding a character from each
-pair, such as both `+` and `-`.
+pair, such as both `+` and `-`. Base64 libraries write one alphabet or the
+other and never a mix, and most of their decoders refuse a mixed text, so a
+mixed text is a sign of damage, for example a value converted only in part.
+A package that reads `-` as `+` and `_` as `/` before decoding MUST make this
+check first, because that mapping hides the mix.
 [RFC 4648 section 5](https://www.rfc-editor.org/rfc/rfc4648#section-5) says
-the URL-safe encoding "should not be regarded as the same as the "base64"
-encoding", so a text mixing them is in neither alphabet. The issuer and a
-page each write one alphabet, so a mixed text is a sign of damage, for
-example a value converted only in part.
+the same, that the URL-safe encoding "should not be regarded as the same as
+the "base64" encoding".
 
 ## Payload
 
