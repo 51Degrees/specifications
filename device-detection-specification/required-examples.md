@@ -17,6 +17,11 @@ it is often difficult to carry out verification of the results produced by the
 example, and it is likely to be sufficient for a test to show that the example
 runs and completes without failure.
 
+Those tests MUST include a run of each example with no arguments or settings,
+as someone would run it from a fresh clone, so that the run uses the free data
+files. A run that is given a paid data file does not show that the example
+works out of the box.
+
 The need for examples to be runnable as an application and as a test suggests
 that they are written with example code to be executed as a public method, and
 a common pattern is established across examples.
@@ -73,22 +78,43 @@ to provide the same functionality.
 ### Test Data
 
 Many examples require test data consisting of HTTP Header Evidence - User Agent
-and UserAgent Client Hints. A YAML file containing 20,000 sets of such Evidence
-is distributed as one of the Git submodules referenced from on-premise Hash
-detection. It is also available in a repository in
-[GitHub](https://github.com/51Degrees/device-detection-data)
-where it is updated on a monthly basis.
+and UserAgent Client Hints. A YAML file containing 20,000 sets of such Evidence,
+`20000 Evidence Records.yml`, is linked from the `device-detection` folder of
+the [data repository](https://github.com/51Degrees/data), which each language
+repository holds as a submodule, and the data repository's `get-data-files`
+scripts download it.
 
 See [File References](#file-references) for a discussion of locating files.
 
 ### On-Premise Device Detection
 
-Reference implementation examples illustrate use of the Lite Data File that is
-distributed as one of the Git submodules referenced from on-premise Hash detection.
-It is also updated in [GitHub](https://github.com/51Degrees/device-detection-data)
-on a monthly basis.
+Examples MUST run out of the box with the free data files. Given no arguments
+or settings, an example uses the Lite Data File, `51Degrees-LiteV4.1.hash`,
+which the [data repository](https://github.com/51Degrees/data) links in its
+`device-detection` folder. An example looks for the file and, when it is
+missing, downloads it with the data repository's `get-data-files` script, so a
+fresh clone of a language repository runs every example with nothing set. A
+paid data file can be given as an argument or setting instead.
 
 See [File References](#file-references) for a discussion of locating files.
+
+Examples MUST also show what only the Enterprise Data File can do, because the
+examples are where a developer first sees what the paid data files add.
+Alongside Properties the Lite Data File holds, an example asks for Properties
+that only the Enterprise Data File holds, such as `HardwareVendor`,
+`HardwareName` and `DeviceType`. Where the data file in use has no value for
+one of them, the example says that the Property needs the Enterprise Data
+File, rather than leaving it out or showing a default value, and once in its
+output gives a link to the
+[51Degrees contact page](https://51degrees.com/contact-us?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=device-detection-specification-required-examples.md&utm_term=on-premise-device-detection)
+to ask for a copy. The link the example writes carries `utm_source=code`,
+`utm_medium=example`, the language repository's name as `utm_campaign` and
+the example's file as `utm_content`, so that an enquiry can be traced to the
+example that prompted it.
+
+An example whose purpose needs the Enterprise Data File or a License Key, such
+as one that updates the data file, explains that when it runs with the Lite
+Data File, gives the same link, and completes without failure.
 
 In the reference implementations it is stressed in comments as well as
 in the output of examples that

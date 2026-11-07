@@ -50,6 +50,11 @@ Each property MUST also be exposed as a [weighted value](../pipeline-specificati
 | Areas | `WktString` |
 | AccuracyRadius | `int` |
 
+Latitude and Longitude, and the points of Areas, are given to 3 decimal
+places, as [rounding of Azimuth and Declination
+values](../pipeline-specification/features/value-types.md#rounding-of-azimuth-and-declination-values)
+describes.
+
 The `WktString` type is defined in `pipeline-core`, see [WKT Type](#wkt-type).
 
 ### Example

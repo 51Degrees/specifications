@@ -171,6 +171,4 @@ Below is JSON with an error value set.
 
 ## Configuration options
 
-| **Name**      | **Type**        | **Default**  | **Description**                                                                                                                                                                                                                                                                                                                                                                |
-|---------------|-----------------|--------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| SetProperties | List of strings | [Empty list] | A list of the Properties to include in the JSON. By default, the list is empty and all Properties will be included in the JSON. Note that some Properties, such as JavaScript Properties and meta properties, MUST always be included, regardless of this setting. Property names will need to be fully qualified. (e.g. `device.ismobile` or `devices.profiles.hardwarename`) |
+None
