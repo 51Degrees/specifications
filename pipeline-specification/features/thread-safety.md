@@ -35,16 +35,27 @@ processing, as described in
 
 ## Element Data
 
-In general, Element Data instances do not need to be thread safe, as they
-will only be accessed and updated from a single thread.
+Element Data instances do not need to be safe for writing from several
+threads at once, because an instance is written only by the Flow Element
+that creates it, while that Flow Element processes.
 
-While it is certainly possible for a user to engineer a scenario where an
-instance is accessed from multiple threads. We do not consider it worthwhile
-to cater for this scenario given the decreased performance and increased
-complexity that it would require.
+They are read from several threads at once where the Pipeline contains
+elements running in [parallel](../advanced-features/parallel-processing.md).
+Every member of a parallel group processes the same Flow Data at the same
+time, so Element Data written before the group is read by all of them
+together, as the reference implementation's
+[`ParallelElements`](https://github.com/51Degrees/51degrees-dotnet/blob/main/pipeline/Core/FlowElements/ParallelElements.cs)
+does. Reading an Element Data instance once the Flow Element that writes it
+has finished MUST therefore be safe from several threads at once.
+
+It is possible for a user to engineer a scenario where an instance is
+written from several threads, or read while another thread writes it. It is
+not worthwhile to cater for that scenario, given the decreased performance
+and increased complexity that it would require.
 
 Code comments and documentation MUST be clear that these instances are not
-intended to be accessed from multiple threads simultaneously.
+intended to be written from multiple threads simultaneously, nor read while
+they are being written.
 
 ## Aspect data
 
