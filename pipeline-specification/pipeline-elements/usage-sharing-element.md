@@ -194,18 +194,29 @@ We have no need for this duplicate data, so it MUST be discarded as
 early as possible.
 
 This can be achieved by maintaining a data structure containing
-recently shared Evidence values. If the data entry being processed
-already has a matching entry in this data structure, it MUST NOT
-be shared. For example, the C# implementation generates a hash of the
-Evidence values using the same logic as the [caching](../features/caching.md)
+recently shared Evidence values, each with the time it was last shared.
+For example, the C# implementation generates a hash of the Evidence
+values using the same logic as the [caching](../features/caching.md)
 feature.
 
-Entries will have a configurable lifetime within this data structure.
-This is reset each time an entry with matching Evidence values is
-processed.
+The [repeat Evidence interval](#configuration-options) is a sliding
+window that starts again each time Evidence is shared.
 
-See [configuration options](#configuration-options) for more detail
-on customizing this lifetime.
+- Evidence with no matching entry MUST be shared, and an entry MUST be
+  stored with the time it is shared.
+- Evidence matching an entry shared less than the interval ago MUST NOT
+  be shared, and the entry's time MUST NOT change.
+- Evidence matching an entry shared the interval or more ago MUST be
+  shared, and the entry's time MUST be set to the time it is shared.
+
+So identical Evidence is shared at most once in each interval, however
+often it is seen. The time MUST NOT be reset when matching Evidence is
+seen but not shared, because Evidence seen continuously would then never
+be shared again.
+
+Entries MAY be removed once the interval has passed since they were
+shared, and MAY be removed sooner to limit memory. Evidence matching no
+entry is then shared as new.
 
 Note that certain Evidence values MUST NOT be included in the generation
 of this hash code as they are designed to make a request unique.
@@ -240,7 +251,53 @@ For example, the queue of data to be sent has limited size. If this
 becomes full, additional data can simply be discarded until there
 is room to add entries again.
 However, it is important that these actions are logged so that users
-can identify potential issues with their usage sharing.
+can identify potential issues with their usage sharing. A message MUST
+NOT be logged for each entry discarded, as a busy server would flood its
+log.
+
+### Back-off after failed sends
+
+Repeated failed sends MUST pause sending, so that a service that is down
+or overloaded is not sent a message for every batch, and so that usage
+data waits in the queue rather than being sent and lost. Only sending
+pauses. Processing MUST NOT wait for, or be stopped by, the back-off.
+
+A send fails when the request cannot be made, has no answer within the
+time the implementation allows, or is answered with anything other than
+200.
+
+1. When the [failures to enter recovery](#configuration-options) number
+   of sends have failed within the last
+   [failures window seconds](#configuration-options), sending MUST pause
+   for the [initial recovery delay](#configuration-options). Failures
+   older than the window MUST NOT be counted. Successful sends between the
+   failures do not reset the count, so a high rate of failures pauses
+   sending even when some sends succeed.
+2. The first send after a pause ends is a trial. If it fails, the delay
+   MUST be multiplied by the [recovery multiplier](#configuration-options),
+   up to the [maximum recovery delay](#configuration-options), and sending
+   MUST pause again for the new delay. One failed trial is enough.
+3. A successful send MUST end the back-off. The count of failures starts
+   again from zero, and the next pause starts again from the initial
+   delay.
+4. During a pause, Evidence MUST still be added to the queue. New
+   Evidence is discarded only when the queue is full.
+5. When a pause ends and at least the
+   [minimum entries per message](#configuration-options) are queued,
+   sending MUST start again without waiting for more requests to be
+   processed, and MUST continue until fewer than the minimum entries per
+   message are queued, so a queue that filled during the pause drains at
+   once.
+6. A message SHOULD be logged as a warning when sending pauses or a pause
+   is lengthened, giving the delay, and as information when sending
+   resumes.
+
+With the defaults, ten failed sends within 100 seconds pause sending for
+2 seconds. While the trials keep failing the pauses grow to 4, 8, 16
+seconds and so on, up to 300 seconds.
+
+One message is sent at a time, so that while backing off a failing
+service is sent one trial when each pause ends.
 
 ## Cleanup
 
@@ -251,6 +308,11 @@ it will need to handle cleanup a little more carefully than other elements.
 2. Send a final message with any data remaining in the queue (even if it is
    less than the configured minimum batch size)
 3. Free any resources associated with the queue and background processing.
+
+While sending is paused by the [back-off](#back-off-after-failed-sends),
+cleanup MUST NOT wait for the pause to end and MUST NOT send. The data
+remaining in the queue is discarded, and the number of entries discarded
+SHOULD be logged.
 
 ## Configuration options
 
@@ -267,15 +329,15 @@ it will need to handle cleanup a little more carefully than other elements.
 | Add timeout milliseconds          | yes                   | yes          | 5                                                                            | The timeout to use when trying to add items to the usage sharing queue. If the request times out, the data will be discarded |
 | Take timeout milliseconds         | yes                   | yes          | 100                                                                          | The timeout to use when getting items from the usage sharing queue to add to the next payload.                               |
 | Share usage URL                   | yes                   | yes          | <https://devices-v4.51degrees.com/new.ashx>                                  | The URL to send data to                                                                                                      |
-| Repeat Evidence interval minutes  | yes                   | yes          | 20                                                                           | The size of the sliding window during which identical usage data will not be sent if it is seen second or subsequent times.  |
+| Repeat Evidence interval minutes  | yes                   | yes          | 20                                                                           | How long after Evidence is shared it is not shared again. A repeat after that is shared and starts a new interval.           |
 | Track session                     | yes                   | yes          | false                                                                        | If this flag is set, the session cookie is compared along with the Evidence, so a repeat from a new session is shared.       |
 | Session cookie name               | yes                   | yes          | `asp.net_sessionid` in .NET                                                  | The name of the cookie that holds the session id. It has no effect unless track session is on.                               |
-| Failures to enter recovery        | yes                   | yes          | 10                                                                           | Has no effect, see below. The .NET builder rejects a value outside 1 to 100.                                                 |
-| Failures window seconds           | yes                   | yes          | 100                                                                          | Has no effect, see below.                                                                                                    |
-| Initial recovery delay seconds    | yes                   | yes          | 2.0                                                                          | Has no effect, see below.                                                                                                    |
-| Maximum recovery delay seconds    | yes                   | yes          | 300.0                                                                        | Has no effect, see below.                                                                                                    |
-| Recovery multiplier               | yes                   | yes          | 2.0                                                                          | Has no effect, see below.                                                                                                    |
+| Failures to enter recovery        | yes                   | yes          | 10                                                                           | The number of failed sends within the failures window that pauses sending. From 1 to 100.                                    |
+| Failures window seconds           | yes                   | yes          | 100                                                                          | The time over which failed sends are counted. 1 or more.                                                                     |
+| Initial recovery delay seconds    | yes                   | yes          | 2.0                                                                          | The length of the first pause after failed sends. More than 0.                                                               |
+| Maximum recovery delay seconds    | yes                   | yes          | 300.0                                                                        | The longest a pause can be. More than 0.                                                                                     |
+| Recovery multiplier               | yes                   | yes          | 2.0                                                                          | What a pause is multiplied by each time the trial send when it ends fails. 1 or more.                                        |
 
-The five recovery options are left from a back-off that usage sharing no
-longer has. The .NET builder still accepts them, but nothing in the usage
-sharing element reads them, so they change nothing.
+The five recovery options set the
+[back-off after failed sends](#back-off-after-failed-sends). An
+implementation MUST reject a value outside the range given.
