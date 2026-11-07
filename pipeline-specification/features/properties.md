@@ -75,8 +75,8 @@ and store values as they need to.
 
 see reference implementations:
 
-- [C#](https://github.com/51Degrees/pipeline-dotnet/blob/master/FiftyOne.Pipeline.Core/FlowElements/FlowElementBase.cs#L111)
-- [Java](https://github.com/51Degrees/pipeline-java/blob/main/pipeline.core/src/main/java/fiftyone/pipeline/core/flowelements/FlowElementBase.java#L108)
+- [C#](https://github.com/51Degrees/51degrees-dotnet/blob/main/pipeline/Core/FlowElements/FlowElementBase.cs#L111)
+- [Java](https://github.com/51Degrees/51degrees-java/blob/main/pipeline/pipeline.core/src/main/java/fiftyone/pipeline/core/flowelements/FlowElementBase.java#L108)
   (Java also provides a `getProperty` method that takes the string name of a
   property, but this is not a required part of the spec)
 

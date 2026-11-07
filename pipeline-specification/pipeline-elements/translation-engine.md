@@ -80,6 +80,7 @@ The engine only uses evidence for language selection.
 Accepted evidence keys (in order of precidence):
 
 - `query.translation`
+- `query.accept-language`
 - `header.accept-language`
 
 The evidence value itself can be provided in 3 ways:
@@ -139,9 +140,7 @@ The Translation Engine is configurable using jsonConfiguration:
       "BuilderName": "TranslationEngine",
       "BuildParameters": {
         "SourceElementDataKey": "ip",
-        "Sources": [
-          "countries/*.yml",
-        ],
+        "Sources": "countries/*.yml",
         "Translations": [
           {
             "SourceProperty": "Country",
@@ -154,9 +153,7 @@ The Translation Engine is configurable using jsonConfiguration:
       "BuilderName": "TranslationEngine",
       "BuildParameters": {
         "SourceElementDataKey": "ip",
-        "Sources": [
-          "countrycodes/*.yaml"
-        ],
+        "Sources": "countrycodes/*.yaml",
         "FixedLanguage":"en_GB",
         "MissingTranslationBehaviour": "Original",
         "Translations": [
@@ -170,6 +167,11 @@ The Translation Engine is configurable using jsonConfiguration:
   ]
 }
 ```
+
+`Sources` is a list of file paths where wildcards are allowed. The list is
+given as a comma-separated string, as
+[pipeline configuration](../features/pipeline-configuration.md#deserialization)
+describes for every list of strings.
 
 The Translation Engine is configurable using the builder:
 
