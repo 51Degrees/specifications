@@ -60,6 +60,23 @@ as it already does. The Property metadata it exposes is empty, so anything
 that reads the metadata to decide what the Engine can produce MUST tolerate
 finding nothing there.
 
+A Resource Key can also be valid and include no product that holds a
+particular Cloud Aspect Engine's Properties, and what a Resource Key includes
+can change while the application runs, for example when a license lapses. A
+missing product is therefore not a definitive configuration error, and a Cloud
+Aspect Engine whose product is missing from the accessible Properties MUST NOT
+fail the Pipeline build. It SHOULD log that once when the Pipeline is built,
+and its Property metadata is then empty, as under a License Key. On each
+request the remote server returns no data for that Engine's Aspect, and
+returns any Property the Resource Key was configured with but is not entitled
+to as null with a `nullreason` explaining why, so the response itself says
+what that request can have.
+
+For the same reason a Cloud Aspect Engine MUST NOT log, on every response,
+each Property in the response that its Property metadata does not list. The
+`nullreason` entries and the log made when the Pipeline is built already say
+why.
+
 ## Processing
 
 The precise processing that occurs depends on the Aspect this
