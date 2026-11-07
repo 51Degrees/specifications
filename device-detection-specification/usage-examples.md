@@ -103,10 +103,10 @@ create a web application where:
 
 For detailed examples see:
 
-- [Java getting started web - cloud](https://github.com/51Degrees/device-detection-java-examples/tree/master/web/getting-started.cloud)
-- [Java getting started web - on premise](https://github.com/51Degrees/device-detection-java-examples/tree/master/web/getting-started.onprem)
-- [.NET getting started web - cloud](https://github.com/51Degrees/device-detection-dotnet-examples/tree/main/Examples/Cloud/GettingStarted-Web)
-- [.NET getting started web - on premise](https://github.com/51Degrees/device-detection-dotnet-examples/tree/main/Examples/OnPremise/GettingStarted-Web)
+- [Java getting started web - cloud](https://github.com/51Degrees/51degrees-java/tree/main/examples/device-detection/web/getting-started.cloud)
+- [Java getting started web - on premise](https://github.com/51Degrees/51degrees-java/tree/main/examples/device-detection/web/getting-started.onprem)
+- [.NET getting started web - cloud](https://github.com/51Degrees/51degrees-dotnet/tree/main/examples/device-detection/Cloud/GettingStarted-Web)
+- [.NET getting started web - on premise](https://github.com/51Degrees/51degrees-dotnet/tree/main/examples/device-detection/OnPremise/GettingStarted-Web)
 
 ### Apple model detection
 
@@ -142,8 +142,8 @@ var pipeline = pipelineBuilder
 
 For more detailed examples see:
 
-- [Java data file updates](https://github.com/51Degrees/device-detection-java-examples/blob/master/console/src/main/java/fiftyone/devicedetection/examples/console/UpdateDataFile.java)
-- [.NET data file updates](https://github.com/51Degrees/device-detection-dotnet-examples/blob/main/Examples/OnPremise/UpdateDataFile-Console/Program.cs)
+- [Java data file updates](https://github.com/51Degrees/51degrees-java/blob/main/examples/device-detection/console/src/main/java/fiftyone/devicedetection/examples/console/UpdateDataFile.java)
+- [.NET data file updates](https://github.com/51Degrees/51degrees-dotnet/blob/main/examples/device-detection/OnPremise/UpdateDataFile-Console/Program.cs)
 
 ## Property metadata
 
@@ -160,8 +160,8 @@ foreach (var property in deviceDetectionEngine.Properties)
 
 For more detailed examples see:
 
-- [Java cloud metadata](https://github.com/51Degrees/device-detection-java-examples/blob/master/console/src/main/java/fiftyone/devicedetection/examples/console/MetadataCloud.java#L113)
-- [.NET cloud metadata](https://github.com/51Degrees/device-detection-dotnet-examples/blob/main/Examples/Cloud/Metadata-Console/Program.cs#L111)
+- [Java cloud metadata](https://github.com/51Degrees/51degrees-java/blob/main/examples/device-detection/console/src/main/java/fiftyone/devicedetection/examples/console/MetadataCloud.java#L113)
+- [.NET cloud metadata](https://github.com/51Degrees/51degrees-dotnet/blob/main/examples/device-detection/Cloud/Metadata-Console/Program.cs#L111)
 
 ## Extended on-premise metadata
 
@@ -185,8 +185,8 @@ foreach (var value in deviceDetectionEngine.Values)
 
 For more detailed examples see:
 
-- [Java on-premise metadata](https://github.com/51Degrees/device-detection-java-examples/blob/master/console/src/main/java/fiftyone/devicedetection/examples/console/MetadataOnPrem.java#L134)
-- [.NET on-premise metadata](https://github.com/51Degrees/device-detection-dotnet-examples/blob/main/Examples/OnPremise/Metadata-Console/Program.cs#L126)
+- [Java on-premise metadata](https://github.com/51Degrees/51degrees-java/blob/main/examples/device-detection/console/src/main/java/fiftyone/devicedetection/examples/console/MetadataOnPrem.java#L134)
+- [.NET on-premise metadata](https://github.com/51Degrees/51degrees-dotnet/blob/main/examples/device-detection/OnPremise/Metadata-Console/Program.cs#L146)
 
 ## TAC/Native key lookup
 
@@ -217,7 +217,7 @@ using(var flowdata = pipeline.CreateFlowData())
 
 For more detailed examples see:
 
-- [.NET TAC lookup](https://github.com/51Degrees/device-detection-dotnet-examples/blob/main/Examples/Cloud/TAC-Console/Program.cs)
-- [.NET native key lookup](https://github.com/51Degrees/device-detection-dotnet-examples/blob/main/Examples/Cloud/NativeModel-Console/Program.cs)
-- [Java TAC lookup](https://github.com/51Degrees/device-detection-java-examples/blob/master/console/src/main/java/fiftyone/devicedetection/examples/console/TacCloud.java)
-- [Java native key lookup](https://github.com/51Degrees/device-detection-java-examples/blob/master/console/src/main/java/fiftyone/devicedetection/examples/console/NativeModelCloud.java)
+- [.NET TAC lookup](https://github.com/51Degrees/51degrees-dotnet/blob/main/examples/device-detection/Cloud/TAC-Console/Program.cs)
+- [.NET native key lookup](https://github.com/51Degrees/51degrees-dotnet/blob/main/examples/device-detection/Cloud/NativeModel-Console/Program.cs)
+- [Java TAC lookup](https://github.com/51Degrees/51degrees-java/blob/main/examples/device-detection/console/src/main/java/fiftyone/devicedetection/examples/console/TacCloud.java)
+- [Java native key lookup](https://github.com/51Degrees/51degrees-java/blob/main/examples/device-detection/console/src/main/java/fiftyone/devicedetection/examples/console/NativeModelCloud.java)
