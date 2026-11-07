@@ -125,7 +125,10 @@ Element after that group.
 Nothing is lost, because a source Property that has not been written by
 the time the Element runs is a source Property that cannot be read, which
 the one rule below already answers. The derived Property has no value and
-the message names the Property that was missing.
+the message names the Property that was missing. Where a request carries
+no Element Data at all under a key the Pipeline check confirmed, the
+Element also logs an error once, as
+[Logging and exposed metadata](#logging-and-exposed-metadata) says.
 
 ### Absent and invalid source Properties
 
@@ -190,6 +193,18 @@ inferred types and computed dependencies included, so that anyone
 holding the log can reconstruct what was evaluated without the file. A
 deprecated script logs a warning carrying the note the author left.
 
+While requests are processed, the one thing logged is a request that
+carries no Element Data at all under a key a script reads. The Pipeline
+check confirmed that an Element supplies that key, so that Element is
+running after this one rather than before it, and every request leaves the
+script with no value until the Pipeline is changed. The Element logs an
+error the first time this happens for each script, naming the script, the
+source Property and the Element Data key, saying that this Element should
+be added after the Element that supplies the key, and saying that the
+error is reported once. A source Property that is absent on a request for
+any other reason, such as one the JavaScript has not populated yet, is not
+logged, because its no-value message already says why.
+
 The Element's Property metadata list carries one entry per script with
 the name, the value type as the language's type, the category from the
 script's output block, and available true, which is what the Flow
@@ -211,7 +226,10 @@ field.
    path, no text and no reference to the source is kept,
 4. All expensive work happens at build, so per request there is no
    reflection, no string parsing, no regular expressions, no locks and
-   no mutable state shared between requests,
+   no mutable state shared between requests, apart from one flag per
+   script that records, without a lock, that the error under
+   [Logging and exposed metadata](#logging-and-exposed-metadata) has been
+   logged,
 5. The compiled model is immutable, so parallel Elements and concurrent
    `Process` calls need nothing further,
 6. Multiple Derived Property Elements can exist in one Pipeline and each
@@ -310,8 +328,11 @@ Per request, the Element:
    the `derived` Element Data.
 
 Message strings for absent Properties are built only when a Property is
-absent. The compiled model is immutable and nothing is shared between
-requests, so concurrent `Process` calls need nothing further.
+absent. The compiled model is immutable, and the only state shared
+between requests is the flag per script that records the error under
+[Logging and exposed metadata](#logging-and-exposed-metadata) has been
+logged, which is set once without a lock, so concurrent `Process` calls
+need nothing further.
 
 ## Configuration
 
