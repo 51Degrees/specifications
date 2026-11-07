@@ -210,6 +210,29 @@ If the value in the 'If-None-Match' header matches the calculated ETag value for
 the current request, then the content in the cache is still valid and the
 endpoint can just return a 304 status code. (Not modified)
 
+The same Evidence MUST give the same ETag in every process running the same
+build of the Pipeline API. A browser revalidates with the ETag it kept, and its
+request can reach a server that has restarted since, or another server behind a
+load balancer. A hash that is keyed afresh in each process, such as .NET's
+`string.GetHashCode`, gives a different ETag in every process, so a browser's
+revalidation never matches and it gets the full response every time.
+
+A response to a request whose processing recorded errors is the one exception
+to the table above. It MUST carry `Cache-Control: private, no-cache` and MUST
+NOT carry an ETag. `private` keeps the response out of shared caches, as the
+table's value does for every other response, because a shared cache may
+otherwise store a response made for one visitor
+([RFC 9111 section 5.2.2.7](https://www.rfc-editor.org/rfc/rfc9111#section-5.2.2.7),
+[section 3](https://www.rfc-editor.org/rfc/rfc9111#section-3)). A browser may
+keep a `no-cache` response as long as it asks the server before using it again
+([section 5.2.2.4](https://www.rfc-editor.org/rfc/rfc9111#section-5.2.2.4)),
+and it asks with the ETag it kept. With no ETag it has
+nothing to revalidate with, so its next request gets a full response, built
+once processing works again, rather than a 304 that keeps the faulty one. A
+request whose 'If-None-Match' header matches still gets its 304 while
+processing is failing, so a browser that holds a good response keeps it
+through an outage.
+
 This process could lead to responses that are not strictly
 correct if the JavaScript snippet is getting data values that might change over time.
 For example, if we're using JavaScript to get location and the user has moved then
