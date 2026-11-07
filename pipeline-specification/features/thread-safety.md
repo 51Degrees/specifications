@@ -29,7 +29,9 @@ Flow Data or not.
 ### Evidence
 
 Evidence collection stored within Flow Data needs to be thread safe for
-concurrent read access and immutable once created.
+concurrent read access. Flow Elements MAY add values to the Evidence during
+processing, as described in
+[adding Evidence values](evidence.md#adding-evidence-values).
 
 ## Element Data
 

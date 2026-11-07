@@ -323,13 +323,8 @@ The Derived Property Element is configurable using json configuration:
     {
       "BuilderName": "DerivedPropertyElement",
       "BuildParameters": {
-        "Scripts": [
-          "HumanConfidence"
-        ],
-        "ScriptFiles": [
-          "derived/*.yaml",
-          "derived/StaffDevice.json"
-        ]
+        "Scripts": "HumanConfidence",
+        "ScriptFiles": "derived/*.yaml,derived/StaffDevice.json"
       }
     }
   ]
@@ -337,7 +332,10 @@ The Derived Property Element is configurable using json configuration:
 ```
 
 `Scripts` is a list of built-in script names, and `ScriptFiles` is a
-list of file paths where wildcards are allowed. The third source form,
+list of file paths where wildcards are allowed. Each list is given as a
+comma-separated string, as
+[pipeline configuration](../features/pipeline-configuration.md#deserialization)
+describes for every list of strings. The third source form,
 script text passed from code, is not available from configuration.
 
 The Derived Property Element is configurable using the builder:

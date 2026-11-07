@@ -45,9 +45,33 @@ one, because an unsigned identifier would be indistinguishable from a signed
 one further down the chain. Reading an identifier is not the same as
 verifying it, and a package MUST keep the two answers separate.
 
-An Envelope is exchanged as base64. The remote server issues the standard
-alphabet with padding, and a page that puts an identifier in a link uses the
-URL-safe alphabet, so a package accepts both on the way in.
+An Envelope is exchanged as base64
+([RFC 4648](https://www.rfc-editor.org/rfc/rfc4648)). The remote server
+issues the standard alphabet with padding, and a page that puts an identifier
+in a link uses the URL-safe alphabet, so a package accepts both on the way in.
+
+A package MUST ignore white space before and after the text, so that a value
+read from a file, or from a header with a trailing line break, reads as the
+clean value does. White space is any character with the Unicode White_Space
+property. A package MUST refuse a text with any other character outside the
+alphabet, white space inside the text included, as
+[RFC 4648 section 3.3](https://www.rfc-editor.org/rfc/rfc4648#section-3.3)
+requires when the referring specification says nothing else. The issuer never
+writes white space inside an identifier, so white space there is a sign of
+damage, for example a `+` turned into a space by a form decoder, and skipping
+it would read bytes other than the ones issued.
+
+A text MUST use one alphabet. The two differ only in the characters for the
+values 62 and 63, being `+` and `/` in the standard alphabet and `-` and `_` in the
+URL-safe one, so a package MUST refuse a text holding a character from each
+pair, such as both `+` and `-`. Base64 libraries write one alphabet or the
+other and never a mix, and most of their decoders refuse a mixed text, so a
+mixed text is a sign of damage, for example a value converted only in part.
+A package that reads `-` as `+` and `_` as `/` before decoding MUST make this
+check first, because that mapping hides the mix.
+[RFC 4648 section 5](https://www.rfc-editor.org/rfc/rfc4648#section-5) says
+the same, that the URL-safe encoding "should not be regarded as the same as
+the "base64" encoding".
 
 ## Payload
 
