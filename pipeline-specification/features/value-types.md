@@ -152,7 +152,7 @@ Importantly, it should be noted that the convention for lat/lon coordinates is `
 ## Property Details
 
 Each Property SHOULD return
-an [Aspect Property value](../pipeline-specification/features/properties.md#null-values)
+an [Aspect Property value](properties.md#null-values)
 in order to support exposing the reason that a value is not set.
 
 Additionally, values MUST be returned along with their weights when fetched
