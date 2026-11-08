@@ -140,12 +140,15 @@ of the following.
 - A display name that holds a `quoted-string` and any other word, such as
   `"Tom" Smith`.
 
-An email that uses the obsolete syntax of
+The issuer MUST refuse every email that is not such a `mailbox`, and creates
+no Hashed Email identifier from one it refuses. That includes an email that
+uses the obsolete syntax of
 [RFC 5322 section 4](https://www.rfc-editor.org/rfc/rfc5322#section-4),
-being the `obs-` rules, or that is otherwise not such a `mailbox`, MAY be
-refused, or MAY be accepted when the issuer can read one address part from
-it. The issuer MUST NOT create a Hashed Email identifier from an email in
-which it cannot find one.
+being the `obs-` rules, such as `john . smith@example.com`, and an email that
+is not one `mailbox`, such as `user name@example.com` or the list
+`user@example.com, other@example.com`. RFC 5322's syntax allows only ASCII,
+so it also includes an email holding any character outside ASCII, such as
+`Üser@Exämple.com`.
 
 Normalization Form C is the one
 [Unicode Standard Annex #15](https://www.unicode.org/reports/tr15/tr15-54.html)
