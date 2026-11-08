@@ -87,17 +87,18 @@ a signer to cover either `@authority` or `@target-uri`. The three
 `@query` and `@target-uri` are rebuilt from.
 
 A signature names the parts of the request it covers, and it may cover any
-request header. A covered header that is not one of the keys above is read
-from the web request, which the web integration supplies as
-`server.http-request`
+request header. A covered header that is not one of the keys above is taken
+from the Evidence where the Flow Data holds it, for example
+`header.content-type` supplied by the caller, and otherwise from the web
+request, which the web integration supplies as `server.http-request`
 ([Populating Evidence](../features/web-integration.md#populating-evidence)).
 The [Usage Sharing Element](usage-sharing-element.md#accepted-evidence)
-reads the headers that no Flow Element accepts in the same way. No Flow
-Element accepts `server.http-request`, so such a header never takes part
-in a cache key, the ETag or the Vary header. Where no web request is
-supplied as `server.http-request`, a signature covering any other header
-cannot be rebuilt and reports Unverified with reason
-`ComponentUnavailable`.
+reads the same two places, and likewise uses the value from the Evidence
+for a key found in both. The Element accepts neither such a header nor
+`server.http-request`, so the Element never adds such a header to a cache
+key, the ETag or the Vary header. Where neither the Evidence nor the web
+request holds a covered header, the signature cannot be rebuilt and
+reports Unverified with reason `ComponentUnavailable`.
 
 ## Start-up activity
 
@@ -318,9 +319,10 @@ strict form, such as one writing a space after a parameter semicolon.
 - A component listed twice MUST make the signature unverifiable, because
   RFC 9421 forbids a base that is ambiguous.
 - A header component named by one of the
-  [accepted Evidence](#accepted-evidence) keys is taken from that Evidence,
-  and any other header component is taken from the web request supplied as
-  `server.http-request`. Either way the value is trimmed of surrounding
+  [accepted Evidence](#accepted-evidence) keys is taken from that Evidence.
+  Any other header component is taken from the Evidence where the Flow Data
+  holds it, and otherwise from the web request supplied as
+  `server.http-request`. In every case the value is trimmed of surrounding
   space, and a header seen more than once is joined with `, `.
 - A component that carries the `key` parameter is a named member of a
   dictionary header, and the value is the strict serialisation of that
