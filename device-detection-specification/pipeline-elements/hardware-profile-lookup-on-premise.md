@@ -80,6 +80,10 @@ proposes.
 |----------|------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | profiles | `IReadOnlyList<IDeviceData>` | Every hardware profile holding the value, in the order of the data file. Each is interface compatible with the results from the cloud and on-premise Device Detection Engines. |
 
+The [JSON Builder](../../pipeline-specification/pipeline-elements/json-builder.md#process)
+writes `profiles` as an empty list, whatever ids the Element Data holds, so
+building the JSON reads no profile.
+
 ## Start-up activity
 
 The Device Detection on-premise Engine whose data this Engine uses SHOULD be
