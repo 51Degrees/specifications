@@ -298,8 +298,9 @@ package refuses any other profile for it. PHP usually serves requests from
 worker processes forked from the process that built that Engine. A fork copies
 the open file handles, which then share one read position between the workers,
 so with a profile that reads from the file the workers would corrupt each
-other's reads. An Engine a package builds after the fork, or in a process that
-never forks, opens its own file handles and may use any profile.
+other's reads. Any other Engine, such as one a package builds after the
+fork or in a process that never forks, opens its own file handles and may use
+any profile.
 
 [^2]: The default values for many configuration options come from the native
 C/C++ code. You can find these defaults in
