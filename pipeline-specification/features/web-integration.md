@@ -65,8 +65,8 @@ Evidence, and hence defer processing until the Evidence is actually used.
 Whichever approach it takes, the web integration MUST also add the web request
 itself to Evidence under the key `server.http-request`, whether or not any
 Flow Element accepts that key. The value is the language's own request object,
-or a read-only view of the request's headers, cookies, query string and
-session. The [Usage Sharing Element](../pipeline-elements/usage-sharing-element.md#accepted-evidence)
+or a read-only view of the request's headers, cookies, query string, session,
+client IP address, protocol and request line. The [Usage Sharing Element](../pipeline-elements/usage-sharing-element.md#accepted-evidence)
 accepts no Evidence, and reads the request from this value instead, so that it
 can share headers no other Flow Element accepts. No Flow Element accepts
 `server.http-request`, so it never takes part in a cache key, the ETag or the

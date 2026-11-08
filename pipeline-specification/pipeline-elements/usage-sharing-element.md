@@ -19,7 +19,8 @@ It shares instead what it finds, from two places:
 
 - every Evidence value in the Flow Data, and
 - every header, cookie, query string parameter and session value of the web
-  request, when the web integration supplies the request as
+  request, with its client IP address, its protocol and the method and path
+  of its request line, when the web integration supplies the request as
   `server.http-request` (see
   [Populating Evidence](../features/web-integration.md#populating-evidence)).
   This is how a header that no other Flow Element accepts is still shared.
@@ -32,7 +33,9 @@ Which of the keys it finds are shared is decided by a filter function. The
 prefix of a key is everything before its first `.` and the field is everything
 after it, so a field can itself contain a `.`. Keys are compared without regard
 to case. A value from the web request is given the key it would have as
-Evidence, for example `header.user-agent` for its User-Agent header.
+Evidence, for example `header.user-agent` for its User-Agent header,
+`server.client-ip` for its client IP address and `header.protocol` for its
+protocol.
 
 The filter function MUST return false (i.e. not shared) for these keys,
 matched as the whole key or after a `.`, whatever the configuration and even
