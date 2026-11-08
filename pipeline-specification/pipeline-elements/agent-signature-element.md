@@ -60,7 +60,7 @@ three parts to belong to one signature.
 
 ## Accepted Evidence
 
-The Element accepts these eight Evidence keys and no others:
+The Element accepts these eight Evidence keys:
 
 - `header.signature`
 - `header.signature-input`
@@ -70,6 +70,22 @@ The Element accepts these eight Evidence keys and no others:
 - `server.request-method`
 - `server.request-path`
 - `server.request-query`
+
+Where forwarded Evidence is trusted, as
+[trusting forwarded Evidence](#trusting-forwarded-evidence) describes, the
+Element also accepts the same eight names under the `query.` prefix:
+
+- `query.signature`
+- `query.signature-input`
+- `query.signature-agent`
+- `query.host`
+- `query.protocol`
+- `query.request-method`
+- `query.request-path`
+- `query.request-query`
+
+The Element accepts no other key. With forwarded Evidence not trusted,
+which is the default, the Element accepts no `query.` key at all.
 
 Evidence keys MUST be matched without regard to case.
 
@@ -99,6 +115,41 @@ for a key found in both. The Element accepts neither such a header nor
 key, the ETag or the Vary header. Where neither the Evidence nor the web
 request holds a covered header, the signature cannot be rebuilt and
 reports Unverified with reason `ComponentUnavailable`.
+
+### Trusting forwarded Evidence
+
+A Pipeline whose [Cloud Request Engine](cloud-request-engine.md#processing)
+sends its Evidence to the cloud service takes the prefix off every key on
+the way, so the service receives `header.signature` as `query.signature`
+and `server.request-path` as `query.request-path`. The trust forwarded
+Evidence option, which is off unless set, lets the Element check a
+signature that reached a service this way.
+
+With the option on, a request whose Evidence holds `query.signature` or
+`query.signature-input` is read wholly from the `query.` keys. Each of
+the eight keys this page names under `header.` or `server.` is read under
+`query.` with the same name, so `header.host` becomes `query.host` and
+`server.request-method` becomes `query.request-method`. A covered header
+that is not one of the eight names is taken from the Evidence under
+`query.` where the Flow Data holds it, and otherwise from the web request
+supplied as `server.http-request`, whose query string values carry the
+`query.` prefix. A request whose Evidence holds neither key is read from
+the `header.` and `server.` keys as the rest of this page describes. The
+two prefixes MUST NOT be mixed in one signature, because the `query.` keys
+describe the request that reached the Pipeline which forwarded them and
+the `header.` keys describe the request the service received, so a
+signature base built from both would be one that no agent signed.
+
+The option MUST be off by default. A web integration turns query string
+parameters into Evidence under the `query.` prefix, so with the option on,
+a visitor could put a signature, a host and a path in the address of an
+ordinary page and have the Element check those in place of the request
+that actually arrived. A signature captured from a genuine agent on any
+site could then be replayed and reported as Verified, which is what
+covering `@authority` and the path exists to prevent. Forwarded Evidence
+and a typed query string cannot be told apart once they arrive, so the
+option is only for a service that knows it receives forwarded Evidence,
+and never for one that a browser can reach.
 
 ## Start-up activity
 
@@ -606,6 +657,7 @@ network call MUST NOT be made while a lock is held.
 | Registry                        | yes                   | yes          | none                    | The address of a registry of agent cards. More than one MAY be configured.                                                       |
 | Allow the older Signature-Agent | yes                   | yes          | true                    | Whether the bare quoted string form of the `Signature-Agent` header, which the earlier drafts used, is accepted.                  |
 | Allow inline directory          | yes                   | yes          | false                   | Whether a key set carried inline in a `data:` URI is accepted. Off by default, because an inline key set is chosen by whoever sent the request, so a signature that checks out against it says nothing about which agent sent the request. Turn it on only where every caller is already trusted, such as a test harness. |
+| Trust forwarded Evidence        | yes                   | yes          | false                   | Whether a signature forwarded under the `query.` prefix is checked, as [trusting forwarded Evidence](#trusting-forwarded-evidence) describes. Off by default, because with it on a visitor could put a captured signature in a query string and have it reported as Verified. Turn it on only in a service that receives forwarded Evidence and that no browser can reach. |
 | Maximum response size           | yes                   | yes          | 262,144 bytes           | The most that is read from a key directory, agent card or registry response before the fetch is abandoned.                       |
 
 Every period MUST be checked when the Element is built, and a negative
