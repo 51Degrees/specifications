@@ -80,6 +80,16 @@ itself, and which accepts both keys and passes their values to that native
 code unchanged, need not read this Element's data. A Pipeline built around
 such an Engine does not need this Element.
 
+The native code converts only one such value, being the first
+`51d_gethighentropyvalues` or `51d_structureduseragent` value, from the query
+or a cookie, that gives at least one header
+([hash.c lines 3587 to 3596](https://github.com/51Degrees/51degrees-cxx/blob/e866f6d3cea936587790f87967eff7863778b30e/src/dd/hash/hash.c#L3587-L3596)).
+So where the Evidence also holds a `51d_structureduseragent` value that the
+native code reads first, the high entropy values are not converted, and the
+header values come from the structured User-Agent alone, which gives no
+`sec-ch-ua` value
+([transformc.c lines 1105 to 1107](https://github.com/51Degrees/51degrees-cxx/blob/e866f6d3cea936587790f87967eff7863778b30e/src/dd/transformc.c#L1105-L1107)).
+
 ## Configuration options
 
 This Element has no configuration options
