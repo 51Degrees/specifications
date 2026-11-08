@@ -63,13 +63,17 @@ first be determined:
    quotes, so a session id that does not match `^[A-Za-z0-9-]{1,64}$` MUST
    be rendered as an empty string.
 6. If protocol, host and endpoint are all set, meaning none of them is empty
-   or only whitespace, then generate a URL in the following format:
+   or only white space, then generate a URL in the following format:
    `[protocol]://[host][endpoint]`, adding a `/` between the host and the
    endpoint when neither has one and removing one when both do. The protocol
    and host can come from Evidence, and the template writes the URL inside a
    single-quoted JavaScript string, so the URL MUST be checked and encoded as
    described under [Callback URL](#callback-url) before it is passed to the
-   template.
+   template. White space means the characters with the Unicode `White_Space`
+   property
+   ([PropList.txt](https://www.unicode.org/Public/18.0.0/ucd/PropList.txt)),
+   being U+0009 to U+000D, U+0020, U+0085, U+00A0, U+1680, U+2000 to U+200A,
+   U+2028, U+2029, U+202F, U+205F and U+3000.
 7. The JavaScript might need to make call backs to the server. A list of any
    query parameters that will be included in those calls needs to be created.
    This can be done by looking at the query entries in the existing Evidence:
@@ -165,21 +169,39 @@ rules before it is passed to the template.
    Standard's [scheme fetch](https://fetch.spec.whatwg.org/#scheme-fetch)
    gives a network error for every scheme but `about`, `blob`, `data`,
    `file`, `http` and `https`, of which only `http` and `https` can reach a
-   server. A configured protocol that is neither MUST be refused when the
-   element is built, using the language's usual configuration error.
-2. The authority is the host value up to its first `/`, `?` or `#`. Anything
-   after that point is written after the authority and before the endpoint,
+   server. A configured protocol that is neither, including one made only of
+   white space, MUST be refused when the element is built, using the
+   language's usual configuration error. An empty configured protocol means
+   that none is configured, which is the default under
+   [Configuration options](#configuration-options), so step 1 takes the
+   protocol from Evidence, but a builder method that sets the protocol MAY
+   refuse an empty one.
+2. The host value MUST NOT hold `?` or `#`. The endpoint is written after the
+   host value, so a `?` or `#` in the host value would make the endpoint part
+   of the URL's query or fragment, and the callback would go to the wrong
+   path. The authority is the host value up to its first `/`. Anything after
+   that point is written after the authority and before the endpoint,
    encoded as rule 8 says.
-3. The authority MAY start with user information, which ends at the first
-   `@`. What follows the first `@` is the host and an optional port, so a
-   second `@` fails rule 4.
+3. The authority MUST NOT hold user information, so an authority holding `@`
+   fails. The script sends its request with `fetch` where the browser
+   supports it, and the Fetch Standard's
+   [Request constructor](https://fetch.spec.whatwg.org/#dom-request) throws
+   a `TypeError` when the URL includes credentials, meaning a username or a
+   password.
 4. The host MUST be one of the following.
    - An IPv6 address in square brackets, as
      [RFC 3986 section 3.2.2](https://www.rfc-editor.org/rfc/rfc3986#section-3.2.2)
-     defines one, optionally followed inside the brackets by `%25` and a zone
-     identifier of one or more unreserved characters
-     ([RFC 3986 section 2.3](https://www.rfc-editor.org/rfc/rfc3986#section-2.3)).
-     Nothing but a port may follow the closing bracket.
+     defines one, with nothing else inside the brackets. A `%` inside the
+     brackets fails, so an IPv6 zone identifier is refused. RFC 3986's syntax
+     "does not support IPv6 scoped addressing zone identifiers".
+     [RFC 9844 section 3](https://www.rfc-editor.org/rfc/rfc9844#section-3)
+     obsoletes RFC 6874, which had added them to that syntax, because web
+     browser implementers found RFC 6874 "impracticable to support". The
+     WHATWG URL Standard's
+     [IPv6 parser](https://url.spec.whatwg.org/#concept-ipv6-parser) returns
+     failure for any code point but an ASCII hex digit, `:` and `.`, so a
+     browser cannot parse a URL holding one. Nothing but a port may follow
+     the closing bracket.
    - A name made of labels separated by `.`, optionally ending in `.`, where
      every label holds at least one character and only ASCII letters, digits,
      `-` and `_`. An IPv4 address in dotted decimal meets this rule. A host
@@ -193,18 +215,21 @@ rules before it is passed to the template.
 5. A port, where present, is `:` followed by nothing or by digits whose value
    is no more than 65535.
 6. A URL that fails any of rules 1 to 5 MUST NOT be passed to the template,
-   so the script is produced without callback functionality. An error SHOULD
-   be logged the first time, written so that the URL cannot start a new log
-   line.
+   so the script is produced without callback functionality. Each instance
+   of the element SHOULD log an error the first time a URL fails, and not on
+   every later request, written so that the URL cannot start a new log line.
 7. ASCII letters in the protocol and the host MUST be written in lower case.
-8. In the user information, in anything after the authority, and in the
-   endpoint, every byte of the UTF-8 encoding that is a control character,
-   is outside ASCII, is a space, or is one of `"`, `'`, `<`, `>`, `\`, `^`,
-   `` ` ``, `{`, `|` and `}` MUST be percent-encoded, as MUST a `%` that is
-   not followed by two hexadecimal digits.
+8. In anything after the authority, and in the endpoint, every byte of the
+   UTF-8 encoding that is a control character, is outside ASCII, is a space,
+   or is one of `"`, `'`, `<`, `>`, `\`, `^`, `` ` ``, `{`, `|` and `}` MUST
+   be percent-encoded, as MUST a `%` that is not followed by two hexadecimal
+   digits.
 
-These rules accept fewer hosts than RFC 3986 does, because the host is
-written into a script rather than sent in an HTTP request.
+Every host these rules accept is one that RFC 3986 section 3.2.2 allows, but
+they refuse many that it allows, such as a registered name holding `~`, a
+sub-delimiter or a percent-encoded byte, and an `IPvFuture` literal. The host
+is written inside a single-quoted string in a script, where a sub-delimiter
+such as `'` would end the string.
 
 ## More than one script on a page
 
