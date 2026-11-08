@@ -217,10 +217,12 @@ load balancer. A hash that is keyed afresh in each process, such as .NET's
 `string.GetHashCode`, gives a different ETag in every process, so a browser's
 revalidation never matches and it gets the full response every time.
 
-A response to a request whose processing recorded errors is the one exception
-to the table above. It MUST carry `Cache-Control: private, no-cache` and MUST
-NOT carry an ETag. `private` keeps the response out of shared caches, as the
-table's value does for every other response, because a shared cache may
+A response to a request whose processing recorded errors, in the Flow Data
+errors collection described under
+[Process function](exception-handling.md#process-function), differs from the
+table above in two rows. It MUST carry `Cache-Control: private, no-cache` and
+MUST NOT carry an ETag. `private` keeps the response out of shared caches, as
+the table's value does for every other response, because a shared cache may
 otherwise store a response made for one visitor
 ([RFC 9111 section 5.2.2.7](https://www.rfc-editor.org/rfc/rfc9111#section-5.2.2.7),
 [section 3](https://www.rfc-editor.org/rfc/rfc9111#section-3)). A browser may
@@ -228,12 +230,19 @@ keep a `no-cache` response as long as it asks the server before using it again
 ([section 5.2.2.4](https://www.rfc-editor.org/rfc/rfc9111#section-5.2.2.4)),
 and it asks with the ETag it kept. With no ETag it has
 nothing to revalidate with, so its next request gets a full response, built
-once processing works again, rather than a 304 that keeps the faulty one. A
-request whose 'If-None-Match' header matches still gets its 304 while
-processing is failing, so a browser that holds a good response keeps it
-through an outage.
+once processing works again, rather than a 304 that keeps the faulty one.
 
-This process could lead to responses that are not strictly
+The ETag depends on the Evidence alone, so a request whose 'If-None-Match'
+header matches it gets the same answer while processing is failing as at any
+other time. As
+[RFC 9110 section 13.1.2](https://www.rfc-editor.org/rfc/rfc9110#section-13.1.2)
+requires, the answer is a 304 status code (Not Modified) to a GET or HEAD
+request and a 412 status code (Precondition Failed) to any other method, such
+as a POST to the JSON endpoint. So a browser that holds a good response to a
+GET request keeps it through an outage.
+
+Caching, whether by the browser with the ETag or in session storage, could
+lead to responses that are not strictly
 correct if the JavaScript snippet is getting data values that might change over time.
 For example, if we're using JavaScript to get location and the user has moved then
 session storage will still contain the previous location lookup response.
