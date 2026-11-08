@@ -106,7 +106,8 @@ order:
 
 1. The length of the salt in bytes, as one byte.
 2. The salt.
-3. The address part of the email, lowercased, as UTF-8.
+3. The address part of the email, put in Unicode Normalization Form C and
+   then lowercased, as UTF-8.
 
 The length byte comes first so that no two pairs of email and salt give the
 same bytes to hash, as they could if the salt were simply followed by the
@@ -114,20 +115,56 @@ email. The salt is at most 64 bytes, so its length always fits the one byte.
 
 The address part is the `addr-spec` of the email read as a `mailbox` under
 [RFC 5322 section 3.4](https://www.rfc-editor.org/rfc/rfc5322#section-3.4),
-being `local-part "@" domain`. A display name, the angle brackets around the
-address and any comments are not part of it, so `Tom <User@Example.COM>` and
-`user@example.com` give the same Match Key. Whitespace around the email is
-ignored. The issuer MUST accept every `mailbox`, MAY accept other forms from
-which it can read one address part, and MUST NOT create a Hashed Email
-identifier from an email in which it cannot find one.
+being its `local-part`, then `@`, then its `domain`. The local part and the
+domain are each taken as written, without the comments and white space that
+RFC 5322 allows around them. A display name, the angle brackets around the
+address and any comments are not part of the address part, so
+`Tom <User@Example.COM>` and `user@example.com` give the same Match Key.
+White space around the email is ignored, meaning the characters with the
+Unicode `White_Space` property
+([PropList.txt](https://www.unicode.org/Public/15.1.0/ucd/PropList.txt)).
 
-Lowercasing uses the simple case mappings of the Unicode Character Database,
-which map each character to exactly one character.
+A local part that is a `quoted-string` is taken with its quote characters and
+the `\` of each `quoted-pair`, although
+[RFC 5322 section 3.2.4](https://www.rfc-editor.org/rfc/rfc5322#section-3.2.4)
+says that neither is part of the string. So `"john"@example.com` and
+`john@example.com` are different address parts and give different Match
+Keys.
+
+The issuer MUST accept every `mailbox` in the syntax of RFC 5322 section 3
+without its `obs-` rules, except that it MAY refuse a `mailbox` that holds any
+of the following.
+
+- A line break, being the CR LF of folding white space.
+- A `quoted-pair` of a space or a tab, being `\` followed by either.
+- A display name that holds a `quoted-string` and any other word, such as
+  `"Tom" Smith`.
+
+An email that uses the obsolete syntax of
+[RFC 5322 section 4](https://www.rfc-editor.org/rfc/rfc5322#section-4),
+being the `obs-` rules, or that is otherwise not such a `mailbox`, MAY be
+refused, or MAY be accepted when the issuer can read one address part from
+it. The issuer MUST NOT create a Hashed Email identifier from an email in
+which it cannot find one.
+
+Normalization Form C is the one
+[Unicode Standard Annex #15](https://www.unicode.org/reports/tr15/tr15-54.html)
+defines, and it changes nothing in an email made only of ASCII. Lowercasing
+replaces each character that has a simple lowercase mapping in field 13 of
+[UnicodeData.txt](https://www.unicode.org/Public/15.1.0/ucd/UnicodeData.txt)
+for Unicode 15.1 by that mapping, and leaves every other character as it is.
+The one exception is U+0130 (LATIN CAPITAL LETTER I WITH DOT ABOVE), which is
+left as it is although its mapping is U+0069. Unicode 15.0 has the same
+mappings, and .NET's `String.ToLowerInvariant` lowercases in this way where
+its ICU library implements Unicode 15.0 or 15.1.
 
 For example, the salt `36 9C` and the email `Tom <User@Example.COM>` give the
 bytes `02 36 9C` followed by the UTF-8 of `user@example.com`, and the Match
 Key
 `747e0f5f09ae03849ce0fc00c0579a2c8bf0b1a3146ca2e8f47c6b6e12e35287`.
+The same salt and the email `"John"@Example.COM` give the bytes `02 36 9C`
+followed by the UTF-8 of `"john"@example.com`, and the Match Key
+`f9ce95a889a65380bfb6248846d13a6543898f94130990adc629c4fd8b14320e`.
 
 ## Flags byte
 
