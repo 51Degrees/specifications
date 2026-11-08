@@ -60,25 +60,44 @@ three parts to belong to one signature.
 
 ## Accepted Evidence
 
-The Element asks for every `header.*` Evidence key. A signature names the
-parts of the request it covers, it may cover any request header, and only
-a part the verifier can rebuild can be checked, so a fixed list of headers
-would leave a signature covering any other header unable to be rebuilt.
-
-Five keys have named roles:
+The Element accepts these eight Evidence keys and no others:
 
 - `header.signature`
 - `header.signature-input`
 - `header.signature-agent`
 - `header.host`
 - `header.protocol`
+- `server.request-method`
+- `server.request-path`
+- `server.request-query`
 
 Evidence keys MUST be matched without regard to case.
 
-`header.host` and `header.protocol` are not read for their own sake. They
-are the only Evidence from which the two derived components that RFC 9421
-calls `@authority` and `@scheme` can be rebuilt, and the protocol draft
-requires a signer to cover either `@authority` or `@target-uri`.
+Only Evidence that can change the Element's results is accepted, as
+[Advertise accepted Evidence](../features/advertize-accepted-evidence.md#flow-elements)
+requires, because the Pipeline's accepted Evidence decides the cache keys,
+the ETag and the Vary header.
+
+The first three keys are the three signature headers. `header.host` and
+`header.protocol` are not read for their own sake. They are the only
+Evidence from which the two derived components that RFC 9421 calls
+`@authority` and `@scheme` can be rebuilt, and the protocol draft requires
+a signer to cover either `@authority` or `@target-uri`. The three
+`server.request-` keys carry the request line, which `@method`, `@path`,
+`@query` and `@target-uri` are rebuilt from.
+
+A signature names the parts of the request it covers, and it may cover any
+request header. A covered header that is not one of the keys above is read
+from the web request, which the web integration supplies as
+`server.http-request`
+([Populating Evidence](../features/web-integration.md#populating-evidence)).
+The [Usage Sharing Element](usage-sharing-element.md#accepted-evidence)
+reads the headers that no Flow Element accepts in the same way. No Flow
+Element accepts `server.http-request`, so such a header never takes part
+in a cache key, the ETag or the Vary header. Where no web request is
+supplied as `server.http-request`, a signature covering any other header
+cannot be rebuilt and reports Unverified with reason
+`ComponentUnavailable`.
 
 ## Start-up activity
 
@@ -298,10 +317,11 @@ strict form, such as one writing a space after a parameter semicolon.
   unverifiable.
 - A component listed twice MUST make the signature unverifiable, because
   RFC 9421 forbids a base that is ambiguous.
-- Header components are taken from the Evidence, trimmed of surrounding
-  space, and a header seen more than once is joined with `, `. Any request
-  header may be covered, which is why the Element asks for every header as
-  Evidence.
+- A header component named by one of the
+  [accepted Evidence](#accepted-evidence) keys is taken from that Evidence,
+  and any other header component is taken from the web request supplied as
+  `server.http-request`. Either way the value is trimmed of surrounding
+  space, and a header seen more than once is joined with `, `.
 - A component that carries the `key` parameter is a named member of a
   dictionary header, and the value is the strict serialisation of that
   member's value with its parameters. A member with no explicit value
