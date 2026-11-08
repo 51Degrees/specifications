@@ -233,8 +233,8 @@ nothing to revalidate with, so its next request gets a full response, built
 once processing works again, rather than a 304 that keeps the faulty one.
 
 The ETag depends on the Evidence alone, so a request whose 'If-None-Match'
-header matches it gets the same answer while processing is failing as at any
-other time. As
+header matches the ETag gets the same status code when processing records
+errors as at any other time. As
 [RFC 9110 section 13.1.2](https://www.rfc-editor.org/rfc/rfc9110#section-13.1.2)
 requires, the answer is a 304 status code (Not Modified) to a GET or HEAD
 request and a 412 status code (Precondition Failed) to any other method, such
