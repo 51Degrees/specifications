@@ -116,7 +116,7 @@ does not exist in the result set for some reason, the system MUST throw an
 error/exception with a message explaining why the Property is not available.
 
 This could be any of the following reasons, named in the second line of each
-row as the reference implementation names them.
+row as the .NET packages' `MissingPropertyReason` names them.
 
 | **Reason**                                                                                 | **Message**                                                                                                                                                                                                                                                                | **Parameters**                                                                                                                                   |
 |--------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -125,7 +125,7 @@ row as the reference implementation names them.
 | Property excluded in configuration<br/>`PropertyExcludedFromEngineConfiguration`           | Property '{0}' not found in data for element '{1}'. This is because the property has been excluded when configuring the engine.                                                                                                                                            | 0. Property name<br/>1. Data Key of the Engine                                                                                                   |
 | Product not included with Resource Key<br/>`ProductNotAccessibleWithResourceKey`           | Property '{0}' not found in data for element '{1}'. This is because your resource key does not include access to any properties under '{1}'. Check or create a resource key with the properties you need in the configurator at https://configure.51degrees.com.           | 0. Property name<br/>1. Data Key of the Engine                                                                                                   |
 | Property not included with Resource Key<br/>`PropertyNotAccessibleWithResourceKey`         | Property '{0}' not found in data for element '{1}'. This is because your resource key does not include access to this property. The properties included for your key under '{1}' are {2}. Check or change your key in the configurator at https://configure.51degrees.com. | 0. Property name<br/>1. Data Key of the Engine<br/>2. names of the Properties in the Engine's metadata                                           |
-| Request to the remote server failed<br/>`CloudRequestFailed`                               | Property '{0}' not found in data for element '{1}'. This is because an upstream cloud request failed, so no data was available to populate the property.                                                                                                                   | 0. Property name<br/>1. Data Key of the Engine, or under step 1 of the first Engine, or `Unknown` when there is none                             |
+| Request to the remote server failed<br/>`CloudRequestFailed`                               | Property '{0}' not found in data for element '{1}'. This is because an upstream cloud request failed, so no data was available to populate the property.                                                                                                                   | 0. Property name<br/>1. Data Key of the Engine. Under step 1, the Data Key of the first Engine, or `Unknown` when there is none                  |
 | Unknown<br/>`Unknown`                                                                      | Property '{0}' not found in data for element '{1}'. The reason for this is unknown. Please check that the aspect and property name are correct.                                                                                                                            | 0. Property name<br/>1. Data Key of the Engine                                                                                                   |
 
 The second row is the message where the data tiers are not known or their
@@ -174,8 +174,15 @@ that applies.
       message is the one for data tiers that are not known.
    4. Otherwise the reason is `Unknown`.
 
-The reference implementation is
+The .NET packages decide the reason in
 [`MissingPropertyService`](https://github.com/51Degrees/51degrees-dotnet/blob/main/pipeline/Engines/Services/MissingPropertyService.cs)
 and, for Cloud Engines,
 [`MissingPropertyServiceCloud`](https://github.com/51Degrees/51degrees-dotnet/blob/main/pipeline/CloudRequestEngine/Services/MissingPropertyServiceCloud.cs),
-with the text in [`Messages.resx`](https://github.com/51Degrees/51degrees-dotnet/blob/main/pipeline/Engines/Messages.resx).
+with the text in [`Messages.resx`](https://github.com/51Degrees/51degrees-dotnet/blob/main/pipeline/Engines/Messages.resx),
+whose text without its campaign parameters is every row of the table but the
+second. The .NET packages are to change to match this section, because they
+do not yet give the second row, compare names in step 3.1 with their case,
+leave the metadata of a Cloud Engine whose Resource Key has no entry for its
+element unloaded, apply step 3.3 to Cloud Engines and to a Property the
+metadata lists, and leave out the typed accessors an Element Data type
+inherits.
