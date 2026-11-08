@@ -17,6 +17,10 @@ encoded using base-64 encoding. This element decodes and transforms this
 Evidence into values that match the HTTP header format so that it can
 be used by the Device Detection Engines.
 
+An on-premise Device Detection Engine whose native code does this
+conversion itself does not need this Element. See
+[Engines that convert the values](#engines-that-convert-the-values).
+
 ## Accepted Evidence
 
 - cookie.51d_gethighentropyvalues
@@ -24,15 +28,15 @@ be used by the Device Detection Engines.
 
 ## Element Data
 
-This Element is only implemented for
-[.NET](https://github.com/51Degrees/51degrees-dotnet/tree/main/device-detection/DeviceDetection)
-at time of writing.
-The reference implementation writes directly to Evidence, which will not
-be possible if Evidence is immutable.
+The .NET and Java packages have no implementation of this Element, and the
+native code their on-premise Engines use converts the values itself.
+Writing the values directly to Evidence will not be possible if Evidence is
+immutable.
 Instead, the Element can output its values using Element Data as described
 in the table below.
-The Device Detection Engines MUST be capable of using these values if
-available and falling back to Evidence values if they are not.
+A Device Detection Engine MUST be capable of using these values if
+available and falling back to Evidence values if they are not, unless it is
+an on-premise Engine whose native code converts the values itself.
 See [adding Evidence values](../../pipeline-specification/features/evidence.md#adding-evidence-values)
 for more details.
 
@@ -57,6 +61,24 @@ not needed for device detection, so are not featured here.
 - Convert the JSON representation into individual HTTP header values.
   - See [here](https://github.com/51Degrees/sua-uach-conversion/blob/main/src/convertSUAtoUACH.js)
     for an example of this using JavaScript.
+
+## Engines that convert the values
+
+The native code of the on-premise Device Detection Engine in
+[51degrees-cxx](https://github.com/51Degrees/51degrees-cxx) converts the
+`query.51d_gethighentropyvalues` and `cookie.51d_gethighentropyvalues`
+Evidence itself, before it matches, into header values that include those in
+the [Element Data](#element-data) table
+([hash.c lines 3540 to 3556](https://github.com/51Degrees/51degrees-cxx/blob/e866f6d3cea936587790f87967eff7863778b30e/src/dd/hash/hash.c#L3540-L3556)
+and the list of headers in
+[transform.h lines 49 to 56](https://github.com/51Degrees/51degrees-cxx/blob/e866f6d3cea936587790f87967eff7863778b30e/src/dd/transform.h#L49-L56)).
+It does so while special evidence processing is enabled, which is the default
+([config-dd.h line 90](https://github.com/51Degrees/51degrees-cxx/blob/e866f6d3cea936587790f87967eff7863778b30e/src/dd/config-dd.h#L90)).
+
+An on-premise Device Detection Engine whose native code converts the values
+itself, and which accepts both keys and passes their values to that native
+code unchanged, need not read this Element's data. A Pipeline built around
+such an Engine does not need this Element.
 
 ## Configuration options
 
