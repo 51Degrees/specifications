@@ -57,6 +57,13 @@ be added for each Property:
 | delayexecution     | This meta-Property MUST be added with the value 'true' for all Properties where the [metadata](../features/properties.md#property-metadata) delay execution flag is true.                                                                                                                |
 | EvidenceProperties | Where the JSON includes other Properties that are in the [metadata](../features/properties.md#property-metadata) Evidence Properties list for this Property and those Properties have the delayed execution flag set to true, this meta-Property MUST be added to list those Properties. |
 
+Where a Property's value is a list of Element Data, such as `profiles` in the
+[hardware profile lookup](../../device-detection-specification/pipeline-elements/hardware-profile-lookup-cloud.md),
+each item MUST be written as an object with a sub-entry for each of its
+Properties, set to 'null' if there is no value, and the `nullreason`
+meta-Property MUST be added for each such null, as for a top-level Element
+Data.
+
 Some Elements MUST be excluded from having their Properties added to the JSON.
 These are:
 
