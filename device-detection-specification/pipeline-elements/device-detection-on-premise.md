@@ -248,12 +248,42 @@ is needed for querying.
 For details on the additional metadata, see the
 [data model specification](../../data-model-specification/README.md).
 
+### Property values
+
+Where the Evidence holds a value for a Property that a JavaScript Property
+gathers, in a cookie or query string value named `51D_` followed by the
+Property's name, such as the `51D_ScreenPixelsWidth` cookie that
+ScreenPixelsWidthJavascript writes, the Engine gives that value whether or not
+a Profile was matched. Otherwise the value of a data file Property comes from
+the Profile the Evidence matched for the Property's Component. Where no
+Profile was matched and Allow Unmatched is false, the Property has no value.
+Otherwise a List Property's value is every Value the Profile holds for the
+Property, in the order the data file gives them, each as the data file stores
+it, an empty one included and none split, and an empty list where the Profile
+holds none. A Property that is not a List has no value where the Profile holds
+none. Otherwise a string Property is its Value, or its Values joined by `|`,
+and a Boolean or numeric Property is read as
+[values stored as strings](../../pipeline-specification/features/value-types.md#values-stored-as-strings)
+says.
+
+The data file's `JavascriptHardwareProfile` values are the body of a script
+that pushes the Profile ids it finds onto a `profileIds` array. The Engine
+gives each value, an empty one included, as `var profileIds = []`, a line
+break, the value, a line break, and
+`document.cookie = "51D_ProfileIds=" + profileIds.join("|")`, as the C++
+results do
+([ResultsHash.cpp lines 78 to 82](https://github.com/51Degrees/51degrees-cxx/blob/e866f6d3cea936587790f87967eff7863778b30e/src/dd/hash/ResultsHash.cpp#L78-L82)).
+
 ### Match metric Properties
 
 In addition to the 'standard' Device Detection Properties, there are a set of
 Properties that return details about the processing that was performed and
 the match that was found. Metadata for these Properties MUST be added, as they
 will not be included in the metadata exposed by the native code.
+
+The Engine lists these Properties after the Properties from the data file, in
+the order of the table below, in its Property metadata and its Element Data,
+and so in the JSON.
 
 All these Properties have the following values:
 

@@ -167,7 +167,7 @@ An example of the JSON response received from the server:
     "platformversion": "Unknown",
     "iscrawler": false,
     "javascripthardwareprofile": null,
-    "javascripthardwareprofilenullreason": null,
+    "javascripthardwareprofilenullreason": "No value for property 'javascripthardwareprofile'.",
     "devicetype": "SmartPhone",
     "setheaderbrowseraccept-ch": "Sec-CH-UA,Sec-CH-UA-Full-Version-List,Sec-CH-UA-Mobile,Sec-CH-UA-Platform",
     "setheaderhardwareaccept-ch": "Sec-CH-UA-Model,Sec-CH-UA-Mobile",
