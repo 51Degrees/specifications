@@ -151,12 +151,8 @@ A configuration file can set the options that take a single value:
 A package MAY also let a configuration file set sources and translations. A
 translation is a pair of values, the source property and the destination
 property, and a source given as file contents is a pair as well, the file name
-and its contents. Neither pair is one of the types that
-[pipeline configuration](../features/pipeline-configuration.md#deserialization)
-supports in every language, so a package that offers them chooses how they are
-written in the file, uses the same names as it does in code, and documents the
-form with an example. A package that does not offer them adds
-sources and translations in code, through `AddSource` and `AddTranslation` on
+and its contents. A package that does not let a configuration file set sources
+and translations adds them in code, through `AddSource` and `AddTranslation` on
 the builder.
 
 A package MAY also offer a builder for one particular translation, which adds
