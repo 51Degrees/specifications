@@ -31,12 +31,14 @@ The core types are:
 - numeric (integer or floating point)
 - array of strings
 
-In addition, there are a couple of types that are supported through additions in
+In addition, there are a few types that are supported through additions in
 JSON encode/decode logic:
 
 - javascript - See [the javascript type](#the-javascript-type) below
 - array of key-value-pair collections - Used in scenarios where we want to return
   multiple Aspect data instances. (For example, TAC lookup)
+- WKT - A shape in well-known text format, written as an object holding the
+  text. See [WKT](value-types.md#wkt)
 
 ### The javascript type
 

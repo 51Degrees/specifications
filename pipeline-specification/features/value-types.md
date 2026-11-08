@@ -110,6 +110,14 @@ This comes from the data file in WKBR (R = reduced) format. And is interpreted
 to a more useable form, as the interface `WktString` which extends string, and
 contains a WKT format string.
 
+Where a WKT value is written to JSON, for example by the
+[JSON Builder Element](../pipeline-elements/json-builder.md) or in a response
+from the remote server, it MUST be written as an object with one member,
+`value`, holding the WKT text, for example `{"value": "POINT(2 4)"}`. This is
+the form the .NET reference implementation writes and its
+[IP Intelligence Cloud Engine](../../ip-intelligence-specification/pipeline-elements/ip-intelligence-cloud.md)
+reads.
+
 Implementation adapts the [OGC 06-103r4](https://www.ogc.org/publications/standard/sfa/) standard, by changing the size of fields to reduce the size.
 
 The modified structures are:
