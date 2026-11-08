@@ -93,11 +93,15 @@ profile at start-up.
 1. Read the TAC or native model name from the Evidence.
 2. Get the ids of the profiles holding it from the native lookup, with the
    Property name `TAC` or `NativeModel`.
-3. For each id, in the order returned, populate an instance of the device
-   data with the Property values of that profile, for example by processing
-   the id as `51D_ProfileIds` Evidence with the Device Detection on-premise
-   Engine.
-4. Set the instances as the `profiles` of the Element Data.
+3. Add the ids to the Element Data, in the order returned, without reading
+   the profiles, so that a value many profiles hold costs only the lookup
+   until `profiles` is read. There is no limit on the number of ids.
+4. The first time `profiles` is read, populate an instance of the device
+   data for each id, in the order the ids were added, with the Property
+   values of that profile, for example by processing the id as
+   `51D_ProfileIds` Evidence with the Device Detection on-premise Engine.
+   A later read does not read the profiles again unless more ids have been
+   added since.
 
 ## Refresh data
 
