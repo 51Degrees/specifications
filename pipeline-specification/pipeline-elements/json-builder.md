@@ -43,6 +43,10 @@ method in C# for an example of creating these lists.
 The Element needs to produce a JSON representation of the Flow Data.
 There MUST be a top-level entry for each Element Data containing sub-entries
 for each Property and its value (set to 'null' if there is no value).
+For `profiles` in the Element Data of the
+[hardware profile lookup on-premise](../../device-detection-specification/pipeline-elements/hardware-profile-lookup-on-premise.md),
+the value MUST be written as an empty list however many profiles match, so
+that building the JSON reads no profile.
 
 There are also several metadata Properties with different suffixes that can
 be added for each Property:
@@ -129,7 +133,8 @@ Below is the JSON from a location lookup before any coordinates have been suppli
 
 ```
 
-Below is the partial JSON from a TAC lookup that returns multiple devices.
+Below is the partial JSON from a TAC lookup through the cloud service that
+returns multiple devices.
 
 ```json
 {
