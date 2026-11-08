@@ -186,8 +186,16 @@ rules before it is passed to the template.
    fails. The script sends its request with `fetch` where the browser
    supports it, and the Fetch Standard's
    [Request constructor](https://fetch.spec.whatwg.org/#dom-request) throws
-   a `TypeError` when the URL includes credentials, meaning a username or a
-   password.
+   a `TypeError` when the URL
+   [includes credentials](https://url.spec.whatwg.org/#include-credentials),
+   meaning a user name or password that is not empty. Otherwise the script
+   uses `XMLHttpRequest`, whose
+   [`send()` method](https://xhr.spec.whatwg.org/#dom-xmlhttprequest-send)
+   accepts credentials in the URL, setting the request's use-URL-credentials
+   flag when the URL includes them. An empty user name, as in
+   `@example.com`, is not credentials, so `fetch` accepts it. Refusing all
+   user information, meaning any `@` before the first `/`, gives the callback
+   the same outcome under `fetch` and `XMLHttpRequest`.
 4. The host MUST be one of the following.
    - An IPv6 address in square brackets, as
      [RFC 3986 section 3.2.2](https://www.rfc-editor.org/rfc/rfc3986#section-3.2.2)
@@ -212,12 +220,32 @@ rules before it is passed to the template.
      and RFC 3986 asks for an internationalized name in its IDNA form. A
      configured internationalized host MUST therefore be given as A-labels
      ([RFC 5890 section 2.3.2.1](https://www.rfc-editor.org/rfc/rfc5890#section-2.3.2.1)).
+     A name whose last label, ignoring a final `.`, is made only of digits,
+     or is `0x` or `0X` followed by zero or more hexadecimal digits, MUST be
+     an IPv4 address written as RFC 3986 section 3.2.2 defines
+     `IPv4address`, being four decimal numbers from 0 to 255 separated by
+     `.`, each with no leading zero, and with no final `.`. The URL
+     Standard's host parser reads such a name as an IPv4 address, and fails
+     if it is not one
+     ([ends in a number checker](https://url.spec.whatwg.org/#ends-in-a-number-checker),
+     section 3.5), so a browser cannot parse a URL holding `example.123`,
+     `example.123.`, `example.0x1f` or `1.2.3.999`. Requiring the
+     `IPv4address` form also refuses forms that the URL Standard's IPv4
+     parser accepts, such as `127.1`, `0x7f.0.0.1`, `01.2.3.4` and
+     `1.2.3.4.`, and refusing them is intended, so that a callback host has
+     one written form that every client reads the same way.
+     [RFC 3986 section 7.4](https://www.rfc-editor.org/rfc/rfc3986#section-7.4)
+     leaves such forms out of the URI syntax "due to differences between
+     platform implementations".
 5. A port, where present, is `:` followed by nothing or by digits whose value
    is no more than 65535.
 6. A URL that fails any of rules 1 to 5 MUST NOT be passed to the template,
    so the script is produced without callback functionality. Each instance
    of the element SHOULD log an error the first time a URL fails, and not on
    every later request, written so that the URL cannot start a new log line.
+   The error MUST NOT carry the user information, meaning everything in the
+   authority before its last `@`, so that a password in the host value,
+   whether configured or from Evidence, is never written to the log.
 7. ASCII letters in the protocol and the host MUST be written in lower case.
 8. In anything after the authority, and in the endpoint, every byte of the
    UTF-8 encoding that is a control character, is outside ASCII, is a space,
