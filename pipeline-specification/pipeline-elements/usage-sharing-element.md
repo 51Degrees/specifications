@@ -136,7 +136,7 @@ In the snippet below:
   <ServerIP>IP_ADDRESS</ServerIP> 
   <Platform>PLATFORM PLATFORM_VER SERVICE_PACK</Platform> 
   <!--Each evidence value is represented as an entry in the form:--> 
-  <PREFIX [escaped=true] [truncated=true] Name="FIELD">VALUE</PREFIX> 
+  <PREFIX [escaped="true"] [truncated="true"] Name="FIELD">VALUE</PREFIX> 
   <!--For example:--> 
   <Header Name="user-agent">USER_AGENT</Header> 
   <Header Name="host">HOST</Header>
@@ -184,6 +184,18 @@ Currently, the defined attributes are:
   characters, which have been replaced with escaped ones.
 - truncated - Indicates that the original evidence value was too long. The
   value in the XML does not include all characters from the original.
+
+A character that XML 1.0 does not allow is replaced by the text `\x` followed
+by the code of the character as four lower-case hexadecimal digits, for
+example `\x001f`, and the element for that Evidence entry is marked
+`escaped="true"`.
+
+A value longer than 10,000 characters is cut to 10,000 characters and the
+element for that Evidence entry is marked `truncated="true"`. The limit counts
+Unicode code points, and the cut never splits a character, so a character that
+UTF-16 stores as two units (a surrogate pair, such as most emoji) is never
+divided. The limit applies to the value as it was supplied, before any
+character is replaced, so the `\x` escapes do not count towards it.
 
 See the [ReplacedString](https://github.com/51Degrees/51degrees-java/blob/main/pipeline/pipeline.engines.fiftyone/src/main/java/fiftyone/pipeline/engines/fiftyone/flowelements/ShareUsageElement.java#L485)
 function in Java for an example of this.

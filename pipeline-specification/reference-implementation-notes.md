@@ -119,5 +119,6 @@ stands). They mark a value containing characters that XML does not allow with
 a `<BadSchema>` element and `\x` escapes, where the specification uses an
 `escaped` attribute. They put a `[TRUNCATED BY USAGE SHARING]` prefix on a
 value that is too long, where the specification uses a `truncated` attribute.
-Every other language follows the Processing section. .NET will change to it
+They count the length of a value in UTF-16 units, where the specification
+counts Unicode code points. Every other language follows the Processing section. .NET will change to it
 once both forms have been seen working downstream.
