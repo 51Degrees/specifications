@@ -102,8 +102,7 @@ information on configuring and creating elements.
 In general, the details of the options exposed by each builder are a matter
 for individual Elements. However, there is an API-wide expectation that
 the user will be able to specify [file system paths](features/file-system-paths.md)
-using relative path specifications that are commonly seen when working with
-the users's language and/or framework.
+as relative paths.
 
 Be aware that the way builders were implemented in the reference languages
 has caused some issues that could be avoided by making different design
