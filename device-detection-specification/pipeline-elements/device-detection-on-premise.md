@@ -224,9 +224,9 @@ Engine can be shared.
 Finished Element Data MUST be safe to read from several threads at once, as
 [thread safety](../../pipeline-specification/features/thread-safety.md#element-data)
 describes, so Aspect Data that reads its values from a `ResultsHash` instance
-MUST let one thread at a time read that instance, for example by holding a
-lock for each read, unless it is a type the language does not let several
-threads share.
+MUST let only one thread at a time read from its results, for example by
+holding a lock for each read, unless the Aspect Data is a type the language
+does not let several threads share.
 
 ### Performance guidance
 
