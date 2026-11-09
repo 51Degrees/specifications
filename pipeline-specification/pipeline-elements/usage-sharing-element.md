@@ -318,6 +318,7 @@ pauses. Processing MUST NOT wait for, or be stopped by, the back-off.
 A send fails when the request cannot be made, has no answer within the
 time the implementation allows, or is answered with anything other than
 200.
+The batch that failed is dropped. It is not put back on the queue.
 
 1. When the [failures to enter recovery](#configuration-options) number
    of sends have failed within the last
