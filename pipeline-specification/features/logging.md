@@ -20,17 +20,18 @@ impact performance when it is not enabled.
 A license key MUST NOT appear in full in a log entry or in an error message, at
 any log level. Where a message names a license key it MUST show only the key's
 last 4 characters, with every character before them replaced, so that a reader
-can tell two keys apart but cannot use either. A license key is a paid
-credential, and logs and error messages
-travel further than the server, to log services, to support tickets and,
-through the [JSON Builder's](../pipeline-elements/json-builder.md) `errors`
-list, to the browser.
+can tell two keys apart but cannot use either. A key of 4 characters or fewer
+MUST be replaced entirely. A license key is a paid credential, and logs and
+error messages travel further than the server, to log services, to support
+tickets and, through the
+[JSON Builder's](../pipeline-elements/json-builder.md) `errors` list, to the
+browser.
 
 Some URLs carry a license key in their query, such as the URL a
 [data update](data-updates.md) request is sent to. A message that names such a
-URL MUST name it with the key masked in the same way. The same
-applies to the message of an error raised by an HTTP library, which often
-includes the URL it requested.
+URL MUST name it with the key masked in the same way. The same applies to the
+message of an error raised by an HTTP library, which often includes the URL it
+requested.
 
 There MUST be a test that a failed request carrying a license key produces log
 entries and error messages that hold only the masked form of the key.
