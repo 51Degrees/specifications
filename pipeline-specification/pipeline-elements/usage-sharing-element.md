@@ -72,11 +72,16 @@ Unless all Evidence is shared, it MUST also return false for any key where:
 
 Anything else MUST return true. (i.e. it will be shared)
 
-The session cookie is the one exception to the cookie rule. The filter MAY
-accept the cookie named by the [session cookie name](#configuration-options)
-option, and MUST accept it when [session tracking](#session-tracking) is on,
-so that the tracker can read it. The session cookie MUST NOT be shared unless
-all Evidence is shared.
+The element accepts no Evidence, so it does not accept the session cookie
+either. When the [track session](#configuration-options) option is on, the
+element MUST read the cookie named by the
+[session cookie name](#configuration-options) option from the same two places
+as the values it shares, being the Evidence in the Flow Data and the web
+request supplied as `server.http-request` (see
+[Accepted Evidence](#accepted-evidence)), so that the
+[session tracking](#session-tracking) can compare it. A cookie found in both
+places is read once, with the value from the Evidence. The session cookie
+MUST NOT be shared unless all Evidence is shared.
 
 See [configuration options](#configuration-options) for more detail on the
 configuration parameters that can affect this filter function.
