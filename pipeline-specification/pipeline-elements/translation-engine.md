@@ -148,18 +148,17 @@ A configuration file can set the options that take a single value:
 }
 ```
 
-Sources and translations are added in code only, through `AddSource` and
-`AddTranslation` on the builder, and a configuration file cannot set them. A
+A package MAY also let a configuration file set sources and translations. A
 translation is a pair of values, the source property and the destination
-property, which is one of the complex options that
-[pipeline configuration](../features/pipeline-configuration.md#flow-elements)
-expects to stay in code. A source is added one at a time, and one of the two
-ways to add it also takes a pair of values.
+property, and a source given as file contents is a pair as well, the file name
+and its contents. A package that does not let a configuration file set sources
+and translations adds them in code, through `AddSource` and `AddTranslation` on
+the builder.
 
-To build a Translation Engine from a configuration file, a package MAY offer a
-builder for one particular translation, which adds its own sources and
-translations, and the configuration file names that builder. The .NET IP
-Intelligence package does this for its country translations.
+A package MAY also offer a builder for one particular translation, which adds
+its own sources and translations, so that a configuration file only names that
+builder. The .NET IP Intelligence package does this for its country
+translations.
 
 The Translation Engine is configurable using the builder:
 

@@ -62,9 +62,18 @@ first be determined:
    script always parses. A session id is written into the script inside
    quotes, so a session id that does not match `^[A-Za-z0-9-]{1,64}$` MUST
    be rendered as an empty string.
-6. If protocol, host and endpoint are all set, then generate a URL in the
-   following format: `[protocol]://[host][endpoint]`. Ensure that values
-   with/without leading/trailing slashes are handled correctly.
+6. If protocol, host and endpoint are all set, meaning none of them is empty
+   or only white space, then generate a URL in the following format:
+   `[protocol]://[host][endpoint]`, adding a `/` between the host and the
+   endpoint when neither has one and removing one when both do. The protocol
+   and host can come from Evidence, and the template writes the URL inside a
+   single-quoted JavaScript string, so the URL MUST be checked and encoded as
+   described under [Callback URL](#callback-url) before it is passed to the
+   template. White space means the characters with the Unicode `White_Space`
+   property
+   ([PropList.txt](https://www.unicode.org/Public/18.0.0/ucd/PropList.txt)),
+   being U+0009 to U+000D, U+0020, U+0085, U+00A0, U+1680, U+2000 to U+200A,
+   U+2028, U+2029, U+202F, U+205F and U+3000.
 7. The JavaScript might need to make call backs to the server. A list of any
    query parameters that will be included in those calls needs to be created.
    This can be done by looking at the query entries in the existing Evidence:
@@ -139,13 +148,181 @@ the following:
 
 - a JavaScript reserved word, including those reserved in strict mode and
   `null`, `true` and `false`;
-- `Infinity`, `NaN` or `undefined`, which a top level `var` cannot replace,
-  so the object would never be created;
+- `eval` or `arguments`, which strict mode code cannot declare
+  ([ECMA-262 section 13.1.1](https://tc39.es/ecma262/multipage/ecmascript-language-expressions.html#sec-identifiers-static-semantics-early-errors)),
+  and because the script declares the object with a top level `var` that is
+  not strict mode code, `eval` would replace the page's own `eval` function;
+- `Infinity`, `NaN` or `undefined`, or, in a browser, any of the following
+  properties of the Window object, none of which a top level `var` can
+  replace in a secure context, so the object would never be created:
+  - `window`, `document`, `top`, `name`, `status`, `history`, `navigator`,
+    `closed`, `frameElement`, `customElements` and `originAgentCluster`,
+    from the HTML Standard's
+    [Window object](https://html.spec.whatwg.org/multipage/nav-history-apis.html#the-window-object)
+    (`name` and `status` keep only the text `[object Object]`);
+  - `isSecureContext`, `crossOriginIsolated`, `localStorage` and
+    `sessionStorage`, which the HTML Standard also gives the Window object;
+  - `crypto`, `indexedDB`, `caches`, `trustedTypes`, `cookieStore` and
+    `speechSynthesis`, which the
+    [Web Cryptography API](https://w3c.github.io/webcrypto/),
+    [Indexed Database API](https://w3c.github.io/IndexedDB/),
+    [Service Workers](https://w3c.github.io/ServiceWorker/),
+    [Trusted Types](https://w3c.github.io/trusted-types/dist/spec/),
+    [Cookie Store API](https://cookiestore.spec.whatwg.org/) and
+    [Web Speech API](https://webaudio.github.io/web-speech-api/)
+    specifications define;
+  - `crashReport`, `credentialless`, `documentPictureInPicture`, `fence` and
+    `launchQueue`, which the
+    [Crash Reporting](https://wicg.github.io/crash-reporting/),
+    [Iframe credentialless](https://wicg.github.io/anonymous-iframe/),
+    [Document Picture-in-Picture](https://wicg.github.io/document-picture-in-picture/),
+    [Fenced Frame](https://wicg.github.io/fenced-frame/) and
+    [Web App Launch Handler API](https://wicg.github.io/web-app-launch/)
+    drafts of the Web Platform Incubator Community Group define;
+  - `styleMedia`, which Chrome defines although no standard does.
+
+  `caches`, `cookieStore` and `documentPictureInPicture` exist only in a
+  secure context, such as a page served over HTTPS, and are refused on every
+  page, so that whether a name is valid does not depend on the page's scheme;
+- `location`, which the Window object declares with `[PutForwards=href]`,
+  so in a browser a top level `var location` sets `location.href` to the
+  object's text, `[object Object]`, and navigates the page away;
 - `fiftyoneDegreesManager`, which is the constructor the script defines.
 
 Where no name is configured, the name is `fod`. A configured name that is
 not valid, including an empty one, MUST be refused when the element is
 built, using the language's usual configuration error.
+
+## Callback URL
+
+The protocol and host of the callback URL come from the `header.protocol`
+and `header.host` Evidence values unless they are configured, so whoever
+makes the request supplies them. The URL MUST therefore meet the following
+rules before it is passed to the template.
+
+1. The protocol MUST be `http` or `https`, compared ignoring ASCII case
+   only, so that a letter outside ASCII never matches one inside it. The
+   script uses the URL only with `fetch` and `XMLHttpRequest`, and the Fetch
+   Standard's [scheme fetch](https://fetch.spec.whatwg.org/#scheme-fetch)
+   gives a network error for every scheme but `about`, `blob`, `data`,
+   `file`, `http` and `https`, of which only `http` and `https` can reach a
+   server. A configured protocol that is neither, including one made only of
+   white space, MUST be refused when the element is built, using the
+   language's usual configuration error. An empty configured protocol means
+   that none is configured, which is the default under
+   [Configuration options](#configuration-options), so step 1 takes the
+   protocol from Evidence, but a builder method that sets the protocol MAY
+   refuse an empty one.
+2. The host value MUST NOT hold `?` or `#`. The endpoint is written after the
+   host value, so a `?` or `#` in the host value would make the endpoint part
+   of the URL's query or fragment, and the callback would go to the wrong
+   path. The authority is the host value up to its first `/`. Anything after
+   that point is written after the authority and before the endpoint,
+   encoded as rule 8 says.
+3. The host value MUST NOT hold `@` anywhere, so it holds no user
+   information. The script sends its request with `fetch` where the browser
+   supports it, and the Fetch Standard's
+   [Request constructor](https://fetch.spec.whatwg.org/#dom-request) throws
+   a `TypeError` when the URL
+   [includes credentials](https://url.spec.whatwg.org/#include-credentials),
+   meaning a user name or password that is not empty. Otherwise the script
+   uses `XMLHttpRequest`, whose
+   [`send()` method](https://xhr.spec.whatwg.org/#dom-xmlhttprequest-send)
+   accepts credentials in the URL, setting the request's use-URL-credentials
+   flag when the URL includes them. An empty user name, as in
+   `@example.com`, is not credentials, so `fetch` accepts it. Refusing all
+   user information gives the callback the same outcome under `fetch` and
+   `XMLHttpRequest`. An `@` after the first `/` is refused as well, so
+   `example.com/a@b` fails, because a password may hold a `/` that is not
+   percent-encoded. The configured host `user:12/ss@example.com`, with the
+   user name `user` and the password `12/ss`, has the authority `user:12`,
+   which would otherwise pass rules 4 and 5 as the host `user` and the port
+   12, so every script served would carry the password and send its callback
+   to the host `user`.
+4. The host MUST be one of the following.
+   - An IPv6 address in square brackets, as
+     [RFC 3986 section 3.2.2](https://www.rfc-editor.org/rfc/rfc3986#section-3.2.2)
+     defines one, with nothing else inside the brackets. A `%` inside the
+     brackets fails, so an IPv6 zone identifier is refused. RFC 3986's syntax
+     "does not support IPv6 scoped addressing zone identifiers".
+     [RFC 9844 section 3](https://www.rfc-editor.org/rfc/rfc9844#section-3)
+     obsoletes RFC 6874, which had added them to that syntax, because web
+     browser implementers found RFC 6874 "impracticable to support". The
+     WHATWG URL Standard's
+     [IPv6 parser](https://url.spec.whatwg.org/#concept-ipv6-parser) returns
+     failure for any code point but an ASCII hex digit, `:` and `.`, so a
+     browser cannot parse a URL holding one. Nothing but a port may follow
+     the closing bracket.
+   - A name made of labels separated by `.`, optionally ending in `.`, where
+     every label holds at least one character and only ASCII letters, digits,
+     `-` and `_`. An IPv4 address in dotted decimal meets this rule. A host
+     holding any character outside ASCII fails, because the Host header's
+     syntax allows only ASCII
+     ([RFC 9110 section 7.2](https://www.rfc-editor.org/rfc/rfc9110#section-7.2),
+     [RFC 3986 section 3.2.2](https://www.rfc-editor.org/rfc/rfc3986#section-3.2.2))
+     and RFC 3986 asks for an internationalized name in its IDNA form. A
+     configured internationalized host MUST therefore be given as A-labels
+     ([RFC 5890 section 2.3.2.1](https://www.rfc-editor.org/rfc/rfc5890#section-2.3.2.1)).
+     A name whose last label, ignoring a final `.`, is made only of digits,
+     or is `0x` or `0X` followed by zero or more hexadecimal digits, MUST be
+     an IPv4 address written as RFC 3986 section 3.2.2 defines
+     `IPv4address`, being four decimal numbers from 0 to 255 separated by
+     `.`, each a `dec-octet`, which starts with `0` only when it is `0`
+     alone, so `0` and `101` pass and `00` and `01` fail, and with no final
+     `.`. The URL Standard's host parser reads such a name as an IPv4
+     address, and fails if it is not one
+     ([ends in a number checker](https://url.spec.whatwg.org/#ends-in-a-number-checker),
+     section 3.5), so a browser cannot parse a URL holding `example.123`,
+     `example.123.`, `example.0x1f` or `1.2.3.999`. Requiring the
+     `IPv4address` form also refuses forms that the URL Standard's IPv4
+     parser accepts, such as `127.1`, `0x7f.0.0.1`, `01.2.3.4` and
+     `1.2.3.4.`, and refusing them is intended, so that a callback host has
+     one written form that every client reads the same way.
+     [RFC 3986 section 7.4](https://www.rfc-editor.org/rfc/rfc3986#section-7.4)
+     leaves the first three out of the URI syntax "due to differences
+     between platform implementations", and RFC 3986 reads `1.2.3.4.` as a
+     registered name rather than an `IPv4address`.
+5. A port, where present, is `:` followed by one or more digits whose value
+   is no more than 65535, so an empty port is refused.
+   [RFC 3986 section 3.2.3](https://www.rfc-editor.org/rfc/rfc3986#section-3.2.3)
+   allows an empty port in its syntax, `port = *DIGIT`, but says "URI
+   producers and normalizers should omit the port component and its ":"
+   delimiter if port is empty [...]". Refusing an empty port also refuses a host
+   value that starts with a scheme and `://`, such as `https://example.com`,
+   whose authority is `https:`, being the host `https` with an empty port.
+   With the protocol `https` and the endpoint `/51dpipeline/json`, that host
+   value would otherwise give the callback
+   `https://https://example.com/51dpipeline/json`, which a browser reads as
+   the host `https` and the path `//example.com/51dpipeline/json`.
+6. A URL that fails any of rules 1 to 5 MUST NOT be passed to the template,
+   so the script is produced without callback functionality. Each instance
+   of the element SHOULD log an error the first time a URL fails, and not on
+   every later request, written so that the URL cannot start a new log line.
+   The error MUST NOT carry anything in the host value before its last `@`,
+   and MUST show `***` in its place, so that a password in the host value,
+   whether configured or from Evidence, is never written to the log. The
+   last `@` of the whole host value is used, and not that of the authority,
+   because a password may hold a `/`, `?` or `#` that is not percent-encoded.
+   The configured host `user:pa/ss@example.com` has the authority `user:pa`,
+   which holds no `@`, so leaving out only what comes before the authority's
+   last `@` would log `pa`. An authority that also ends at the first `?` or
+   `#` would do the same for `user:pa?ss@example.com`. This can leave part
+   of a refused host out of the log, and that is intended. With the protocol
+   `https` and the endpoint `/51dpipeline/json`, the host value
+   `exa mple.com/a@b`, which rules 3 and 4 refuse, is logged as
+   `https://***@b/51dpipeline/json`.
+7. ASCII letters in the protocol and the host MUST be written in lower case.
+8. In anything after the authority, and in the endpoint, every byte of the
+   UTF-8 encoding that is a control character, is outside ASCII, is a space,
+   or is one of `"`, `'`, `<`, `>`, `\`, `^`, `` ` ``, `{`, `|` and `}` MUST
+   be percent-encoded, as MUST a `%` that is not followed by two hexadecimal
+   digits.
+
+Every host these rules accept is one that RFC 3986 section 3.2.2 allows, but
+they refuse many that it allows, such as a registered name holding `~`, a
+sub-delimiter or a percent-encoded byte, and an `IPvFuture` literal. The host
+is written inside a single-quoted string in a script, where a sub-delimiter
+such as `'` would end the string.
 
 ## More than one script on a page
 

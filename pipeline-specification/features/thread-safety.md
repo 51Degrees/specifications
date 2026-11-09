@@ -33,6 +33,14 @@ concurrent read access. Flow Elements MAY add values to the Evidence during
 processing, as described in
 [adding Evidence values](evidence.md#adding-evidence-values).
 
+A Flow Element that runs in a
+[parallel](../advanced-features/parallel-processing.md) group MUST NOT add
+values to the Evidence. The other members of the group read the Evidence at
+the same time, and the Evidence only needs to be safe for reading from several
+threads at once, not for a write during those reads. A Flow Element that adds
+Evidence for later Flow Elements to read runs outside any parallel group,
+before the Flow Elements that read the value.
+
 ## Element Data
 
 In general, Element Data instances do not need to be thread safe, as they

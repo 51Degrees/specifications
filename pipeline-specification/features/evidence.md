@@ -56,13 +56,19 @@ A Flow Element MAY add values to Evidence while it processes a Flow Data.
 Flow Elements that run later, and the caller once processing is complete,
 read the added values as they read any other Evidence. For example, the
 [Sequence Element](../pipeline-elements/sequence-element.md#process) adds
-the session id and sequence so that later Flow Elements can use them.
+the session id and sequence so that later Flow Elements can use them. A Flow
+Element that runs in a parallel group MUST NOT add values, as
+[thread safety](thread-safety.md#evidence) explains.
 
 A Flow Element adds a value with the same Flow Data function that the
 caller uses to supply Evidence. Where the key is already present, ignoring
 case, the added value replaces the value held under that key. A value is
 added whether or not its key is [accepted](advertize-accepted-evidence.md)
 by the Flow Element that adds it.
+
+Caching that is keyed on Evidence, such as the ETag in
+[web integration](web-integration.md#cache-header-detail), uses the Evidence as
+the request supplied it.
 
 A Flow Element MAY instead output such values in its own Element Data. In
 that case, it is suggested that a helper function is created that will pull
