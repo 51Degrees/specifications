@@ -12,20 +12,24 @@ values they can use would be sufficient.
 For example, the Device Detection Engine will accept `query.user-agent`,
 `header.user-agent`, `query.sec-ch-ua`, `header.sec-ch-ua`, etc.
 
-However, in some scenarios, a more complex approach is needed.
-The main use-case is the
-[Usage Sharing Element](../pipeline-elements/usage-sharing-element.md#accepted-evidence).
-The data that this Element shares is configurable, but will typically include all
-HTTP headers (excluding those known to have personally identifiable information).
-Consequently, listing all the header names it will accept is impractical.
+Where listing the keys is impractical, a Flow Element can use a filter
+function that returns true if the supplied key is accepted by the Element and
+false otherwise.
 
-Instead, the reference implementations use a filter function that is set
-up to return true if the supplied key is accepted by the Element and false
-otherwise.
+Every Flow Element MUST declare the Evidence it accepts. Where an
+implementation's base Flow Element provides a default, that default MUST
+accept no Evidence, so an Element that declares nothing accepts nothing and
+the Pipeline keeps no Evidence on its behalf. A default that accepts every key
+would make the Pipeline accept every key, whatever its other Elements read.
 
-It is valid for an element not to make use of any Evidence values at all
-(for example, Cloud Aspect Engines - which use the output from the cloud
-request Engine)
+An Element MUST accept only the Evidence that can change its results, because
+the Pipeline's accepted Evidence decides the cache keys, the ETag and the Vary
+header. It is valid for an element not to make use of any Evidence values at
+all. Cloud Aspect Engines, which use the output from the Cloud Request Engine,
+accept none. The
+[Usage Sharing Element](../pipeline-elements/usage-sharing-element.md#accepted-evidence)
+accepts none either. It shares what it finds in the Flow Data and in the web
+request, and none of that changes a result.
 
 ## Usage
 
