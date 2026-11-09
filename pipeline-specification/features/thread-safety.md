@@ -56,6 +56,14 @@ together, as the reference implementation's
 does. Reading an Element Data instance once the Flow Element that writes it
 has finished MUST therefore be safe from several threads at once.
 
+Some Element Data writes into something it holds when it is read, such as an
+on-premise Engine's Aspect Data, which reads its values from native results
+that each read writes into. Such Element Data MUST let one thread at a time
+make each read, for example by holding a lock for each read, as the
+reference implementation's
+[`DeviceDataBaseOnPremise`](https://github.com/51Degrees/51degrees-dotnet/blob/5b4d06e99b1751b4c36ec6c554bc0ece4664a781/device-detection/Shared/Data/DeviceDataBaseOnPremise.cs#L546-L588)
+does, unless it is a type the language does not let several threads share.
+
 It is possible for a user to engineer a scenario where an instance is
 written from several threads, or read while another thread writes it. It is
 not worthwhile to cater for that scenario, given the decreased performance
@@ -67,8 +75,9 @@ they are being written.
 
 ## Aspect data
 
-In contrast to Element Data, Aspect Data instances SHOULD be thread-safe. This
-is because, if the [caching](caching.md) feature is enabled, the same instance
-might be added to multiple different Flow Data from different calls to `Process`.
-If the Aspect Data cannot be made thread safe for some reason then the
-corresponding Engine MUST NOT allow a cache to be added.
+Aspect Data is Element Data, so reading it once its Engine has finished is
+safe from several threads at once, as [Element Data](#element-data) requires.
+That also covers the [caching](caching.md) feature, where the same instance
+might be added to multiple different Flow Data from different calls to
+`Process`. An Engine whose Aspect Data is a type the language does not let
+several threads share MUST NOT allow a cache to be added.
