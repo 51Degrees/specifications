@@ -158,6 +158,9 @@ the following:
   [Window object](https://html.spec.whatwg.org/multipage/nav-history-apis.html#the-window-object),
   none of which a top level `var` can replace, so the object would never be
   created (`name` and `status` keep only the text `[object Object]`);
+- `location`, which the Window object declares with `[PutForwards=href]`,
+  so in a browser a top level `var location` sets `location.href` to the
+  object's text, `[object Object]`, and navigates the page away;
 - `fiftyoneDegreesManager`, which is the constructor the script defines.
 
 Where no name is configured, the name is `fod`. A configured name that is
