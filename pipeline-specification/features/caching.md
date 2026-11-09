@@ -98,9 +98,9 @@ Configuration options:
 
 [This article](https://medium.com/@yewang2018/lru-cache-design-8257850a69fe)
 describes the internals of such a cache. You can also review the
-[Java](https://github.com/51Degrees/pipeline-java/blob/master/pipeline.caching/src/main/java/fiftyone/caching/LruCacheBase.java)
-, [.NET](https://github.com/51Degrees/caching-dotnet/blob/master/FiftyOne.Caching/LruCacheBase.cs)
-and [C](https://github.com/51Degrees/common-cxx/blob/main/cache.c)
+[Java](https://github.com/51Degrees/51degrees-java/blob/main/pipeline/pipeline.caching/src/main/java/fiftyone/caching/LruCacheBase.java)
+, [.NET](https://github.com/51Degrees/51degrees-dotnet/blob/main/caching/Caching/LruCacheBase.cs)
+and [C](https://github.com/51Degrees/51degrees-cxx/blob/main/src/common/cache.c)
 reference implementations.
 
 ## Data lifetime and concurrency issues
