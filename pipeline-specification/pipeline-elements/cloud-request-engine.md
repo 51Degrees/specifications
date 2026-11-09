@@ -219,13 +219,17 @@ How a discovery failure at build time is handled depends on its class:
   a timeout, an HTTP 5xx response, or an HTTP 408 (Request Timeout) or 429 (Too
   Many Requests) response - MUST NOT fail the build. The Engine MUST log a
   warning, complete the build, and retry discovery on first use. A 408 and a
-  429 are transient because the same request can succeed later, as
+  429 are transient because a later request can succeed.
   [RFC 9110 section 15.5.9](https://www.rfc-editor.org/rfc/rfc9110#section-15.5.9)
-  says the client "MAY repeat that request" after a 408, and
+  says a 408 means the server did not receive a complete request in the time
+  it was prepared to wait, and that a client with a request in transit "MAY
+  repeat that request".
   [RFC 6585 section 4](https://www.rfc-editor.org/rfc/rfc6585#section-4) says
-  a 429 "MAY include a Retry-After header indicating how long to wait before
-  making a new request". Failures of those first-use retries are
-  process-time failures, so
+  a 429 means too many requests in a given time, and that it may carry a
+  Retry-After header saying how long to wait before a new request. A 408 at
+  build is transient, yet it does not count towards the
+  [recovery period](#failures-that-count), as that section says. Failures of
+  those first-use retries are process-time failures, so
   [`SuppressProcessExceptions`](../features/exception-handling.md) applies to
   them as to any other processing error.
 
