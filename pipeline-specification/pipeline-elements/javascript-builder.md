@@ -245,8 +245,18 @@ rules before it is passed to the template.
      leaves the first three out of the URI syntax "due to differences
      between platform implementations", and RFC 3986 reads `1.2.3.4.` as a
      registered name rather than an `IPv4address`.
-5. A port, where present, is `:` followed by nothing or by digits whose value
-   is no more than 65535.
+5. A port, where present, is `:` followed by one or more digits whose value
+   is no more than 65535, so an empty port is refused.
+   [RFC 3986 section 3.2.3](https://www.rfc-editor.org/rfc/rfc3986#section-3.2.3)
+   allows an empty port in its syntax, `port = *DIGIT`, but says "URI
+   producers and normalizers should omit the port component and its ":"
+   delimiter if port is empty". Refusing an empty port also refuses a host
+   value that starts with a scheme and `://`, such as `https://example.com`,
+   whose authority is `https:`, being the host `https` with an empty port.
+   With the protocol `https` and the endpoint `/51dpipeline/json`, that host
+   value would otherwise give the callback
+   `https://https://example.com/51dpipeline/json`, which a browser reads as
+   the host `https` and the path `//example.com/51dpipeline/json`.
 6. A URL that fails any of rules 1 to 5 MUST NOT be passed to the template,
    so the script is produced without callback functionality. Each instance
    of the element SHOULD log an error the first time a URL fails, and not on
