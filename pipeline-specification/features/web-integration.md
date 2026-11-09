@@ -225,7 +225,7 @@ accepts it, and a revalidation's ETag is the same as the one it sends.
 |----------------|-------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
 | Cache-Control  | max-age=1800 private                                                                | Cache item lifetime is 30 minutes. Only local client caches can cache this content.                  |
 | Vary           | all headers in Pipeline Evidence key filter (e.g. User-Agent)                       | Let the cache know that if one of these headers changes, the cached content will need to be re-fetched. |
-| ETag           | Calculated hash of ALL the Evidence values in Evidence filter key for this Pipeline | Assists caches in re-validating expired content                                                         |
+| ETag           | Calculated hash of the Evidence values in the Evidence key filter, as the request supplied them (see below) | Assists caches in re-validating expired content                                                         |
 | Content-Type   | application/x-javascript or application/JSON                                        | Indicate the type of content being returned                                                             |
 | Content-Length | Content length in bytes                                                             | Indicate the expected length of the content                                                             |
 
@@ -237,6 +237,17 @@ valid.
 If the value in the 'If-None-Match' header matches the calculated ETag value for
 the current request, then the content in the cache is still valid and the
 endpoint can just return a 304 status code. (Not modified)
+
+The ETag MUST be calculated from the Evidence values in the Pipeline's Evidence
+key filter exactly as the request supplied them, before any Flow Element has
+added or replaced a value. A Flow Element MAY add Evidence while it processes,
+as [Adding Evidence values](evidence.md#adding-evidence-values) describes, and
+the [Sequence Element](../pipeline-elements/sequence-element.md#process) adds a
+new `query.session-id` and an incremented `query.sequence` on every request. A
+hash of the Evidence after processing would therefore differ on every request,
+and a revalidation would never get a 304 status code. The web integration
+MUST keep the supplied values and calculate the ETag from them, both for the
+response and for the 'If-None-Match' comparison.
 
 The same Evidence MUST give the same ETag in every process running the same
 build of the Pipeline API. A browser revalidates with the ETag it kept, and its
