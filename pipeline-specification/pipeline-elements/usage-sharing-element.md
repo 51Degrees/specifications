@@ -5,15 +5,67 @@ feature.
 
 ## Accepted Evidence
 
-The accepted Evidence for share usage is unusual as it cannot simply be a
-list of accepted keys like most Flow Elements.
+The Usage Sharing Element MUST NOT accept any Evidence. Its
+[accepted Evidence](../features/advertize-accepted-evidence.md) is empty, so it
+never adds a key to the Evidence a Pipeline accepts. The features that are
+built from a Pipeline's accepted Evidence, being [caching](../features/caching.md)
+and the ETag and Vary headers of the
+[client-side endpoints](../features/web-integration.md#cache-header-detail),
+therefore never depend on it. Usage sharing collects what it sees in order to
+share it, and none of it changes a result, so none of it belongs in a cache key
+or an ETag.
 
-Instead, it is a filter function that will need to return false (i.e. not shared)
-for any key where:
+It shares instead what it finds, from two places:
 
-- Prefix = `header.` and field is in a user-configurable block list
-  (by default, this block list SHOULD include the `cookies` HTTP header).
+- every Evidence value in the Flow Data, and
+- every header other than Cookie, every cookie, query string parameter and
+  session value of the web request, with its client IP address, its protocol and the method and path
+  of its request line, when the web integration supplies the request as
+  `server.http-request` (see
+  [Populating Evidence](../features/web-integration.md#populating-evidence)).
+  This is how a header that no other Flow Element accepts is still shared.
+
+A key found in both places is shared once, with the value from the Evidence.
+
+## Shared Evidence
+
+Which of the keys it finds are shared is decided by a filter function. The
+prefix of a key is everything before its first `.` and the field is everything
+after it, so a field can itself contain a `.`. Keys are compared without regard
+to case. A value from the web request is given the key it would have as
+Evidence, for example `header.user-agent` for its User-Agent header,
+`server.client-ip` for its client IP address and `header.protocol` for its
+protocol.
+
+The filter function MUST return false (i.e. not shared) for these keys,
+matched as the whole key or after a `.`, whatever the configuration and even
+when all Evidence is shared:
+
+- `id.email`, which is a raw email address.
+- `id.salt`, which is the salt used to make hashed email identifiers.
+- `request-query`, which is the whole query string. Sharing it would undo the
+  rules for query string parameters below.
+- `request-path`, which is the path of the request. Sharing it makes each page
+  a visitor opens look like a new session to the
+  [session tracking](#session-tracking), and the path is the part of a URL most
+  likely to carry a name or an identifier a site has put in it.
+- `header.cookie`, which is the Cookie header of the request and carries every
+  cookie ([RFC 6265 section 5.4](https://www.rfc-editor.org/rfc/rfc6265#section-5.4)).
+  This holds for the Cookie header of the `server.http-request` view as well as
+  for Evidence. The cookies starting `51D_` are shared as their own `cookie.`
+  Evidence under the rules below, and no other cookie is shared through the
+  header.
+
+So `query.id.email`, `server.request-path` and `header.cookie` are never shared, while
+`query.valid.email` is an ordinary query string parameter. The
+`server.http-request` value itself is never shared, only the values read from
+it.
+
+Unless all Evidence is shared, it MUST also return false for any key where:
+
+- Prefix = `header.` and field is in a user-configurable block list.
 - Prefix = `cookie.` and field does not start with `51D_`
+- Prefix = `session.` and field does not start with `51D_`
 - Prefix = `query.` and field does not start with `51D_` and is not in a
   user-configurable allow list of query string parameters that will be
   shared.
@@ -115,8 +167,9 @@ In the snippet below:
   this server.
 - **ServerIP** - IP address of the server where the xml is being generated.
 - **Platform** - The platform name, version and service pack if available.
-- **Evidence** – The Evidence that is shared will be determined by the
-  [accepted Evidence](#accepted-evidence).
+- **Evidence** – The Evidence that is shared is what the element finds, as
+  [accepted Evidence](#accepted-evidence) describes, less what the
+  [shared Evidence](#shared-evidence) rules leave out.
 
 Evidence values can be extremely long, or contain characters that are not
 permitted in XML. In order to handle this, some mechanism MUST be implemented
@@ -179,6 +232,9 @@ processed.
 See [configuration options](#configuration-options) for more detail
 on customizing this lifetime.
 
+The hash is of the values that would be shared, as the element accepts no
+Evidence of its own for the caching logic to read.
+
 Note that certain Evidence values MUST NOT be included in the generation
 of this hash code as they are designed to make a request unique.
 For example, the sequence number generated by the
@@ -216,8 +272,8 @@ it will need to handle cleanup a little more carefully than other elements.
 |-----------------------------------|-----------------------|--------------|------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------|
 | Included query string parameters  | yes                   | yes          | All query string and HTTP form parameters starting with `51D_` are shared.   | Allows the user to include specific query string or HTTP form parameters in the usage data that is shared.                   |
 | Share all query string parameters | yes                   | yes          | false                                                                        | If this flag is set, all query string and HTTP form parameters will be shared.                                               |
-| Share all Evidence                | yes                   | yes          | false                                                                        | If this flag is set, all Evidence values will be shared.                                                                     |
-| Blocked HTTP headers              | yes                   | yes          | All HTTP headers are shared except for cookies that do not start with `51D_` | Allows the user to exclude specific HTTP headers that they do not want to share.                                             |
+| Share all Evidence                | yes                   | yes          | false                                                                        | If this flag is set, all Evidence values will be shared, apart from the keys that are never shared.                          |
+| Blocked HTTP headers              | yes                   | yes          | All HTTP headers are shared except `Cookie`                                  | Allows the user to exclude specific HTTP headers that they do not want to share.                                             |
 | Ignore Flow Data Evidence filter  | yes                   | yes          | not set                                                                      | Allows the user to block a request from being shared if the specified criteria are met.                                      |
 | Share percentage                  | yes                   | yes          | 1.0                                                                          | Used to set the approximate proportion of requests that will be shared. A value of 1 means that 100% of requests are shared. |
 | Minimum entries per message       | yes                   | yes          | 50                                                                           | The number of requests that will be added to a usage sharing payload before it is sent.                                      |
