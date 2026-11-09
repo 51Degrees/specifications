@@ -182,8 +182,8 @@ rules before it is passed to the template.
    path. The authority is the host value up to its first `/`. Anything after
    that point is written after the authority and before the endpoint,
    encoded as rule 8 says.
-3. The authority MUST NOT hold user information, so an authority holding `@`
-   fails. The script sends its request with `fetch` where the browser
+3. The host value MUST NOT hold `@` anywhere, so it holds no user
+   information. The script sends its request with `fetch` where the browser
    supports it, and the Fetch Standard's
    [Request constructor](https://fetch.spec.whatwg.org/#dom-request) throws
    a `TypeError` when the URL
@@ -194,8 +194,14 @@ rules before it is passed to the template.
    accepts credentials in the URL, setting the request's use-URL-credentials
    flag when the URL includes them. An empty user name, as in
    `@example.com`, is not credentials, so `fetch` accepts it. Refusing all
-   user information, meaning any `@` before the first `/`, gives the callback
-   the same outcome under `fetch` and `XMLHttpRequest`.
+   user information gives the callback the same outcome under `fetch` and
+   `XMLHttpRequest`. An `@` after the first `/` is refused as well, so
+   `example.com/a@b` fails, because a password may hold a `/` that is not
+   percent-encoded. The configured host `user:12/ss@example.com`, with the
+   user name `user` and the password `12/ss`, has the authority `user:12`,
+   which would otherwise pass rules 4 and 5 as the host `user` and the port
+   12, so every script served would carry the password and send its callback
+   to the host `user`.
 4. The host MUST be one of the following.
    - An IPv6 address in square brackets, as
      [RFC 3986 section 3.2.2](https://www.rfc-editor.org/rfc/rfc3986#section-3.2.2)
@@ -224,10 +230,10 @@ rules before it is passed to the template.
      or is `0x` or `0X` followed by zero or more hexadecimal digits, MUST be
      an IPv4 address written as RFC 3986 section 3.2.2 defines
      `IPv4address`, being four decimal numbers from 0 to 255 separated by
-     `.`, each a `dec-octet` with no zero before another digit, so `0` and
-     `101` pass and `00` and `01` fail, and with no final `.`. The URL
-     Standard's host parser reads such a name as an IPv4 address, and fails
-     if it is not one
+     `.`, each a `dec-octet`, which starts with `0` only when it is `0`
+     alone, so `0` and `101` pass and `00` and `01` fail, and with no final
+     `.`. The URL Standard's host parser reads such a name as an IPv4
+     address, and fails if it is not one
      ([ends in a number checker](https://url.spec.whatwg.org/#ends-in-a-number-checker),
      section 3.5), so a browser cannot parse a URL holding `example.123`,
      `example.123.`, `example.0x1f` or `1.2.3.999`. Requiring the
@@ -236,8 +242,9 @@ rules before it is passed to the template.
      `1.2.3.4.`, and refusing them is intended, so that a callback host has
      one written form that every client reads the same way.
      [RFC 3986 section 7.4](https://www.rfc-editor.org/rfc/rfc3986#section-7.4)
-     leaves such forms out of the URI syntax "due to differences between
-     platform implementations".
+     leaves the first three out of the URI syntax "due to differences
+     between platform implementations", and RFC 3986 reads `1.2.3.4.` as a
+     registered name rather than an `IPv4address`.
 5. A port, where present, is `:` followed by nothing or by digits whose value
    is no more than 65535.
 6. A URL that fails any of rules 1 to 5 MUST NOT be passed to the template,
@@ -255,7 +262,8 @@ rules before it is passed to the template.
    `#` would do the same for `user:pa?ss@example.com`. This can leave part
    of a refused host out of the log, and that is intended. With the protocol
    `https` and the endpoint `/51dpipeline/json`, the host value
-   `exa mple.com/a@b` is logged as `https://***@b/51dpipeline/json`.
+   `exa mple.com/a@b`, which rules 3 and 4 refuse, is logged as
+   `https://***@b/51dpipeline/json`.
 7. ASCII letters in the protocol and the host MUST be written in lower case.
 8. In anything after the authority, and in the endpoint, every byte of the
    UTF-8 encoding that is a control character, is outside ASCII, is a space,
