@@ -198,24 +198,31 @@ reason, until a later data file has it again.
 
 ### Reading graphs
 
-`process` walks no graph. The native code walks the graph of a component when a
-Property of that component is first read from a `ResultsIpi` instance, against
-the data set that instance holds, and walks it once for that instance. A lookup
-that reads a few Properties walks only the graphs of their components, whatever
-Properties the Engine was created with, and a data refresh between `process`
-and the read does not change the answer.
+When the Engine was created with names, `process` walks the graph of each
+component a named Property belongs to, and no other, so no later read walks a
+graph. A failure to read one of those graphs from the data file is reported by
+`process`, which throws in C++ and the languages built on it.
 
-A failure to read a graph from the data file is reported by the read that
-walked it, which throws in C++ and the languages built on it. That component is
-not walked again for the instance, so its Properties then read as if it had no
-profile.
+When the Engine was created with no names, `process` walks no graph. The native
+code walks the graph of a component when a Property of that component is first
+read from a `ResultsIpi` instance, against the data set that instance holds,
+and walks it once for that instance, so a lookup that reads the Properties of
+one component walks one graph. A failure to read a graph from the data file is
+reported by the read that walked it, which throws in C++ and the languages
+built on it. That component is not walked again for the instance, so its
+Properties then read as if it had no profile.
+
+Either way the values are the same whatever is read first, and a data refresh
+between `process` and a read does not change the answer, as the instance keeps
+the data set it was populated from.
 
 ### Results and threads
 
 A `ResultsIpi` instance is used by one thread at a time, because reading a
-value writes into it, and the first read of a Property of a component walks the
-component's graph. Different `ResultsIpi` instances can be used on different
-threads at once, and the Engine can be shared.
+value writes into it, and when the Engine was created with no names the first
+read of a Property of a component walks the component's graph. Different
+`ResultsIpi` instances can be used on different threads at once, and the
+Engine can be shared.
 
 Aspect Data SHOULD be thread safe, as
 [thread safety](../../pipeline-specification/features/thread-safety.md)
