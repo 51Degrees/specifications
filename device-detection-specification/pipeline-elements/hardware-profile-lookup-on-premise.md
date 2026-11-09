@@ -18,6 +18,9 @@ Enterprise and TAC data files. The Lite data file has neither.
 The lookup is part of the native component in
 [51degrees-cxx/src/dd/hash](https://github.com/51Degrees/51degrees-cxx/tree/main/src/dd/hash),
 added by [51degrees-cxx#66](https://github.com/51Degrees/51degrees-cxx/pull/66).
+The Device Detection on-premise Engine gives it as the
+[profiles for a property value](device-detection-on-premise.md#profiles-for-a-property-value),
+and this Engine is built on that.
 
 ### Index of profiles by value
 
@@ -38,10 +41,12 @@ every profile and returns the same profiles more slowly.
 
 ### Results
 
-A lookup MUST return every profile holding the value, in the order of the
-profiles in the data file, which is ascending profile id. A value that no
-profile holds returns no profiles. The Property name and the value are
-matched exactly, including their case.
+A lookup MUST return every profile holding the value, each once, in the order
+of the profiles in the data file, which is ascending profile id. A value that
+no profile holds returns no profiles. The Property name and the value are
+matched exactly, as the data file holds them, including their case, as the
+[profiles for a property value](device-detection-on-premise.md#profiles-for-a-property-value)
+require.
 
 Choosing one of several profiles is left to the caller. A caller that wants a
 single device MAY pass the id of one profile to the Device Detection
@@ -60,11 +65,16 @@ on-premise Engine as the `51D_ProfileIds` Evidence.
 The languages built on SWIG get these once their wrapper is generated again
 from the interface in 51degrees-cxx. In .NET the `NativeEngine` and
 `TacEngine` of `FiftyOne.DeviceDetection.PropertyKeyed` are On-premise
-Engines of this kind. Today they find the profiles by processing every
-hardware profile at start-up, and
-[device-detection-dotnet#915](https://github.com/51Degrees/device-detection-dotnet/issues/915)
-moves them to the native lookup. Java has no such Engine yet, which
-[device-detection-java#605](https://github.com/51Degrees/device-detection-java/issues/605)
+Engines of this kind. Since
+[51degrees-dotnet#101](https://github.com/51Degrees/51degrees-dotnet/pull/101)
+they use the native lookup for a Property that the Device Detection
+on-premise Engine's builder names with
+`SetIndexedProperties("NativeModel", "TAC")`. For a Property the builder does
+not name, they still process every hardware profile at start-up to build an index
+of their own, which
+[51degrees-dotnet#30](https://github.com/51Degrees/51degrees-dotnet/issues/30)
+tracks. Java has no such Engine yet, which
+[51degrees-java#17](https://github.com/51Degrees/51degrees-java/issues/17)
 proposes.
 
 ## Accepted Evidence
@@ -89,7 +99,9 @@ building the JSON reads no profile.
 The Device Detection on-premise Engine whose data this Engine uses SHOULD be
 created with the NativeModel and TAC Properties named to index, so that the
 native index is built when its data set is initialized. An Engine of this
-kind SHOULD use the native lookup rather than processing every hardware
+kind MUST find the profiles through the native lookup, as the
+[profiles for a property value](device-detection-on-premise.md#profiles-for-a-property-value)
+require, rather than build an index of its own by processing every hardware
 profile at start-up.
 
 ## Process
