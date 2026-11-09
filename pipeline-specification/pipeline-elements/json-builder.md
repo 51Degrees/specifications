@@ -46,6 +46,12 @@ The Element needs to produce a JSON representation of the Flow Data.
 There MUST be a top-level entry for each Element Data containing sub-entries
 for each Property and its value (set to 'null' if there is no value).
 
+These keys MUST be written in lower case. The key of a top-level entry is the
+Element Data's Data Key, and the key of a sub-entry is the Property name,
+followed by the suffix of any meta-Property in the table below. The one
+exception is the top-level key `javascriptProperties`, which keeps its
+capital P.
+
 There are also several metadata Properties with different suffixes that can
 be added for each Property:
 
@@ -53,7 +59,7 @@ be added for each Property:
 |--------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | nullreason         | Where the Property value is null, this meta-Property MUST be added with a string message that explains why this Property does not have a value.                                                                                                                                          |
 | delayexecution     | This meta-Property MUST be added with the value 'true' for all Properties where the [metadata](../features/properties.md#property-metadata) delay execution flag is true.                                                                                                                |
-| EvidenceProperties | Where the JSON includes other Properties that are in the [metadata](../features/properties.md#property-metadata) Evidence Properties list for this Property and those Properties have the delayed execution flag set to true, this meta-Property MUST be added to list those Properties. |
+| evidenceproperties | Where the JSON includes other Properties that are in the [metadata](../features/properties.md#property-metadata) Evidence Properties list for this Property and those Properties have the delayed execution flag set to true, this meta-Property MUST be added to list those Properties. |
 
 Some Elements MUST be excluded from having their Properties added to the JSON.
 These are:
@@ -201,6 +207,4 @@ Below is JSON with an error value set.
 
 ## Configuration options
 
-| **Name**      | **Type**        | **Default**  | **Description**                                                                                                                                                                                                                                                                                                                                                                |
-|---------------|-----------------|--------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| SetProperties | List of strings | [Empty list] | A list of the Properties to include in the JSON. By default, the list is empty and all Properties will be included in the JSON. Note that some Properties, such as JavaScript Properties and meta properties, MUST always be included, regardless of this setting. Property names will need to be fully qualified. (e.g. `device.ismobile` or `devices.profiles.hardwarename`) |
+None

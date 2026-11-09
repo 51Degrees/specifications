@@ -16,6 +16,8 @@ mapping to an HTTP session.
 
 ## Element Data
 
+The Element Data key is `sequence`.
+
 | **Name**   | **Type** | **Description**                                                                       |
 |------------|----------|---------------------------------------------------------------------------------------|
 | session-id | string   | An identifier for this session.                                                       |
@@ -29,9 +31,10 @@ add it to the output. The reference implementations use a GUID.
 If `query.sequence` is present in Evidence then add one to it and add it to
 the output. If it is not present, set the output value for sequence to one.
 
-Note that the reference implementations currently write these output values
-back to the Evidence collection as Evidence is not implemented as
-immutable in the reference implementations.
+Add both output values to Evidence as well, under `query.session-id` and
+`query.sequence`, so that later Flow Elements and the caller can read them
+from Evidence. See
+[adding Evidence values](../features/evidence.md#adding-evidence-values).
 
 ## Configuration options
 

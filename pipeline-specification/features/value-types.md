@@ -84,6 +84,23 @@ double actualValue = 90.0 * ((double)storedValue / (double)int16_max);
 double actualValue = 90.0 * ((double)storedValue / 32767.0);
 ```
 
+### Rounding of Azimuth and Declination values
+
+A value converted from Azimuth or Declination MUST be given to the caller
+rounded to 3 decimal places, whether it is given as a number, as a string or
+as a point in a [WKT](#wkt) shape. For example, a stored Declination of 6751
+converts to 18.542741172521133 and is given as 18.543. Where the number is a
+binary floating point type, it is the value of that type nearest to the
+rounded decimal.
+
+The locations these types hold are rough, and a step of 0.001 degrees of
+latitude is about 111 metres. More decimal places would make each string, and
+each WKT shape with its many points, longer without making the location any
+more accurate.
+
+A package MAY offer a setting that changes the number of decimal places,
+provided the default is 3.
+
 ### WKT
 
 A new property type for the IP Intelligence Engine is the `WktString` interface
