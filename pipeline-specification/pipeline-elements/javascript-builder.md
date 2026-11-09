@@ -224,7 +224,8 @@ rules before it is passed to the template.
      or is `0x` or `0X` followed by zero or more hexadecimal digits, MUST be
      an IPv4 address written as RFC 3986 section 3.2.2 defines
      `IPv4address`, being four decimal numbers from 0 to 255 separated by
-     `.`, each with no leading zero, and with no final `.`. The URL
+     `.`, each a `dec-octet` with no zero before another digit, so `0` and
+     `101` pass and `00` and `01` fail, and with no final `.`. The URL
      Standard's host parser reads such a name as an IPv4 address, and fails
      if it is not one
      ([ends in a number checker](https://url.spec.whatwg.org/#ends-in-a-number-checker),
@@ -243,9 +244,18 @@ rules before it is passed to the template.
    so the script is produced without callback functionality. Each instance
    of the element SHOULD log an error the first time a URL fails, and not on
    every later request, written so that the URL cannot start a new log line.
-   The error MUST NOT carry the user information, meaning everything in the
-   authority before its last `@`, so that a password in the host value,
-   whether configured or from Evidence, is never written to the log.
+   The error MUST NOT carry anything in the host value before its last `@`,
+   and MUST show `***` in its place, so that a password in the host value,
+   whether configured or from Evidence, is never written to the log. The
+   last `@` of the whole host value is used, and not that of the authority,
+   because a password may hold a `/`, `?` or `#` that is not percent-encoded.
+   The configured host `user:pa/ss@example.com` has the authority `user:pa`,
+   which holds no `@`, so leaving out only what comes before the authority's
+   last `@` would log `pa`. An authority that also ends at the first `?` or
+   `#` would do the same for `user:pa?ss@example.com`. This can leave part
+   of a refused host out of the log, and that is intended. With the protocol
+   `https` and the endpoint `/51dpipeline/json`, the host value
+   `exa mple.com/a@b` is logged as `https://***@b/51dpipeline/json`.
 7. ASCII letters in the protocol and the host MUST be written in lower case.
 8. In anything after the authority, and in the endpoint, every byte of the
    UTF-8 encoding that is a control character, is outside ASCII, is a space,
