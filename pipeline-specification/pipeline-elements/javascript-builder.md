@@ -250,7 +250,7 @@ rules before it is passed to the template.
    [RFC 3986 section 3.2.3](https://www.rfc-editor.org/rfc/rfc3986#section-3.2.3)
    allows an empty port in its syntax, `port = *DIGIT`, but says "URI
    producers and normalizers should omit the port component and its ":"
-   delimiter if port is empty". Refusing an empty port also refuses a host
+   delimiter if port is empty [...]". Refusing an empty port also refuses a host
    value that starts with a scheme and `://`, such as `https://example.com`,
    whose authority is `https:`, being the host `https` with an empty port.
    With the protocol `https` and the endpoint `/51dpipeline/json`, that host
