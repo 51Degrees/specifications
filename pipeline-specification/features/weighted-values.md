@@ -2,11 +2,13 @@
 
 ## Overview
 
-Some Engines MAY return values which are weighted. This gives the user the
-full picture of which are most likely when a single value is not certain.
+Some Engines MAY return values which are weighted. This gives the user every
+value that applies when a single value is not certain, each with its
+weighting. What a weighting measures depends on the property, and the
+property's definition says what it is, for example a share of an area.
 
-For example, when returning a location based on IP address evidence, there
-can be multiple locations with different probabilities.
+For example, the area associated with an IP address can cover several regions
+of a country, and each region is returned with its share of that area.
 
 ## Accessing
 
@@ -20,14 +22,14 @@ IExampleData data;
 IReadOnlyList<IWeightedValue<string>> values = data.ExampleProperty;
 ```
 
-2. Fetch the most likely value. The values are ordered from highest to lowest probability:
+2. Fetch the value with the highest weighting. The values are ordered from the highest weighting to the lowest:
 
 ```c#
 IReadOnlyList<IWeightedValue<string>> values;
-string mostLikelyValue = values[0].Value;
+string firstValue = values[0].Value;
 ```
 
-3. Get the probabilities of each value:
+3. Get the weighting of each value:
 
 ```c#
 IReadOnlyList<IWeightedValue<string>> values;
@@ -53,9 +55,9 @@ When serializing weighted values, they are represented like:
 
 The raw weighting is stored as a 16-bit unsigned integer (aka [ushort](https://learn.microsoft.com/en-us/dotnet/api/system.uint16.maxvalue?view=netstandard-2.0)).
 
-The sum of raw weightings for all values within any specific property should always add up to [UInt16.MaxValue](https://learn.microsoft.com/en-us/dotnet/api/system.uint16.maxvalue?view=netstandard-2.0) (that represents a `1.0` "likelyhood").
+The sum of raw weightings for all values within any specific property should always add up to [UInt16.MaxValue](https://learn.microsoft.com/en-us/dotnet/api/system.uint16.maxvalue?view=netstandard-2.0) (that represents a weighting of `1.0`).
 
-See [IWeightedValue.cs](https://github.com/51Degrees/pipeline-dotnet/blob/version/4.5/FiftyOne.Pipeline.Core/Data/IWeightedValue.cs) for more details.
+See [IWeightedValue.cs](https://github.com/51Degrees/51degrees-dotnet/blob/main/pipeline/Core/Data/IWeightedValue.cs) for more details.
 
 ## Internal Representation
 

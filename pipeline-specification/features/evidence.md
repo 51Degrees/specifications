@@ -5,7 +5,8 @@
 Evidence is the name for the input values added to a Flow Data instance.
 
 It is stored as key-value pairs and is used by Flow Elements within the
-Pipeline. Evidence is immutable once created.
+Pipeline. A Flow Element MAY add values to Evidence during processing, as
+described in [adding Evidence values](#adding-evidence-values).
 Keys MUST be case-insensitive and will usually be split into \<prefix\>.\<field\>.
 
 Currently, defined examples of keys are:
@@ -51,12 +52,24 @@ to use when clashes occur.
 
 ## Adding Evidence values
 
-Evidence is immutable. However, it might be desireable for some Flow Elements
-to add new values to Evidence for later elements to use.
+A Flow Element MAY add values to Evidence while it processes a Flow Data.
+Flow Elements that run later, and the caller once processing is complete,
+read the added values as they read any other Evidence. For example, the
+[Sequence Element](../pipeline-elements/sequence-element.md#process) adds
+the session id and sequence so that later Flow Elements can use them. A Flow
+Element that runs in a parallel group MUST NOT add values, as
+[thread safety](thread-safety.md#evidence) explains.
 
-In order to allow for something similar this usage scenario, it is suggested
-that a helper function is created that will pull a value from an existing
-Element Data if available, or fallback to pulling it from Evidence if needed.
+A Flow Element adds a value with the same Flow Data function that the
+caller uses to supply Evidence. Where the key is already present, ignoring
+case, the added value replaces the value held under that key. A value is
+added whether or not its key is [accepted](advertize-accepted-evidence.md)
+by the Flow Element that adds it.
+
+A Flow Element MAY instead output such values in its own Element Data. In
+that case, it is suggested that a helper function is created that will pull
+a value from an existing Element Data if available, or fallback to pulling
+it from Evidence if needed.
 
 For example, if Device Detection Engine requests `query.sec-ch-ua-platform`
 from this function, it would return a Property value from any Element Data
