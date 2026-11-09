@@ -28,11 +28,14 @@ This Element is only implemented for
 [.NET](https://github.com/51Degrees/51degrees-dotnet/tree/main/device-detection/DeviceDetection)
 at time of writing.
 The reference implementation writes the decoded values to Evidence, which
-a Flow Element MAY do, as Evidence is not immutable.
+a Flow Element MAY do outside a
+[parallel group](../../pipeline-specification/features/thread-safety.md#evidence),
+as Evidence is not immutable.
 Alternatively, the Element can output its values using Element Data as
 described in the table below.
-Where it does, the Device Detection Engines MUST be capable of using these
-values if available and falling back to Evidence values if they are not.
+The Device Detection Engines MUST be capable of using these values from
+Element Data if available, and falling back to Evidence values if they are
+not.
 See [adding Evidence values](../../pipeline-specification/features/evidence.md#adding-evidence-values)
 for more details.
 
