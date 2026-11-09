@@ -192,8 +192,10 @@ example `\x001f`, and the element for that Evidence entry is marked
 
 A value longer than 10,000 characters is cut to 10,000 characters and the
 element for that Evidence entry is marked `truncated="true"`. The limit counts
-Unicode code points, and the cut never splits a character, so a surrogate pair
-is never divided.
+Unicode code points, and the cut never splits a character, so a character that
+UTF-16 stores as two units (a surrogate pair, such as most emoji) is never
+divided. The limit applies to the value as it was supplied, before any
+character is replaced, so the `\x` escapes do not count towards it.
 
 See the [ReplacedString](https://github.com/51Degrees/51degrees-java/blob/main/pipeline/pipeline.engines.fiftyone/src/main/java/fiftyone/pipeline/engines/fiftyone/flowelements/ShareUsageElement.java#L485)
 function in Java for an example of this.
