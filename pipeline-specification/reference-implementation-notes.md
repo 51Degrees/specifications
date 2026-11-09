@@ -111,4 +111,13 @@ to avoid the issues described above.
 
 ## .NET usage sharing record
 
-The .NET packages do not yet write the record that the [Processing section of the usage sharing element](pipeline-elements/usage-sharing-element.md#processing) specifies. They write each value in a CDATA section, mark values containing characters that XML does not allow with a `<BadSchema>` element and `\x` escapes where the specification uses an `escaped` attribute, and put a `[TRUNCATED BY USAGE SHARING]` prefix on a value that is too long where the specification uses a `truncated` attribute. The Processing section is the form every language is moving to, and .NET will change to it after the receiving side has been checked with both forms working.
+The .NET packages do not yet write the record that the
+[Processing section of the usage sharing element](pipeline-elements/usage-sharing-element.md#processing)
+specifies. They write each Evidence value that has a prefix, such as a header
+or a cookie, inside a CDATA section (a block of XML text that is read as it
+stands). They mark a value containing characters that XML does not allow with
+a `<BadSchema>` element and `\x` escapes, where the specification uses an
+`escaped` attribute. They put a `[TRUNCATED BY USAGE SHARING]` prefix on a
+value that is too long, where the specification uses a `truncated` attribute.
+Every other language follows the Processing section. .NET will change to it
+once both forms have been seen working downstream.
