@@ -30,7 +30,7 @@ any other text. An integer is the decimal number at the start of the text,
 after any white space and sign, as C's `atoi` reads it, and 0 when the text
 does not start with one. A floating point number is what C's `strtod` reads
 from the start of the text, and 0 when the text does not start with one. So
-`"Unknown"` and `"N/A"` give `false` or 0. Where the result holds more than
+`"Unknown"` and `"N/A"` give `false` or 0. Where the Profile holds more than
 one value for such a Property, the Property has no value.
 
 Where a Flow Element holds values as strings, it MAY expose them. Where it

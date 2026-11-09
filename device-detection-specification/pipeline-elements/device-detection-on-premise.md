@@ -251,21 +251,25 @@ For details on the additional metadata, see the
 
 ### Property values
 
-Where the Evidence holds a value for a Property that a JavaScript Property
-gathers, in a cookie or query string value named `51D_` followed by the
-Property's name, such as the `51D_ScreenPixelsWidth` cookie that
-ScreenPixelsWidthJavascript writes, the Engine gives that value whether or not
-a Profile was matched. Otherwise the value of a data file Property comes from
-the Profile the Evidence matched for the Property's Component. Where no
-Profile was matched and Allow Unmatched is false, the Property has no value.
-Otherwise a List Property's value is every Value the Profile holds for the
-Property, in the order the data file gives them, each as the data file stores
-it, an empty one included and none split, and an empty list where the Profile
-holds none. A Property that is not a List has no value where the Profile holds
-none. Otherwise a string Property is its Value, or its Values joined by `|`,
-and a Boolean or numeric Property is read as
-[values stored as strings](../../pipeline-specification/features/value-types.md#values-stored-as-strings)
-says.
+The Engine gives the value of a Property as follows.
+
+1. Where the Evidence holds a value for a Property that a JavaScript Property
+   gathers, in a cookie or query string value named `51D_` followed by the
+   Property's name (the `51D_ScreenPixelsWidth` cookie that
+   ScreenPixelsWidthJavascript writes, for example), the Engine gives that
+   value, whether or not a Profile was matched.
+2. Otherwise the value comes from the Profile the Evidence matched for the
+   Property's Component. Where no Profile was matched and Allow Unmatched is
+   false, the Property has no value.
+3. A List Property's value is every Value the Profile holds for the Property,
+   in the order the data file gives them, each as the data file stores it. An
+   empty Value is included and no Value is split. Where the Profile holds none,
+   the value is an empty list.
+4. A Property that is not a List has no value where the Profile holds none.
+5. A string Property is its Value, or its Values joined by `|`. A Boolean or
+   numeric Property is read as
+   [values stored as strings](../../pipeline-specification/features/value-types.md#values-stored-as-strings)
+   says.
 
 The data file's `JavascriptHardwareProfile` values are the body of a script
 that pushes the Profile ids it finds onto a `profileIds` array. The Engine
