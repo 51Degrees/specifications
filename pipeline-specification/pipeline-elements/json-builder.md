@@ -45,7 +45,11 @@ method in C# for an example of creating these lists.
 
 The Element needs to produce a JSON representation of the Flow Data.
 There MUST be a top-level entry for each Element Data containing sub-entries
-for each Property and its value (set to 'null' if there is no value).
+for each Property and its value. A Property that has been assigned
+['no value'](../features/properties.md#null-values) MUST be written as 'null',
+with the `nullreason` meta-Property in the table below. A Property whose value
+is null without having been assigned 'no value', as a Flow Element that is not
+an Engine can give, MUST be left out, with no sub-entry.
 For `profiles` in the Element Data of the
 [hardware profile lookup on-premise](../../device-detection-specification/pipeline-elements/hardware-profile-lookup-on-premise.md),
 the value MUST be written as an empty list however many profiles match, so
@@ -62,16 +66,15 @@ be added for each Property:
 
 | **Suffix**         | **Description**                                                                                                                                                                                                                                                                          |
 |--------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| nullreason         | Where the Property value is null, this meta-Property MUST be added with a string message that explains why this Property does not have a value.                                                                                                                                          |
+| nullreason         | Where the Property has been assigned 'no value', this meta-Property MUST be added with a string message that explains why this Property does not have a value.                                                                                                                           |
 | delayexecution     | This meta-Property MUST be added with the value 'true' for all Properties where the [metadata](../features/properties.md#property-metadata) delay execution flag is true.                                                                                                                |
 | evidenceproperties | Where the JSON includes other Properties that are in the [metadata](../features/properties.md#property-metadata) Evidence Properties list for this Property and those Properties have the delayed execution flag set to true, this meta-Property MUST be added to list those Properties. |
 
 Where a Property's value is a list of Element Data, such as `profiles` in the
 [hardware profile lookup](../../device-detection-specification/pipeline-elements/hardware-profile-lookup-cloud.md),
-each item MUST be written as an object with a sub-entry for each of its
-Properties, set to 'null' if there is no value, and the `nullreason`
-meta-Property MUST be added for each such null, as for a top-level Element
-Data.
+each item MUST be written as an object in the same way as a top-level
+Element Data, so a Property that has been assigned 'no value' is written as
+'null' and the `nullreason` meta-Property MUST be added for it.
 
 Some Elements MUST be excluded from having their Properties added to the JSON.
 These are:
