@@ -60,25 +60,95 @@ three parts to belong to one signature.
 
 ## Accepted Evidence
 
-The Element asks for every `header.*` Evidence key. A signature names the
-parts of the request it covers, it may cover any request header, and only
-a part the verifier can rebuild can be checked, so a fixed list of headers
-would leave a signature covering any other header unable to be rebuilt.
-
-Five keys have named roles:
+The Element accepts these eight Evidence keys:
 
 - `header.signature`
 - `header.signature-input`
 - `header.signature-agent`
 - `header.host`
 - `header.protocol`
+- `server.request-method`
+- `server.request-path`
+- `server.request-query`
+
+Where forwarded Evidence is trusted, as
+[trusting forwarded Evidence](#trusting-forwarded-evidence) describes, the
+Element also accepts the same eight names under the `query.` prefix:
+
+- `query.signature`
+- `query.signature-input`
+- `query.signature-agent`
+- `query.host`
+- `query.protocol`
+- `query.request-method`
+- `query.request-path`
+- `query.request-query`
+
+The Element accepts no other key. With forwarded Evidence not trusted,
+which is the default, the Element accepts no `query.` key at all.
 
 Evidence keys MUST be matched without regard to case.
 
-`header.host` and `header.protocol` are not read for their own sake. They
-are the only Evidence from which the two derived components that RFC 9421
-calls `@authority` and `@scheme` can be rebuilt, and the protocol draft
-requires a signer to cover either `@authority` or `@target-uri`.
+Only Evidence that can change the Element's results is accepted, as
+[Advertise accepted Evidence](../features/advertize-accepted-evidence.md#flow-elements)
+requires, because the Pipeline's accepted Evidence decides the cache keys,
+the ETag and the Vary header.
+
+The first three keys are the three signature headers. `header.host` and
+`header.protocol` are not read for their own sake. They are the only
+Evidence from which the two derived components that RFC 9421 calls
+`@authority` and `@scheme` can be rebuilt, and the protocol draft requires
+a signer to cover either `@authority` or `@target-uri`. The three
+`server.request-` keys carry the request line, which `@method`, `@path`,
+`@query` and `@target-uri` are rebuilt from.
+
+A signature names the parts of the request it covers, and it may cover any
+request header. The Element reads a covered header only from the keys
+above. A signature that covers any other header reports Unverified with
+reason `ComponentUnavailable`, and the Element does not read that header
+from other Evidence, such as `header.content-type` supplied by the caller,
+or from the web request, which the web integration supplies as
+`server.http-request`
+([Populating Evidence](../features/web-integration.md#populating-evidence)).
+A header outside the accepted Evidence is outside the cache keys, the ETag
+and the Vary header, so if the Element read one, a cached Verified answer
+could be given for a request that differs from the one checked only in
+that header. So the rule that only Evidence that can change the Element's
+results is accepted holds without exception.
+
+### Trusting forwarded Evidence
+
+A Pipeline whose [Cloud Request Engine](cloud-request-engine.md#processing)
+sends its Evidence to the cloud service takes the prefix off every key on
+the way, so the service receives `header.signature` as `query.signature`
+and `server.request-path` as `query.request-path`. The trust forwarded
+Evidence option, which is off unless set, lets the Element check a
+signature that reached a service this way.
+
+With the option on, a request whose Evidence holds `query.signature` or
+`query.signature-input` is read wholly from the `query.` keys. Each of
+the eight keys this page names under `header.` or `server.` is read under
+`query.` with the same name, so `header.host` becomes `query.host` and
+`server.request-method` becomes `query.request-method`. A signature that
+covers a header which is not one of the eight names reports Unverified
+with reason `ComponentUnavailable`, as it does with the option off. A
+request whose Evidence holds neither key is read from
+the `header.` and `server.` keys as the rest of this page describes. The
+two prefixes MUST NOT be mixed in one signature, because the `query.` keys
+describe the request that reached the Pipeline which forwarded them and
+the `header.` keys describe the request the service received, so a
+signature base built from both would be one that no agent signed.
+
+The option MUST be off by default. A web integration turns query string
+parameters into Evidence under the `query.` prefix, so with the option on,
+a visitor could put a signature, a host and a path in the address of an
+ordinary page and have the Element check those in place of the request
+that actually arrived. A signature captured from a genuine agent on any
+site could then be replayed and reported as Verified, which is what
+covering `@authority` and the path exists to prevent. Forwarded Evidence
+and a typed query string cannot be told apart once they arrive, so the
+option is only for a service that knows it receives forwarded Evidence,
+and never for one that a browser can reach.
 
 ## Start-up activity
 
@@ -149,9 +219,10 @@ names the status and the reason code that the two mandatory Properties
 report. The Element MUST NOT throw for any header content, whatever a
 sender puts in the three headers, and MUST NOT stop the Pipeline.
 
-1. Neither `header.signature` nor `header.signature-input` is present.
-   Status **Absent**, reason `NoSignature`. Every other Property has no
-   value.
+1. Neither `header.signature` nor `header.signature-input` is present,
+   nor, where forwarded Evidence is trusted, `query.signature` or
+   `query.signature-input`. Status **Absent**, reason `NoSignature`. Every
+   other Property has no value.
 2. One of the two headers is present without the other, or either fails to
    parse, or the same label does not appear in both, or the
    `Signature-Agent` header fails to parse. Status **Invalid**, reason
@@ -196,7 +267,7 @@ sender puts in the three headers, and MUST NOT stop the Pipeline.
    the request it arrived on. A signature covering neither would check out
    just as well against a request sent to any other site, so one captured
    elsewhere could be replayed here.
-10. A covered component cannot be rebuilt from the Evidence, see
+10. A covered component cannot be rebuilt from the accepted Evidence, see
     [rebuilding the signature base](#rebuilding-the-signature-base). Status
     **Unverified**, reason `ComponentUnavailable`.
 11. The key directory is resolved through the cache, see
@@ -298,10 +369,15 @@ strict form, such as one writing a space after a parameter semicolon.
   unverifiable.
 - A component listed twice MUST make the signature unverifiable, because
   RFC 9421 forbids a base that is ambiguous.
-- Header components are taken from the Evidence, trimmed of surrounding
-  space, and a header seen more than once is joined with `, `. Any request
-  header may be covered, which is why the Element asks for every header as
-  Evidence.
+- A header component named by one of the
+  [accepted Evidence](#accepted-evidence) keys is taken from that Evidence.
+  The value is trimmed of surrounding space, and a header seen more than
+  once is joined with `, `.
+- Any other header component MUST make the signature report Unverified
+  with reason `ComponentUnavailable`, and MUST NOT be read from other
+  Evidence or from `server.http-request`, because a header outside the
+  accepted Evidence is outside the cache keys, the ETag and the Vary
+  header.
 - A component that carries the `key` parameter is a named member of a
   dictionary header, and the value is the strict serialisation of that
   member's value with its parameters. A member with no explicit value
@@ -542,7 +618,7 @@ Notes for implementers:
 | NoAgent              | Unverified | The signature named no agent, so there was nowhere to fetch a key from.                                |
 | InlineDirectory      | Unverified | The agent carried its key set inline in a `data:` URI and the Element is not configured to accept that. |
 | UnboundSignature     | Invalid    | The signature covered neither `@authority` nor `@target-uri`, so nothing ties it to this request and one captured elsewhere could be replayed here. |
-| ComponentUnavailable | Unverified | The signature covered part of the request that cannot be rebuilt from the Evidence the Pipeline holds. |
+| ComponentUnavailable | Unverified | The signature covered part of the request that the Element does not read, or that the Evidence the Pipeline holds cannot rebuild. |
 | DirectoryPending     | Timeout    | The key directory was still being fetched when the wait budget ran out.                                |
 | DirectoryUnavailable | Unverified | The key directory could not be fetched or could not be read.                                           |
 | UnknownKey           | Invalid    | The key directory was read and holds no key with the key id the signature names, which is evidence that the key was withdrawn. |
@@ -584,6 +660,7 @@ network call MUST NOT be made while a lock is held.
 | Registry                        | yes                   | yes          | none                    | The address of a registry of agent cards. More than one MAY be configured.                                                       |
 | Allow the older Signature-Agent | yes                   | yes          | true                    | Whether the bare quoted string form of the `Signature-Agent` header, which the earlier drafts used, is accepted.                  |
 | Allow inline directory          | yes                   | yes          | false                   | Whether a key set carried inline in a `data:` URI is accepted. Off by default, because an inline key set is chosen by whoever sent the request, so a signature that checks out against it says nothing about which agent sent the request. Turn it on only where every caller is already trusted, such as a test harness. |
+| Trust forwarded Evidence        | yes                   | yes          | false                   | Whether a signature forwarded under the `query.` prefix is checked, as [trusting forwarded Evidence](#trusting-forwarded-evidence) describes. Off by default, because with it on a visitor could put a captured signature in a query string and have it reported as Verified. Turn it on only in a service that receives forwarded Evidence and that no browser can reach. |
 | Maximum response size           | yes                   | yes          | 262,144 bytes           | The most that is read from a key directory, agent card or registry response before the fetch is abandoned.                       |
 
 Every period MUST be checked when the Element is built, and a negative
