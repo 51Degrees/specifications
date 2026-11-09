@@ -9,15 +9,18 @@ server. Given a TAC or a native model name, it returns every hardware
 NativeModel Property holds that value.
 
 It uses the data file of the
-[Device Detection on-premise](device-detection-on-premise.md) Engine. The TAC
-Property is only in the TAC data file, and the NativeModel Property is in the
-Enterprise and TAC data files. The Lite data file has neither.
+[Device Detection on-premise](device-detection-on-premise.md) Engine. It needs a
+data file that holds the TAC and NativeModel Properties. The published
+property list of the
+[Lite data file](https://github.com/51Degrees/data#device-detection) has
+neither.
 
 ## Native component
 
 The lookup is part of the native component in
 [51degrees-cxx/src/dd/hash](https://github.com/51Degrees/51degrees-cxx/tree/main/src/dd/hash),
-added by [51degrees-cxx#66](https://github.com/51Degrees/51degrees-cxx/pull/66).
+added in 51degrees-cxx commit
+[b4d2f268](https://github.com/51Degrees/51degrees-cxx/commit/b4d2f268).
 The Device Detection on-premise Engine gives it as the
 [profiles for a property value](device-detection-on-premise.md#profiles-for-a-property-value),
 and this Engine is built on that.
@@ -90,9 +93,10 @@ proposes.
 |----------|------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | profiles | `IReadOnlyList<IDeviceData>` | Every hardware profile holding the value, in the order of the data file. Each is interface compatible with the results from the cloud and on-premise Device Detection Engines. |
 
-The [JSON Builder](../../pipeline-specification/pipeline-elements/json-builder.md#process)
-writes `profiles` as an empty list, whatever ids the Element Data holds, so
-building the JSON reads no profile.
+The .NET implementation writes `profiles` as an empty list in the
+[JSON Builder](../../pipeline-specification/pipeline-elements/json-builder.md#process)
+output, whatever ids the Element Data holds, because the profiles are read on
+demand, so building the JSON reads no profile.
 
 ## Start-up activity
 
