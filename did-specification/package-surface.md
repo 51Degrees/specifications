@@ -106,19 +106,18 @@ from a changed device.
 ### An outcome a package does not know
 
 The set of outcomes grows, so a package will meet a word that its own version
-predates. It MUST expose such a word distinguishably from the values it does
-know, and it MUST NOT report it as a Mismatch, for the reason above: a value
-a package cannot interpret is not evidence against the identifier.
+predates. A package MUST NOT read such a word as a pass.
 
-The Context outcome already carries the word as the server sent it beside the
-named value, which is what lets a caller act on an outcome the package
-predates. The Factor block does not, so an unrecognized factor word currently
-reaches a caller as whatever that language chose and the word itself is lost.
-The six packages also differ in what they choose, four reading an unknown word
-as a Mismatch and the others answering with the word or with absence. That
-divergence is a gap rather than a design, and closing it means giving the
-Factor block the same word-beside-the-value treatment the Context outcome
-has.
+A factor word a package does not know MUST be reported as a Mismatch.
+Verified, Misconfigured and Not recorded are each read only from their own
+word, because none of them is a Mismatch, and any other word is a Mismatch, so
+an unexpected value never reads as a factor that matched or as one that could
+not be compared. A package that predates a new factor word therefore reports
+it as a Mismatch until the package is updated, which is the cost of never
+reading a value it cannot interpret as a pass.
+
+The Context outcome carries the word as the server sent it beside the named
+value, so a caller can still act on a Context outcome the package predates.
 
 ## What a package does not expose
 
