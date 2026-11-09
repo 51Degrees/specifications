@@ -58,11 +58,12 @@ has finished MUST therefore be safe from several threads at once.
 
 Some Element Data writes into something it holds when it is read, such as an
 on-premise Engine's Aspect Data, which reads its values from native results
-that each read writes into. Such Element Data MUST let one thread at a time
-make each read, for example by holding a lock for each read, as the
-reference implementation's
-[`DeviceDataBaseOnPremise`](https://github.com/51Degrees/51degrees-dotnet/blob/5b4d06e99b1751b4c36ec6c554bc0ece4664a781/device-detection/Shared/Data/DeviceDataBaseOnPremise.cs#L546-L588)
-does, unless it is a type the language does not let several threads share.
+that each read writes into. Such Element Data MUST let only one thread at a
+time read from its results, for example by holding a lock for each read, as
+the reference implementation's
+[`DeviceDataBaseOnPremise`](https://github.com/51Degrees/51degrees-dotnet/blob/5b4d06e99b1751b4c36ec6c554bc0ece4664a781/device-detection/Shared/Data/DeviceDataBaseOnPremise.cs#L546-L589)
+does, unless the Element Data is a type the language does not let several
+threads share.
 
 It is possible for a user to engineer a scenario where an instance is
 written from several threads, or read while another thread writes it. It is
