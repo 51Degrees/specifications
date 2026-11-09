@@ -156,7 +156,8 @@ the following:
   properties of the Window object, none of which a top level `var` can
   replace, so the object would never be created:
   - `window`, `document`, `top`, `name`, `status`, `history`, `navigator`,
-    `closed` and `frameElement`, from the HTML Standard's
+    `closed`, `frameElement`, `customElements` and `originAgentCluster`,
+    from the HTML Standard's
     [Window object](https://html.spec.whatwg.org/multipage/nav-history-apis.html#the-window-object)
     (`name` and `status` keep only the text `[object Object]`);
   - `isSecureContext`, `crossOriginIsolated`, `localStorage` and
@@ -171,6 +172,15 @@ the following:
     [Web Speech API](https://webaudio.github.io/web-speech-api/)
     specifications define, where `caches` and `cookieStore` exist only in a
     secure context, such as a page served over HTTPS;
+  - `crashReport`, `credentialless`, `documentPictureInPicture`, `fence` and
+    `launchQueue`, which the
+    [Crash Reporting](https://wicg.github.io/crash-reporting/),
+    [Iframe credentialless](https://wicg.github.io/anonymous-iframe/),
+    [Document Picture-in-Picture](https://wicg.github.io/document-picture-in-picture/),
+    [Fenced Frame](https://wicg.github.io/fenced-frame/) and
+    [Web App Launch Handler API](https://wicg.github.io/web-app-launch/)
+    drafts of the Web Platform Incubator Community Group define, where
+    `documentPictureInPicture` exists only in a secure context;
   - `styleMedia`, which Chrome defines although no standard does;
 - `location`, which the Window object declares with `[PutForwards=href]`,
   so in a browser a top level `var location` sets `location.href` to the
