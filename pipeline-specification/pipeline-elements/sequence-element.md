@@ -16,6 +16,8 @@ mapping to an HTTP session.
 
 ## Element Data
 
+The Element Data key is `sequence`.
+
 | **Name**   | **Type** | **Description**                                                                       |
 |------------|----------|---------------------------------------------------------------------------------------|
 | session-id | string   | An identifier for this session.                                                       |
