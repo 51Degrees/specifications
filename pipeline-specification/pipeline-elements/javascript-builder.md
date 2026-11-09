@@ -148,8 +148,19 @@ the following:
 
 - a JavaScript reserved word, including those reserved in strict mode and
   `null`, `true` and `false`;
-- `Infinity`, `NaN` or `undefined`, which a top level `var` cannot replace,
-  so the object would never be created;
+- `eval` or `arguments`, which strict mode code cannot declare
+  ([ECMA-262 section 13.1.1](https://tc39.es/ecma262/multipage/ecmascript-language-expressions.html#sec-identifiers-static-semantics-early-errors)),
+  and because the script declares the object with a top level `var` that is
+  not strict mode code, `eval` would replace the page's own `eval` function;
+- `Infinity`, `NaN` or `undefined`, or, in a browser, `window`, `document`,
+  `top`, `name`, `status`, `history`, `navigator` or `closed` from the HTML
+  Standard's
+  [Window object](https://html.spec.whatwg.org/multipage/nav-history-apis.html#the-window-object),
+  none of which a top level `var` can replace, so the object would never be
+  created (`name` and `status` keep only the text `[object Object]`);
+- `location`, which the Window object declares with `[PutForwards=href]`,
+  so in a browser a top level `var location` sets `location.href` to the
+  object's text, `[object Object]`, and navigates the page away;
 - `fiftyoneDegreesManager`, which is the constructor the script defines.
 
 Where no name is configured, the name is `fod`. A configured name that is
