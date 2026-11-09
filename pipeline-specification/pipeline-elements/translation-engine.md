@@ -131,7 +131,7 @@ multiple Translation Engine instances. Both write to the same Element Data, mean
 must be thread safe.
 
 ## Configuration
-The Translation Engine is configurable using jsonConfiguration:
+A configuration file can set the options that take a single value:
 
 ```json
 {
@@ -140,38 +140,25 @@ The Translation Engine is configurable using jsonConfiguration:
       "BuilderName": "TranslationEngine",
       "BuildParameters": {
         "SourceElementDataKey": "ip",
-        "Sources": "countries/*.yml",
-        "Translations": [
-          {
-            "SourceProperty": "Country",
-            "DestinationProperty": "CountryTranslated"
-          }
-        ]
-      }
-    },
-    {
-      "BuilderName": "TranslationEngine",
-      "BuildParameters": {
-        "SourceElementDataKey": "ip",
-        "Sources": "countrycodes/*.yaml",
-        "FixedLanguage":"en_GB",
-        "MissingTranslationBehaviour": "Original",
-        "Translations": [
-          {
-            "SourceProperty": "CountryCode",
-            "DestinationProperty": "CountryCodeTranslated"
-          }
-        ]
+        "FixedLanguage": "en_GB",
+        "MissingTranslationBehavior": "Original"
       }
     }
   ]
 }
 ```
 
-`Sources` is a list of file paths where wildcards are allowed. The list is
-given as a comma-separated string, as
-[pipeline configuration](../features/pipeline-configuration.md#deserialization)
-describes for every list of strings.
+A package MAY also let a configuration file set sources and translations. A
+translation is a pair of values, the source property and the destination
+property, and a source given as file contents is a pair as well, the file name
+and its contents. A package that does not let a configuration file set sources
+and translations adds them in code, through `AddSource` and `AddTranslation` on
+the builder.
+
+A package MAY also offer a builder for one particular translation, which adds
+its own sources and translations, so that a configuration file only names that
+builder. The .NET IP Intelligence package does this for its country
+translations.
 
 The Translation Engine is configurable using the builder:
 
