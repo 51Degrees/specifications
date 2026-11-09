@@ -93,10 +93,10 @@ proposes.
 |----------|------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | profiles | `IReadOnlyList<IDeviceData>` | Every hardware profile holding the value, in the order of the data file. Each is interface compatible with the results from the cloud and on-premise Device Detection Engines. |
 
-The .NET implementation writes `profiles` as an empty list in the
-[JSON Builder](../../pipeline-specification/pipeline-elements/json-builder.md#process)
-output, whatever ids the Element Data holds, because the profiles are read on
-demand, so building the JSON reads no profile.
+The [JSON Builder](../../pipeline-specification/pipeline-elements/json-builder.md#process)
+MUST write `profiles` as an empty list however many ids the Element Data
+holds, because the profiles are read on demand, so building the JSON reads no
+profile.
 
 ## Start-up activity
 
