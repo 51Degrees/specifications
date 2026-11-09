@@ -62,6 +62,26 @@ feature to determine if individual values need to be added to Evidence or not.
 An alternative approach would be to wrap the web request structure itself as
 Evidence, and hence defer processing until the Evidence is actually used.
 
+Whichever approach it takes, the web integration MUST also add the web request
+itself to Evidence under the key `server.http-request`, whether or not any
+Flow Element accepts that key. The value is a read-only view of the request
+with these named parts, and the web integration adds it on every request.
+
+- headers
+- cookies
+- query
+- session
+- client IP address
+- protocol
+- method
+- path
+
+The [Usage Sharing Element](../pipeline-elements/usage-sharing-element.md#accepted-evidence)
+accepts no Evidence, and reads the request from this value instead, so that it
+can share headers no other Flow Element accepts. No Flow Element accepts
+`server.http-request`, so it never takes part in a cache key, the ETag or the
+Vary header.
+
 In any case, the list below illustrates the type of data that can be used
 and the Evidence names they would be associated with.
 
@@ -191,7 +211,15 @@ for more details.
 ##### Cache header detail
 
 The HTTP response headers that MUST be set for the JSON and JavaScript endpoints
-are:
+are as follows. The Pipeline Evidence key filter is the union of the accepted
+Evidence of the Pipeline's Flow Elements, and a Flow Element accepts only the
+Evidence that can change its results
+([Advertise accepted Evidence](advertize-accepted-evidence.md#flow-elements)),
+so the ETag ([RFC 9110 section 8.8.3](https://www.rfc-editor.org/rfc/rfc9110#section-8.8.3))
+and the Vary header ([RFC 9110 section 12.5.5](https://www.rfc-editor.org/rfc/rfc9110#section-12.5.5))
+cover only those keys. The Usage Sharing
+Element accepts none. `If-None-Match` changes no result, so no Flow Element
+accepts it, and a revalidation's ETag is the same as the one it sends.
 
 | **Header**     | **Values**                                                                          | **Purpose**                                                                                             |
 |----------------|-------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
