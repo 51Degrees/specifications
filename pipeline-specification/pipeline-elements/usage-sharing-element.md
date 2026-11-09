@@ -185,6 +185,14 @@ Currently, the defined attributes are:
 - truncated - Indicates that the original evidence value was too long. The
   value in the XML does not include all characters from the original.
 
+A character that XML 1.0 does not allow is replaced by the text `\x` followed
+by the code of the character as four lower-case hexadecimal digits, for
+example `\x001f`, and the element for that Evidence entry is marked
+`escaped="true"`.
+
+A value longer than 10,000 characters is cut to 10,000 characters and the
+element for that Evidence entry is marked `truncated="true"`.
+
 See the [ReplacedString](https://github.com/51Degrees/51degrees-java/blob/main/pipeline/pipeline.engines.fiftyone/src/main/java/fiftyone/pipeline/engines/fiftyone/flowelements/ShareUsageElement.java#L485)
 function in Java for an example of this.
 
