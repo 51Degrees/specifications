@@ -136,7 +136,7 @@ In the snippet below:
   <ServerIP>IP_ADDRESS</ServerIP> 
   <Platform>PLATFORM PLATFORM_VER SERVICE_PACK</Platform> 
   <!--Each evidence value is represented as an entry in the form:--> 
-  <PREFIX [escaped=true] [truncated=true] Name="FIELD">VALUE</PREFIX> 
+  <PREFIX [escaped="true"] [truncated="true"] Name="FIELD">VALUE</PREFIX> 
   <!--For example:--> 
   <Header Name="user-agent">USER_AGENT</Header> 
   <Header Name="host">HOST</Header>
@@ -191,7 +191,9 @@ example `\x001f`, and the element for that Evidence entry is marked
 `escaped="true"`.
 
 A value longer than 10,000 characters is cut to 10,000 characters and the
-element for that Evidence entry is marked `truncated="true"`.
+element for that Evidence entry is marked `truncated="true"`. The limit counts
+Unicode code points, and the cut never splits a character, so a surrogate pair
+is never divided.
 
 See the [ReplacedString](https://github.com/51Degrees/51degrees-java/blob/main/pipeline/pipeline.engines.fiftyone/src/main/java/fiftyone/pipeline/engines/fiftyone/flowelements/ShareUsageElement.java#L485)
 function in Java for an example of this.
