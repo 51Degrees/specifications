@@ -62,6 +62,26 @@ feature to determine if individual values need to be added to Evidence or not.
 An alternative approach would be to wrap the web request structure itself as
 Evidence, and hence defer processing until the Evidence is actually used.
 
+Whichever approach it takes, the web integration MUST also add the web request
+itself to Evidence under the key `server.http-request`, whether or not any
+Flow Element accepts that key. The value is a read-only view of the request
+with these named parts, and the web integration adds it on every request.
+
+- headers
+- cookies
+- query
+- session
+- client IP address
+- protocol
+- method
+- path
+
+The [Usage Sharing Element](../pipeline-elements/usage-sharing-element.md#accepted-evidence)
+accepts no Evidence, and reads the request from this value instead, so that it
+can share headers no other Flow Element accepts. No Flow Element accepts
+`server.http-request`, so it never takes part in a cache key, the ETag or the
+Vary header.
+
 In any case, the list below illustrates the type of data that can be used
 and the Evidence names they would be associated with.
 
@@ -191,13 +211,21 @@ for more details.
 ##### Cache header detail
 
 The HTTP response headers that MUST be set for the JSON and JavaScript endpoints
-are:
+are as follows. The Pipeline Evidence key filter is the union of the accepted
+Evidence of the Pipeline's Flow Elements, and a Flow Element accepts only the
+Evidence that can change its results
+([Advertise accepted Evidence](advertize-accepted-evidence.md#flow-elements)),
+so the ETag ([RFC 9110 section 8.8.3](https://www.rfc-editor.org/rfc/rfc9110#section-8.8.3))
+and the Vary header ([RFC 9110 section 12.5.5](https://www.rfc-editor.org/rfc/rfc9110#section-12.5.5))
+cover only those keys. The Usage Sharing
+Element accepts none. `If-None-Match` changes no result, so no Flow Element
+accepts it, and a revalidation's ETag is the same as the one it sends.
 
 | **Header**     | **Values**                                                                          | **Purpose**                                                                                             |
 |----------------|-------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
 | Cache-Control  | max-age=1800 private                                                                | Cache item lifetime is 30 minutes. Only local client caches can cache this content.                  |
 | Vary           | all headers in Pipeline Evidence key filter (e.g. User-Agent)                       | Let the cache know that if one of these headers changes, the cached content will need to be re-fetched. |
-| ETag           | Calculated hash of ALL the Evidence values in Evidence filter key for this Pipeline | Assists caches in re-validating expired content                                                         |
+| ETag           | Weak entity tag `W/"<hash>"` of the Evidence values in the Evidence key filter, as the request supplied them (see below) | Assists caches in re-validating expired content                                                         |
 | Content-Type   | application/x-javascript or application/JSON                                        | Indicate the type of content being returned                                                             |
 | Content-Length | Content length in bytes                                                             | Indicate the expected length of the content                                                             |
 
@@ -210,7 +238,66 @@ If the value in the 'If-None-Match' header matches the calculated ETag value for
 the current request, then the content in the cache is still valid and the
 endpoint can just return a 304 status code. (Not modified)
 
-This process could lead to responses that are not strictly
+The ETag MUST be calculated from the Evidence values in the Pipeline's Evidence
+key filter exactly as the request supplied them, before any Flow Element has
+added or replaced a value. A Flow Element MAY add Evidence while it processes,
+as [Adding Evidence values](evidence.md#adding-evidence-values) describes, and
+the [Sequence Element](../pipeline-elements/sequence-element.md#process) adds a
+new `query.session-id` and an incremented `query.sequence` on every request. A
+hash of the Evidence after processing would therefore differ on every request,
+and a revalidation would never get a 304 status code. The web integration
+MUST keep the supplied values and calculate the ETag from them, both for the
+response and for the 'If-None-Match' comparison.
+
+The same Evidence MUST give the same ETag in every process running the same
+build of the Pipeline API. A browser revalidates with the ETag it kept, and its
+request can reach a server that has restarted since, or another server behind a
+load balancer. A hash that is keyed afresh in each process, such as .NET's
+`string.GetHashCode`, gives a different ETag in every process, so a browser's
+revalidation never matches and it gets the full response every time.
+
+The ETag MUST be sent as a weak entity tag, `W/"..."`, because it is not a
+strong validator.
+[RFC 9110 section 8.8.1](https://www.rfc-editor.org/rfc/rfc9110#section-8.8.1)
+says a strong validator "changes value whenever a change occurs to the
+representation data that would be observable in the content of a 200 (OK)
+response to GET". The ETag depends on the Evidence alone, so a data file update
+that changes the JSON or JavaScript for the same Evidence leaves the ETag as it
+was, and so can a new version of the package.
+[Section 8.8.3](https://www.rfc-editor.org/rfc/rfc9110#section-8.8.3) says
+such an entity tag MUST be marked weak with the prefix `W/`, which is case
+sensitive. The endpoint compares the 'If-None-Match' header with the weak
+comparison that
+[section 13.1.2](https://www.rfc-editor.org/rfc/rfc9110#section-13.1.2)
+requires, in which two entity tags match when their quoted parts are the same,
+with or without `W/` on either, so a revalidation still matches.
+
+A response to a request whose processing recorded errors, in the Flow Data
+errors collection described under
+[Process function](exception-handling.md#process-function), differs from the
+table above in two rows. It MUST carry `Cache-Control: private, no-cache` and
+MUST NOT carry an ETag. `private` keeps the response out of shared caches, as
+the table's value does for every other response, because a shared cache may
+otherwise store a response made for one visitor
+([RFC 9111 section 5.2.2.7](https://www.rfc-editor.org/rfc/rfc9111#section-5.2.2.7),
+[section 3](https://www.rfc-editor.org/rfc/rfc9111#section-3)). A browser may
+keep a `no-cache` response as long as it asks the server before using it again
+([section 5.2.2.4](https://www.rfc-editor.org/rfc/rfc9111#section-5.2.2.4)),
+and it asks with the ETag it kept. With no ETag it has
+nothing to revalidate with, so its next request gets a full response, built
+once processing works again, rather than a 304 that keeps the faulty one.
+
+The ETag depends on the Evidence alone, so a request whose 'If-None-Match'
+header matches the ETag gets the same status code when processing records
+errors as at any other time. As
+[RFC 9110 section 13.1.2](https://www.rfc-editor.org/rfc/rfc9110#section-13.1.2)
+requires, the answer is a 304 status code (Not Modified) to a GET or HEAD
+request and a 412 status code (Precondition Failed) to any other method, such
+as a POST to the JSON endpoint. So a browser that holds a good response to a
+GET request keeps it through an outage.
+
+Caching, whether by the browser with the ETag or in session storage, could
+lead to responses that are not strictly
 correct if the JavaScript snippet is getting data values that might change over time.
 For example, if we're using JavaScript to get location and the user has moved then
 session storage will still contain the previous location lookup response.
