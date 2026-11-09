@@ -39,13 +39,16 @@ endif
 if(result == null)
   result = doNormalProcessing()
 
-  if(cache is enabled)
+  if(cache is enabled and result may be cached)
     cache.Add(cacheKey, result)
   endif
 endif
 
 flowData.Add(engineDataKey, result);
 ```
+
+Results that must not be added are described in
+[Values created for one request](#values-created-for-one-request).
 
 Warning - don't take the pseudo code above as a template. Real production code
 is likely to vary significantly from this in order to account for concurrency
@@ -141,6 +144,7 @@ receive different 51Dids.
 A cache MUST NOT store a result that holds such a value, and MUST NOT serve
 one that it finds. For the
 [Cloud Request Engine](../pipeline-elements/cloud-request-engine.md), a
-response whose JSON has a top-level `fodid` member is neither stored in nor
-served from the cache, and the request goes to the cloud service instead.
+response whose JSON has a top-level member named `fodid`, in any case, is
+neither stored in nor served from the cache, and the request goes to the
+cloud service instead.
 Every other response is cached as before.
