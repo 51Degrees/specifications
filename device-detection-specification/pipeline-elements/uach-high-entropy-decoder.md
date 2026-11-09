@@ -23,8 +23,10 @@ be used by the Device Detection Engines.
 - query.51d_gethighentropyvalues
 
 The Device Detection Engines read `51D_StructuredUserAgent` in the same way,
-as a `cookie` or `query` value, with the `query` value used before the `cookie`
-value as described in the [Process](#process) section.
+as `cookie.51d_structureduseragent` or `query.51d_structureduseragent`. Only the
+first value of either key that gives headers is used, and a `query` value is
+tried before any `cookie` value, as described in the [Process](#process)
+section.
 
 ## Element Data
 
@@ -57,8 +59,9 @@ not needed for device detection, so are not featured here.
 
 - Get the encoded value from Evidence for the [relevant keys](#accepted-evidence)
   - Use the value with the `query` prefix if both are available
-    - A value is available when it is present and can be decoded, so a `query`
-      value that cannot be decoded leaves the `cookie` value to be used
+    - A value is available when it is present and gives at least one header
+      when decoded, so a `query` value that cannot be decoded, or gives no
+      header, leaves the `cookie` value to be used
 - Decode the value from base 64
 - Convert the JSON representation into individual HTTP header values.
   - See [here](https://github.com/51Degrees/sua-uach-conversion/blob/main/src/convertSUAtoUACH.js)
