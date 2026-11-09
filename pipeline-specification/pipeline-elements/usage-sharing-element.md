@@ -110,10 +110,14 @@ adding them to the XML payload and sending it once it contains the
 configured quantity of data.
 
 The complete XML document MUST be written exactly as this section describes,
-so that the same Evidence gives the same bytes in every language when run on
-the same host. The only exceptions are `DateSent` and the values that name
-the runtime, being `Version`, `Language`, `LanguageVersion`, `Platform` and
-the `FlowElement` text.
+so that the same values, found in the same order, give the same bytes in every
+language when run on the same host. The only exceptions are `DateSent` and the
+values that name the runtime, being `Version`, `Language`, `LanguageVersion`,
+`Platform` and the `FlowElement` text.
+
+Multiple `<Device>` elements will be batched up as part of each message.
+The number of items per batch is configurable using the
+[minimum entries per message](#configuration-options) setting.
 
 ### The document
 
@@ -125,20 +129,16 @@ the `FlowElement` text.
 4. Nothing is written between elements, so there is no indentation and no
    line break anywhere in the document.
 
-Multiple `<Device>` elements are batched in each message. The number of items
-per batch is set by the [minimum entries per message](#configuration-options)
-option.
-
 ### The record
 
 Each `<Device>` holds these elements in this order.
 
 | **Element**       | **Content**                                                                                                                                                                                                                    |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `SessionId`       | The value of the `query.session-id` Evidence                                                                                                                                                                                   |
-| `Sequence`        | The value of the `query.sequence` Evidence as a 32-bit integer in decimal, or `0` when it is absent or does not parse                                                                                                          |
+| `SessionId`       | The value found for `query.session-id`                                                                                                                                                                                         |
+| `Sequence`        | The value found for `query.sequence` as a 32-bit integer in decimal, or `0` when there is none or it does not parse                                                                                                            |
 | `DateSent`        | The time the record was written, in UTC, formatted `yyyy-MM-ddTHH:mm:ss` on a 24-hour clock, for example `2026-11-02T14:05:09`                                                                                                 |
-| `ClientIP`        | The value of the `server.client-ip` Evidence                                                                                                                                                                                   |
+| `ClientIP`        | The value found for `server.client-ip`                                                                                                                                                                                         |
 | `Version`         | The version of the Pipeline core package                                                                                                                                                                                       |
 | `Product`         | `Pipeline`                                                                                                                                                                                                                     |
 | `FlowElement`     | One for each Flow Element in the Pipeline, in Pipeline order, holding the element's fully qualified type name                                                                                                                  |
@@ -146,27 +146,30 @@ Each `<Device>` holds these elements in this order.
 | `LanguageVersion` | The version of the language runtime                                                                                                                                                                                            |
 | `ServerIP`        | The first address the server's host name resolves to that is IPv4 and is not `127.0.0.1`, otherwise the first that is neither `127.0.0.1` nor `::1`, otherwise empty. The usage sharing element works it out once and keeps it |
 | `Platform`        | The name and version of the operating system                                                                                                                                                                                   |
-| Evidence entries  | One for each shared Evidence entry, as described below. The [accepted Evidence](#accepted-evidence) decides which are shared                                                                                                   |
+| Evidence entries  | One for each value the element shares, written as described below. The values shared are what the element finds, as [accepted Evidence](#accepted-evidence) describes, less what the [shared Evidence](#shared-evidence) rules leave out |
 | `BadSchema`       | `true`, written only when a character was replaced in a name or value of this record                                                                                                                                           |
 
-`SessionId`, `Sequence`, `DateSent` and `ClientIP` are always written. An
-element with no content, such as `SessionId` when `query.session-id` is
-absent, is written as `<SessionId />`, with a space before the slash. The
-keys `query.session-id`, `query.sequence` and `server.client-ip` are matched
-without regard to case and are not written again as Evidence entries.
+The values found are those that [accepted Evidence](#accepted-evidence)
+describes, from the Evidence and from the web request. `SessionId`, `Sequence`,
+`DateSent` and `ClientIP` are always written. An element with no content, such
+as `SessionId` when no value is found for `query.session-id`, is written as
+`<SessionId />`, with a space before the slash. The keys `query.session-id`,
+`query.sequence` and `server.client-ip` are matched without regard to case and
+are not written again as Evidence entries.
 
 ### Evidence entries
 
-1. Each shared Evidence key is split at its first `.` into a prefix and a
-   field. The entry is an element named by the prefix exactly as the key has
-   it, with a `Name` attribute holding the field exactly as the key has it,
-   and the value in a CDATA section, for example
+1. Each shared key is split at its first `.` into a prefix and a field. The
+   entry is an element named by the prefix exactly as the key has it, with a
+   `Name` attribute holding the field exactly as the key has it, and the value
+   in a CDATA section, for example
    `<header Name="User-Agent"><![CDATA[Mozilla/5.0]]></header>`.
-2. A key that has no `.`, or that starts with `.`, is written as an element
-   named by the whole key, with the value as element text rather than CDATA.
-3. Entries are grouped by prefix. The prefixes come in the order each first
-   appears in the Evidence, and the entries within a prefix in the order the
-   Evidence holds them. Nothing is sorted.
+2. A key that has no `.` is written as an element named by the whole key, with
+   the value as element text rather than CDATA.
+3. Entries are grouped by prefix, as the key spells it, so prefixes that differ
+   only in case are different groups. The prefixes come in the order each
+   first appears among the values found, and the entries within a prefix in
+   the order they were found. Nothing is sorted.
 
 ### Names and values
 
@@ -187,7 +190,7 @@ without regard to case and are not written again as Evidence entries.
 
 ### Example
 
-With no session id, no client IP and these Evidence entries, in this order,
+With no session id, no client IP and these values found, in this order,
 
 - `header.User-Agent` = `Mozilla/5.0`
 - `header.X-Test` = `a]]>b`
