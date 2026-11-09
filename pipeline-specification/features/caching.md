@@ -39,13 +39,16 @@ endif
 if(result == null)
   result = doNormalProcessing()
 
-  if(cache is enabled)
+  if(cache is enabled and result may be cached)
     cache.Add(cacheKey, result)
   endif
 endif
 
 flowData.Add(engineDataKey, result);
 ```
+
+Results that must not be added are described in
+[Values created for one request](#values-created-for-one-request).
 
 Warning - don't take the pseudo code above as a template. Real production code
 is likely to vary significantly from this in order to account for concurrency
@@ -129,3 +132,19 @@ to allow caches to still work in the scenarios described above. (Creating
 a duplicate of the instance, reference counting to ensure cleanup happens,
 etc.) 51Degrees has decided not to pursue these at present, so the current
 implementations simply do not support adding a cache in these cases.
+
+## Values created for one request
+
+Some results hold a value created for the one request that asked for it,
+which a later request with the same Evidence must not receive. A
+[51Did](../../did-specification/README.md) is one. The cloud service creates
+a new 51Did for every request, so two requests with identical Evidence
+receive different 51Dids.
+
+A cache MUST NOT store a result that holds such a value, and MUST NOT serve
+one that it finds. For the
+[Cloud Request Engine](../pipeline-elements/cloud-request-engine.md), a
+response whose JSON has a top-level member named `fodid`, in any case, is
+neither stored in nor served from the cache, and the request goes to the
+cloud service instead.
+Every other response is cached as before.

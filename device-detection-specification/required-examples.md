@@ -267,6 +267,11 @@ using either TAC or native model name.
 These examples require the user to obtain a license key in order to
 configure an appropriate Resource Key.
 
+An implementation that provides the
+[hardware profile lookup on-premise](pipeline-elements/hardware-profile-lookup-on-premise.md)
+MAY also illustrate it, with an Enterprise data file for the native model
+name and a TAC data file for TAC.
+
 See documentation
 [TAC](https://51degrees.com/documentation/_examples__device_detection__tac_lookup__cloud.html?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=device-detection-specification-required-examples.md&utm_term=tac-native-key-lookup),
 [Native key](https://51degrees.com/documentation/_examples__device_detection__native_key_lookup__cloud.html?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=device-detection-specification-required-examples.md&utm_term=tac-native-key-lookup)
