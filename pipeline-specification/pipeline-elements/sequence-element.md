@@ -36,6 +36,12 @@ Add both output values to Evidence as well, under `query.session-id` and
 from Evidence. See
 [adding Evidence values](../features/evidence.md#adding-evidence-values).
 
+A value that cannot be used counts as not present. A `query.session-id` value
+that is not a non-empty string is not present. A `query.sequence` value that is
+not a whole number, or a string of decimal digits, from 0 up to 2,147,483,646
+is not present, so that adding one stays within a 32 bit integer. No error is
+recorded.
+
 ## Configuration options
 
 None
