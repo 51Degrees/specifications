@@ -58,4 +58,4 @@ still runs on a checkout without the shared repository present.
 
 The .NET reference implementation of this example is
 `Examples/DerivedProperty` in
-[pipeline-dotnet](https://github.com/51Degrees/pipeline-dotnet).
+[pipeline-dotnet](https://github.com/51Degrees/51degrees-dotnet/tree/main/pipeline).
