@@ -73,6 +73,10 @@ be sent alongside a Resource Key, in which case it adds the products it grants
 to those the Resource Key already carries, so the set of accessible Properties
 widens.
 
+The License Key is a license key for the purposes of
+[logging](../features/logging.md#license-keys), so it MUST NOT appear in full
+in a log entry or an error message.
+
 ### Requested Properties
 
 Requested Properties is the list of Properties the caller wants in the
