@@ -18,8 +18,8 @@ or an ETag.
 It shares instead what it finds, from two places:
 
 - every Evidence value in the Flow Data, and
-- every header, cookie, query string parameter and session value of the web
-  request, with its client IP address, its protocol and the method and path
+- every header other than Cookie, every cookie, query string parameter and
+  session value of the web request, with its client IP address, its protocol and the method and path
   of its request line, when the web integration supplies the request as
   `server.http-request` (see
   [Populating Evidence](../features/web-integration.md#populating-evidence)).
@@ -49,17 +49,20 @@ when all Evidence is shared:
   a visitor opens look like a new session to the
   [session tracking](#session-tracking), and the path is the part of a URL most
   likely to carry a name or an identifier a site has put in it.
+- `header.cookie`, which is the Cookie header of the request and carries every
+  cookie ([RFC 6265 section 5.4](https://www.rfc-editor.org/rfc/rfc6265#section-5.4)).
+  This holds for the Cookie header of the `server.http-request` view as well as
+  for Evidence. The cookies starting `51D_` are shared as their own `cookie.`
+  Evidence under the rules below, and no other cookie is shared through the
+  header.
 
-So `query.id.email` and `server.request-path` are never shared, while
+So `query.id.email`, `server.request-path` and `header.cookie` are never shared, while
 `query.valid.email` is an ordinary query string parameter. The
 `server.http-request` value itself is never shared, only the values read from
 it.
 
 Unless all Evidence is shared, it MUST also return false for any key where:
 
-- Prefix = `header.` and field is `cookie`, the HTTP header that carries every
-  cookie ([RFC 6265 section 5.4](https://www.rfc-editor.org/rfc/rfc6265#section-5.4)).
-  The cookies starting `51D_` are shared as their own `cookie.` Evidence.
 - Prefix = `header.` and field is in a user-configurable block list.
 - Prefix = `cookie.` and field does not start with `51D_`
 - Prefix = `session.` and field does not start with `51D_`
