@@ -70,10 +70,9 @@ Properties it wants. See [Requested Properties](#requested-properties).
 
 The License Key is sent to the remote server using the key `license`. The
 server also reads `licence` as another spelling of `license`, but the Engine
-always sends `license`. It MAY
-be sent alongside a Resource Key, in which case it adds the products it grants
-to those the Resource Key already carries, so the set of accessible Properties
-widens.
+always sends `license`. The License Key MAY be sent alongside a Resource Key,
+in which case it adds the products it grants to those the Resource Key
+already carries, so the set of accessible Properties widens.
 
 The License Key is a license key for the purposes of
 [logging](../features/logging.md#license-keys), so it MUST NOT appear in full
@@ -339,8 +338,8 @@ another spelling of `license`. Evidence whose key strips to `values`,
 out of the request, because sending it would put a second field of the same
 name, or a second spelling of the same credential, in the request with no way
 for either side to know which one applied. The rule covers `resource`,
-`license` and `licence` as well as `values`, so that the credentials are never
-sent twice whichever keys the server advertises.
+`license` and `licence` as well as `values`, and does not depend on which keys
+the server advertises.
 
 When Evidence is added, its prefix MUST be removed.
 For example, `query.user-agent` becomes `user-agent`.
