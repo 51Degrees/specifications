@@ -190,10 +190,14 @@ value = IPv4address / IPv6address
 port  = 1*DIGIT      ; 0 to 65535
 ```
 
-`IPv4address` and `IPv6address` are the rules of RFC 3986 section 3.2.2. The
-`IPv4address` rule allows no leading zeros, so `01.2.3.4` is not an address,
-and each part is 0 to 255. RFC 3986 says its `IPv6address` rule is "a
-translation of the text definition of an IPv6 literal address" and that rule
+`IPv4address` and `IPv6address` are the rules of RFC 3986 section 3.2.2. Its
+`dec-octet` rule, which builds each part of an `IPv4address`, allows no leading
+zero and a value of 0 to 255. The Engine MUST NOT read an IPv4 address that has
+a leading zero in any part, such as `01.2.3.4`, `1.02.3.4`, `1.2.3.04` or
+`00.0.0.0`, and the value is refused whole and not read with the zero dropped.
+The text `0.0.0.0` is read, as each part is a single digit. RFC 3986 says its
+`IPv6address` rule is "a translation of the text definition of an IPv6 literal
+address" and that rule
 holds each form of RFC 4291 section 2.2, with hexadecimal digits in either
 case and with an IPv4 address only as the last 32 bits. RFC 3986 allows an
 empty port, and this rule does not.
@@ -220,14 +224,14 @@ none of the client IP keys. These values are not read:
 | `203.0.113.1 x`            | Text after the address.                                                                                                                            |
 | `203.0.113.1, 198.51.100.7` | Several addresses. A list is not one address, and no entry of it is chosen.                                                                        |
 | `203.0.113.1` and a space  | A space, tab or line ending before or after the address.                                                                                           |
-| `fe80::1%eth0`             | A zone index. See below.                                                                                                                           |
+| `fe80::1%eth0`, `[fe80::1%25eth0]` | A zone index. See below.                                                                                                                   |
 | `[203.0.113.1]`            | Brackets hold only an IPv6 address.                                                                                                                |
 | `[2001:db8::1`             | A bracket that is not closed.                                                                                                                      |
 | `2001:db8::1]:80`          | A closing bracket with no opening one.                                                                                                             |
 | `203.0.113.1:`             | A colon with no port.                                                                                                                              |
 | `203.0.113.1:65536`        | A port above 65535.                                                                                                                                |
 | `256.0.113.1`              | A part above 255.                                                                                                                                  |
-| `01.2.3.4`                 | A leading zero, which some software reads as octal.                                                                                                |
+| `01.2.3.4`, `1.2.3.04`, `00.0.0.0` | A leading zero in a part, which some software reads as octal.                                                                       |
 | `203.0.113`                | Fewer than four parts.                                                                                                                             |
 | `2001:db8::1::2`           | More than one `::`.                                                                                                                                |
 | `2001:db8:1:2:3:4:5:6:7`   | More than eight groups.                                                                                                                            |
@@ -239,7 +243,10 @@ none of the client IP keys. These values are not read:
 
 An IPv6 address can carry a zone index after a percent sign, such as
 `fe80::1%eth0`, to say which network interface of one machine an address
-belongs to. The Engine MUST NOT read such a value. The reasons are:
+belongs to. The Engine MUST NOT read a value that holds a zone index, in any
+form, with or without brackets or a port. `fe80::1%eth0`, `fe80::1%1`,
+`[fe80::1%eth0]:80` and the percent-encoded form `[fe80::1%25eth0]` are all
+refused whole. The reasons are:
 
 - RFC 3986 section 3.2.2 says of its IPv6 rule, "This syntax does not support
   IPv6 scoped addressing zone identifiers."
@@ -253,7 +260,7 @@ belongs to. The Engine MUST NOT read such a value. The reasons are:
   address, so the zone index adds nothing that a lookup of a client on the
   internet could use.
 
-The Engine does not strip the zone index and read the rest, because that reads
+The Engine MUST NOT strip the zone index and read the rest, because that reads
 part of a value and drops the remainder, which this section rules out.
 
 ### Value Retrieval
