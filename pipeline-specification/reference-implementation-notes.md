@@ -108,3 +108,7 @@ need some capability that is beyond its scope, they have to migrate to the
 On the whole, we prefer solutions that will reduce complexity for users, such as
 this special builder. However, if this is implemented, care will need to be taken
 to avoid the issues described above.
+
+## .NET usage sharing record
+
+The .NET packages do not yet write the record that the [Processing section of the usage sharing element](pipeline-elements/usage-sharing-element.md#processing) specifies. They write each value in a CDATA section, mark values containing characters that XML does not allow with a `<BadSchema>` element and `\x` escapes where the specification uses an `escaped` attribute, and put a `[TRUNCATED BY USAGE SHARING]` prefix on a value that is too long where the specification uses a `truncated` attribute. The Processing section is the form every language is moving to, and .NET will change to it after the receiving side has been checked with both forms working.
