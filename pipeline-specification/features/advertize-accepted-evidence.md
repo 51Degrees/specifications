@@ -16,6 +16,12 @@ Where listing the keys is impractical, a Flow Element can use a filter
 function that returns true if the supplied key is accepted by the Element and
 false otherwise.
 
+Every Flow Element MUST declare the Evidence it accepts. Where an
+implementation's base Flow Element provides a default, that default MUST
+accept no Evidence, so an Element that declares nothing accepts nothing and
+the Pipeline keeps no Evidence on its behalf. A default that accepts every key
+would make the Pipeline accept every key, whatever its other Elements read.
+
 An Element MUST accept only the Evidence that can change its results, because
 the Pipeline's accepted Evidence decides the cache keys, the ETag and the Vary
 header. It is valid for an element not to make use of any Evidence values at
