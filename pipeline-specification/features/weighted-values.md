@@ -61,7 +61,7 @@ The raw weighting is stored as a 16-bit unsigned integer (aka [ushort](https://l
 
 The sum of raw weightings for all values within any specific property should always add up to [UInt16.MaxValue](https://learn.microsoft.com/en-us/dotnet/api/system.uint16.maxvalue?view=netstandard-2.0) (that represents a weighting of `1.0`).
 
-See [IWeightedValue.cs](https://github.com/51Degrees/pipeline-dotnet/blob/version/4.5/FiftyOne.Pipeline.Core/Data/IWeightedValue.cs) for more details.
+See [IWeightedValue.cs](https://github.com/51Degrees/51degrees-dotnet/blob/main/pipeline/Core/Data/IWeightedValue.cs) for more details.
 
 ## Internal Representation
 

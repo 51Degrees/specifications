@@ -29,7 +29,7 @@ available in second or subsequent requests as part of the same
 [session](sequence-element.md). These values can then be used to determine or
 refine results.
 
-See the [`PopulateMetaDataCollections`](https://github.com/51Degrees/pipeline-dotnet/blob/master/FiftyOne.Pipeline.Elements/FiftyOne.Pipeline.JsonBuilderElement/FlowElement/JsonBuilderElement.cs#L715)
+See the [`PopulateMetaDataCollections`](https://github.com/51Degrees/51degrees-dotnet/blob/main/pipeline/JsonBuilderElement/FlowElement/JsonBuilderElement.cs#L882)
 method in C# for an example of creating these lists.
 
 ## Element Data
@@ -171,6 +171,4 @@ Below is JSON with an error value set.
 
 ## Configuration options
 
-| **Name**      | **Type**        | **Default**  | **Description**                                                                                                                                                                                                                                                                                                                                                                |
-|---------------|-----------------|--------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| SetProperties | List of strings | [Empty list] | A list of the Properties to include in the JSON. By default, the list is empty and all Properties will be included in the JSON. Note that some Properties, such as JavaScript Properties and meta properties, MUST always be included, regardless of this setting. Property names will need to be fully qualified. (e.g. `device.ismobile` or `devices.profiles.hardwarename`) |
+None
