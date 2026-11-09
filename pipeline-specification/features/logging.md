@@ -19,9 +19,11 @@ impact performance when it is not enabled.
 
 A license key MUST NOT appear in full in a log entry or in an error message, at
 any log level. Where a message names a license key it MUST show only the key's
-last 4 characters, with every character before them replaced, so that a reader
-can tell two keys apart but cannot use either. A key of 4 characters or fewer
-MUST be replaced entirely. A license key is a paid credential, and logs and
+last 4 characters, with each character before them replaced by one `*`, so
+that a reader can tell two keys apart but cannot use either. A key of 4
+characters or fewer MUST be replaced entirely, by one `*` for each character.
+Every package masks the same way, so `ABCDEFGH` is written `****EFGH` in every
+language. A license key is a paid credential, and logs and
 error messages travel further than the server, to log services, to support
 tickets and, through the
 [JSON Builder's](../pipeline-elements/json-builder.md) `errors` list, to the
