@@ -225,7 +225,7 @@ accepts it, and a revalidation's ETag is the same as the one it sends.
 |----------------|-------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
 | Cache-Control  | max-age=1800 private                                                                | Cache item lifetime is 30 minutes. Only local client caches can cache this content.                  |
 | Vary           | all headers in Pipeline Evidence key filter (e.g. User-Agent)                       | Let the cache know that if one of these headers changes, the cached content will need to be re-fetched. |
-| ETag           | Calculated hash of the Evidence values in the Evidence key filter, as the request supplied them (see below) | Assists caches in re-validating expired content                                                         |
+| ETag           | Weak entity tag `W/"<hash>"` of the Evidence values in the Evidence key filter, as the request supplied them (see below) | Assists caches in re-validating expired content                                                         |
 | Content-Type   | application/x-javascript or application/JSON                                        | Indicate the type of content being returned                                                             |
 | Content-Length | Content length in bytes                                                             | Indicate the expected length of the content                                                             |
 
@@ -255,6 +255,22 @@ request can reach a server that has restarted since, or another server behind a
 load balancer. A hash that is keyed afresh in each process, such as .NET's
 `string.GetHashCode`, gives a different ETag in every process, so a browser's
 revalidation never matches and it gets the full response every time.
+
+The ETag MUST be sent as a weak entity tag, `W/"..."`, because it is not a
+strong validator.
+[RFC 9110 section 8.8.1](https://www.rfc-editor.org/rfc/rfc9110#section-8.8.1)
+says a strong validator "changes value whenever a change occurs to the
+representation data that would be observable in the content of a 200 (OK)
+response to GET". The ETag depends on the Evidence alone, so a data file update
+that changes the JSON or JavaScript for the same Evidence leaves the ETag as it
+was, and so can a new version of the package.
+[Section 8.8.3](https://www.rfc-editor.org/rfc/rfc9110#section-8.8.3) says
+such an entity tag MUST be marked weak with the prefix `W/`, which is case
+sensitive. The endpoint compares the 'If-None-Match' header with the weak
+comparison that
+[section 13.1.2](https://www.rfc-editor.org/rfc/rfc9110#section-13.1.2)
+requires, in which two entity tags match when their quoted parts are the same,
+with or without `W/` on either, so a revalidation still matches.
 
 A response to a request whose processing recorded errors, in the Flow Data
 errors collection described under
