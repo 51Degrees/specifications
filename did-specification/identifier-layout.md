@@ -115,14 +115,16 @@ email. The salt is at most 64 bytes, so its length always fits the one byte.
 
 The address part is the `addr-spec` of the email read as a `mailbox` under
 [RFC 5322 section 3.4](https://www.rfc-editor.org/rfc/rfc5322#section-3.4),
-being its `local-part`, then `@`, then its `domain`. The local part and the
-domain are each taken as written, without the comments and white space that
-RFC 5322 allows around them. A display name, the angle brackets around the
-address and any comments are not part of the address part, so
-`Tom <User@Example.COM>` and `user@example.com` give the same Match Key.
-White space around the email is ignored, meaning the characters with the
-Unicode `White_Space` property
-([PropList.txt](https://www.unicode.org/Public/15.1.0/ucd/PropList.txt)).
+as defined below, being its `local-part`, then `@`, then its `domain`. The
+local part and the domain are each taken as written, without the comments
+and white space that RFC 5322 allows around them. A display name, the angle
+brackets around the address and any comments are not part of the address
+part, so `Tom <User@Example.COM>` and `user@example.com` give the same Match
+Key. White space around the email, meaning the characters with the Unicode
+`White_Space` property
+([PropList.txt](https://www.unicode.org/Public/15.1.0/ucd/PropList.txt)),
+is removed before the email is read as a `mailbox`, and every rule below
+applies to what remains.
 
 A local part that is a `quoted-string` is taken with its quote characters and
 the `\` of each `quoted-pair`, although
