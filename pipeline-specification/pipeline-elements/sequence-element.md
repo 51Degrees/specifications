@@ -38,9 +38,10 @@ from Evidence. See
 
 A value that cannot be used counts as not present. A `query.session-id` value
 that is not a non-empty string is not present. A `query.sequence` value that is
-not a whole number, or a string of decimal digits, from 0 up to 2,147,483,646
-is not present, so that adding one stays within a 32 bit integer. No error is
-recorded.
+not a whole number, or a string made only of the digits 0 to 9 with no sign or
+spaces, from 0 up to 2,147,483,646 is not present, so that adding one stays
+within a 32 bit integer. Leading zeros are allowed. A sequence of 0 gives an
+output of 1, as an absent one does. No error is recorded.
 
 ## Configuration options
 
