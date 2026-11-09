@@ -12,8 +12,11 @@ the JavaScript builder element.
 
 ## Accepted Evidence
 
-This Element uses no Evidence, its only input is the current set of
-Element Data instances in the Flow Data.
+This Element accepts no Evidence, so its Evidence key filter is empty. It
+reads the integer under `query.sequence` that the
+[Sequence Element](sequence-element.md) adds, as described in
+[Sequence number](#sequence-number), and the current set of Element Data
+instances in the Flow Data.
 
 ## Start-up activity
 
@@ -83,6 +86,31 @@ final JSON output:
     present.
 - Add any errors from the Flow Data errors collection to the result. This is structured
   as a string array of the error messages under the top-level key `errors`.
+
+### Sequence number
+
+The Element uses the sequence number that the
+[Sequence Element](sequence-element.md) adds to Evidence under `query.sequence`
+as an integer (see
+[adding Evidence values](../features/evidence.md#adding-evidence-values) and
+[Sequence Element](sequence-element.md#process)). A Pipeline that includes the
+JSON Builder Element therefore needs a Sequence Element before it. Where the
+[web integration](../features/web-integration.md#pipeline-configuration)
+creates the Pipeline, it adds both if they are not present.
+
+If no Sequence Element has produced a sequence number when the Element runs,
+the Element MUST fail with an error and MUST NOT set its JSON value. The error
+SHOULD say that a Sequence Element needs to be placed before the JSON Builder
+Element in the Pipeline. The Pipeline handles the error as described in
+[exception handling](../features/exception-handling.md#process-function).
+When the Element fails, the web integration handles the error as that page
+describes, and a response it serves then, such as the .NET web integration's
+fallback response, is not the Element's JSON value.
+
+A `query.sequence` value taken from a query string is text and not an integer,
+so it does not count as a sequence number. An integer that a caller added to
+`query.sequence` without a Sequence Element does count in .NET and Java,
+because the Element reads the integer in Evidence whoever added it.
 
 ### Examples
 
