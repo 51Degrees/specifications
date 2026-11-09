@@ -332,11 +332,12 @@ Flow Data Evidence.
 The remote server advertises `query.values` among its accepted Evidence keys,
 so a value in the Flow Data Evidence could otherwise collide with the Property
 list the Engine is already sending. Evidence whose key strips to `values`,
-`resource` or `license` MUST therefore be left out of the request, because
-sending it would put a second field of the same name in the request with no
-way for either side to know which one applied. The rule covers `resource` and
-`license` as well as `values`, so that the credentials are never sent twice
-whichever keys the server advertises.
+`resource`, `license` or `licence` MUST therefore be left out of the request,
+because sending it would put a second field for the same value in the request
+with no way for either side to know which one applied. The rule covers
+`resource`, `license` and `licence` as well as `values`, so that the
+credentials are never sent twice whichever keys the server advertises. The
+server reads the License Key from `licence` where `license` is absent.
 
 When Evidence is added, its prefix MUST be removed.
 For example, `query.user-agent` becomes `user-agent`.
