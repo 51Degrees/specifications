@@ -113,7 +113,8 @@ It is essential that the Element Data instance populated by this
 On-premise Engine is interface compatible with the Element Data
 populated by the [cloud Device Detection Engine](device-detection-cloud.md)
 as well as the individual devices populated in the Element Data from
-the [hardware profile lookup Engine](hardware-profile-lookup-cloud.md).
+the [hardware profile lookup Engine](hardware-profile-lookup-cloud.md) and
+its [on-premise counterpart](hardware-profile-lookup-on-premise.md).
 
 [^1]: The native implementations have some additional complexity
 in their code because of a plan to split Device Detection into 4
