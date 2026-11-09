@@ -89,9 +89,10 @@ therefore needs a Sequence Element before it. Where the
 [web integration](../features/web-integration.md#pipeline-configuration) creates
 the Pipeline, it adds both.
 
-The .NET and Java implementations read the sequence number from the
-`query.sequence` Evidence instead, where their Sequence Elements write it back
-as an integer (see [Sequence Element](sequence-element.md#process)).
+The .NET and Java implementations read the same number from the
+`query.sequence` Evidence, which their Sequence Elements write back as an
+integer, as [adding Evidence values](../features/evidence.md#adding-evidence-values)
+allows (see [Sequence Element](sequence-element.md#process)).
 
 If no Sequence Element has produced a sequence number when the Element runs,
 the Element MUST fail with an error and MUST NOT set its JSON value. The error
