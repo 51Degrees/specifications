@@ -238,6 +238,17 @@ If the value in the 'If-None-Match' header matches the calculated ETag value for
 the current request, then the content in the cache is still valid and the
 endpoint can just return a 304 status code. (Not modified)
 
+The ETag MUST be calculated from the Evidence values in the Pipeline's Evidence
+key filter exactly as the request supplied them, before any Flow Element has
+added or replaced a value. A Flow Element MAY add Evidence while it processes,
+as [Adding Evidence values](evidence.md#adding-evidence-values) describes, and
+the [Sequence Element](../pipeline-elements/sequence-element.md#process) adds a
+new `query.session-id` and an incremented `query.sequence` on every request. A
+hash of the Evidence after processing would therefore differ on every request,
+and a revalidation would never get a 304 status code. The web integration
+MUST keep the supplied values and calculate the ETag from them, both for the
+response and for the 'If-None-Match' comparison.
+
 The same Evidence MUST give the same ETag in every process running the same
 build of the Pipeline API. A browser revalidates with the ETag it kept, and its
 request can reach a server that has restarted since, or another server behind a
