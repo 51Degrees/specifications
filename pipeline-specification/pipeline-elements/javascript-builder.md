@@ -154,7 +154,7 @@ the following:
   not strict mode code, `eval` would replace the page's own `eval` function;
 - `Infinity`, `NaN` or `undefined`, or, in a browser, any of the following
   properties of the Window object, none of which a top level `var` can
-  replace, so the object would never be created:
+  replace in a secure context, so the object would never be created:
   - `window`, `document`, `top`, `name`, `status`, `history`, `navigator`,
     `closed`, `frameElement`, `customElements` and `originAgentCluster`,
     from the HTML Standard's
@@ -170,8 +170,7 @@ the following:
     [Trusted Types](https://w3c.github.io/trusted-types/dist/spec/),
     [Cookie Store API](https://cookiestore.spec.whatwg.org/) and
     [Web Speech API](https://webaudio.github.io/web-speech-api/)
-    specifications define, where `caches` and `cookieStore` exist only in a
-    secure context, such as a page served over HTTPS;
+    specifications define;
   - `crashReport`, `credentialless`, `documentPictureInPicture`, `fence` and
     `launchQueue`, which the
     [Crash Reporting](https://wicg.github.io/crash-reporting/),
@@ -179,9 +178,12 @@ the following:
     [Document Picture-in-Picture](https://wicg.github.io/document-picture-in-picture/),
     [Fenced Frame](https://wicg.github.io/fenced-frame/) and
     [Web App Launch Handler API](https://wicg.github.io/web-app-launch/)
-    drafts of the Web Platform Incubator Community Group define, where
-    `documentPictureInPicture` exists only in a secure context;
-  - `styleMedia`, which Chrome defines although no standard does;
+    drafts of the Web Platform Incubator Community Group define;
+  - `styleMedia`, which Chrome defines although no standard does.
+
+  `caches`, `cookieStore` and `documentPictureInPicture` exist only in a
+  secure context, such as a page served over HTTPS, and are refused on every
+  page, so that whether a name is valid does not depend on the page's scheme;
 - `location`, which the Window object declares with `[PutForwards=href]`,
   so in a browser a top level `var location` sets `location.href` to the
   object's text, `[object Object]`, and navigates the page away;
