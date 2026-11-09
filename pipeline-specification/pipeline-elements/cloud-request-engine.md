@@ -211,14 +211,21 @@ populates the [accepted Evidence](#accepted-evidence) for the Engine.
 How a discovery failure at build time is handled depends on its class:
 
 - **Definitive configuration errors** - an HTTP 4xx response to a discovery
-  request (for example an invalid Resource Key) - MUST fail the build with a
-  critical error. Retrying with the same configuration can never succeed, so
-  the Engine fails fast with a clear error at start-up instead of surfacing the
-  misconfiguration on the first request.
+  request (for example an invalid Resource Key), other than 408 and 429 -
+  MUST fail the build with a critical error. Retrying with the same
+  configuration can never succeed, so the Engine fails fast with a clear error
+  at start-up instead of surfacing the misconfiguration on the first request.
 - **Transient failures** - the service unreachable (DNS or connection failure),
-  a timeout, or an HTTP 5xx response - MUST NOT fail the build. The Engine MUST
-  log a warning, complete the build, and retry discovery on first use. Failures
-  of those first-use retries are process-time failures, so
+  a timeout, an HTTP 5xx response, or an HTTP 408 (Request Timeout) or 429 (Too
+  Many Requests) response - MUST NOT fail the build. The Engine MUST log a
+  warning, complete the build, and retry discovery on first use. A 408 and a
+  429 are transient because the same request can succeed later, as
+  [RFC 9110 section 15.5.9](https://www.rfc-editor.org/rfc/rfc9110#section-15.5.9)
+  says the client "MAY repeat that request" after a 408, and
+  [RFC 6585 section 4](https://www.rfc-editor.org/rfc/rfc6585#section-4) says
+  a 429 "MAY include a Retry-After header indicating how long to wait before
+  making a new request". Failures of those first-use retries are
+  process-time failures, so
   [`SuppressProcessExceptions`](../features/exception-handling.md) applies to
   them as to any other processing error.
 
