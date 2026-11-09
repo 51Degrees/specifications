@@ -68,7 +68,9 @@ browser. Unlike a Resource Key it names no Properties of its own, so a caller
 that authenticates with a License Key alone MUST also supply the list of
 Properties it wants. See [Requested Properties](#requested-properties).
 
-The License Key is sent to the remote server using the key `license`. It MAY
+The License Key is sent to the remote server using the key `license`. The
+server also reads `licence` as another spelling of `license`, but the Engine
+always sends `license`. It MAY
 be sent alongside a Resource Key, in which case it adds the products it grants
 to those the Resource Key already carries, so the set of accessible Properties
 widens.
@@ -331,13 +333,14 @@ Flow Data Evidence.
 
 The remote server advertises `query.values` among its accepted Evidence keys,
 so a value in the Flow Data Evidence could otherwise collide with the Property
-list the Engine is already sending. Evidence whose key strips to `values`,
-`resource`, `license` or `licence` MUST therefore be left out of the request,
-because sending it would put a second field for the same value in the request
-with no way for either side to know which one applied. The rule covers
-`resource`, `license` and `licence` as well as `values`, so that the
-credentials are never sent twice whichever keys the server advertises. The
-server reads the License Key from `licence` where `license` is absent.
+list the Engine is already sending. The remote server also reads `licence` as
+another spelling of `license`. Evidence whose key strips to `values`,
+`resource`, `license` or `licence`, in any letter case, MUST therefore be left
+out of the request, because sending it would put a second field of the same
+name, or a second spelling of the same credential, in the request with no way
+for either side to know which one applied. The rule covers `resource`,
+`license` and `licence` as well as `values`, so that the credentials are never
+sent twice whichever keys the server advertises.
 
 When Evidence is added, its prefix MUST be removed.
 For example, `query.user-agent` becomes `user-agent`.
