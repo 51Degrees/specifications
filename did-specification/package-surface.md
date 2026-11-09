@@ -76,9 +76,10 @@ came out.
 
 The Signature outcome says whether the identifier is one the issuer made and
 nothing has altered. The Context outcome says whether the identifier is being
-presented from the connection it was created on, and it carries the reasons a
-check could not be completed as well as the two results, so a caller can tell
-a failed comparison from a comparison that never happened. The two are
+presented from the connection it was created on. It says whether the
+identifier was verified or mismatched, and also carries the reasons a check
+could not be completed, so a caller can tell a failed comparison from a
+comparison that never happened. The two are
 independent and a package MUST NOT derive either from the other.
 
 The Factor block answers for each factor separately, with these values:
@@ -89,6 +90,11 @@ The Factor block answers for each factor separately, with these values:
 | Mismatch           | The factor did not match that connection.                                                                     |
 | Misconfigured      | The verifying server is not able to determine that factor for any request, so it could not compare this one.   |
 | Not recorded       | The issuing server recorded no value for that factor, so the identifier says nothing about it either way.      |
+
+The server sends these as the lower case words `verified`, `mismatch`,
+`misconfigured` and `notrecorded`. The comparison ignores case, as .NET does,
+so a package whose language compares exactly, such as Java, MUST lower-case
+the word before it compares.
 
 Not recorded and Mismatch are different answers and a package MUST expose
 them as different values. A Mismatch is a statement about the identifier,
@@ -116,8 +122,9 @@ not be compared. A package that predates a new factor word therefore reports
 it as a Mismatch until the package is updated, which is the cost of never
 reading a value it cannot interpret as a pass.
 
-The Context outcome carries the word as the server sent it beside the named
-value, so a caller can still act on a Context outcome the package predates.
+A Context word a package does not know is reported as Unreadable, and the
+Context outcome carries the word as the server sent it beside that value, so a
+caller can still act on a Context outcome the package predates.
 
 ## What a package does not expose
 
