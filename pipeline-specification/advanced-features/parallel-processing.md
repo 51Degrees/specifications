@@ -3,7 +3,7 @@
 The reference implementations allow users to configure the Pipeline to
 execute Elements in parallel.
 For example, C# enables this by using an additional Element called
-[ParallelElements](https://github.com/51Degrees/pipeline-dotnet/blob/master/FiftyOne.Pipeline.Core/FlowElements/ParallelElements.cs).
+[ParallelElements](https://github.com/51Degrees/51degrees-dotnet/blob/main/pipeline/Core/FlowElements/ParallelElements.cs).
 
 ## Benefits
 
