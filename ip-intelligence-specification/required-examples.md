@@ -10,13 +10,18 @@ IP Intelligence examples follow the same general principles as [device detection
 
 IP Intelligence uses **IP address evidence** with these accepted evidence keys (as defined in data files):
 
-**Primary evidence keys:**
+**Primary evidence keys**, in the data file's priority order:
+- `query.true-client-ip-51d` - 51Degrees-specific true client IP
+- `server.true-client-ip-51d` - 51Degrees-specific true client IP from server variables
+- `query.client-ip-51d` - 51Degrees-specific client IP
+- `server.client-ip-51d` - 51Degrees-specific client IP from server variables
 - `query.client-ip` - Standard client IP from query parameters (most common)
-- `server.client-ip` - Client IP from server variables  
-- `query.client-ip-51d` - 51Degrees-specific client IP (may have priority)
-- `server.client-ip-51d` - 51Degrees-specific server client IP
-- `query.true-client-ip-51d` - 51Degrees-specific true client IP (highest priority)
-- `server.true-client-ip-51d` - 51Degrees-specific server true client IP
+- `server.client-ip` - Client IP from server variables
+
+When a request carries more than one of these, the Engine uses one value,
+every `query` key before any `server` key and the data file's order within a
+prefix, as [choosing the IP address](pipeline-elements/ip-intelligence-on-premise.md#choosing-the-ip-address)
+describes.
 
 **Evidence formats:**
 - IPv4: `"203.0.113.1"`
@@ -47,24 +52,47 @@ Additional properties may include: `Address`, `County`, `Suburb`, `ZipCode`
 
 ### Available Implementations
 
-Examples MUST be implemented for these available language implementations:
+Examples MUST be implemented in every implementation of IP Intelligence, each
+in its own repository:
 
-- **C/C++** - On-premise via ip-intelligence-cxx
-- **.NET (C#)** - On-premise and Cloud via ip-intelligence-dotnet  
-- **Go** - On-premise via ip-intelligence-go
-
-**Note**: Node.js, Python, Java, and PHP implementations do not currently exist for IP Intelligence.
+- **C/C++** - [51degrees-cxx](https://github.com/51Degrees/51degrees-cxx)
+- **.NET (C#)** - [51degrees-dotnet](https://github.com/51Degrees/51degrees-dotnet)
+- **Go** - [51degrees-go](https://github.com/51Degrees/51degrees-go)
+- **Java** - [51degrees-java](https://github.com/51Degrees/51degrees-java)
+- **Node.js** - [51degrees-node](https://github.com/51Degrees/51degrees-node)
+- **PHP** - [51degrees-php](https://github.com/51Degrees/51degrees-php)
+- **Python** - [51degrees-python](https://github.com/51Degrees/51degrees-python)
+- **Rust** - [51degrees-rust](https://github.com/51Degrees/51degrees-rust)
+- **nginx and Varnish modules** - [51degrees-nginx](https://github.com/51Degrees/51degrees-nginx) and [51degrees-varnish](https://github.com/51Degrees/51degrees-varnish)
 
 ### Data Files
 
-IP Intelligence uses `.ipi` data files:
-- **Lite data file**: `51Degrees-LiteV41.ipi` (free, available from GitHub)
-- **Enterprise data file**: Contact 51Degrees sales team for access (Distributor not yet available for IP Intelligence)
+IP Intelligence uses `.ipi` data files. The free ones are linked from the
+`ip-intelligence` folder of the [data repository](https://github.com/51Degrees/data):
+- **Lite data file**: `51Degrees-LiteV41.ipi`, giving `RegisteredCountry`,
+  `RegisteredName` and `RegisteredOwner`
+- **Asn data file**: `51Degrees-IPIV4AsnIpiV41.ipi`, giving `Asn` and `AsnName`
+- **Enterprise data file**: every other Property, from the
+  [51Degrees contact page](https://51degrees.com/contact-us?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=ip-intelligence-specification-required-examples.md&utm_term=data-files)
+
+Examples follow the device detection rules for
+[on-premise examples](../device-detection-specification/required-examples.md#on-premise-device-detection).
+Given no arguments or settings, an example that shows location or
+registration Properties uses the Lite data file, and so does one whose purpose
+needs the Enterprise data file, such as a compare, metrics or country overlap
+example. A performance, reload or update example, whose Properties do not
+matter to what it shows, uses the Asn data file, which is far smaller to
+download. An example downloads its file when it is missing. It asks for
+Properties only the Enterprise data file holds, such as `Latitude`,
+`Longitude` and `Areas`, says of each one the data file in use cannot give
+that it needs the Enterprise data file, and once gives a link to the contact
+page to ask for a copy.
 
 ### Test Data
 
 Examples use IP address evidence files:
-- **evidence.yml** - YAML formatted file containing test IP addresses
+- **evidence.yml** - YAML formatted file containing 20,000 random IPv4 and IPv6
+  addresses, in the `ip-intelligence` folder of the data repository
 - Format example:
   ```yaml
   - server.client-ip: "203.0.113.1"
@@ -74,7 +102,7 @@ Examples use IP address evidence files:
 
 ### Weighted Values
 
-Unlike Device Detection, IP Intelligence properties return **weighted values** due to the probabilistic nature of IP geolocation data. Examples MUST demonstrate accessing both the value and its associated weighting:
+Unlike Device Detection, IP Intelligence properties return **[weighted values](../pipeline-specification/features/weighted-values.md)**, and a property with a single answer returns it with a weighting of 1. Examples MUST demonstrate accessing both the value and its associated weighting:
 
 ```csharp
 var country = ipData.RegisteredCountry;

@@ -26,9 +26,9 @@ language.
 
 The code for this component is available on GitHub:
 
-- [common-cxx](https://github.com/51Degrees/common-cxx)
-- [ip-intelligence-cxx](https://github.com/51Degrees/ip-intelligence-cxx)
-- [ip-graph-cxx](https://github.com/51Degrees/ip-graph-cxx)
+- [51degrees-cxx/src/common](https://github.com/51Degrees/51degrees-cxx/tree/main/src/common)
+- [51degrees-cxx/src/ipi](https://github.com/51Degrees/51degrees-cxx/tree/main/src/ipi)
+- [51degrees-cxx/src/ipi/graph](https://github.com/51Degrees/51degrees-cxx/tree/main/src/ipi/graph)
 
 Unfortunately, while calling a native library is possible in many languages, it
 is often fiddly and can come with unexpected difficulties. As such, we generally
@@ -52,7 +52,7 @@ to determine the correct native binary to use based on the current
 operating system.
 
 In some cases, this capability is built into the packaging infrastructure
-For example, [.NET/NuGet](https://github.com/51Degrees/ip-intelligence-dotnet/blob/main/FiftyOne.IpIntelligence.Engine.OnPremise/FiftyOne.IpIntelligence.Engine.OnPremise.csproj).
+For example, [.NET/NuGet](https://github.com/51Degrees/51degrees-dotnet/blob/main/ip-intelligence/Engine.OnPremise/FiftyOne.IpIntelligence.Engine.OnPremise.csproj).
 Some require additional code to be written to determine the correct binary
 at runtime (Java/Maven and Node/NPM). Others
 do not allow native binaries in packages at all (PHP/Composer).
@@ -76,7 +76,8 @@ This Engine determines the accepted Evidence keys on data refresh based
 on values in the data source.
 
 After loading the data source into the native code, call the `getKeys`
-function to return a list of the accepted Evidence keys.
+function to return a list of the accepted Evidence keys, in the order the
+native code tries them (see [choosing the IP address](#choosing-the-ip-address)).
 These values will then need to be stored to prevent repeated calls to the
 native code.
 
@@ -124,9 +125,15 @@ other Pipeline API features.
   that is being used for the On-premise Engine.
   - Pass the `ResultsIpi` instance so it can be used when Property values
     are requested.
-  - Do not immediately copy all the Property values from `ResultsIpi`. By
-    default, around 200 Properties will be populated, meaning 200+ calls to
-    the native code marshalling values back and forth [^3].
+  - The Element Data MUST read a Property value from `ResultsIpi` only when
+    that Property is requested, and MUST NOT copy Property values out of
+    `ResultsIpi` while the Engine processes the Flow Data. Copying every
+    Property means a call to the native code for each one, marshalling
+    values back and forth, and conversions the caller may never need, such
+    as writing a geometry value as text, on every request [^3].
+  - The Element Data MAY keep a value once it has been read, so that a
+    second request for the same Property does not call the native code
+    again.
 
 [^3]: Note the effect that
 holding the "un-managed" memory references (i.e. memory references that
@@ -136,6 +143,24 @@ are not handled by language garbage collection) has on
 The reference implementations don't allow a cache to be
 added to this Engine because of the complexity this introduces, however
 end-users might be tempted to create their own cache of results.
+
+### Choosing the IP address
+
+The data file lists the client IP keys in priority order, for example
+`true-client-ip-51d`, then `client-ip-51d`, then `client-ip`, and the Engine
+accepts each of them under both the `query` and the `server` prefix. When the
+Evidence holds more than one of these keys, the native code uses one value,
+chosen in this order:
+
+1. The `query` keys, in the data file's order.
+2. Only when no `query` key supplied an address, the `server` keys, in the
+   data file's order.
+
+The prefix is decided first, as the
+[Evidence precedence](../../pipeline-specification/features/evidence.md#overview)
+requires, and the data file's order decides between keys under one prefix.
+So `query.client-ip` is used ahead of `server.true-client-ip-51d`. The
+Property values in the result describe that one address.
 
 ### Value Retrieval
 
@@ -231,9 +256,20 @@ addition to all the configuration options defined for other features. For exampl
 
 | **Parameter**             | **Native code location**                                                                                                                            | **Optional** | **Default**                                                                                                                      | **Notes**                                                                                                                                                                                                                                                                                                                                                                                                   |
 |---------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|--------------|----------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Performance Profile       | [ConfigIpi=>set\[ProfileName\]()](https://github.com/51Degrees/ip-intelligence-cxx/blob/main/src/ConfigIpi.hpp#L104)                        | Yes          | Balanced. See [native code](https://github.com/51Degrees/ip-intelligence-cxx/blob/main/src/ipi.h#L429) for definitions. | Set the performance profile to use when creating the Engine. Each profile has default values for various internal configuration options, as well as things like the use of predictive/performance graphs.                                                                                                                                                                                                   |
-| Concurrency               | [ConfigIpi::setConcurrency()](https://github.com/51Degrees/ip-intelligence-cxx/blob/main/src/ConfigIpi.hpp#L180)                            | Yes          | System processor count                                                                                                           | Set the expected number of concurrent operations using the Engine. This is used to configure internal caches to avoid excessive locking. It has no effect if these internal caches are not used. (For example, when using the 'MaxPerformance' profile)                                                                                                                                                     |
+| Performance Profile       | [ConfigIpi=>set\[ProfileName\]()](https://github.com/51Degrees/51degrees-cxx/blob/main/src/ipi/ConfigIpi.hpp#L104)                        | Yes          | Balanced, except for the Engine PHP builds at start-up [^php]. See [native code](https://github.com/51Degrees/51degrees-cxx/blob/main/src/ipi/ipi.h#L429) for definitions. | Set the performance profile to use when creating the Engine. Each profile has default values for various internal configuration options, as well as things like the use of predictive/performance graphs.                                                                                                                                                                                                   |
+| Concurrency               | [ConfigIpi::setConcurrency()](https://github.com/51Degrees/51degrees-cxx/blob/main/src/ipi/ConfigIpi.hpp#L180)                            | Yes          | System processor count | Set the expected number of operations that use the Engine at the same time. The native code uses it for every collection read from the file.</br>1. It sets the number of file handles in the pool, which is Concurrency up to a fixed maximum of 64, because a process can only have so many files open (512 through `fopen` by default on Windows). An operation that has to read from the file when every handle is in use MUST wait until another operation releases one.</br>2. It decides how each cache is split into parts, each with its own lock, which avoids excessive locking. An item in use cannot be removed from a cache, and any operation can need any part, so every part MUST hold at least Concurrency items. The number of parts is Concurrency, or fewer where needed so that every part holds at least Concurrency items, and a cache that holds fewer than Concurrency items in total MUST be made large enough to hold Concurrency items. No value of Concurrency stops the Engine building.</br>Concurrency has no effect when every collection is held in memory, for example with the 'MaxPerformance' profile. |
+| Reuse Operational File    | [ConfigBase=>setReuseTempFile()](https://github.com/51Degrees/51degrees-cxx/blob/main/src/common/ConfigBase.hpp#L105)                             | Yes          | `false`, from [native code](https://github.com/51Degrees/51degrees-cxx/blob/main/src/common/config.h#L119) | Set whether or not an existing operational file will be used if one is found in the temp directory. It has an effect only when the Engine uses an operational file (see [data updates](../../pipeline-specification/features/data-updates.md#operational-file-config)). |
+
+[^php]: In PHP the Engine built when PHP starts, from its configuration file,
+always uses MaxPerformance, which holds the whole data file in memory, and a
+package refuses any other profile for it. PHP usually serves requests from
+worker processes forked from the process that built that Engine. A fork copies
+the open file handles, which then share one read position between the workers,
+so with a profile that reads from the file the workers would corrupt each
+other's reads. Any other Engine, such as one a package builds after the
+fork or in a process that never forks, opens its own file handles and may use
+any profile.
 
 The default values for many configuration options come from the native
 C/C++ code. You can find these defaults in
-<https://github.com/51Degrees/common-cxx/blob/master/config.h>.
+<https://github.com/51Degrees/51degrees-cxx/blob/main/src/common/config.h>.
