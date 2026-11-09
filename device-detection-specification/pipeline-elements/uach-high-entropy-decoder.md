@@ -22,17 +22,26 @@ be used by the Device Detection Engines.
 - cookie.51d_gethighentropyvalues
 - query.51d_gethighentropyvalues
 
+The Device Detection Engines read `51D_StructuredUserAgent` in the same way,
+as `cookie.51d_structureduseragent` or `query.51d_structureduseragent`. Only the
+first value of either key that gives headers is used, and a `query` value is
+tried before any `cookie` value, as described in the [Process](#process)
+section.
+
 ## Element Data
 
 This Element is only implemented for
 [.NET](https://github.com/51Degrees/51degrees-dotnet/tree/main/device-detection/DeviceDetection)
 at time of writing.
-The reference implementation writes directly to Evidence, which will not
-be possible if Evidence is immutable.
-Instead, the Element can output its values using Element Data as described
-in the table below.
-The Device Detection Engines MUST be capable of using these values if
-available and falling back to Evidence values if they are not.
+The reference implementation writes the decoded values to Evidence, which
+a Flow Element MAY do outside a
+[parallel group](../../pipeline-specification/features/thread-safety.md#evidence),
+as Evidence is not immutable.
+Alternatively, the Element can output its values using Element Data as
+described in the table below.
+The Device Detection Engines MUST be capable of using these values from
+Element Data if available, and falling back to Evidence values if they are
+not.
 See [adding Evidence values](../../pipeline-specification/features/evidence.md#adding-evidence-values)
 for more details.
 
@@ -53,6 +62,9 @@ not needed for device detection, so are not featured here.
 
 - Get the encoded value from Evidence for the [relevant keys](#accepted-evidence)
   - Use the value with the `query` prefix if both are available
+    - A value is available when it is present and gives at least one header
+      when decoded, so a `query` value that cannot be decoded, or gives no
+      header, leaves the `cookie` value to be used
 - Decode the value from base 64
 - Convert the JSON representation into individual HTTP header values.
   - See [here](https://github.com/51Degrees/sua-uach-conversion/blob/main/src/convertSUAtoUACH.js)
