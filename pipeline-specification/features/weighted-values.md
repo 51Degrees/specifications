@@ -53,9 +53,9 @@ When serializing weighted values, they are represented like:
 }
 ```
 
-The keys are lower case, as the 51Degrees implementation of the
-[JSON Builder Element](../pipeline-elements/json-builder.md) writes them, and
-Cloud Engines read weighted values from the remote server in this form.
+The keys MUST be written in lower case, as the other keys of the
+[JSON Builder Element](../pipeline-elements/json-builder.md) are. A reader MUST
+accept them in lower case, which is how the remote server writes them.
 
 The raw weighting is stored as a 16-bit unsigned integer (aka [ushort](https://learn.microsoft.com/en-us/dotnet/api/system.uint16.maxvalue?view=netstandard-2.0)).
 
