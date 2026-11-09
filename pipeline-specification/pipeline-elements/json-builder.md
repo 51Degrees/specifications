@@ -103,6 +103,9 @@ the Element MUST fail with an error and MUST NOT set its JSON value. The error
 SHOULD say that a Sequence Element needs to be placed before the JSON Builder
 Element in the Pipeline. The Pipeline handles the error as described in
 [exception handling](../features/exception-handling.md#process-function).
+When the Element fails, the web integration handles the error as that page
+describes, and a response it serves then, such as the .NET web integration's
+fallback response, is not the Element's JSON value.
 
 A `query.sequence` value taken from a query string is text and not an integer,
 so it does not count as a sequence number. An integer that a caller added to
