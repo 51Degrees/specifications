@@ -25,7 +25,7 @@ be used by the Device Detection Engines.
 ## Element Data
 
 This Element is only implemented for
-[.NET](https://github.com/51Degrees/device-detection-dotnet/blob/main/FiftyOne.DeviceDetection/Uach/UachJsConversionElement.cs)
+[.NET](https://github.com/51Degrees/51degrees-dotnet/tree/main/device-detection/DeviceDetection)
 at time of writing.
 The reference implementation writes directly to Evidence, which will not
 be possible if Evidence is immutable.

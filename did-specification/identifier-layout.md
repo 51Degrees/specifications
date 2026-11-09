@@ -45,9 +45,33 @@ one, because an unsigned identifier would be indistinguishable from a signed
 one further down the chain. Reading an identifier is not the same as
 verifying it, and a package MUST keep the two answers separate.
 
-An Envelope is exchanged as base64. The remote server issues the standard
-alphabet with padding, and a page that puts an identifier in a link uses the
-URL-safe alphabet, so a package accepts both on the way in.
+An Envelope is exchanged as base64
+([RFC 4648](https://www.rfc-editor.org/rfc/rfc4648)). The remote server
+issues the standard alphabet with padding, and a page that puts an identifier
+in a link uses the URL-safe alphabet, so a package accepts both on the way in.
+
+A package MUST ignore white space before and after the text, so that a value
+read from a file, or from a header with a trailing line break, reads as the
+clean value does. White space is any character with the Unicode White_Space
+property. A package MUST refuse a text with any other character outside the
+alphabet, white space inside the text included, as
+[RFC 4648 section 3.3](https://www.rfc-editor.org/rfc/rfc4648#section-3.3)
+requires when the referring specification says nothing else. The issuer never
+writes white space inside an identifier, so white space there is a sign of
+damage, for example a `+` turned into a space by a form decoder, and skipping
+it would read bytes other than the ones issued.
+
+A text MUST use one alphabet. The two differ only in the characters for the
+values 62 and 63, being `+` and `/` in the standard alphabet and `-` and `_` in the
+URL-safe one, so a package MUST refuse a text holding a character from each
+pair, such as both `+` and `-`. Base64 libraries write one alphabet or the
+other and never a mix, and most of their decoders refuse a mixed text, so a
+mixed text is a sign of damage, for example a value converted only in part.
+A package that reads `-` as `+` and `_` as `/` before decoding MUST make this
+check first, because that mapping hides the mix.
+[RFC 4648 section 5](https://www.rfc-editor.org/rfc/rfc4648#section-5) says
+the same, that the URL-safe encoding "should not be regarded as the same as
+the "base64" encoding".
 
 ## Payload
 
@@ -98,6 +122,115 @@ issued for the same inputs carry the same Match Key even though their
 envelopes differ, so it is the value to use as a cache or de-duplication key,
 and the value to compare when asking whether two identifiers stand for the
 same thing.
+
+#### Hashed Email match key
+
+The Match Key of a Hashed Email identifier is the SHA-256 of these bytes, in
+order:
+
+1. The length of the salt in bytes, as one byte.
+2. The salt.
+3. The address part of the email, put in Unicode Normalization Form C and
+   then lowercased, as UTF-8.
+
+The length byte comes first so that no two pairs of email and salt give the
+same bytes to hash, as they could if the salt were simply followed by the
+email. The salt is at most 64 bytes, so its length always fits the one byte.
+
+The address part is the `addr-spec` of the email read as a `mailbox` under
+[RFC 5322 section 3.4](https://www.rfc-editor.org/rfc/rfc5322#section-3.4),
+as defined below, being its `local-part`, then `@`, then its `domain`. The
+local part and the domain are each taken as written, without the comments
+and white space that RFC 5322 allows around them. A display name, the angle
+brackets around the address and any comments are not part of the address
+part, so `Tom <User@Example.COM>` and `user@example.com` give the same Match
+Key. White space around the email, meaning the characters with the Unicode
+`White_Space` property
+([PropList.txt](https://www.unicode.org/Public/15.1.0/ucd/PropList.txt)),
+is removed before the email is read as a `mailbox`, and every rule below
+applies to what remains.
+
+A local part that is a `quoted-string` is taken with its quote characters and
+the `\` of each `quoted-pair`, although
+[RFC 5322 section 3.2.4](https://www.rfc-editor.org/rfc/rfc5322#section-3.2.4)
+says that neither is part of the string. So `"john"@example.com` and
+`john@example.com` are different address parts and give different Match
+Keys.
+
+A `mailbox` here is one in the syntax of RFC 5322 section 3 without its
+`obs-` rules, as
+[RFC 6532 section 3.2](https://www.rfc-editor.org/rfc/rfc6532#section-3.2)
+extends that syntax to allow UTF-8. RFC 6532 section 3.2 adds
+`UTF8-non-ascii`, which
+[RFC 6532 section 3.1](https://www.rfc-editor.org/rfc/rfc6532#section-3.1)
+defines as any character outside ASCII written as UTF-8, to each of these
+rules.
+
+- `VCHAR =/ UTF8-non-ascii`, extending the printable characters of
+  [RFC 5234 appendix B.1](https://www.rfc-editor.org/rfc/rfc5234#appendix-B.1),
+  so the `\` of a `quoted-pair` may be followed by one.
+- `ctext =/ UTF8-non-ascii`, extending the text of a comment in
+  [RFC 5322 section 3.2.2](https://www.rfc-editor.org/rfc/rfc5322#section-3.2.2).
+- `atext =/ UTF8-non-ascii`, extending the characters of an atom in
+  [RFC 5322 section 3.2.3](https://www.rfc-editor.org/rfc/rfc5322#section-3.2.3),
+  so a local part, a domain or a display name written without quotes may hold
+  one.
+- `qtext =/ UTF8-non-ascii`, extending the text of a quoted string in
+  [RFC 5322 section 3.2.4](https://www.rfc-editor.org/rfc/rfc5322#section-3.2.4).
+- `dtext =/ UTF8-non-ascii`, extending the text of a domain literal in
+  [RFC 5322 section 3.4.1](https://www.rfc-editor.org/rfc/rfc5322#section-3.4.1).
+
+RFC 6532 section 3.2 also extends `text`, which only a message body uses. So
+`Üser@Exämple.com` is a `mailbox`, and the issuer accepts it.
+
+The issuer MUST accept every such `mailbox`, except that it MAY refuse a
+`mailbox` that holds any of the following.
+
+- A line break, being the CR LF of folding white space.
+- A `quoted-pair` of a space or a tab, being `\` followed by either.
+- A display name that holds a `quoted-string` and any other word, such as
+  `"Tom" Smith`.
+- A `domain-literal`, being a domain written in `[` and `]`, that holds a
+  character outside ASCII, such as `user@[Ü]`.
+- U+FFFE, a code point that Unicode reserves for internal use and never
+  assigns to a character.
+
+The issuer MUST refuse every email that is not such a `mailbox`, and creates
+no Hashed Email identifier from one it refuses. That includes an email that
+uses the obsolete syntax of
+[RFC 5322 section 4](https://www.rfc-editor.org/rfc/rfc5322#section-4),
+being the `obs-` rules, such as `john . smith@example.com`, and an email that
+is not one `mailbox`, such as `user name@example.com` or the list
+`user@example.com, other@example.com`.
+
+Normalization Form C is the one
+[Unicode Standard Annex #15](https://www.unicode.org/reports/tr15/tr15-54.html)
+defines, and it changes nothing in an email made only of ASCII. Lowercasing
+replaces each character that has a simple lowercase mapping in field 13 of
+[UnicodeData.txt](https://www.unicode.org/Public/15.1.0/ucd/UnicodeData.txt)
+for Unicode 15.1 by that mapping, and leaves every other character as it is.
+The one exception is U+0130 (LATIN CAPITAL LETTER I WITH DOT ABOVE), which is
+left as it is although its mapping is U+0069. Unicode 15.0 has the same
+mappings, and .NET's `String.ToLowerInvariant` lowercases in this way where
+its ICU library implements Unicode 15.0 or 15.1.
+
+For example, the salt `36 9C` and the email `Tom <User@Example.COM>` give the
+bytes `02 36 9C` followed by the UTF-8 of `user@example.com`, and the Match
+Key
+`747e0f5f09ae03849ce0fc00c0579a2c8bf0b1a3146ca2e8f47c6b6e12e35287`.
+The same salt and the email `"John"@Example.COM` give the bytes `02 36 9C`
+followed by the UTF-8 of `"john"@example.com`, and the Match Key
+`f9ce95a889a65380bfb6248846d13a6543898f94130990adc629c4fd8b14320e`.
+
+The same salt and the email `Üser@Exämple.com` give the bytes `02 36 9C`
+followed by the UTF-8 of `üser@exämple.com`, being
+`C3 BC 73 65 72 40 65 78 C3 A4 6D 70 6C 65 2E 63 6F 6D`, and the Match Key
+`55775e912df51d557b213ad416bbc6a8337cca7b7455c46212978485708d74cb`.
+The key is the same whether `Ü` and `ä` are each written as one character
+(U+00DC and U+00E4) or as `U` and `a` each followed by U+0308 (COMBINING
+DIAERESIS), because Normalization Form C makes the two forms the same.
+Lowercasing then replaces U+00DC by U+00FC and `E` by `e`, and leaves `ä` as
+it is.
 
 ## Flags byte
 
