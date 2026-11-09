@@ -221,13 +221,12 @@ read of a Property of a component walks the component's graph. Different
 `ResultsHash` instances can be used on different threads at once, and the
 Engine can be shared.
 
-Aspect Data SHOULD be thread safe, as
-[thread safety](../../pipeline-specification/features/thread-safety.md)
+Finished Element Data MUST be safe to read from several threads at once, as
+[thread safety](../../pipeline-specification/features/thread-safety.md#element-data)
 describes, so Aspect Data that reads its values from a `ResultsHash` instance
-SHOULD let one thread at a time read that instance, for example by holding a
-lock for each read. An Engine whose Aspect Data lets several threads read
-one instance at once MUST NOT allow a
-[cache](../../pipeline-specification/features/caching.md) to be added.
+MUST let one thread at a time read that instance, for example by holding a
+lock for each read, unless it is a type the language does not let several
+threads share.
 
 ### Performance guidance
 
