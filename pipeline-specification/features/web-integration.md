@@ -225,7 +225,7 @@ accepts it, and a revalidation's ETag is the same as the one it sends.
 |----------------|-------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
 | Cache-Control  | max-age=1800 private                                                                | Cache item lifetime is 30 minutes. Only local client caches can cache this content.                  |
 | Vary           | all headers in Pipeline Evidence key filter (e.g. User-Agent)                       | Let the cache know that if one of these headers changes, the cached content will need to be re-fetched. |
-| ETag           | Calculated hash of ALL the Evidence values in Evidence filter key for this Pipeline | Assists caches in re-validating expired content                                                         |
+| ETag           | Calculated hash of the Evidence values in the Evidence key filter, as the request supplied them (see below) | Assists caches in re-validating expired content                                                         |
 | Content-Type   | application/x-javascript or application/JSON                                        | Indicate the type of content being returned                                                             |
 | Content-Length | Content length in bytes                                                             | Indicate the expected length of the content                                                             |
 
