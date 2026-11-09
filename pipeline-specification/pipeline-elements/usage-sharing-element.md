@@ -118,8 +118,8 @@ We recommend implementing a producer/consumer approach where the process
 function just adds the raw data to a shared queue.
 
 A background thread can then be used to consume items from this queue,
-adding them to the XML payload and sending it once it contains the
-configured quantity of data.
+adding them to the XML payload and sending it once the queue holds the
+configured quantity of data, as described below.
 
 The complete XML document MUST contain a `<Devices>` root element with
 each `<Device>` element containing the details related to a request.
@@ -129,15 +129,17 @@ The size of each batch is set by the
 [minimum entries per message and take timeout](#configuration-options)
 settings, as follows.
 
-1. A message is started once the queue holds the minimum entries per message.
+1. Unless sending is paused by the [back-off](#back-off-after-failed-sends), a
+   message is started once the queue holds the minimum entries per message.
 2. Entries are taken from the queue for it, waiting up to the take timeout for
    each one, until a wait ends with no entry or the message holds twice the
    minimum entries per message.
 3. The message is sent.
 
 A message therefore holds from the minimum entries per message to twice that
-number. The one exception is the final message sent when the element is
-disposed, which holds whatever is left in the queue (see [Cleanup](#cleanup)).
+number. The one exception is disposal, when the data remaining in the queue is
+sent even if it is fewer than the minimum entries per message (see
+[Cleanup](#cleanup)).
 With a take timeout of zero, a message takes only the entries already queued.
 The take timeout only applies while a message is being filled, so an element
 with an empty queue does not wake up to check it.
@@ -392,10 +394,10 @@ SHOULD be logged.
 | Blocked HTTP headers              | yes                   | yes          | All HTTP headers are shared except `Cookie`                                  | Allows the user to exclude specific HTTP headers that they do not want to share.                                             |
 | Ignore Flow Data Evidence filter  | yes                   | yes          | not set                                                                      | Allows the user to block a request from being shared if the specified criteria are met.                                      |
 | Share percentage                  | yes                   | yes          | 1.0                                                                          | Used to set the approximate proportion of requests that will be shared. A value of 1 means that 100% of requests are shared. |
-| Minimum entries per message       | yes                   | yes          | 50                                                                           | The number of requests that will be added to a usage sharing payload before it is sent.                                      |
+| Minimum entries per message       | yes                   | yes          | 50                                                                           | The number of requests that must be queued before a message is started. A message holds from this to twice this number.        |
 | Maximum queue size                | yes                   | yes          | 1000, or ten times the minimum entries per message if that is larger         | The size of the queue that is used to buffer requests to be added to a usage sharing payload.                                |
 | Add timeout milliseconds          | yes                   | yes          | 5                                                                            | The timeout to use when trying to add items to the usage sharing queue. If the request times out, the data will be discarded |
-| Take timeout milliseconds         | yes                   | yes          | 100                                                                          | The timeout to use when getting items from the usage sharing queue to add to the next payload.                               |
+| Take timeout milliseconds         | yes                   | yes          | 100                                                                          | How long to wait for each entry when filling a message.                                                                      |
 | Share usage URL                   | yes                   | yes          | <https://devices-v4.51degrees.com/new.ashx>                                  | The URL to send data to                                                                                                      |
 | Repeat Evidence interval minutes  | yes                   | yes          | 20                                                                           | How long after Evidence is shared it is not shared again. A repeat after that is shared and starts a new interval.           |
 | Track session                     | yes                   | yes          | false                                                                        | If this flag is set, the session cookie is compared along with the Evidence, so a repeat from a new session is shared.       |
