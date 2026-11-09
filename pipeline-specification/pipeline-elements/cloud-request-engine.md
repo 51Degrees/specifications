@@ -423,7 +423,9 @@ when it says the cloud service is in trouble, being:
 - a response with a success status whose body could not be used
 
 Any other status from 400 to 499 answers the content of that one request, such
-as Evidence the service will not accept, and MUST NOT count. Otherwise one
+as Evidence the service will not accept, and MUST NOT count. That includes 408
+(Request Timeout) and 401 and 403 (a resource key the service does not accept),
+which do not count towards the recovery period. Otherwise one
 visitor sending a few such requests could start a recovery period that stops
 every visitor's requests reaching the cloud service, and keep it going.
 
