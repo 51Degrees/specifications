@@ -60,12 +60,15 @@ as it already does. The Property metadata it exposes is empty, so anything
 that reads the metadata to decide what the Engine can produce MUST tolerate
 finding nothing there.
 
-A Resource Key can also be valid and include no product that holds a
-particular Cloud Aspect Engine's Properties. That is not a definitive
-configuration error, so the Cloud Aspect Engine MUST NOT fail the Pipeline
-build. It builds with empty Property metadata, MUST log the missing product
-once, and MUST NOT log a warning on each response because the product is
-missing.
+Once the Cloud Request Engine's discovery has completed, a Resource Key can be
+valid and still include no product that holds a particular Cloud Aspect
+Engine's Properties. That is not a definitive configuration error, so the
+Cloud Aspect Engine MUST NOT fail the Pipeline build. It builds with empty
+Property metadata and MUST log the missing product once per Cloud Aspect
+Engine instance, at warning level, naming its Data Key. It MUST NOT log the
+missing product again on each response. This does not conflict with the rule
+above against caching an empty result, because an empty product list before
+discovery has completed is temporary, and after discovery it is final.
 
 ## Processing
 
@@ -77,6 +80,9 @@ deserialize the raw JSON from the Cloud Request Engine:
    Element Data) that relates to this Aspect by using the appropriate
    string Data Key. (For example, `device` for Device Detection)
 2. Deserialize that portion of the raw JSON to construct the Element Data result.
+
+Where the response JSON has no portion for the Engine's Data Key, the Cloud
+Aspect Engine leaves the Element Data without values and raises no error.
 
 The primary difficulty with this process is usually converting from the JSON
 format to whatever structure is needed to support the
