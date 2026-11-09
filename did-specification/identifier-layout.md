@@ -131,14 +131,43 @@ says that neither is part of the string. So `"john"@example.com` and
 `john@example.com` are different address parts and give different Match
 Keys.
 
-The issuer MUST accept every `mailbox` in the syntax of RFC 5322 section 3
-without its `obs-` rules, except that it MAY refuse a `mailbox` that holds any
-of the following.
+A `mailbox` here is one in the syntax of RFC 5322 section 3 without its
+`obs-` rules, as
+[RFC 6532 section 3.2](https://www.rfc-editor.org/rfc/rfc6532#section-3.2)
+extends that syntax to allow UTF-8. RFC 6532 section 3.2 adds
+`UTF8-non-ascii`, which
+[RFC 6532 section 3.1](https://www.rfc-editor.org/rfc/rfc6532#section-3.1)
+defines as any character outside ASCII written as UTF-8, to each of these
+rules.
+
+- `VCHAR =/ UTF8-non-ascii`, extending the printable characters of
+  [RFC 5234 appendix B.1](https://www.rfc-editor.org/rfc/rfc5234#appendix-B.1),
+  so the `\` of a `quoted-pair` may be followed by one.
+- `ctext =/ UTF8-non-ascii`, extending the text of a comment in
+  [RFC 5322 section 3.2.2](https://www.rfc-editor.org/rfc/rfc5322#section-3.2.2).
+- `atext =/ UTF8-non-ascii`, extending the characters of an atom in
+  [RFC 5322 section 3.2.3](https://www.rfc-editor.org/rfc/rfc5322#section-3.2.3),
+  so a local part, a domain or a display name written without quotes may hold
+  one.
+- `qtext =/ UTF8-non-ascii`, extending the text of a quoted string in
+  [RFC 5322 section 3.2.4](https://www.rfc-editor.org/rfc/rfc5322#section-3.2.4).
+- `dtext =/ UTF8-non-ascii`, extending the text of a domain literal in
+  [RFC 5322 section 3.4.1](https://www.rfc-editor.org/rfc/rfc5322#section-3.4.1).
+
+RFC 6532 section 3.2 also extends `text`, which only a message body uses. So
+`Üser@Exämple.com` is a `mailbox`, and the issuer accepts it.
+
+The issuer MUST accept every such `mailbox`, except that it MAY refuse a
+`mailbox` that holds any of the following.
 
 - A line break, being the CR LF of folding white space.
 - A `quoted-pair` of a space or a tab, being `\` followed by either.
 - A display name that holds a `quoted-string` and any other word, such as
   `"Tom" Smith`.
+- A `domain-literal`, being a domain written in `[` and `]`, that holds a
+  character outside ASCII, such as `user@[Ü]`.
+- U+FFFE, a code point that Unicode reserves for internal use and never
+  assigns to a character.
 
 The issuer MUST refuse every email that is not such a `mailbox`, and creates
 no Hashed Email identifier from one it refuses. That includes an email that
@@ -146,9 +175,7 @@ uses the obsolete syntax of
 [RFC 5322 section 4](https://www.rfc-editor.org/rfc/rfc5322#section-4),
 being the `obs-` rules, such as `john . smith@example.com`, and an email that
 is not one `mailbox`, such as `user name@example.com` or the list
-`user@example.com, other@example.com`. RFC 5322's syntax allows only ASCII,
-so it also includes an email holding any character outside ASCII, such as
-`Üser@Exämple.com`.
+`user@example.com, other@example.com`.
 
 Normalization Form C is the one
 [Unicode Standard Annex #15](https://www.unicode.org/reports/tr15/tr15-54.html)
@@ -168,6 +195,16 @@ Key
 The same salt and the email `"John"@Example.COM` give the bytes `02 36 9C`
 followed by the UTF-8 of `"john"@example.com`, and the Match Key
 `f9ce95a889a65380bfb6248846d13a6543898f94130990adc629c4fd8b14320e`.
+
+The same salt and the email `Üser@Exämple.com` give the bytes `02 36 9C`
+followed by the UTF-8 of `üser@exämple.com`, being
+`C3 BC 73 65 72 40 65 78 C3 A4 6D 70 6C 65 2E 63 6F 6D`, and the Match Key
+`55775e912df51d557b213ad416bbc6a8337cca7b7455c46212978485708d74cb`.
+The key is the same whether `Ü` and `ä` are each written as one character
+(U+00DC and U+00E4) or as `U` and `a` each followed by U+0308 (COMBINING
+DIAERESIS), because Normalization Form C makes the two forms the same.
+Lowercasing then replaces U+00DC by U+00FC and `E` by `e`, and leaves `ä` as
+it is.
 
 ## Flags byte
 
