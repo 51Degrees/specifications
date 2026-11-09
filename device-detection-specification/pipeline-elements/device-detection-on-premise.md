@@ -113,7 +113,8 @@ It is essential that the Element Data instance populated by this
 On-premise Engine is interface compatible with the Element Data
 populated by the [cloud Device Detection Engine](device-detection-cloud.md)
 as well as the individual devices populated in the Element Data from
-the [hardware profile lookup Engine](hardware-profile-lookup-cloud.md).
+the [hardware profile lookup Engine](hardware-profile-lookup-cloud.md) and
+its [on-premise counterpart](hardware-profile-lookup-on-premise.md).
 
 [^1]: The native implementations have some additional complexity
 in their code because of a plan to split Device Detection into 4
@@ -338,6 +339,30 @@ All these Properties have the following values:
 | Iterations       | int    | 0             | The number of iterations carried out in order to find a match. This is the number of nodes in the graph which have been visited.                                                                                                                                           | n/a                                             |
 | Method           | string | "NONE"        | The method used to determine the match result.                                                                                                                                                                                                                             | "NONE", "PERFORMANCE", "COMBINED", "PREDICTIVE" |
 
+## Profiles for a property value
+
+The Engine MUST be able to give the ids of the profiles that hold a given value
+of a given Property, such as a TAC or a native model name, through the native
+code's
+[EngineHash::getProfileIdsForPropertyValue()](https://github.com/51Degrees/51degrees-cxx/blob/main/src/dd/hash/EngineHash.hpp#L181).
+TAC and native model lookups on-premise are built on it.
+
+- The Property name and the value MUST both be matched exactly, as the data
+  file holds them. A value given in another case does not match, and where
+  the data file holds two spellings of a value that differ only in case, each
+  spelling gives only its own profiles.
+- The ids are in ascending profile id, which is the order of the data file,
+  and each id appears once.
+- For a Property named with the Indexed Properties
+  [configuration option](#configuration-options), the native code's index
+  finds the profiles without reading every profile. For any other Property
+  every profile is read, which gives the same ids more slowly.
+
+A language MUST use this native function for such a lookup rather than keep an
+index of its own, because an index of its own can match differently (the .NET
+fallback index matches without regard to case), so that every language gives
+the same answers.
+
 ## Configuration options
 
 These are the configuration options that are unique to this Engine. They are in
@@ -353,6 +378,7 @@ addition to all the configuration options defined for other features. For exampl
 | Update Matched User Agent | [ConfigDeviceDetection::setUpdateMatchedUserAgent()](https://github.com/51Degrees/51degrees-cxx/blob/main/src/dd/ConfigDeviceDetection.hpp#L90) | Yes          | `true`, from native code [^2]                                                                                                    | Set whether or not the result will include the characters from the Evidence values that were used to find a match. If set, this will be available from the 'UserAgents' [match metric](#match-metric-properties) Property. It is enabled by default, and it can be turned off when the 'UserAgents' Property is not needed, which saves recording the characters.                                                                                |
 | Use Performance Graph     | [ConfigHash::setUsePerformanceGraph()](https://github.com/51Degrees/51degrees-cxx/blob/main/src/dd/hash/ConfigHash.hpp#L159)                    | Yes          | Native code [^2]                                                                                                                 | Set whether or not to use the [performance](https://51degrees.com/documentation/_device_detection__hash.html?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=device-detection-specification-pipeline-elements-device-detection-on-premise.md&utm_term=configuration-options-3#performance-graphs) graph when attempting to match Evidence values.                                                                                                                                                                                                                        |
 | Use Predictive Graph      | [ConfigHash::setUsePredictiveGraph()](https://github.com/51Degrees/51degrees-cxx/blob/main/src/dd/hash/ConfigHash.hpp#L170)                     | Yes          | Native code [^2]                                                                                                                 | Set whether or not to use the [predictive](https://51degrees.com/documentation/_device_detection__hash.html?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=device-detection-specification-pipeline-elements-device-detection-on-premise.md&utm_term=configuration-options-4#predictive-graphs) graph when attempting to match Evidence values.                                                                                                                                                                                                                          |
+| Indexed Properties        | [ConfigHash::setIndexedProperties()](https://github.com/51Degrees/51degrees-cxx/blob/main/src/dd/hash/ConfigHash.hpp#L202)                     | Yes          | None                                                                                                                             | Names the Properties, such as TAC and NativeModel, whose values are indexed to the profiles holding them when the data file loads, so that the [profiles for a value](#profiles-for-a-property-value) of one of them are found without reading every profile. Names are matched exactly. A refresh indexes the same Properties.                                                                                  |
 | Performance Profile       | [ConfigHash=>set\[ProfileName\]()](https://github.com/51Degrees/51degrees-cxx/blob/main/src/dd/hash/ConfigHash.hpp#L104)                        | Yes          | Balanced, except for the Engine PHP builds at start-up [^php]. See [native code](https://github.com/51Degrees/51degrees-cxx/blob/main/src/dd/hash/hash.c#L175) for definitions. | Set the performance profile to use when creating the Engine. Each profile has default values for various internal configuration options, as well as things like the use of predictive/performance graphs.                                                                                                                                                                                                   |
 | Concurrency               | [ConfigHash::setConcurrency()](https://github.com/51Degrees/51degrees-cxx/blob/main/src/dd/hash/ConfigHash.hpp#L180)                            | Yes          | System processor count | Set the expected number of operations that use the Engine at the same time. The native code uses it for every collection read from the file.</br>1. It sets the number of file handles in the pool, which is Concurrency up to a fixed maximum of 64, because a process can only have so many files open (512 through `fopen` by default on Windows). An operation that has to read from the file when every handle is in use MUST wait until another operation releases one.</br>2. It decides how each cache is split into parts, each with its own lock, which avoids excessive locking. An item in use cannot be removed from a cache, and any operation can need any part, so every part MUST hold at least Concurrency items. The number of parts is Concurrency, or fewer where needed so that every part holds at least Concurrency items, and a cache that holds fewer than Concurrency items in total MUST be made large enough to hold Concurrency items. No value of Concurrency stops the Engine building.</br>Concurrency has no effect when every collection is held in memory, for example with the 'MaxPerformance' profile. |
 

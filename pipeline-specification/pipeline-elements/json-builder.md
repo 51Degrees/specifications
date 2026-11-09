@@ -12,8 +12,11 @@ the JavaScript builder element.
 
 ## Accepted Evidence
 
-This Element uses no Evidence, its only input is the current set of
-Element Data instances in the Flow Data.
+This Element accepts no Evidence, so its Evidence key filter is empty. It
+reads the integer under `query.sequence` that the
+[Sequence Element](sequence-element.md) adds, as described in
+[Sequence number](#sequence-number), and the current set of Element Data
+instances in the Flow Data.
 
 ## Start-up activity
 
@@ -44,6 +47,12 @@ The Element needs to produce a JSON representation of the Flow Data.
 There MUST be a top-level entry for each Element Data containing sub-entries
 for each Property and its value (set to 'null' if there is no value).
 
+These keys MUST be written in lower case. The key of a top-level entry is the
+Element Data's Data Key, and the key of a sub-entry is the Property name,
+followed by the suffix of any meta-Property in the table below. The one
+exception is the top-level key `javascriptProperties`, which keeps its
+capital P.
+
 There are also several metadata Properties with different suffixes that can
 be added for each Property:
 
@@ -51,7 +60,7 @@ be added for each Property:
 |--------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | nullreason         | Where the Property value is null, this meta-Property MUST be added with a string message that explains why this Property does not have a value.                                                                                                                                          |
 | delayexecution     | This meta-Property MUST be added with the value 'true' for all Properties where the [metadata](../features/properties.md#property-metadata) delay execution flag is true.                                                                                                                |
-| EvidenceProperties | Where the JSON includes other Properties that are in the [metadata](../features/properties.md#property-metadata) Evidence Properties list for this Property and those Properties have the delayed execution flag set to true, this meta-Property MUST be added to list those Properties. |
+| evidenceproperties | Where the JSON includes other Properties that are in the [metadata](../features/properties.md#property-metadata) Evidence Properties list for this Property and those Properties have the delayed execution flag set to true, this meta-Property MUST be added to list those Properties. |
 
 Some Elements MUST be excluded from having their Properties added to the JSON.
 These are:
@@ -77,6 +86,31 @@ final JSON output:
     present.
 - Add any errors from the Flow Data errors collection to the result. This is structured
   as a string array of the error messages under the top-level key `errors`.
+
+### Sequence number
+
+The Element uses the sequence number that the
+[Sequence Element](sequence-element.md) adds to Evidence under `query.sequence`
+as an integer (see
+[adding Evidence values](../features/evidence.md#adding-evidence-values) and
+[Sequence Element](sequence-element.md#process)). A Pipeline that includes the
+JSON Builder Element therefore needs a Sequence Element before it. Where the
+[web integration](../features/web-integration.md#pipeline-configuration)
+creates the Pipeline, it adds both if they are not present.
+
+If no Sequence Element has produced a sequence number when the Element runs,
+the Element MUST fail with an error and MUST NOT set its JSON value. The error
+SHOULD say that a Sequence Element needs to be placed before the JSON Builder
+Element in the Pipeline. The Pipeline handles the error as described in
+[exception handling](../features/exception-handling.md#process-function).
+When the Element fails, the web integration handles the error as that page
+describes, and a response it serves then, such as the .NET web integration's
+fallback response, is not the Element's JSON value.
+
+A `query.sequence` value taken from a query string is text and not an integer,
+so it does not count as a sequence number. An integer that a caller added to
+`query.sequence` without a Sequence Element does count in .NET and Java,
+because the Element reads the integer in Evidence whoever added it.
 
 ### Examples
 

@@ -23,6 +23,9 @@ Currently, this capability is used for two use-cases:
   [Android devices](https://developer.android.com/reference/android/os/Build#MODEL)
   and [iOS devices](https://gist.github.com/soapyigu/c99e1f45553070726f14c1bb0a54053b#file-machinename-swift)
 
+The same lookup without a remote server is described in
+[hardware profile lookup on-premise](hardware-profile-lookup-on-premise.md).
+
 ## Accepted Evidence
 
 None. This Engine uses the output from the Cloud Aspect Engine as input
