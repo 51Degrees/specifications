@@ -271,28 +271,47 @@ associated weighting. This should be reflected in the `Element Data` implementat
 ### Finding Properties
 
 The Engine is created with the names of the Properties an implementation
-reads, or with none to have every Property of the data file. The position of a
-Property is the index of its name in the names the Engine was created with, so
-it does not depend on the data file. A [data refresh](#refresh-data) keeps
-every position, and a Property the new data file lacks keeps its position and
-reads as a Property the data set does not have, with the invalid Property
-reason, until a later data file has it again.
+reads, or with none to have every Property of the data file. For an Engine
+created with names, the position of a Property is the index of its name in
+those names, so it does not depend on the data file. A
+[data refresh](#refresh-data) keeps every such position, and a Property the
+new data file lacks keeps its position and reads as a Property the data set
+does not have, with the invalid Property reason, until a later data file has
+it again.
 
 - An implementation that created the Engine with names MAY read a Property by
   its position, being the index of its name in the list it gave, or by its
   name. It MUST NOT keep a map of its own from names to positions, such as one
   built from the data set, as the native code gives each name its position.
-- An Engine created with no names has no positions. Its methods that take a
-  position return no value, with the invalid Property reason, so an
-  implementation MUST read the Properties of such an Engine by name, through
-  the `ResultsIpi` methods that take a Property name.
+- Read through the C++ `ResultsIpi` class, an Engine created with no names
+  has no positions. Its methods that take a position return no value, with
+  the invalid Property reason, because `allowedRequiredPropertyIndex` refuses
+  every position when no names were given
+  ([ResultsBase.cpp lines 481 to 484](https://github.com/51Degrees/51degrees-cxx/blob/cfad8978827292b97ad08f306891edea09ece304/src/common/ResultsBase.cpp#L481-L484)).
+  So an implementation that reads such an Engine through the C++ classes MUST
+  read its Properties by name, through the `ResultsIpi` methods that take a
+  Property name.
+- The C code gives an Engine created with no names a position for each
+  Property. Its comment says "Without names, each property's index is its own
+  place"
+  ([src/common/properties.c lines 479 to 491](https://github.com/51Degrees/51degrees-cxx/blob/cfad8978827292b97ad08f306891edea09ece304/src/common/properties.c#L479-L491)),
+  that place being the index of the Property among every Property of the data
+  file, sorted by name. So an implementation that calls C MAY read a Property
+  of such an Engine by its position or by its name. The position depends on
+  the data file, and a data refresh can change it. As with names, the native
+  code gives each position, so the implementation MUST NOT keep a map of its
+  own from names to positions, and a read by name asks the native code for
+  the position.
 - `getAvailableProperties`, `getPropertyName` and the Engine's
   `getRequiredProperties` follow the names the Engine was created with, in
   that order. `getProperties` lists the Properties the data set has, sorted by
-  name, so its order is not the order of the positions.
+  name, so for an Engine created with names its order is not the order of the
+  positions.
 - `copyValueAsUTF8String` takes only a position, as it is for the fastest
-  read, and no form of it takes a Property name. The position is the index of
-  the Property in the names the Engine was created with.
+  read, and no form of it takes a Property name. It is a method of the C++
+  `ResultsIpi` class, so the position is the index of the Property in the
+  names the Engine was created with, and an Engine created with no names
+  gives it no value.
 - An Engine created with only the Properties an implementation reads lets the
   Balanced configuration hold what they read in memory, so an implementation
   SHOULD create the Engine with only those Properties.
@@ -355,8 +374,7 @@ As such, steps SHOULD be taken to minimize this as much as possible:
   values that will only change after a [data refresh](#refresh-data) can
   be stored in the Engine instance to avoid native calls for that value until
   a refresh occurs. Note the possible clean-up consequences that this implies.
-  Positions need no such store, as each is the index of a Property in the
-  names the Engine was created with, as
+  Positions need no such store, because the native code gives each one, as
   [finding Properties](#finding-properties) describes.
 
 ## Refresh Data

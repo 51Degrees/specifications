@@ -187,7 +187,7 @@ License Key alone still resolves its accepted Evidence in the normal way.
 ## Element Data
 
 The Element Data key is `cloud-response`. The
-[JSON Builder](json-builder.md#processing) leaves this Element Data out of its
+[JSON Builder](json-builder.md#process) leaves this Element Data out of its
 output by that key.
 
 | **Name**      | **Type** | **Description**                                   |
