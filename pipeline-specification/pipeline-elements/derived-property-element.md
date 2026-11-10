@@ -195,9 +195,13 @@ deprecated script logs a warning carrying the note the author left.
 
 While requests are processed, the one thing logged is a request that
 carries no Element Data at all under a key a script reads. The Pipeline
-check confirmed that an Element supplies that key, so that Element is
-running after this one rather than before it, and every request leaves the
-script with no value until the Pipeline is changed. The Element logs an
+check confirmed that an Element supplies that key, so that Element has
+run after this one, or failed before adding its Element Data, because
+every Flow Element still runs after one fails, as
+[exception handling](../features/exception-handling.md#process-function)
+says. An Element that runs too late leaves every request with no value
+for the script until the Pipeline is changed, whilst a failure is also in
+the Flow Data errors and may not recur on later requests. The Element logs an
 error the first time this happens for each script, naming the script, the
 source Property and the Element Data key, saying that this Element should
 be added after the Element that supplies the key, and saying that the
@@ -436,7 +440,9 @@ implementation judging position would refuse this correct Pipeline.
 An Element placed too late is not silently wrong. Every source Property
 it needed has still not been written when it runs, so the derived
 Property has no value and the message names those Properties, which is
-the same answer the one rule gives for any unavailable source.
+the same answer the one rule gives for any unavailable source. The
+Element also logs an error once for each script, as
+[Logging and exposed metadata](#logging-and-exposed-metadata) says.
 
 ### The response
 
