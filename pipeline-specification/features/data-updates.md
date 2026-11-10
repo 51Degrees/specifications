@@ -301,7 +301,9 @@ Probably can't compare dates so load whatever we have:
 ### newFileAvailable (via remote or file watcher)
 
 The file will be in *dataFilePath* from watcher or from download, if the
-downloaded file is newer than the current file
+downloaded file is newer than the current file. A watched or downloaded file
+that is not newer is not loaded, and the check is reported as not needed, as
+[reporting each check](#reporting-each-check) says.
 
 - pause file watcher, if any
 - pause update polling, if any
@@ -311,7 +313,7 @@ downloaded file is newer than the current file
     onUpdateCallbacks
 - resume polling, if any, whether or not the file loaded
 - resume file watcher, if any, whether or not the file loaded
-- trigger onUpdateCallbacks, if the file loaded
+- trigger onUpdateCallbacks with success, if the file loaded
 
 ### Programmatic update
 
@@ -322,6 +324,27 @@ downloaded file is newer than the current file
 - if newer file in *dataFilePath*
   - process as per newFile above
   - return
+- otherwise, report the check as not needed
+
+### Reporting each check
+
+Every check for an update MUST be reported to onUpdateCallbacks once it ends,
+including the checks made by update polling, by the file watcher and by a
+programmatic call. A report names the data file and gives one status.
+
+- Success, when the Engine was refreshed with new data.
+- Not needed, when no update was applied because none was needed, for example
+  a 304 (Not modified) response, or a downloaded or watched file that is not
+  newer than the current file. A check that was skipped is also reported as
+  not needed, for example one where no update URL is set and the file is not
+  newer, or one asked for while another check of the same data file was under
+  way.
+- A failure, naming its cause, when the check or the refresh failed, for
+  example a connection failure, a failed integrity check or a failed refresh.
+  The failure is also logged, as [errors](#errors) describes.
+
+A check that has ended MUST NOT be reported as still in progress, and a
+skipped check MUST NOT go unreported.
 
 ## Defaults
 
@@ -378,8 +401,9 @@ Once the refresh is complete, the data update service can start
 checking for updates using the newly refreshed *next expected update*
 date/time.
 
-If no update was found then the service will need to repeat the same checks
-after the *polling interval* + a random time based on  
+If no update was found then the check is reported as not needed, as
+[reporting each check](#reporting-each-check) says, and the service will need
+to repeat the same checks after the *polling interval* + a random time based on  
 *update time maximum randomization* has passed.
 
 ## Logging
