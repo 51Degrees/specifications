@@ -50,15 +50,25 @@ metadata as failable, lazily-completed data: it MUST tolerate the metadata
 being temporarily absent and MUST NOT permanently cache an empty result
 obtained before the Cloud Request Engine's discovery has completed.
 
-There is also a case in which the Property metadata is permanently empty. A
-Cloud Request Engine built on a
-[License Key](cloud-request-engine.md#license-key) alone cannot resolve
-accessible Properties at all, because the endpoint that reports them requires
-a Resource Key. A Cloud Aspect Engine MUST still work in that case, reading
-the response JSON and inferring the type of each value from the value itself,
-as it already does. The Property metadata it exposes is empty, so anything
-that reads the metadata to decide what the Engine can produce MUST tolerate
-finding nothing there.
+A Cloud Request Engine built on a
+[License Key](cloud-request-engine.md#license-key) alone resolves its
+accessible Properties as one built on a Resource Key does (see
+[Discovery under a License Key](cloud-request-engine.md#discovery-under-a-license-key)).
+Where the Property metadata is empty, for example before discovery has
+completed, a Cloud Aspect Engine MUST still work, reading the response JSON
+and inferring the type of each value from the value itself, as it already
+does, and anything that reads the metadata to decide what the Engine can
+produce MUST tolerate finding nothing there.
+
+Once the Cloud Request Engine's discovery has completed, a Resource Key can be
+valid and still include no product that holds a particular Cloud Aspect
+Engine's Properties. That is not a definitive configuration error, so the
+Cloud Aspect Engine MUST NOT fail the Pipeline build. It builds with empty
+Property metadata and MUST log the missing product once per Cloud Aspect
+Engine instance, at warning level, naming its Data Key. It MUST NOT log the
+missing product again on each response. This does not conflict with the rule
+above against caching an empty result, because an empty product list before
+discovery has completed is temporary, and after discovery it is final.
 
 ## Processing
 
@@ -70,6 +80,9 @@ deserialize the raw JSON from the Cloud Request Engine:
    Element Data) that relates to this Aspect by using the appropriate
    string Data Key. (For example, `device` for Device Detection)
 2. Deserialize that portion of the raw JSON to construct the Element Data result.
+
+Where the response JSON has no portion for the Engine's Data Key, the Cloud
+Aspect Engine leaves the Element Data without values and raises no error.
 
 The primary difficulty with this process is usually converting from the JSON
 format to whatever structure is needed to support the
