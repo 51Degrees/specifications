@@ -201,7 +201,7 @@ it again.
   the data file, and a data refresh can change it. As with names, the native
   code gives each position, so the implementation MUST NOT keep a map of its
   own from names to positions, and a read by name asks the native code for
-  the position.
+  the position in the data set the results were populated from.
 - `getAvailableProperties`, `getPropertyName` and the Engine's
   `getRequiredProperties` follow the names the Engine was created with, in
   that order. `getProperties` lists the Properties the data set has, sorted by
