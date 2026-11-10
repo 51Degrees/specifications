@@ -239,6 +239,19 @@ the current request, then the content in the cache is still valid and the
 endpoint does not send it again. Which status code it sends depends on the
 method, as described below.
 
+The ETag depends on the Evidence alone, as the request supplied it (see
+below), so the endpoint can compare the 'If-None-Match' header with the ETag
+before the Pipeline processes the request. It MUST do so, and MUST NOT process
+a request whose 'If-None-Match' header matches. Running the Pipeline is how the
+endpoint performs the request method, and
+[RFC 9110 section 13.2.1](https://www.rfc-editor.org/rfc/rfc9110#section-13.2.1)
+says a server "MUST evaluate received request preconditions ... just before it
+would process the request content (if any) or perform the action associated
+with the request method".
+[Section 13.1.2](https://www.rfc-editor.org/rfc/rfc9110#section-13.1.2) says
+that when an If-None-Match condition evaluates to false the server "MUST NOT
+perform the requested method".
+
 The ETag MUST be calculated from the Evidence values in the Pipeline's Evidence
 key filter exactly as the request supplied them, before any Flow Element has
 added or replaced a value. A Flow Element MAY add Evidence while it processes,
@@ -289,7 +302,7 @@ nothing to revalidate with, so its next request gets a full response, built
 once processing works again, rather than a 304 that keeps the faulty one.
 
 The ETag depends on the Evidence alone, so a request whose 'If-None-Match'
-header matches the ETag gets the same status code when processing records
+header matches the ETag gets the same status code when processing would record
 errors as at any other time. As
 [RFC 9110 section 13.1.2](https://www.rfc-editor.org/rfc/rfc9110#section-13.1.2)
 requires, the answer is a 304 status code (Not Modified) to a GET or HEAD
@@ -301,6 +314,11 @@ A 304 response has no content, and MUST carry each of the Cache-Control, Vary
 and ETag headers, and the Content-Location, Date and Expires headers, that a 200
 response to the same request would carry
 ([RFC 9110 section 15.4.5](https://www.rfc-editor.org/rfc/rfc9110#section-15.4.5)).
+Because a matching request is not processed, its 304 carries the headers in
+the table above, which are the ones a 200 to the same request carries when its
+processing records no errors. That holds during an outage too, so a browser
+that holds a good response keeps it, and its cache keeps the ETag and
+`max-age`.
 A cache finds the response it holds by the ETag and updates that response's
 headers from these
 ([RFC 9111 section 4.3.4](https://www.rfc-editor.org/rfc/rfc9111#section-4.3.4)).
