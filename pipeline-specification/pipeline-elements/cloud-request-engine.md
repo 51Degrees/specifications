@@ -93,9 +93,10 @@ The remote server honors that list whenever the request carries a License
 Key. With a License Key alone the response holds only the Requested
 Properties. With a License Key beside a Resource Key it holds every Property
 the Resource Key carries plus the Requested Properties the License Key grants.
-With a Resource Key and no License Key the list is ignored and the response
-is exactly what the Resource Key carries, so naming Properties then has no
-effect at all.
+With a Resource Key and no License Key the list adds no data. A requested
+Property the Resource Key already carries changes nothing, and one it does
+not carry is answered as null, with a `nullreason` saying the Property is a
+paid feature that needs a License Key.
 
 This was measured against `cloud.51degrees.com`, asking for one Property and
 varying only the credential. The exact counts depend on the keys used, so two
@@ -119,6 +120,23 @@ location answers plus an IP Intelligence answer holding exactly the two
 requested Properties. The same two keys with no `values` gave only the
 Resource Key's answers.
 
+Measured again on 10 November 2026 with a free Resource Key and a License
+Key, asking for one device Property each time:
+
+| **Credentials**                | **values**              | **Device Properties** | **HardwareVendor**                         |
+|--------------------------------|-------------------------|-----------------------|--------------------------------------------|
+| Resource Key                   | none                    | 14                    | absent                                     |
+| License Key                    | `device.HardwareVendor` | 1                     | a value                                    |
+| Resource Key and License Key   | `device.HardwareVendor` | 15                    | a value                                    |
+| Resource Key                   | `device.HardwareVendor` | 15                    | null, with the paid feature `nullreason`   |
+| Resource Key                   | `device.IsMobile`       | 14                    | absent, and `ismobile` is unchanged        |
+
+The remote server builds the answer this way by design. It adds the licence
+behind the Resource Key to any License Key the request carries, and the
+Properties the Resource Key was created with to any Requested Properties, and
+then answers each Property the combined licences grant and gives the rest as
+null with a `nullreason`.
+
 ### Accepted combinations
 
 The following table gives every combination and whether it is valid. "Yes" in
@@ -132,7 +150,7 @@ or is only whitespace counts as absent.
 | Yes              | Yes             | Yes                      | Yes       | The response adds the Requested Properties the License Key grants.                     |
 | No               | Yes             | Yes                      | Yes       | The License Key names no Properties, so the caller names the ones it wants.            |
 | No               | Yes             | No                       | **No**    | The remote server answers 400 to such a request, so every request would fail.          |
-| Yes              | No              | Yes                      | **No**    | The list is ignored without a License Key, so the response would not change.           |
+| Yes              | No              | Yes                      | **No**    | Without a License Key the list adds no data, only nulls for Properties the key lacks.  |
 | No               | No              | Either                   | **No**    | There is nothing to authenticate with, and the remote server answers 401.              |
 
 An Engine MUST refuse an invalid combination when it is built, in its builder
@@ -148,9 +166,9 @@ or constructor, rather than when a request is made. Two reasons:
 
 The error raised MUST explain why the combination cannot work rather than
 restating the rule. For example, a list of Properties supplied alongside a
-Resource Key and no License Key is refused because the remote server ignores
-the list, so the caller would believe the response had changed when it had
-not.
+Resource Key and no License Key is refused because the list adds no data
+without a License Key, so the caller would believe it had asked for
+Properties it will never receive.
 
 ## Accepted Evidence
 
