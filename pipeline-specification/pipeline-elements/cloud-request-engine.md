@@ -93,10 +93,11 @@ The remote server honors that list whenever the request carries a License
 Key. With a License Key alone the response holds only the Requested
 Properties. With a License Key beside a Resource Key it holds every Property
 the Resource Key carries plus the Requested Properties the License Key grants.
-With a Resource Key and no License Key the list adds no data. A requested
-Property the Resource Key already carries changes nothing, and one it does
-not carry is answered as null, with a `nullreason` saying the Property is a
-paid feature that needs a License Key.
+With a Resource Key and no License Key, each requested Property is added to
+the Properties the Resource Key carries. One that the licence behind the
+Resource Key does not grant is answered as null, with a `nullreason` saying
+the Property is a paid feature that needs a License Key, and a name that is
+not a Property is not returned.
 
 This was measured against `cloud.51degrees.com`, asking for one Property and
 varying only the credential. The exact counts depend on the keys used, so two
@@ -150,7 +151,7 @@ or is only whitespace counts as absent.
 | Yes              | Yes             | Yes                      | Yes       | The response adds the Requested Properties the License Key grants.                     |
 | No               | Yes             | Yes                      | Yes       | The License Key names no Properties, so the caller names the ones it wants.            |
 | No               | Yes             | No                       | **No**    | The remote server answers 400 to such a request, so every request would fail.          |
-| Yes              | No              | Yes                      | **No**    | Without a License Key the list adds no data, only nulls for Properties the key lacks.  |
+| Yes              | No              | Yes                      | Yes       | Each requested Property is added, as null with a reason where no licence grants it.    |
 | No               | No              | Either                   | **No**    | There is nothing to authenticate with, and the remote server answers 401.              |
 
 An Engine MUST refuse an invalid combination when it is built, in its builder
@@ -165,10 +166,9 @@ or constructor, rather than when a request is made. Two reasons:
   surfaces on the path that serves a request.
 
 The error raised MUST explain why the combination cannot work rather than
-restating the rule. For example, a list of Properties supplied alongside a
-Resource Key and no License Key is refused because the list adds no data
-without a License Key, so the caller would believe it had asked for
-Properties it will never receive.
+restating the rule. For example, a License Key with no Requested Properties
+is refused because the remote server answers 400 to every such request, so
+every request the Engine made would fail.
 
 ## Accepted Evidence
 
