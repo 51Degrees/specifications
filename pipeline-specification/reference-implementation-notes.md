@@ -108,3 +108,17 @@ need some capability that is beyond its scope, they have to migrate to the
 On the whole, we prefer solutions that will reduce complexity for users, such as
 this special builder. However, if this is implemented, care will need to be taken
 to avoid the issues described above.
+
+## .NET usage sharing record
+
+The .NET packages do not yet write the record that the
+[Processing section of the usage sharing element](pipeline-elements/usage-sharing-element.md#processing)
+specifies. They write each Evidence value that has a prefix, such as a header
+or a cookie, inside a CDATA section (a block of XML text that is read as it
+stands). They mark a value containing characters that XML does not allow with
+a `<BadSchema>` element and `\x` escapes, where the specification uses an
+`escaped` attribute. They put a `[TRUNCATED BY USAGE SHARING]` prefix on a
+value that is too long, where the specification uses a `truncated` attribute.
+They count the length of a value in UTF-16 units, where the specification
+counts Unicode code points. Every other language follows the Processing section. .NET will change to it
+once both forms have been seen working downstream.

@@ -65,6 +65,67 @@ Reading an identifier and verifying its signature are separate questions, and
 a package MUST answer them separately, so that no caller can mistake a
 structurally valid identifier for a genuine one.
 
+## What the verification outcomes are
+
+A package that calls the remote server's verification endpoints exposes what
+came back as named values rather than as strings, in the same way it exposes
+the Usage and the Type. There are three answers in one response, being the
+Signature outcome, the Context outcome and, where the server sent one, a
+Factor block naming each factor of the Context check and how that factor
+came out.
+
+The Signature outcome says whether the identifier is one the issuer made and
+nothing has altered. The Context outcome says whether the identifier is being
+presented from the connection it was created on. It says whether the
+identifier was verified or mismatched, and also carries the reasons a check
+could not be completed, so a caller can tell a failed comparison from a
+comparison that never happened. The two are
+independent and a package MUST NOT derive either from the other.
+
+The Factor block answers for each factor separately, with these values:
+
+| **Factor outcome** | **Meaning**                                                                                                  |
+|--------------------|--------------------------------------------------------------------------------------------------------------|
+| Verified           | The factor matched the connection the identifier was presented on.                                            |
+| Mismatch           | The factor did not match that connection.                                                                     |
+| Misconfigured      | The verifying server is not able to determine that factor for any request, so it could not compare this one.   |
+| Not recorded       | The issuing server recorded no value for that factor, so the identifier says nothing about it either way.      |
+
+The server sends these as the lower case words `verified`, `mismatch`,
+`misconfigured` and `notrecorded`. The comparison ignores case, as .NET does,
+so a package whose language compares exactly, such as Java, MUST lower-case
+the word before it compares.
+
+Not recorded and Mismatch are different answers and a package MUST expose
+them as different values. A Mismatch is a statement about the identifier,
+whereas Not recorded is the absence of one, so reading the second as the
+first reports a difference the identifier never claimed and makes a genuine
+identifier look replayed. Misconfigured is a third thing again, being a
+statement about the verifying server rather than about the identifier or the
+issuer.
+
+A caller decides what weight to give each value, and a package MUST NOT
+collapse the block into a single verdict of its own, because the point of
+answering per factor is that a caller weighs an address change differently
+from a changed device.
+
+### An outcome a package does not know
+
+The set of outcomes grows, so a package will meet a word that its own version
+predates. A package MUST NOT read such a word as a pass.
+
+A factor word a package does not know MUST be reported as a Mismatch.
+Verified, Misconfigured and Not recorded are each read only from their own
+word, because none of them is a Mismatch, and any other word is a Mismatch, so
+an unexpected value never reads as a factor that matched or as one that could
+not be compared. A package that predates a new factor word therefore reports
+it as a Mismatch until the package is updated, which is the cost of never
+reading a value it cannot interpret as a pass.
+
+A Context word a package does not know is reported as Unreadable, and the
+Context outcome carries the word as the server sent it beside that value, so a
+caller can still act on a Context outcome the package predates.
+
 ## What a package does not expose
 
 A package MUST NOT make any of the following public, in any language.
