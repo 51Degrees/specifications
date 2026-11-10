@@ -73,6 +73,11 @@ Unless all Evidence is shared, it MUST also return false for any key where:
 
 Anything else MUST return true. (i.e. it will be shared)
 
+A Pipeline that authenticates the requests it serves with a Resource Key or a
+License Key MUST hold them as the Evidence `fiftyone.resource-key` and
+`fiftyone.license-key`, and the filter function MUST return true for both,
+whatever the configuration, because usage is counted against them.
+
 The element accepts no Evidence, so it does not accept the session cookie
 either. When the [track session](#configuration-options) option is on, the
 element MUST read the cookie named by the
