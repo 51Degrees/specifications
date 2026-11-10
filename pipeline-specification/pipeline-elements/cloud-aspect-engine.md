@@ -50,15 +50,15 @@ metadata as failable, lazily-completed data: it MUST tolerate the metadata
 being temporarily absent and MUST NOT permanently cache an empty result
 obtained before the Cloud Request Engine's discovery has completed.
 
-There is also a case in which the Property metadata is permanently empty. A
-Cloud Request Engine built on a
-[License Key](cloud-request-engine.md#license-key) alone cannot resolve
-accessible Properties at all, because the endpoint that reports them requires
-a Resource Key. A Cloud Aspect Engine MUST still work in that case, reading
-the response JSON and inferring the type of each value from the value itself,
-as it already does. The Property metadata it exposes is empty, so anything
-that reads the metadata to decide what the Engine can produce MUST tolerate
-finding nothing there.
+A Cloud Request Engine built on a
+[License Key](cloud-request-engine.md#license-key) alone resolves its
+accessible Properties as one built on a Resource Key does (see
+[Discovery under a License Key](cloud-request-engine.md#discovery-under-a-license-key)).
+Where the Property metadata is empty, for example before discovery has
+completed, a Cloud Aspect Engine MUST still work, reading the response JSON
+and inferring the type of each value from the value itself, as it already
+does, and anything that reads the metadata to decide what the Engine can
+produce MUST tolerate finding nothing there.
 
 Once the Cloud Request Engine's discovery has completed, a Resource Key can be
 valid and still include no product that holds a particular Cloud Aspect
