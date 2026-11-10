@@ -196,7 +196,7 @@ reasons it was wrong are kept at the end for context.
 
 ### Revised design (eager discovery at build time, transient-failure fallback)
 
-On start-up the Engine resolves, for the configured Resource Key, the accessible
+On start-up the Engine resolves, for the configured credentials, the accessible
 Properties (from the [configured](#configuration-options) `accessibleproperties`
 endpoint) and the accepted Evidence keys (from `evidencekeys`). The Engine MUST
 attempt both discovery requests when it is built (in its builder or constructor),
@@ -230,24 +230,20 @@ See [HTTP requests](#http-requests) for general details on HTTP request handling
 
 ### Discovery under a License Key
 
-The `accessibleproperties` endpoint requires a Resource Key. Measured against
-`cloud.51degrees.com` on 21 September 2026, it answers 401 to a request
-carrying a License Key and no Resource Key, with the message that a Resource
-Key is required.
-
-An Engine built on a License Key alone therefore has no accessible Properties
-to resolve. It MUST NOT treat that 401 as a definitive configuration error and
-fail the build. It MUST skip the `accessibleproperties` request altogether,
-start with an empty set of accessible Properties, and still resolve its
+An Engine built on a License Key alone MUST make the `accessibleproperties`
+request with the License Key, sent as `license` in the body of a POST request
+rather than in the URL, so that the key stays out of request logs. The remote
+server answers it with every Property the License Key entitles, as it answers
+a Resource Key with the Properties the key carries. Measured against
+`cloud.51degrees.com` on 10 November 2026, it answers 200 to a License Key
+alone, for both GET and POST, listing eight products. The Engine resolves its
 accepted Evidence from `evidencekeys` as described above.
 
-The consequence for [Cloud Aspect Engines](cloud-aspect-engine.md) is that
-under a License Key they expose no Property metadata, although the data itself
-still flows, because each of them already reads the response JSON and infers
-the type of each value from the value it finds. Implementations MUST NOT
-manufacture Property metadata from the [Requested Properties](#requested-properties)
-list instead, because the type of each Property would be unknown and a wrong
-type is worse than none.
+[Cloud Aspect Engines](cloud-aspect-engine.md) then take their Property
+metadata from that answer, as they do under a Resource Key. Implementations
+MUST NOT manufacture Property metadata from the
+[Requested Properties](#requested-properties) list instead, because the type
+of each Property would be unknown and a wrong type is worse than none.
 
 ### Consequences for consumers of the Engine
 
@@ -270,8 +266,8 @@ fallback above rather than by deferring all discovery.
 
 In addition, implementations SHOULD allow an Engine to be built from a
 previously obtained, persisted copy of the discovery results (the accepted
-Evidence keys and the accessible Properties, which depend only on the Resource
-Key). When supplied, the builder uses it and makes no cloud request, so the
+Evidence keys and the accessible Properties, which depend only on the
+configured credentials). When supplied, the builder uses it and makes no cloud request, so the
 Pipeline can be built offline and a short-lived or frequently-restarted host
 (for example a serverless or edge / WebAssembly runtime) need not call the
 cloud on every cold start. The persisted copy is read back from the builder
