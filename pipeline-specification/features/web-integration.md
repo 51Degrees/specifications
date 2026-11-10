@@ -236,7 +236,8 @@ valid.
 
 If the value in the 'If-None-Match' header matches the calculated ETag value for
 the current request, then the content in the cache is still valid and the
-endpoint can just return a 304 status code. (Not modified)
+endpoint does not send it again. Which status code it sends depends on the
+method, as described below.
 
 The ETag MUST be calculated from the Evidence values in the Pipeline's Evidence
 key filter exactly as the request supplied them, before any Flow Element has
@@ -295,6 +296,14 @@ requires, the answer is a 304 status code (Not Modified) to a GET or HEAD
 request and a 412 status code (Precondition Failed) to any other method, such
 as a POST to the JSON endpoint. So a browser that holds a good response to a
 GET request keeps it through an outage.
+
+A 304 response has no content, and MUST carry each of the Cache-Control, Vary
+and ETag headers, and the Content-Location, Date and Expires headers, that a 200
+response to the same request would carry
+([RFC 9110 section 15.4.5](https://www.rfc-editor.org/rfc/rfc9110#section-15.4.5)).
+A cache finds the response it holds by the ETag and updates that response's
+headers from these
+([RFC 9111 section 4.3.4](https://www.rfc-editor.org/rfc/rfc9111#section-4.3.4)).
 
 Caching, whether by the browser with the ETag or in session storage, could
 lead to responses that are not strictly
