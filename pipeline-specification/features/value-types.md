@@ -116,8 +116,8 @@ from the remote server, it MUST be written as an object with one member,
 `value`, holding the WKT text, for example `{"value": "POINT(2 4)"}`. This is
 the form the .NET and Java implementations write, and their
 [IP Intelligence Cloud Engines](../../ip-intelligence-specification/pipeline-elements/ip-intelligence-cloud.md)
-read. A reader MUST accept this form. It MAY also accept the WKT text alone as
-a string.
+read. A reader MUST accept this form. A reader MAY also accept the WKT text
+alone as a string.
 
 Implementation adapts the [OGC 06-103r4](https://www.ogc.org/publications/standard/sfa/) standard, by changing the size of fields to reduce the size.
 
