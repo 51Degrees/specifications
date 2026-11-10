@@ -78,6 +78,9 @@ first be determined:
    query parameters that will be included in those calls needs to be created.
    This can be done by looking at the query entries in the existing Evidence:
    - Get all Evidence values starting with `query.`
+   - Leave out `query.session-id` and `query.sequence`. The template adds the
+     session id and the sequence to each callback itself, from `_sessionId`
+     and `_sequence`, so passing them here as well would send each twice.
    - Use the text after `query.` as the key.
    - Pass keys and values in the form needed by the template (don't forget
      URL encoding, etc. if needed).
