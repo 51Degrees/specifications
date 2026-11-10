@@ -286,9 +286,8 @@ Properties that return details about the processing that was performed and
 the match that was found. Metadata for these Properties MUST be added, as they
 will not be included in the metadata exposed by the native code.
 
-The Engine lists these Properties after the Properties from the data file, in
-the order of the table below, in its Property metadata and its Element Data,
-and so in the JSON.
+The Engine lists these Properties in its Property metadata after the
+Properties from the data file, in the order of the table below.
 
 All these Properties have the following values:
 
