@@ -353,9 +353,9 @@ above is recommended so a Pipeline can also be built entirely offline.
 ## Processing
 
 The Engine processes Flow Data by making an HTTP request to the server with
-every Evidence value in the Flow Data, apart from the reserved names below.
-The HTTP API used for access to 51Degrees servers is defined at
-<https://cloud.51degrees.com/api-docs/index.html>.
+every Evidence value in the Flow Data, apart from the reserved names and the
+web request view below. The HTTP API used for access to 51Degrees servers is
+defined at <https://cloud.51degrees.com/api-docs/index.html>.
 
 The Engine does not limit the request to the
 [accepted Evidence](#accepted-evidence) that the `evidencekeys` request
@@ -369,7 +369,7 @@ by adding the [credentials](#credentials) that were configured, being the
 Resource Key using the key `resource` and the License Key using the key
 `license`, then the [Requested Properties](#requested-properties) using the
 key `values` where a list was configured, then adding every value from the
-Flow Data Evidence apart from the reserved names.
+Flow Data Evidence apart from the reserved names and the web request view.
 
 The remote server advertises `query.values` among its accepted Evidence keys,
 so a value in the Flow Data Evidence could otherwise collide with the Property
@@ -381,6 +381,11 @@ field of the same name, or a second spelling of the same credential, in the
 request with no way for either side to know which one applied. The rule covers
 `resource`, `license` and `licence` as well as `values`, and does not depend on
 which keys the server advertises.
+
+The web request view that a web integration adds under `server.http-request`,
+as [web integration](../features/web-integration.md#populating-evidence)
+describes, MUST also be left out of the request, because it is a view of the
+whole web request and not a value to send.
 
 When Evidence is added, its prefix MUST be removed.
 For example, `query.user-agent` becomes `user-agent`.
