@@ -384,6 +384,11 @@ it will need to handle cleanup a little more carefully than other elements.
    less than the configured minimum batch size)
 3. Free any resources associated with the queue and background processing.
 
+Cleanup SHOULD complete within 5 seconds, so that closing the element does not
+hold up the process that closes it. If the data waiting in the queue has not
+all been sent after 5 seconds, the element SHOULD stop sending, discard the
+data remaining in the queue and log a warning.
+
 While sending is paused by the [back-off](#back-off-after-failed-sends),
 cleanup MUST NOT wait for the pause to end and MUST NOT send. The data
 remaining in the queue is discarded, and the number of entries discarded
