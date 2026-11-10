@@ -271,8 +271,7 @@ configured credentials). When supplied, the builder uses it and makes no cloud r
 Pipeline can be built offline and a short-lived or frequently-restarted host
 (for example a serverless or edge / WebAssembly runtime) need not call the
 cloud on every cold start. The persisted copy is read back from the builder
-after a successful build. At the time of writing no implementation provides
-this yet.
+after a successful build.
 
 ### Why the fully lazy design was withdrawn
 
