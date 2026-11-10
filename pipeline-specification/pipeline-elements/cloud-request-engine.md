@@ -70,9 +70,13 @@ Properties it wants. See [Requested Properties](#requested-properties).
 
 The License Key is sent to the remote server using the key `license`. The
 server also reads `licence` as another spelling of `license`, but the Engine
-always sends `license`. The License Key MAY be sent alongside a Resource Key,
-in which case it adds the products it grants to those the Resource Key
-already carries, so the set of accessible Properties widens.
+always sends `license`. The License Key MAY be sent alongside a Resource Key.
+The remote server then uses both the licence behind the Resource Key and the
+License Key given, and the response holds every Property the Resource Key
+carries plus the [Requested Properties](#requested-properties) the License Key
+grants. This serves a Resource Key for normal use that now and then needs
+another License Key, for example to get a 51Did whose `id.usage` is standard
+or personal.
 
 The License Key is a license key for the purposes of
 [logging](../features/logging.md#license-keys), so it MUST NOT appear in full
@@ -85,10 +89,15 @@ response. It is sent to the remote server using the key `values`, as a comma
 separated list of fully qualified Property names, for example
 `device.ismobile,device.iscrawler`.
 
-The remote server honors that list only when the request authenticates with a
-License Key alone. Whenever a Resource Key is present the list is ignored and
-the response is exactly what the Resource Key carries, so naming Properties
-alongside a Resource Key has no effect at all.
+The remote server honors that list whenever the request carries a License
+Key. With a License Key alone the response holds only the Requested
+Properties. With a License Key beside a Resource Key it holds every Property
+the Resource Key carries plus the Requested Properties the License Key grants.
+With a Resource Key and no License Key, each requested Property is added to
+the Properties the Resource Key carries. One that the licence behind the
+Resource Key does not grant is answered as null, with a `nullreason` saying
+the Property is a paid feature that needs a License Key, and a name that is
+not a Property is not returned.
 
 This was measured against `cloud.51degrees.com`, asking for one Property and
 varying only the credential. The exact counts depend on the keys used, so two
@@ -105,6 +114,30 @@ In the second measurement the Resource Key response was byte for byte
 identical to the same request sent with no `values` at all, which is the
 clearest statement that the list was ignored.
 
+Measured again on 10 November 2026, a Resource Key carrying device and
+location Properties, sent with a License Key and
+`values=ip.RegisteredName,ip.Country`, gave the Resource Key's device and
+location answers plus an IP Intelligence answer holding exactly the two
+requested Properties. The same two keys with no `values` gave only the
+Resource Key's answers.
+
+Measured again on 10 November 2026 with a free Resource Key and a License
+Key, asking for one device Property each time:
+
+| **Credentials**                | **values**              | **Device Properties** | **HardwareVendor**                         |
+|--------------------------------|-------------------------|-----------------------|--------------------------------------------|
+| Resource Key                   | none                    | 14                    | absent                                     |
+| License Key                    | `device.HardwareVendor` | 1                     | a value                                    |
+| Resource Key and License Key   | `device.HardwareVendor` | 15                    | a value                                    |
+| Resource Key                   | `device.HardwareVendor` | 15                    | null, with the paid feature `nullreason`   |
+| Resource Key                   | `device.IsMobile`       | 14                    | absent, and `ismobile` is unchanged        |
+
+The remote server builds the answer this way by design. It adds the licence
+behind the Resource Key to any License Key the request carries, and the
+Properties the Resource Key was created with to any Requested Properties, and
+then answers each Property the combined licences grant and gives the rest as
+null with a `nullreason`.
+
 ### Accepted combinations
 
 The following table gives every combination and whether it is valid. "Yes" in
@@ -114,10 +147,11 @@ or is only whitespace counts as absent.
 | **Resource Key** | **License Key** | **Requested Properties** | **Valid** | **Reason**                                                                             |
 |------------------|-----------------|--------------------------|-----------|----------------------------------------------------------------------------------------|
 | Yes              | No              | No                       | Yes       | The Resource Key already states which Properties it carries.                           |
-| Yes              | Yes             | No                       | Yes       | The License Key adds the products it grants to those the Resource Key carries.         |
+| Yes              | Yes             | No                       | Yes       | The response holds what the Resource Key carries, and the License Key adds no Property.|
+| Yes              | Yes             | Yes                      | Yes       | The response adds the Requested Properties the License Key grants.                     |
 | No               | Yes             | Yes                      | Yes       | The License Key names no Properties, so the caller names the ones it wants.            |
 | No               | Yes             | No                       | **No**    | The remote server answers 400 to such a request, so every request would fail.          |
-| Yes              | Either          | Yes                      | **No**    | The list is ignored while a Resource Key is present, so the response would not narrow. |
+| Yes              | No              | Yes                      | Yes       | Each requested Property is added, as null with a reason where no licence grants it.    |
 | No               | No              | Either                   | **No**    | There is nothing to authenticate with, and the remote server answers 401.              |
 
 An Engine MUST refuse an invalid combination when it is built, in its builder
@@ -132,9 +166,9 @@ or constructor, rather than when a request is made. Two reasons:
   surfaces on the path that serves a request.
 
 The error raised MUST explain why the combination cannot work rather than
-restating the rule. For example, a list of Properties supplied alongside a
-Resource Key is refused because the remote server ignores the list, so the
-caller would believe the response had narrowed when it had not.
+restating the rule. For example, a License Key with no Requested Properties
+is refused because the remote server answers 400 to every such request, so
+every request the Engine made would fail.
 
 ## Accepted Evidence
 
