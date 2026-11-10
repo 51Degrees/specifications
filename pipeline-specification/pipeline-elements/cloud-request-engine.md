@@ -68,10 +68,11 @@ browser. Unlike a Resource Key it names no Properties of its own, so a caller
 that authenticates with a License Key alone MUST also supply the list of
 Properties it wants. See [Requested Properties](#requested-properties).
 
-The License Key is sent to the remote server using the key `license`. It MAY
-be sent alongside a Resource Key, in which case it adds the products it grants
-to those the Resource Key already carries, so the set of accessible Properties
-widens.
+The License Key is sent to the remote server using the key `license`. The
+server also reads `licence` as another spelling of `license`, but the Engine
+always sends `license`. The License Key MAY be sent alongside a Resource Key,
+in which case it adds the products it grants to those the Resource Key
+already carries, so the set of accessible Properties widens.
 
 The License Key is a license key for the purposes of
 [logging](../features/logging.md#license-keys), so it MUST NOT appear in full
@@ -329,13 +330,16 @@ Resource Key using the key `resource` and the License Key using the key
 key `values` where a list was configured, then adding all the values from the
 Flow Data Evidence.
 
-The remote server advertises `query.values`, `query.resource` and
-`query.license` among its accepted Evidence keys, so a value in the Flow Data
-Evidence could otherwise collide with the credentials and the Property list
-the Engine is already sending. Evidence whose key strips to `values`,
-`resource` or `license` MUST therefore be left out of the request, because
-sending it would put a second field of the same name in the request with no
-way for either side to know which one applied.
+The remote server advertises `query.values` among its accepted Evidence keys,
+so a value in the Flow Data Evidence could otherwise collide with the Property
+list the Engine is already sending. The remote server also reads `licence` as
+another spelling of `license`. Evidence whose key strips to `values`,
+`resource`, `license` or `licence`, in any letter case, MUST therefore be left
+out of the request, because sending it would put a second field of the same
+name, or a second spelling of the same credential, in the request with no way
+for either side to know which one applied. The rule covers `resource`,
+`license` and `licence` as well as `values`, and does not depend on which keys
+the server advertises.
 
 When Evidence is added, its prefix MUST be removed.
 For example, `query.user-agent` becomes `user-agent`.
