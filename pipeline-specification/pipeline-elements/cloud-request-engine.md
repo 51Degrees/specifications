@@ -175,7 +175,10 @@ every request the Engine made would fail.
 
 ## Accepted Evidence
 
-Accepted Evidence is dependent on the supplied Resource Key.
+Accepted Evidence is dependent on the supplied Resource Key. It is what the
+Engine advertises to the Pipeline, for example for the web `Vary` header, and
+it does not limit the Evidence the Engine sends, as
+[Processing](#processing) says.
 
 The Engine will make a request to its remote server to get this information.  The Engine
 resolves it when it is built, retrying on first use only after a transient failure, see the
@@ -349,29 +352,35 @@ above is recommended so a Pipeline can also be built entirely offline.
 
 ## Processing
 
-The Engine processes Flow Data by filtering the full list of Evidence down
-to just Evidence keys needed by the server, and makes an HTTP
-request to the server using the filtered Evidence. The HTTP API used for access to
-51Degrees servers is defined at <https://cloud.51degrees.com/api-docs/index.html>.
+The Engine processes Flow Data by making an HTTP request to the server with
+every Evidence value in the Flow Data, apart from the reserved names below.
+The HTTP API used for access to 51Degrees servers is defined at
+<https://cloud.51degrees.com/api-docs/index.html>.
+
+The Engine does not limit the request to the
+[accepted Evidence](#accepted-evidence) that the `evidencekeys` request
+returns, so it also sends Evidence the server does not list. What the server
+uses changes over time, and knowing about the other Evidence is important to
+continued optimization.
 
 The server can handle Evidence in a number of different forms, but where
 possible, URL-encoded form data will be used. This is constructed
 by adding the [credentials](#credentials) that were configured, being the
 Resource Key using the key `resource` and the License Key using the key
 `license`, then the [Requested Properties](#requested-properties) using the
-key `values` where a list was configured, then adding all the values from the
-Flow Data Evidence.
+key `values` where a list was configured, then adding every value from the
+Flow Data Evidence apart from the reserved names.
 
 The remote server advertises `query.values` among its accepted Evidence keys,
 so a value in the Flow Data Evidence could otherwise collide with the Property
 list the Engine is already sending. The remote server also reads `licence` as
-another spelling of `license`. Evidence whose key strips to `values`,
-`resource`, `license` or `licence`, in any letter case, MUST therefore be left
-out of the request, because sending it would put a second field of the same
-name, or a second spelling of the same credential, in the request with no way
-for either side to know which one applied. The rule covers `resource`,
-`license` and `licence` as well as `values`, and does not depend on which keys
-the server advertises.
+another spelling of `license`. Evidence under any prefix whose key strips to
+`values`, `resource`, `license` or `licence`, in any letter case, MUST
+therefore be left out of the request, because sending it would put a second
+field of the same name, or a second spelling of the same credential, in the
+request with no way for either side to know which one applied. The rule covers
+`resource`, `license` and `licence` as well as `values`, and does not depend on
+which keys the server advertises.
 
 When Evidence is added, its prefix MUST be removed.
 For example, `query.user-agent` becomes `user-agent`.
