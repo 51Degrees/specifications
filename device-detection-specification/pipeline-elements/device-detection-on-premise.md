@@ -168,6 +168,66 @@ The reference implementations don't allow a cache to be
 added to this Engine because of the complexity this introduces, however
 end-users might be tempted to create their own cache of results.
 
+### Finding Properties
+
+The Engine is created with the names of the Properties an implementation
+reads, or with none to have every Property of the data file. The position of a
+Property is the index of its name in the names the Engine was created with, so
+it does not depend on the data file. A [data refresh](#refresh-data) keeps
+every position, and a Property the new data file lacks keeps its position and
+reads as a Property the data set does not have, with the invalid Property
+reason, until a later data file has it again.
+
+- An implementation that created the Engine with names MAY read a Property by
+  its position, being the index of its name in the list it gave, or by its
+  name. It MUST NOT keep a map of its own from names to positions, such as one
+  built from the data set, as the native code gives each name its position.
+- An Engine created with no names has no positions. Its methods that take a
+  position return no value, with the invalid Property reason, so an
+  implementation MUST read the Properties of such an Engine by name, through
+  the `ResultsHash` methods that take a Property name.
+- `getAvailableProperties`, `getPropertyName` and the Engine's
+  `getRequiredProperties` follow the names the Engine was created with, in
+  that order. `getProperties` lists the Properties the data set has, sorted by
+  name, so its order is not the order of the positions.
+
+### Reading graphs
+
+When the Engine was created with names, `process` walks the graph of each
+component the named Properties need, and no other, so no later read walks a
+graph. A failure to read one of those graphs from the data file is reported by
+`process`, which throws in C++ and the languages built on it.
+
+When the Engine was created with no names, `process` walks no graph. The native
+code walks the graph of a component when a Property of that component is first
+read from a `ResultsHash` instance, against the data set that instance holds,
+and walks it once for that instance, so a lookup that reads the Properties of
+one component walks one graph. A failure to read a graph from the data file is
+reported by the read that walked it, which throws in C++ and the languages
+built on it. That component is not walked again for the instance, so its
+Properties then read as if it had no profile.
+
+Either way the values are the same whatever is read first, and a data refresh
+between `process` and a read does not change the answer, as the instance keeps
+the data set it was populated from. The match metrics, such as
+`getMatchedNodes` and `getDeviceId`, describe every component, so reading one
+walks every graph not yet walked.
+
+### Results and threads
+
+A `ResultsHash` instance is used by one thread at a time, because reading a
+value writes into it, and when the Engine was created with no names the first
+read of a Property of a component walks the component's graph. Different
+`ResultsHash` instances can be used on different threads at once, and the
+Engine can be shared.
+
+Finished Element Data MUST be safe to read from several threads at once, as
+[thread safety](../../pipeline-specification/features/thread-safety.md#element-data)
+describes, so Aspect Data that reads its values from a `ResultsHash` instance
+MUST let only one thread at a time read from its results, for example by
+holding a lock for each read, unless the Aspect Data is a type the language
+does not let several threads share.
+
 ### Performance guidance
 
 We have found that the main performance bottleneck is usually the process
@@ -191,6 +251,9 @@ As such, steps SHOULD be taken to minimize this as much as possible:
   values that will only change after a [data refresh](#refresh-data) can
   be stored in the Engine instance to avoid native calls for that value until
   a refresh occurs. Note the possible clean-up consequences that this implies.
+  Positions need no such store, as each is the index of a Property in the
+  names the Engine was created with, as
+  [finding Properties](#finding-properties) describes.
 
 ## Refresh data
 
