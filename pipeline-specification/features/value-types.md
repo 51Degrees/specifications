@@ -23,6 +23,16 @@ the data really holds, so a caller cannot tell a measurement that was taken
 from one that was never taken, and anything reading the Property draws a
 conclusion the data does not support.
 
+Where a Flow Element holds a Boolean or numeric Property's values as strings,
+the typed accessor reads the stored string as the 51Degrees C library does. A
+Boolean is true only for the text `True`, exactly as written, and false for
+any other text. An integer is the decimal number at the start of the text,
+after any white space and sign, as C's `atoi` reads it, and 0 when the text
+does not start with one. A floating point number is what C's `strtod` reads
+from the start of the text, and 0 when the text does not start with one. So
+`"Unknown"` and `"N/A"` give `false` or 0. Where the Profile holds more than
+one value for such a Property, the Property has no value.
+
 Where a Flow Element holds values as strings, it MAY expose them. Where it
 does:
 
@@ -110,6 +120,15 @@ This comes from the data file in WKBR (R = reduced) format. And is interpreted
 to a more useable form, as the interface `WktString` which extends string, and
 contains a WKT format string.
 
+Where a WKT value is written to JSON, for example by the
+[JSON Builder Element](../pipeline-elements/json-builder.md) or in a response
+from the remote server, it MUST be written as an object with one member,
+`value`, holding the WKT text, for example `{"value": "POINT(2 4)"}`. This is
+the form the .NET and Java implementations write, and their
+[IP Intelligence Cloud Engines](../../ip-intelligence-specification/pipeline-elements/ip-intelligence-cloud.md)
+read. A reader MUST accept this form. A reader MAY also accept the WKT text
+alone as a string.
+
 Implementation adapts the [OGC 06-103r4](https://www.ogc.org/publications/standard/sfa/) standard, by changing the size of fields to reduce the size.
 
 The modified structures are:
@@ -144,7 +163,7 @@ Importantly, it should be noted that the convention for lat/lon coordinates is `
 ## Property Details
 
 Each Property SHOULD return
-an [Aspect Property value](../pipeline-specification/features/properties.md#null-values)
+an [Aspect Property value](properties.md#null-values)
 in order to support exposing the reason that a value is not set.
 
 Additionally, values MUST be returned along with their weights when fetched

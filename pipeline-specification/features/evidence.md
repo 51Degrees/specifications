@@ -66,6 +66,10 @@ case, the added value replaces the value held under that key. A value is
 added whether or not its key is [accepted](advertize-accepted-evidence.md)
 by the Flow Element that adds it.
 
+Caching that is keyed on Evidence, such as the ETag in
+[web integration](web-integration.md#cache-header-detail), uses the Evidence as
+the request supplied it.
+
 A Flow Element MAY instead output such values in its own Element Data. In
 that case, it is suggested that a helper function is created that will pull
 a value from an existing Element Data if available, or fallback to pulling
