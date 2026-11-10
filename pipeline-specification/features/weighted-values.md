@@ -46,12 +46,16 @@ When serializing weighted values, they are represented like:
 
 ```js
 {
-    "WeightedPropertyName": [
-        { "RawWeighting": 32768, "Value": "value 1" },
-        { "RawWeighting": 32767, "Value": "value 2" }
+    "weightedpropertyname": [
+        { "rawweighting": 32768, "value": "value 1" },
+        { "rawweighting": 32767, "value": "value 2" }
     ]
 }
 ```
+
+The keys MUST be written in lower case, as the other keys of the
+[JSON Builder Element](../pipeline-elements/json-builder.md) are. A reader MUST
+accept them in lower case, which is how the remote server writes them.
 
 The raw weighting is stored as a 16-bit unsigned integer (aka [ushort](https://learn.microsoft.com/en-us/dotnet/api/system.uint16.maxvalue?view=netstandard-2.0)).
 

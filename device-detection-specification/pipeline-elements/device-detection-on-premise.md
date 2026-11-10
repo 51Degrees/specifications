@@ -113,7 +113,8 @@ It is essential that the Element Data instance populated by this
 On-premise Engine is interface compatible with the Element Data
 populated by the [cloud Device Detection Engine](device-detection-cloud.md)
 as well as the individual devices populated in the Element Data from
-the [hardware profile lookup Engine](hardware-profile-lookup-cloud.md).
+the [hardware profile lookup Engine](hardware-profile-lookup-cloud.md) and
+its [on-premise counterpart](hardware-profile-lookup-on-premise.md).
 
 [^1]: The native implementations have some additional complexity
 in their code because of a plan to split Device Detection into 4
@@ -167,6 +168,66 @@ The reference implementations don't allow a cache to be
 added to this Engine because of the complexity this introduces, however
 end-users might be tempted to create their own cache of results.
 
+### Finding Properties
+
+The Engine is created with the names of the Properties an implementation
+reads, or with none to have every Property of the data file. The position of a
+Property is the index of its name in the names the Engine was created with, so
+it does not depend on the data file. A [data refresh](#refresh-data) keeps
+every position, and a Property the new data file lacks keeps its position and
+reads as a Property the data set does not have, with the invalid Property
+reason, until a later data file has it again.
+
+- An implementation that created the Engine with names MAY read a Property by
+  its position, being the index of its name in the list it gave, or by its
+  name. It MUST NOT keep a map of its own from names to positions, such as one
+  built from the data set, as the native code gives each name its position.
+- An Engine created with no names has no positions. Its methods that take a
+  position return no value, with the invalid Property reason, so an
+  implementation MUST read the Properties of such an Engine by name, through
+  the `ResultsHash` methods that take a Property name.
+- `getAvailableProperties`, `getPropertyName` and the Engine's
+  `getRequiredProperties` follow the names the Engine was created with, in
+  that order. `getProperties` lists the Properties the data set has, sorted by
+  name, so its order is not the order of the positions.
+
+### Reading graphs
+
+When the Engine was created with names, `process` walks the graph of each
+component the named Properties need, and no other, so no later read walks a
+graph. A failure to read one of those graphs from the data file is reported by
+`process`, which throws in C++ and the languages built on it.
+
+When the Engine was created with no names, `process` walks no graph. The native
+code walks the graph of a component when a Property of that component is first
+read from a `ResultsHash` instance, against the data set that instance holds,
+and walks it once for that instance, so a lookup that reads the Properties of
+one component walks one graph. A failure to read a graph from the data file is
+reported by the read that walked it, which throws in C++ and the languages
+built on it. That component is not walked again for the instance, so its
+Properties then read as if it had no profile.
+
+Either way the values are the same whatever is read first, and a data refresh
+between `process` and a read does not change the answer, as the instance keeps
+the data set it was populated from. The match metrics, such as
+`getMatchedNodes` and `getDeviceId`, describe every component, so reading one
+walks every graph not yet walked.
+
+### Results and threads
+
+A `ResultsHash` instance is used by one thread at a time, because reading a
+value writes into it, and when the Engine was created with no names the first
+read of a Property of a component walks the component's graph. Different
+`ResultsHash` instances can be used on different threads at once, and the
+Engine can be shared.
+
+Finished Element Data MUST be safe to read from several threads at once, as
+[thread safety](../../pipeline-specification/features/thread-safety.md#element-data)
+describes, so Aspect Data that reads its values from a `ResultsHash` instance
+MUST let only one thread at a time read from its results, for example by
+holding a lock for each read, unless the Aspect Data is a type the language
+does not let several threads share.
+
 ### Performance guidance
 
 We have found that the main performance bottleneck is usually the process
@@ -190,6 +251,9 @@ As such, steps SHOULD be taken to minimize this as much as possible:
   values that will only change after a [data refresh](#refresh-data) can
   be stored in the Engine instance to avoid native calls for that value until
   a refresh occurs. Note the possible clean-up consequences that this implies.
+  Positions need no such store, as each is the index of a Property in the
+  names the Engine was created with, as
+  [finding Properties](#finding-properties) describes.
 
 ## Refresh data
 
@@ -248,12 +312,45 @@ is needed for querying.
 For details on the additional metadata, see the
 [data model specification](../../data-model-specification/README.md).
 
+### Property values
+
+The Engine gives the value of a Property as follows.
+
+1. Where the Evidence holds a value for a Property that a JavaScript Property
+   gathers, in a cookie or query string value named `51D_` followed by the
+   Property's name (the `51D_ScreenPixelsWidth` cookie that
+   ScreenPixelsWidthJavascript writes, for example), the Engine gives that
+   value, whether or not a Profile was matched.
+2. Otherwise the value comes from the Profile the Evidence matched for the
+   Property's Component. Where no Profile was matched and Allow Unmatched is
+   false, the Property has no value.
+3. A List Property's value is every Value the Profile holds for the Property,
+   in the order the data file gives them, each as the data file stores it. An
+   empty Value is included and no Value is split. Where the Profile holds none,
+   the value is an empty list.
+4. A Property that is not a List has no value where the Profile holds none.
+5. A string Property is its Value, or its Values joined by `|`. A Boolean or
+   numeric Property is read as
+   [values stored as strings](../../pipeline-specification/features/value-types.md#values-stored-as-strings)
+   says.
+
+The data file's `JavascriptHardwareProfile` values are the body of a script
+that pushes the Profile ids it finds onto a `profileIds` array. The Engine
+gives each value, an empty one included, as `var profileIds = []`, a line
+break, the value, a line break, and
+`document.cookie = "51D_ProfileIds=" + profileIds.join("|")`, as the C++
+results do
+([ResultsHash.cpp lines 78 to 82](https://github.com/51Degrees/51degrees-cxx/blob/e866f6d3cea936587790f87967eff7863778b30e/src/dd/hash/ResultsHash.cpp#L78-L82)).
+
 ### Match metric Properties
 
 In addition to the 'standard' Device Detection Properties, there are a set of
 Properties that return details about the processing that was performed and
 the match that was found. Metadata for these Properties MUST be added, as they
 will not be included in the metadata exposed by the native code.
+
+The Engine lists these Properties in its Property metadata after the
+Properties from the data file, in the order of the table below.
 
 All these Properties have the following values:
 
@@ -274,6 +371,30 @@ All these Properties have the following values:
 | Iterations       | int    | 0             | The number of iterations carried out in order to find a match. This is the number of nodes in the graph which have been visited.                                                                                                                                           | n/a                                             |
 | Method           | string | "NONE"        | The method used to determine the match result.                                                                                                                                                                                                                             | "NONE", "PERFORMANCE", "COMBINED", "PREDICTIVE" |
 
+## Profiles for a property value
+
+The Engine MUST be able to give the ids of the profiles that hold a given value
+of a given Property, such as a TAC or a native model name, through the native
+code's
+[EngineHash::getProfileIdsForPropertyValue()](https://github.com/51Degrees/51degrees-cxx/blob/main/src/dd/hash/EngineHash.hpp#L181).
+TAC and native model lookups on-premise are built on it.
+
+- The Property name and the value MUST both be matched exactly, as the data
+  file holds them. A value given in another case does not match, and where
+  the data file holds two spellings of a value that differ only in case, each
+  spelling gives only its own profiles.
+- The ids are in ascending profile id, which is the order of the data file,
+  and each id appears once.
+- For a Property named with the Indexed Properties
+  [configuration option](#configuration-options), the native code's index
+  finds the profiles without reading every profile. For any other Property
+  every profile is read, which gives the same ids more slowly.
+
+A language MUST use this native function for such a lookup rather than keep an
+index of its own, because an index of its own can match differently (the .NET
+fallback index matches without regard to case), so that every language gives
+the same answers.
+
 ## Configuration options
 
 These are the configuration options that are unique to this Engine. They are in
@@ -289,8 +410,19 @@ addition to all the configuration options defined for other features. For exampl
 | Update Matched User Agent | [ConfigDeviceDetection::setUpdateMatchedUserAgent()](https://github.com/51Degrees/51degrees-cxx/blob/main/src/dd/ConfigDeviceDetection.hpp#L90) | Yes          | `true`, from native code [^2]                                                                                                    | Set whether or not the result will include the characters from the Evidence values that were used to find a match. If set, this will be available from the 'UserAgents' [match metric](#match-metric-properties) Property. It is enabled by default, and it can be turned off when the 'UserAgents' Property is not needed, which saves recording the characters.                                                                                |
 | Use Performance Graph     | [ConfigHash::setUsePerformanceGraph()](https://github.com/51Degrees/51degrees-cxx/blob/main/src/dd/hash/ConfigHash.hpp#L159)                    | Yes          | Native code [^2]                                                                                                                 | Set whether or not to use the [performance](https://51degrees.com/documentation/_device_detection__hash.html?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=device-detection-specification-pipeline-elements-device-detection-on-premise.md&utm_term=configuration-options-3#performance-graphs) graph when attempting to match Evidence values.                                                                                                                                                                                                                        |
 | Use Predictive Graph      | [ConfigHash::setUsePredictiveGraph()](https://github.com/51Degrees/51degrees-cxx/blob/main/src/dd/hash/ConfigHash.hpp#L170)                     | Yes          | Native code [^2]                                                                                                                 | Set whether or not to use the [predictive](https://51degrees.com/documentation/_device_detection__hash.html?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=device-detection-specification-pipeline-elements-device-detection-on-premise.md&utm_term=configuration-options-4#predictive-graphs) graph when attempting to match Evidence values.                                                                                                                                                                                                                          |
-| Performance Profile       | [ConfigHash=>set\[ProfileName\]()](https://github.com/51Degrees/51degrees-cxx/blob/main/src/dd/hash/ConfigHash.hpp#L104)                        | Yes          | Balanced. See [native code](https://github.com/51Degrees/51degrees-cxx/blob/main/src/dd/hash/hash.c#L175) for definitions. | Set the performance profile to use when creating the Engine. Each profile has default values for various internal configuration options, as well as things like the use of predictive/performance graphs.                                                                                                                                                                                                   |
+| Indexed Properties        | [ConfigHash::setIndexedProperties()](https://github.com/51Degrees/51degrees-cxx/blob/main/src/dd/hash/ConfigHash.hpp#L202)                     | Yes          | None                                                                                                                             | Names the Properties, such as TAC and NativeModel, whose values are indexed to the profiles holding them when the data file loads, so that the [profiles for a value](#profiles-for-a-property-value) of one of them are found without reading every profile. Names are matched exactly. A refresh indexes the same Properties.                                                                                  |
+| Performance Profile       | [ConfigHash=>set\[ProfileName\]()](https://github.com/51Degrees/51degrees-cxx/blob/main/src/dd/hash/ConfigHash.hpp#L104)                        | Yes          | Balanced, except for the Engine PHP builds at start-up [^php]. See [native code](https://github.com/51Degrees/51degrees-cxx/blob/main/src/dd/hash/hash.c#L175) for definitions. | Set the performance profile to use when creating the Engine. Each profile has default values for various internal configuration options, as well as things like the use of predictive/performance graphs.                                                                                                                                                                                                   |
 | Concurrency               | [ConfigHash::setConcurrency()](https://github.com/51Degrees/51degrees-cxx/blob/main/src/dd/hash/ConfigHash.hpp#L180)                            | Yes          | System processor count | Set the expected number of operations that use the Engine at the same time. The native code uses it for every collection read from the file.</br>1. It sets the number of file handles in the pool, which is Concurrency up to a fixed maximum of 64, because a process can only have so many files open (512 through `fopen` by default on Windows). An operation that has to read from the file when every handle is in use MUST wait until another operation releases one.</br>2. It decides how each cache is split into parts, each with its own lock, which avoids excessive locking. An item in use cannot be removed from a cache, and any operation can need any part, so every part MUST hold at least Concurrency items. The number of parts is Concurrency, or fewer where needed so that every part holds at least Concurrency items, and a cache that holds fewer than Concurrency items in total MUST be made large enough to hold Concurrency items. No value of Concurrency stops the Engine building.</br>Concurrency has no effect when every collection is held in memory, for example with the 'MaxPerformance' profile. |
+
+[^php]: In PHP the Engine built when PHP starts, from its configuration file,
+always uses MaxPerformance, which holds the whole data file in memory, and a
+package refuses any other profile for it. PHP usually serves requests from
+worker processes forked from the process that built that Engine. A fork copies
+the open file handles, which then share one read position between the workers,
+so with a profile that reads from the file the workers would corrupt each
+other's reads. Any other Engine, such as one a package builds after the
+fork or in a process that never forks, opens its own file handles and may use
+any profile.
 
 [^2]: The default values for many configuration options come from the native
 C/C++ code. You can find these defaults in
