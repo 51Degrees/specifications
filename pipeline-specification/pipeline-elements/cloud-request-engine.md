@@ -111,8 +111,11 @@ separate measurements are given:
 | 21 September 2026 | License Key    | 1                       | 42        |
 
 In the second measurement the Resource Key response was byte for byte
-identical to the same request sent with no `values` at all, which is the
-clearest statement that the list was ignored.
+identical to the same request sent with no `values` at all. Which Property was
+asked for that day was not recorded. The measurement of 10 November 2026 below
+shows that the list is not ignored under a Resource Key, because a requested
+Property the Resource Key already carries leaves the answer unchanged, whilst
+one it does not carry is added.
 
 Measured again on 10 November 2026, a Resource Key carrying device and
 location Properties, sent with a License Key and
@@ -408,8 +411,12 @@ Properties that were covered came back and are usable. The first case above,
 where the response does carry a top-level `errors` list, is handled by the
 existing rule in [HTTP requests](#http-requests) and still raises an error.
 
-An Engine authenticating on a Resource Key sends no list, so there is nothing
-to compare and this costs it nothing.
+An Engine authenticating on a Resource Key with no Requested Properties sends
+no list, so there is nothing to compare and this costs it nothing. With a
+Resource Key, Requested Properties and no License Key, a Property no licence
+grants is answered as null with its `nullreason`, and so counts as answered.
+A name the answer leaves out is then one that is not a Property, and the
+report says so rather than naming a License Key that was never given.
 
 See [HTTP requests](#http-requests) for general details on
 HTTP request handling.
@@ -481,7 +488,7 @@ For example,
 | EvidenceKeysEndPoint    | string   | <https://cloud.51degrees.com/api/v4/Evidencekeys>         | The URL for the cloud service Evidence keys end point                                                                                                                                     |
 | ResourceKey             | string   | null                                                      | The Resource Key to use when making requests to the cloud service. See [Credentials](#credentials) for which combinations are valid.                                                      |
 | LicenseKey              | string   | null                                                      | The License Key to use when making requests to the cloud service. See [Credentials](#credentials) for which combinations are valid.                                                       |
-| RequestedProperties     | list     | empty                                                     | The Properties to ask the cloud service for, as fully qualified names. Required with a License Key alone and MUST NOT be supplied with a Resource Key. See [Requested Properties](#requested-properties). |
+| RequestedProperties     | list     | empty                                                     | The Properties to ask the cloud service for, as fully qualified names. Required with a License Key alone, and added to the Properties the Resource Key carries when one is given. See [Requested Properties](#requested-properties). |
 | TimeoutSeconds          | integer  | 2                                                         | The timeout to use when making requests to the cloud service                                                                                                                              |
 | CloudRequestOrigin      | string   | null                                                      | The value to set the 'Origin' header to when making requests to the cloud service                                                                                                         |
 | FailuresToEnterRecovery | integer  | 10                                                        | The number of request failures that must occur within the timeframe defined by `FailuresWindowSeconds` for the engine to transition into a "recovery period."                             |
