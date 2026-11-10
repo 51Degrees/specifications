@@ -13,6 +13,11 @@ The Data Update Service assumes that the data is available from an HTTP
 endpoint or that it can be provided by means of file store that is accessible
 to an instance of the Aspect Engine.
 
+A package whose processes last for one request, such as PHP's, has no Data
+Update Service, as none of its processes lives long enough to poll or watch
+for new data. The parts of this page about the service do not apply to such a
+package, and the [Aspect Engine features](#aspect-engine-features) still do.
+
 It is possible that an Aspect Engine requires more than one data source [^1] and
 implementers can choose either to provide the data in a single unified way
 or to implement the Data Update service to allow for multiple sources.
@@ -295,8 +300,11 @@ in this configuration is set for memory data source operation.
 Probably can't compare dates so load whatever we have:
 
 - load buffer
-  - on fail, the Engine keeps the data it had, and the failure is logged and
-    reported as for newFileAvailable
+  - on fail, the Engine keeps the data it had. A failure with a buffer that
+    update polling downloaded is reported and logged as for newFileAvailable.
+    A failure with a buffer passed in by a programmatic update from memory
+    fails that call with an error, which is not logged or reported to
+    onUpdateCallbacks
 
 ### newFileAvailable (via remote or file watcher)
 
@@ -308,43 +316,54 @@ that is not newer is not loaded, and the check is reported as not needed, as
 - pause file watcher, if any
 - pause update polling, if any
 - load file
-  - on fail, the Engine keeps the data it had. Log the failure as
-    [errors](#errors) describes, and report the failure, not success, to
-    onUpdateCallbacks
+  - on fail, the Engine keeps the data it had. Report the failure, not
+    success, to onUpdateCallbacks, and log it as [errors](#errors) describes,
+    apart from a programmatic check, which passes the error to its caller
+    instead of logging it
 - resume polling, if any, whether or not the file loaded
 - resume file watcher, if any, whether or not the file loaded
 - trigger onUpdateCallbacks with success, if the file loaded
 
 ### Programmatic update
 
+- for a data file the Engine has no configuration for, return the no
+  configuration status to the caller, report nothing and stop
 - poll remote, if polling is configured
   - check if file is newer
     - if so, process as per newFile above
+    - if not, report the check as not needed
   - return
 - if newer file in *dataFilePath*
   - process as per newFile above
   - return
 - otherwise, report the check as not needed
+- on fail, report the failure to onUpdateCallbacks, then pass the error to
+  the caller without logging it
 
 ### Reporting each check
 
-Every check for an update MUST be reported to onUpdateCallbacks once it ends,
-including the checks made by update polling, by the file watcher and by a
-programmatic call. A report names the data file and gives one status.
+A check for an update MUST be reported to onUpdateCallbacks once it ends,
+including the checks made by update polling, by the file watcher, by the
+update on start-up and by a programmatic call. A report names the data file
+and gives one status. The status names are those of the .NET data update
+service.
 
-- Success, when the Engine was refreshed with new data.
-- Not needed, when no update was applied because none was needed, for example
-  a 304 (Not modified) response, or a downloaded or watched file that is not
-  newer than the current file. A check that was skipped is also reported as
-  not needed, for example one where no update URL is set and the file is not
-  newer, or one asked for while another check of the same data file was under
-  way.
-- A failure, naming its cause, when the check or the refresh failed, for
-  example a connection failure, a failed integrity check or a failed refresh.
-  The failure is also logged, as [errors](#errors) describes.
+- Success (`AUTO_UPDATE_SUCCESS`), when the Engine was refreshed with new data.
+- Not needed (`AUTO_UPDATE_NOT_NEEDED`), when no update was applied because
+  none was needed, for example a 304 (Not modified) response, a downloaded or
+  watched file that is not newer than the current file, or a check with no
+  update URL set and no newer file.
+- In progress (`AUTO_UPDATE_IN_PROGRESS`), for a file watcher event that
+  waited while another event for the same file was applied, and then had
+  nothing left to do.
+- A failure status naming its cause, when the check or the refresh failed, as
+  [errors](#errors) lists.
 
-A check that has ended MUST NOT be reported as still in progress, and a
-skipped check MUST NOT go unreported.
+Two calls report nothing to onUpdateCallbacks, and give their result to the
+caller instead. A programmatic check for a data file the Engine has no
+configuration for returns the no configuration status
+(`AUTO_UPDATE_NO_CONFIGURATION`), and an update from memory returns success or
+fails with an error.
 
 ## Defaults
 
@@ -441,23 +460,37 @@ appear in full in a log entry or an error message (see
 ### Errors
 
 There are several possible causes of errors within the data update service.
-As this is a background service, any failure MUST be caught and logged,
-rather than being lost or ending the process. A failure MUST NOT stop later
-checks for updates, so a later good data file is still applied.
+A failure in a check started by update polling or by the file watcher MUST be
+caught and logged, rather than being lost or ending the process, and is then
+reported to onUpdateCallbacks. A failure MUST NOT stop later checks for
+updates, so a later good data file is still applied. A programmatic check,
+the update on start-up and an update from memory pass the error to their
+caller instead of logging it.
 
 These messages MUST also be consistent across languages to make life easier
-for 51Degrees support.
+for 51Degrees support. They are the messages and levels of the .NET data
+update service, and each status is the one .NET reports.
 
-[***Highlighted***] text will only be present if this is an automated update rather
-than a procedural update.
+A row at Error level is an error that carries the message shown. Where the
+service logs it, the entry is at Error, reads `Error during check for data
+update`, and has the error attached. An error of any other kind is logged at
+Error with the message in the last row, also with the error attached. A row
+at Warning level is logged with the message shown, and the check goes on.
 
-| **Error**                                                                                                                       | **Log level** | **Message**                                                                                                                                                                                  |
-|---------------------------------------------------------------------------------------------------------------------------------|---------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Could not connect to remote server for data file update                                                                         | Warning       | An error occurred when connecting to \<url\> in order to check for data file updates for \<Engine type name\>. [***Update will be attempted again later.***] Error detail: \<error message\> |
-| Error downloading file                                                                                                          | Warning       | An error occurred while downloading a data file update for \<Engine name\> from \<url\>. [***Update will be attempted again later.***] Error detail: \<error from distributor\>             |
-| Error validating data file                                                                                                      | Warning       | An error occurred during the integrity check of new data file for \<Engine name\>. [***Update will be attempted again later.***] Error detail: \<error\>                                     |
-| Error writing to *data file location* or *temp file location*                                                               | Error         | An error occurred when writing to \<file path\>. Error detail: \<error\>                                                                                                                     |
-| Engine was built from a file with the ‘use temp file’ flag disabled. And the file at *data file location* is currently locked | Error         | Unable to update data file. This is probably because the Engine was built with the ‘use temp file’ option disabled.                                                                          |
-| Error when calling RefreshData on Engine                                                                                        | Error         | An error occurred while applying a data file update to \<Engine type name\>. Error detail: \<error\>                                                                                         |
-| Attempting to update a data file that has no configured temporary file path                                                     | Error         | The data file '\<data file identifier\>' is checking for updates but does not have a temporary file path configured.                                                                         |
-| Some file system error occurs while copying a new data file                                                                     | Error         | An error occurred when copying a data file to replace the existing one at '\<path\>'.                                                                                                        |
+| **Error**                                                                                     | **Log level**                    | **Status**                              | **Message**                                                                                                                                                                                   |
+|-----------------------------------------------------------------------------------------------|----------------------------------|-----------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Connecting to the data update URL failed                                                      | Error                            | `AUTO_UPDATE_HTTPS_ERR`                 | Error accessing data update service at '\<url\>' for engine '\<Engine type name\>'                                                                                                            |
+| The data update URL gave no response                                                          | Error                            | `AUTO_UPDATE_HTTPS_ERR`                 | No response from data update service at '\<url\>' for engine '\<Engine type name\>'                                                                                                           |
+| A 429 (Too many requests) response                                                            | Error                            | `AUTO_UPDATE_ERR_429_TOO_MANY_ATTEMPTS` | Too many requests to '\<url\>' for engine '\<Engine type name\>'                                                                                                                              |
+| A 403 (Forbidden) response                                                                    | Error                            | `AUTO_UPDATE_ERR_403_FORBIDDEN`         | Access denied to data update service at '\<url\>' for engine '\<Engine type name\>'                                                                                                           |
+| Any other response that is not a success and not a 304 (Not modified)                         | Error                            | `AUTO_UPDATE_HTTPS_ERR`                 | HTTP status code '\<status code\>' from data update service at '\<url\>' for engine '\<Engine type name\>'                                                                                    |
+| The response has no `Content-MD5` header                                                      | Warning                          | None, the check goes on                 | No MD5 hash included in data update response for '\<url\>'. Unable to verify data integrity                                                                                                   |
+| The integrity check of the downloaded data failed                                             | Error                            | `AUTO_UPDATE_ERR_MD5_VALIDATION_FAILED` | Integrity check failed. MD5 hash in HTTP response '\<hash in response\>' for '\<Engine type name\>' data update does not match calculated hash for the downloaded file '\<calculated hash\>'. |
+| The data file has no temporary file path configured                                           | Error                            | `AUTO_UPDATE_TEMP_PATH_NOT_SET`         | The data file '\<data file identifier\>' is checking for updates but does not have a temporary file path configured.                                                                          |
+| Copying the new data file over the existing one failed                                        | Error                            | `AUTO_UPDATE_NEW_FILE_CANT_RENAME`      | An error occurred when copying a data file to replace the existing one at '\<path\>'.                                                                                                         |
+| Refreshing the Engine from the data file still failed after 10 tries                          | Error                            | `AUTO_UPDATE_REFRESH_FAILED`            | An error occurred when applying a data update to engine '\<Engine type name\>' after \<tries\> tries.                                                                                         |
+| Refreshing the Engine from data held in memory failed                                         | Error                            | `AUTO_UPDATE_REFRESH_FAILED`            | An error occurred when applying a data update to engine '\<Engine type name\>'                                                                                                                |
+| Writing data passed in from memory to the data file failed                                    | Warning                          | None, the Engine is still refreshed     | An error occurred when writing to '\<path\>'. The engine will be updated to use the new data but the file on disk will still contain old data.                                                |
+| A watched file could not be opened for reading within 10 minutes                              | Not logged                       | `AUTO_UPDATE_TIMEOUT`                   | None                                                                                                                                                                                          |
+| The update on start-up ended with a status other than success or not needed, without an error | Not logged, passed to the caller | That status                             | Update on startup failed for \<data file identifier\> with status \<status\>. See log for details                                                                                             |
+| Any other error                                                                               | Error                            | `AUTO_UPDATE_UNKNOWN_ERROR`             | An unhandled error occurred while checking for automatic updates for engine '\<Engine type name\>'                                                                                            |
