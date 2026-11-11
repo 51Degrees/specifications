@@ -415,7 +415,7 @@ invalid Property reason, until a later data file has it again.
   from a later data set.
 - The native code gives each position. The C comment on the Required Property
   Index says the following
-  ([src/common/properties.h lines 31 to 38](https://github.com/51Degrees/51degrees-cxx/blob/9a535a4977adf433f863f81e556755182de97764/src/common/properties.h#L31-L38)).
+  ([src/common/properties.h lines 31 to 38](https://github.com/51Degrees/51degrees-cxx/blob/1a92d51e7c19bc77a9095738d907f665194b4b77/src/common/properties.h#L31-L38)).
 
   > **Required Property Index** : the 0 based index of the property in the
   > names the caller gave when the data set was created, which is the index
@@ -427,9 +427,9 @@ invalid Property reason, until a later data file has it again.
   > gets no index.
 
   On a reload, C copies those names into the list for the new data set
-  ([src/common/properties.c lines 553 to 572](https://github.com/51Degrees/51degrees-cxx/blob/9a535a4977adf433f863f81e556755182de97764/src/common/properties.c#L553-L572))
+  ([src/common/properties.c lines 553 to 572](https://github.com/51Degrees/51degrees-cxx/blob/1a92d51e7c19bc77a9095738d907f665194b4b77/src/common/properties.c#L553-L572))
   and works each index out again from them
-  ([lines 508 to 536](https://github.com/51Degrees/51degrees-cxx/blob/9a535a4977adf433f863f81e556755182de97764/src/common/properties.c#L508-L536)), so position
+  ([lines 508 to 536](https://github.com/51Degrees/51degrees-cxx/blob/1a92d51e7c19bc77a9095738d907f665194b4b77/src/common/properties.c#L508-L536)), so position
   *i* names the *i*th name whatever order the new data set holds.
 - Read through the C++ `ResultsIpi` class, the methods that take a position
   read by it whether or not the Engine was created with names, and
