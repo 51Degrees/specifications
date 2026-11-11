@@ -405,7 +405,9 @@ invalid Property reason, until a later data file has it again.
   step 3.1 of
   [deciding the reason](../../pipeline-specification/features/properties.md#deciding-the-reason)
   gives, and creating the Engine again includes it.
-- Every read MUST use the position. A typed accessor, such as `IpRangeStart`,
+- Every read MUST use the position, except in an implementation whose own
+  measurement shows that a read by name is faster, as the next item describes.
+  A typed accessor, such as `IpRangeStart`,
   resolves its position once, when the Engine is created or when its data
   object is first made, and reads by position from then on. A read by name
   looks the name up in a table from the names the Engine was created with to
@@ -413,6 +415,31 @@ invalid Property reason, until a later data file has it again.
   the Engine is created, from the names the native code gives, for example
   through the Engine's `getRequiredProperties`, and MUST NOT be built again
   from a later data set.
+- An implementation whose own measurement shows that a read by name is faster
+  than a read by position reads by name, its typed accessors included, as the
+  fastest approach is the one used. It MUST record that measurement, with the
+  runs that took it, in the change that makes it read by name, and it is
+  listed here with a link to that change. These implementations read by name.
+  - Node.js, in this Engine and the Device Detection Engine, measured in
+    [51degrees-node#68](https://github.com/51Degrees/51degrees-node/pull/68)
+    with the Device Detection Engine. Each getter in its SWIG wrapper, this
+    Engine's weighted getters among them, tries the form that takes a name
+    before the form that takes a position, so a read by position first fails
+    and makes a JavaScript error, which costs more than the native code's
+    lookup of the name. In
+    [run 42995016804](https://github.com/51Degrees/51degrees-node/actions/runs/42995016804)
+    a read of the Device Detection Property `IsMobile` took 711 ns by name and
+    2,797 ns by position.
+  - PHP, in this Engine and the Device Detection Engine, measured in
+    [51degrees-php#72](https://github.com/51Degrees/51degrees-php/pull/72)
+    with the Device Detection Engine, as the change made both Engines read in
+    the same way. Finding a position in PHP costs more than the native code's
+    lookup of the name. In
+    [run 43089315389](https://github.com/51Degrees/51degrees-php/actions/runs/43089315389),
+    with the Device Detection TAC file, the median request reading 1, 5 and 15
+    Properties took 60.9, 101.8 and 196.3 µs by name against 63.5, 108.7 and
+    214.3 µs by position, and reading by position was faster in none of its
+    30 rounds.
 - The native code gives each position. The C comment on the Required Property
   Index says the following
   ([src/common/properties.h lines 31 to 38](https://github.com/51Degrees/51degrees-cxx/blob/1a92d51e7c19bc77a9095738d907f665194b4b77/src/common/properties.h#L31-L38)).
