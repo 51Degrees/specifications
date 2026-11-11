@@ -125,7 +125,10 @@ Element after that group.
 Nothing is lost, because a source Property that has not been written by
 the time the Element runs is a source Property that cannot be read, which
 the one rule below already answers. The derived Property has no value and
-the message names the Property that was missing.
+the message names the Property that was missing. Where a request carries
+no Element Data at all under a key the Pipeline check confirmed, the
+Element also logs an error once, as
+[Logging and exposed metadata](#logging-and-exposed-metadata) says.
 
 ### Absent and invalid source Properties
 
@@ -190,6 +193,22 @@ inferred types and computed dependencies included, so that anyone
 holding the log can reconstruct what was evaluated without the file. A
 deprecated script logs a warning carrying the note the author left.
 
+While requests are processed, the one thing logged is a request that
+carries no Element Data at all under a key a script reads. The Pipeline
+check confirmed that an Element supplies that key, so that Element has
+run after this one, or failed before adding its Element Data, because
+every Flow Element still runs after one fails, as
+[exception handling](../features/exception-handling.md#process-function)
+says. An Element that runs too late leaves every request with no value
+for the script until the Pipeline is changed, whilst a failure is also in
+the Flow Data errors and may not recur on later requests. The Element logs an
+error the first time this happens for each script, naming the script, the
+source Property and the Element Data key, saying that this Element should
+be added after the Element that supplies the key, and saying that the
+error is reported once. A source Property that is absent on a request for
+any other reason, such as one the JavaScript has not populated yet, is not
+logged, because its no-value message already says why.
+
 The Element's Property metadata list carries one entry per script with
 the name, the value type as the language's type, the category from the
 script's output block, and available true, which is what the Flow
@@ -211,7 +230,10 @@ field.
    path, no text and no reference to the source is kept,
 4. All expensive work happens at build, so per request there is no
    reflection, no string parsing, no regular expressions, no locks and
-   no mutable state shared between requests,
+   no mutable state shared between requests, apart from one flag per
+   script that records, without a lock, that the error under
+   [Logging and exposed metadata](#logging-and-exposed-metadata) has been
+   logged,
 5. The compiled model is immutable, so parallel Elements and concurrent
    `Process` calls need nothing further,
 6. Multiple Derived Property Elements can exist in one Pipeline and each
@@ -310,8 +332,11 @@ Per request, the Element:
    the `derived` Element Data.
 
 Message strings for absent Properties are built only when a Property is
-absent. The compiled model is immutable and nothing is shared between
-requests, so concurrent `Process` calls need nothing further.
+absent. The compiled model is immutable, and the only state shared
+between requests is the flag per script that records the error under
+[Logging and exposed metadata](#logging-and-exposed-metadata) has been
+logged, which is set once without a lock, so concurrent `Process` calls
+need nothing further.
 
 ## Configuration
 
@@ -323,13 +348,8 @@ The Derived Property Element is configurable using json configuration:
     {
       "BuilderName": "DerivedPropertyElement",
       "BuildParameters": {
-        "Scripts": [
-          "HumanConfidence"
-        ],
-        "ScriptFiles": [
-          "derived/*.yaml",
-          "derived/StaffDevice.json"
-        ]
+        "Scripts": "HumanConfidence",
+        "ScriptFiles": "derived/*.yaml,derived/StaffDevice.json"
       }
     }
   ]
@@ -337,7 +357,10 @@ The Derived Property Element is configurable using json configuration:
 ```
 
 `Scripts` is a list of built-in script names, and `ScriptFiles` is a
-list of file paths where wildcards are allowed. The third source form,
+list of file paths where wildcards are allowed. Each list is given as a
+comma-separated string, as
+[pipeline configuration](../features/pipeline-configuration.md#deserialization)
+describes for every list of strings. The third source form,
 script text passed from code, is not available from configuration.
 
 The Derived Property Element is configurable using the builder:
@@ -417,7 +440,9 @@ implementation judging position would refuse this correct Pipeline.
 An Element placed too late is not silently wrong. Every source Property
 it needed has still not been written when it runs, so the derived
 Property has no value and the message names those Properties, which is
-the same answer the one rule gives for any unavailable source.
+the same answer the one rule gives for any unavailable source. The
+Element also logs an error once for each script, as
+[Logging and exposed metadata](#logging-and-exposed-metadata) says.
 
 ### The response
 

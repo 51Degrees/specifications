@@ -17,22 +17,35 @@ encoded using base-64 encoding. This element decodes and transforms this
 Evidence into values that match the HTTP header format so that it can
 be used by the Device Detection Engines.
 
+An on-premise Device Detection Engine whose native code does this
+conversion itself does not need this Element. See
+[Engines that convert the values](#engines-that-convert-the-values).
+
 ## Accepted Evidence
 
 - cookie.51d_gethighentropyvalues
 - query.51d_gethighentropyvalues
 
+The Device Detection Engines read `51D_StructuredUserAgent` in the same way,
+as `cookie.51d_structureduseragent` or `query.51d_structureduseragent`. Only the
+first value of either key that gives headers is used, and a `query` value is
+tried before any `cookie` value, as described in the [Process](#process)
+section.
+
 ## Element Data
 
-This Element is only implemented for
-[.NET](https://github.com/51Degrees/51degrees-dotnet/tree/main/device-detection/DeviceDetection)
-at time of writing.
-The reference implementation writes directly to Evidence, which will not
-be possible if Evidence is immutable.
-Instead, the Element can output its values using Element Data as described
-in the table below.
-The Device Detection Engines MUST be capable of using these values if
-available and falling back to Evidence values if they are not.
+The .NET and Java packages have no implementation of this Element, and the
+native code their on-premise Engines use converts the values itself.
+An implementation of this Element can write the decoded values to Evidence,
+which a Flow Element MAY do outside a
+[parallel group](../../pipeline-specification/features/thread-safety.md#evidence),
+as Evidence is not immutable.
+Alternatively, the Element can output its values using Element Data as
+described in the table below.
+A Device Detection Engine MUST be capable of using these values from
+Element Data if available, and falling back to Evidence values if they are
+not, unless it is an on-premise Engine whose native code converts the
+values itself.
 See [adding Evidence values](../../pipeline-specification/features/evidence.md#adding-evidence-values)
 for more details.
 
@@ -53,10 +66,42 @@ not needed for device detection, so are not featured here.
 
 - Get the encoded value from Evidence for the [relevant keys](#accepted-evidence)
   - Use the value with the `query` prefix if both are available
+    - A value is available when it is present and gives at least one header
+      when decoded, so a `query` value that cannot be decoded, or gives no
+      header, leaves the `cookie` value to be used
 - Decode the value from base 64
 - Convert the JSON representation into individual HTTP header values.
   - See [here](https://github.com/51Degrees/sua-uach-conversion/blob/main/src/convertSUAtoUACH.js)
     for an example of this using JavaScript.
+
+## Engines that convert the values
+
+The native code of the on-premise Device Detection Engine in
+[51degrees-cxx](https://github.com/51Degrees/51degrees-cxx) converts the
+`query.51d_gethighentropyvalues` and `cookie.51d_gethighentropyvalues`
+Evidence itself, before it matches, into header values that include those in
+the [Element Data](#element-data) table
+([hash.c lines 3902 to 3920](https://github.com/51Degrees/51degrees-cxx/blob/cfad8978827292b97ad08f306891edea09ece304/src/dd/hash/hash.c#L3902-L3920)
+and the list of headers in
+[transform.h lines 49 to 56](https://github.com/51Degrees/51degrees-cxx/blob/cfad8978827292b97ad08f306891edea09ece304/src/dd/transform.h#L49-L56)).
+It does so while special evidence processing is enabled, which is the default
+([config-dd.h line 90](https://github.com/51Degrees/51degrees-cxx/blob/cfad8978827292b97ad08f306891edea09ece304/src/dd/config-dd.h#L90)).
+
+An on-premise Device Detection Engine whose native code converts the values
+itself, and which accepts both keys and passes their values to that native
+code unchanged, need not read this Element's data. A Pipeline built around
+such an Engine does not need this Element.
+
+The native code converts only one such value, as
+[Accepted Evidence](#accepted-evidence) says. It tries every `query` value
+before any `cookie` value, and uses the first `51d_gethighentropyvalues` or
+`51d_structureduseragent` value that gives at least one header
+([hash.c lines 3949 to 3959](https://github.com/51Degrees/51degrees-cxx/blob/cfad8978827292b97ad08f306891edea09ece304/src/dd/hash/hash.c#L3949-L3959)
+and [lines 4287 to 4305](https://github.com/51Degrees/51degrees-cxx/blob/cfad8978827292b97ad08f306891edea09ece304/src/dd/hash/hash.c#L4287-L4305)).
+So where that first value is a `51d_structureduseragent` value, the high
+entropy values are not converted, and the header values come from the
+structured User-Agent alone, which gives no `sec-ch-ua` value
+([transformc.c lines 1105 to 1107](https://github.com/51Degrees/51degrees-cxx/blob/cfad8978827292b97ad08f306891edea09ece304/src/dd/transformc.c#L1105-L1107)).
 
 ## Configuration options
 

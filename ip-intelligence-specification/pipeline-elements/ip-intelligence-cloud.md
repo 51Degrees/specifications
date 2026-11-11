@@ -53,10 +53,12 @@ This will just need to filter and parse the JSON provided by the Cloud Aspect
 Engine to the form that is needed for the Element Data output.
 
 Note that IP Intelligence properties may include
-[weighted values](../data-model.md). The cloud response
-returns these as JSON arrays of objects with value and weight fields,
-and the Engine MUST parse them into the appropriate weighted value
-types used by the Element Data.
+[weighted values](../../pipeline-specification/features/weighted-values.md).
+The cloud response returns these as JSON arrays of objects with a
+`rawweighting` member and a `value` member (see
+[weighted values](../../pipeline-specification/features/weighted-values.md#serializing)),
+and the Engine MUST parse them into the appropriate weighted value types used
+by the Element Data.
 
 ## Configuration options
 
