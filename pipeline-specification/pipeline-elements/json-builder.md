@@ -119,8 +119,24 @@ creates the Pipeline, it adds both if they are not present.
 
 If no Sequence Element has produced a sequence number when the Element runs,
 the Element MUST fail with an error and MUST NOT set its JSON value. The error
-SHOULD say that a Sequence Element needs to be placed before the JSON Builder
-Element in the Pipeline. The Pipeline handles the error as described in
+MUST carry the message below, which is the text every implementation gives, so
+that the message reads the same in every language and makes life easier for
+51Degrees support.
+
+| **Error** | **Message** |
+| --- | --- |
+| No Sequence Element has produced a sequence number | The JSON Builder needs a sequence number. Place a Sequence Element before the JSON Builder in the Pipeline. |
+
+PHP names this Element the JSON Bundler, so PHP gives the same message with
+JSON Bundler in place of JSON Builder, reading "The JSON Bundler needs a
+sequence number. Place a Sequence Element before the JSON Bundler in the
+Pipeline." Nothing else differs. Where an implementation wraps the error in
+another, such as a
+[Pipeline Configuration Exception](../features/exception-handling.md#pipeline-configuration-exception)
+that carries the first error as its cause, the error the caller reads carries
+the message.
+
+The Pipeline handles the error as described in
 [exception handling](../features/exception-handling.md#process-function).
 When the Element fails, the web integration handles the error as that page
 describes, and a response it serves then, such as the .NET web integration's
