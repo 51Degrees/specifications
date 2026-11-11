@@ -476,11 +476,14 @@ A row at Error level is an error that carries the message shown. Where the
 service logs it, the entry is at Error, reads `Error during check for data
 update`, and has the error attached. An error of any other kind is logged at
 Error with the message in the last row, also with the error attached. An
-error raised by a callback in onUpdateCallbacks is logged with the last row's
-message on update polling and the file watcher, and passes to the caller on a
-programmatic check and the update on start-up. Either way the status was
-already reported. A row at Warning level is logged with the message shown, and
-the check goes on.
+error raised by a callback in onUpdateCallbacks is logged in the same way on
+update polling and the file watcher, as `Error during check for data update`
+when it is of the same kind as the Error rows, and with the last row's message
+otherwise. On a programmatic check and the update on start-up it passes to the
+caller. Either way the callbacks after the one that raised the error are not
+called, and on update polling any reports of the check not yet made are not
+made. A row at Warning level is logged with the message shown, and the check
+goes on.
 
 | **Error**                                                                                     | **Log level**                    | **Status**                              | **Message**                                                                                                                                                                                   |
 |-----------------------------------------------------------------------------------------------|----------------------------------|-----------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
