@@ -384,8 +384,8 @@ which keys the server advertises.
 
 The web request view that a web integration adds under `server.http-request`,
 as [web integration](../features/web-integration.md#populating-evidence)
-describes, MUST also be left out of the request, because it is a view of the
-whole web request and not a value to send.
+describes, MUST also be left out of the request, in any letter case, because it
+is a view of the whole web request and not a value to send.
 
 When Evidence is added, its prefix MUST be removed.
 For example, `query.user-agent` becomes `user-agent`.
