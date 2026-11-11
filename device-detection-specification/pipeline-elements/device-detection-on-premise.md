@@ -192,7 +192,13 @@ invalid Property reason, until a later data file has it again.
   is created again, so a read of it, by position or by name, gives no value,
   with the invalid Property reason. Its
   [Property metadata](../../pipeline-specification/features/properties.md#property-metadata)
-  reports it as not available, with `Available` false.
+  reports it as not available, with `Available` false. For an Engine created
+  with no names, its configuration is the names of its first data file, so such
+  a Property counts as excluded from the Engine's configuration. Its missing
+  Property reason is therefore `PropertyExcludedFromEngineConfiguration`, as
+  step 3.1 of
+  [deciding the reason](../../pipeline-specification/features/properties.md#deciding-the-reason)
+  gives, and creating the Engine again includes it.
 - Every read MUST use the position. A typed accessor, such as `IsMobile`,
   resolves its position once, when the Engine is created or when its data
   object is first made, and reads by position from then on. A read by name
