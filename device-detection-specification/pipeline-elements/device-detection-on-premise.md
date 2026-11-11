@@ -171,44 +171,60 @@ end-users might be tempted to create their own cache of results.
 ### Finding Properties
 
 The Engine is created with the names of the Properties an implementation
-reads. The position of a Property is the index of its name in the names the
-Engine was created with. That list is fixed when the Engine is created, so the
-position does not depend on the data file, and the same position names the
-same Property after any [data refresh](#refresh-data). A Property the new data
-file lacks keeps its position and reads as a Property the data set does not
-have, with the invalid Property reason, until a later data file has it again.
+reads, or with none to have every Property of the data file. The position of a
+Property is the index of its name in the names the Engine was created with.
+That list is fixed when the Engine is created, so the position does not depend
+on the data file, and the same position names the same Property after any
+[data refresh](#refresh-data). A Property the new data file lacks keeps its
+position and reads as a Property the data set does not have, with the invalid
+Property reason, until a later data file has it again.
 
-- An implementation configured with no names MUST take every Property name
-  in the data set when it creates the Engine, and create the Engine with that
-  list, so its positions are fixed too. A Property that only a later data
-  file has gets no position until the Engine is created again.
+- An Engine created with no names takes the names of every Property of the
+  first data file it loads, in that data set's order, as the names it was
+  created with, and keeps them across every data refresh, so its positions are
+  fixed too. The native code does this. An implementation configured with no
+  names MUST create the Engine with no names, and MUST NOT pass the data set's
+  names itself, because an Engine created with names walks graphs during
+  `process`, as [reading graphs](#reading-graphs) describes, where one created
+  with no names walks a graph only when a Property of it is first read.
+- A Property that only a later data file has gets no position until the Engine
+  is created again, so a read of it, by position or by name, gives no value,
+  with the invalid Property reason.
 - Every read MUST use the position. A typed accessor, such as `IsMobile`,
   resolves its position once, when the Engine is created or when its data
   object is first made, and reads by position from then on. A read by name
   looks the name up in a table from the names the Engine was created with to
   their positions, and then reads by position. That table is built once, when
-  the Engine is created, and MUST NOT be built from the data set. Nothing is
-  built from the data set's own order of Properties.
-- The native code gives each position. The C comment on
-  `setRequiredPropertyIndexes` says the required property index is "the place
-  of its name among the names given", and C works the index out again for
-  each data set it loads
-  ([src/common/properties.c lines 479 to 503](https://github.com/51Degrees/51degrees-cxx/blob/cfad8978827292b97ad08f306891edea09ece304/src/common/properties.c#L479-L503)),
-  so position *i* names the *i*th name given, whatever order the data set
-  holds. The same comment says "Without names, each property's index is its
-  own place", meaning the place of the Property among every Property of the
-  data set, sorted by name, which a data refresh can change. That is why an
-  implementation configured with no names creates the Engine with the data
-  set's names.
-- Read through the C++ `ResultsHash` class, an Engine created with no names
-  has no positions at all. Its methods that take a position return no value,
-  with the invalid Property reason, because `allowedRequiredPropertyIndex`
-  refuses every position when no names were given
-  ([ResultsBase.cpp lines 481 to 484](https://github.com/51Degrees/51degrees-cxx/blob/cfad8978827292b97ad08f306891edea09ece304/src/common/ResultsBase.cpp#L481-L484)).
+  the Engine is created, from the names the native code gives, for example
+  through the Engine's `getRequiredProperties`, and MUST NOT be built again
+  from a later data set.
+- The native code gives each position. The C comment on the Required Property
+  Index says the following
+  ([src/common/properties.h lines 31 to 38](https://github.com/51Degrees/51degrees-cxx/blob/9a535a4977adf433f863f81e556755182de97764/src/common/properties.h#L31-L38)).
+
+  > **Required Property Index** : the 0 based index of the property in the
+  > names the caller gave when the data set was created, which is the index
+  > every read by position takes. A reload does not change it. A name the data
+  > does not have keeps its index, and reads as a property the data set does
+  > not have. When the caller named no property, the names are those of the
+  > first data set loaded, in the order of its list of available properties,
+  > and a reload keeps them, so a property that only a later data set holds
+  > gets no index.
+
+  On a reload, C copies those names into the list for the new data set
+  ([src/common/properties.c lines 553 to 572](https://github.com/51Degrees/51degrees-cxx/blob/9a535a4977adf433f863f81e556755182de97764/src/common/properties.c#L553-L572))
+  and works each index out again from them
+  ([lines 508 to 536](https://github.com/51Degrees/51degrees-cxx/blob/9a535a4977adf433f863f81e556755182de97764/src/common/properties.c#L508-L536)), so position
+  *i* names the *i*th name whatever order the new data set holds.
+- Read through the C++ `ResultsHash` class, the methods that take a position
+  read by it whether or not the Engine was created with names, and
+  `getPropertyName` gives the name at a position. The methods that take a
+  name find the name's position first, from the names the Engine was created
+  with.
 - `getAvailableProperties`, `getPropertyName` and the Engine's
   `getRequiredProperties` follow the names the Engine was created with, in
   that order. `getProperties` lists the Properties the data set has, sorted by
-  name, so its order is not the order of the positions.
+  name, so its order need not be the order of the positions.
 
 ### Reading graphs
 
@@ -217,7 +233,8 @@ component the named Properties need, and no other, so no later read walks a
 graph. A failure to read one of those graphs from the data file is reported by
 `process`, which throws in C++ and the languages built on it.
 
-When the Engine was created with no names, `process` walks no graph. The native
+When the Engine was created with no names, `process` walks no graph, before or
+after a data refresh. The native
 code walks the graph of a component when a Property of that component is first
 read from a `ResultsHash` instance, against the data set that instance holds,
 and walks it once for that instance, so a lookup that reads the Properties of
