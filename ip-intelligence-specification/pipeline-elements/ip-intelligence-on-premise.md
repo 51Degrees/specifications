@@ -377,8 +377,8 @@ associated weighting. This should be reflected in the `Element Data` implementat
 ### Finding Properties
 
 The Engine is created with the names of the Properties an implementation
-reads, or with none to have every Property of the data file. The position of a
-Property is the index of its name in the names the Engine was created with.
+reads, or with none to have every Property of the first data file it loads.
+The position of a Property is the index of its name in the names the Engine was created with.
 That list is fixed when the Engine is created, so the position does not depend
 on the data file, and the same position names the same Property after any
 [data refresh](#refresh-data). A Property the new data file lacks keeps its
@@ -430,7 +430,10 @@ Property reason, until a later data file has it again.
 - `getAvailableProperties`, `getPropertyName` and the Engine's
   `getRequiredProperties` follow the names the Engine was created with, in
   that order. `getProperties` lists the Properties the data set has, sorted by
-  name, so its order need not be the order of the positions.
+  name, so its order need not be the order of the positions. After a data
+  refresh it can list a Property that has no position, being one that only
+  the new data file has, and a read of that Property gives no value, with the
+  invalid Property reason.
 - `copyValueAsUTF8String` takes only a position, as it is for the fastest
   read, and no form of it takes a Property name. The position is the index of
   the Property in the names the Engine was created with.
