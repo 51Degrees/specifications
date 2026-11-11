@@ -136,6 +136,11 @@ another, such as a
 that carries the first error as its cause, the error the caller reads carries
 the message.
 
+The message is the whole text of the error. An implementation MUST NOT add
+anything to it, such as a link to documentation. A prefix that a language's
+error type writes in front of every error of that type when the error is
+shown, such as the type's name, is not part of the message.
+
 The Pipeline handles the error as described in
 [exception handling](../features/exception-handling.md#process-function).
 When the Element fails, the web integration handles the error as that page
