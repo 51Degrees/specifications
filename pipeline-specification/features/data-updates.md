@@ -476,10 +476,11 @@ A row at Error level is an error that carries the message shown. Where the
 service logs it, the entry is at Error, reads `Error during check for data
 update`, and has the error attached. An error of any other kind is logged at
 Error with the message in the last row, also with the error attached. An
-error raised by a callback in onUpdateCallbacks is logged at Error with the
-message in its row, and does not end the process or change the status already
-reported. A row at Warning level is logged with the message shown, and the
-check goes on.
+error raised by a callback in onUpdateCallbacks is logged with the last row's
+message on update polling and the file watcher, and passes to the caller on a
+programmatic check and the update on start-up. Either way the status was
+already reported. A row at Warning level is logged with the message shown, and
+the check goes on.
 
 | **Error**                                                                                     | **Log level**                    | **Status**                              | **Message**                                                                                                                                                                                   |
 |-----------------------------------------------------------------------------------------------|----------------------------------|-----------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -489,7 +490,7 @@ check goes on.
 | A 403 (Forbidden) response                                                                    | Error                            | `AUTO_UPDATE_ERR_403_FORBIDDEN`         | Access denied to data update service at '\<url\>' for engine '\<Engine type name\>'                                                                                                           |
 | Any other response that is not a success and not a 304 (Not modified)                         | Error                            | `AUTO_UPDATE_HTTPS_ERR`                 | HTTP status code '\<status code\>' from data update service at '\<url\>' for engine '\<Engine type name\>'                                                                                    |
 | The response has no `Content-MD5` header                                                      | Warning                          | None, the check goes on                 | No MD5 hash included in data update response for '\<url\>'. Unable to verify data integrity                                                                                                   |
-| The integrity check of the downloaded data failed                                             | Error                            | `AUTO_UPDATE_ERR_MD5_VALIDATION_FAILED` | Integrity check failed. MD5 hash in HTTP response '\<hash in response\>' for '\<Engine type name\>' data update does not match calculated hash for the downloaded file '\<calculated hash\>'. |
+| The integrity check of the downloaded data failed                                             | Error                            | `AUTO_UPDATE_ERR_MD5_VALIDATION_FAILED` | Integrity check failed. MD5 hash in HTTP response '\<hash in response\>' for '\<Engine type name\>'data update does not match calculated hash for the downloaded file '\<calculated hash\>'.  |
 | The data file has no temporary file path configured                                           | Error                            | `AUTO_UPDATE_TEMP_PATH_NOT_SET`         | The data file '\<data file identifier\>' is checking for updates but does not have a temporary file path configured.                                                                          |
 | Copying the new data file over the existing one failed                                        | Error                            | `AUTO_UPDATE_NEW_FILE_CANT_RENAME`      | An error occurred when copying a data file to replace the existing one at '\<path\>'.                                                                                                         |
 | Refreshing the Engine from the data file still failed after 10 tries                          | Error                            | `AUTO_UPDATE_REFRESH_FAILED`            | An error occurred when applying a data update to engine '\<Engine type name\>' after \<tries\> tries.                                                                                         |
@@ -497,11 +498,5 @@ check goes on.
 | Writing data passed in from memory to the data file failed                                    | Warning                          | None, the Engine is still refreshed     | An error occurred when writing to '\<path\>'. The engine will be updated to use the new data but the file on disk will still contain old data.                                                |
 | A watched file could not be opened for reading within 10 minutes                              | Not logged                       | `AUTO_UPDATE_TIMEOUT`                   | None                                                                                                                                                                                          |
 | The update on start-up ended with a status other than success or not needed, without an error | Not logged, passed to the caller | That status                             | Update on startup failed for \<data file identifier\> with status \<status\>. See log for details                                                                                             |
-| An onUpdateCallbacks callback raised an error                                                 | Error                            | None, the reported status stands        | An update complete callback raised an error for \<Engine type\>. Error detail: \<error\>                                                                                                      |
+| An onUpdateCallbacks callback raised an error                                                 | Error, or passed to the caller   | None, already reported                  | An unhandled error occurred while checking for automatic updates for engine '\<Engine type name\>'                                                                                            |
 | Any other error                                                                               | Error                            | `AUTO_UPDATE_UNKNOWN_ERROR`             | An unhandled error occurred while checking for automatic updates for engine '\<Engine type name\>'                                                                                            |
-
-Two rows differ from .NET at present, and .NET is to change to match them.
-.NET does not catch a callback's error separately, so on update polling and
-the file watcher the error is logged with the last row's message, and on a
-programmatic check and the update on start-up it passes to the caller. .NET
-also writes no space before `data update` in the integrity check message.
