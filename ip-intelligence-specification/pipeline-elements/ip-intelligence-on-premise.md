@@ -376,26 +376,29 @@ associated weighting. This should be reflected in the `Element Data` implementat
 
 ### Finding Properties
 
-The Engine is created with the names of the Properties an implementation
-reads, or with none to have every Property of the first data file it loads.
-The position of a Property is the index of its name in the names the Engine was created with.
-That list is fixed when the Engine is created, so the position does not depend
-on the data file, and the same position names the same Property after any
-[data refresh](#refresh-data). A Property the new data file lacks keeps its
-position and reads as a Property the data set does not have, with the invalid
-Property reason, until a later data file has it again.
+The Engine is created with the names of the Properties an implementation reads,
+or with none to have every Property of the first data file it loads. The
+position of a Property is the index of its name in the names the Engine was
+created with. That list is fixed when the Engine is created, so the position
+does not depend on the data file, and the same position names the same Property
+after any [data refresh](#refresh-data). A Property the new data file lacks
+keeps its position and reads as a Property the data set does not have, with the
+invalid Property reason, until a later data file has it again.
 
-- An Engine created with no names takes the names of every Property of the
-  first data file it loads, in that data set's order, as the names it was
-  created with, and keeps them across every data refresh, so its positions are
-  fixed too. The native code does this. An implementation configured with no
-  names MUST create the Engine with no names, and MUST NOT pass the data set's
-  names itself, because an Engine created with names walks graphs during
-  `process`, as [reading graphs](#reading-graphs) describes, where one created
-  with no names walks a graph only when a Property of it is first read.
+- An Engine created with no names takes as its names those of every Property of
+  the first data file it loads, sorted by name, which is the order of that data
+  set's list of available Properties. It keeps them across every data refresh,
+  so its positions are fixed too. The native code does this. An implementation
+  configured with no names MUST create the Engine with no names, and MUST NOT
+  pass the data set's names itself, because an Engine created with names walks
+  graphs during `process`, as [reading graphs](#reading-graphs) describes,
+  where one created with no names walks a graph only when a Property of it is
+  first read.
 - A Property that only a later data file has gets no position until the Engine
   is created again, so a read of it, by position or by name, gives no value,
-  with the invalid Property reason.
+  with the invalid Property reason. Its
+  [Property metadata](../../pipeline-specification/features/properties.md#property-metadata)
+  reports it as not available, with `Available` false.
 - Every read MUST use the position. A typed accessor, such as `IpRangeStart`,
   resolves its position once, when the Engine is created or when its data
   object is first made, and reads by position from then on. A read by name
