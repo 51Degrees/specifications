@@ -199,14 +199,66 @@ invalid Property reason, until a later data file has it again.
   step 3.1 of
   [deciding the reason](../../pipeline-specification/features/properties.md#deciding-the-reason)
   gives, and creating the Engine again includes it.
-- Every read MUST use the position. A typed accessor, such as `IsMobile`,
-  resolves its position once, when the Engine is created or when its data
-  object is first made, and reads by position from then on. A read by name
-  looks the name up in a table from the names the Engine was created with to
-  their positions, and then reads by position. That table is built once, when
-  the Engine is created, from the names the native code gives, for example
-  through the Engine's `getRequiredProperties`, and MUST NOT be built again
-  from a later data set.
+- Every read SHOULD use the position. The next item gives the exception, which
+  is a read an implementation's tests prove is faster by name. A typed
+  accessor, such as `IsMobile`, resolves its position once, when the Engine is
+  created or when its data object is first made, and reads by position from
+  then on. A read by name looks the name up in a table from the names the
+  Engine was created with to their positions, and then reads by position. That
+  table is built once, when the Engine is created, from the names the native
+  code gives, for example through the Engine's `getRequiredProperties`, and
+  MUST NOT be built again from a later data set.
+- An implementation MAY read by name where its own tests prove that a read by
+  name is faster than a read by position, as the fastest approach is the one
+  used. The proof MUST be a measurement a test or a continuous integration run
+  takes and records, not a run on a developer's machine written up in prose,
+  and the implementation MUST record that run in the change that makes the
+  read go by name. Each read by name is listed here, with the change that made
+  it and, where there is one, the run that proves it. These implementations
+  read by name.
+  - Node.js, every read in this Engine and the IP Intelligence Engine. Its
+    timing tests prove a read by name faster, in
+    [51degrees-node#68](https://github.com/51Degrees/51degrees-node/pull/68).
+    Each getter in its SWIG wrapper tries the form that takes a name before
+    the form that takes a position, so a read by position first fails and
+    makes a JavaScript error, which costs more than the native code's lookup
+    of the name. In
+    [job 130437032538](https://github.com/51Degrees/51degrees-node/actions/runs/42995016804/job/130437032538)
+    a read of `IsMobile` took 711 ns by name and 2,797 ns by position. That
+    job is red because the only two tests that failed in it are timing
+    assertions, and a read by position being slower is what made them fail.
+    The measurement was taken with this Engine, and timing the IP Intelligence
+    Engine on its own is
+    [51degrees-node#81](https://github.com/51Degrees/51degrees-node/issues/81).
+  - .NET, the `TryGet` reads in this Engine. Its cost timing run proves a
+    read by name faster, in
+    [51degrees-dotnet#133](https://github.com/51Degrees/51degrees-dotnet/pull/133).
+    These are the fast getters in its SWIG wrapper for a bool, integer, double
+    or string value, which take a name and return the value in one call. In
+    [job 130391855953](https://github.com/51Degrees/51degrees-dotnet/actions/runs/42981222093/job/130391855953),
+    with the TAC file and MaxPerformance, a `TryGet` read of `IsMobile` took
+    139.7 ns by name, where a read by position, through a `Value<T>` getter,
+    took 207.8 ns. Its other reads, being list values and the read a `TryGet`
+    read falls back to for the no-value message, use the `Value<T>` getters,
+    which return a value object at the cost of an allocation and three more
+    calls. Those reads also go by name, with no test proving them faster that
+    way, as the same job measured a `Value<T>` read of `IsMobile` as slower by
+    name, 236.9 ns against 207.8 ns by position. They are therefore outside
+    this exception, and moving them to the position is
+    [51degrees-dotnet#139](https://github.com/51Degrees/51degrees-dotnet/issues/139).
+    List reads were not timed. Its IP Intelligence Engine reads by position.
+  - PHP, every read in this Engine and the IP Intelligence Engine. Its request
+    timing run proves a read by name faster, in
+    [51degrees-php#72](https://github.com/51Degrees/51degrees-php/pull/72).
+    Finding a position in PHP costs more than the native code's lookup of the
+    name. In
+    [run 43089315389](https://github.com/51Degrees/51degrees-php/actions/runs/43089315389),
+    with the TAC file, the median request reading 1, 5 and 15 Properties took
+    60.9, 101.8 and 196.3 µs by name against 63.5, 108.7 and 214.3 µs by
+    position, and reading by position was faster in none of its 30 rounds.
+    The measurement was taken with this Engine, and timing the IP
+    Intelligence Engine on its own is
+    [51degrees-php#75](https://github.com/51Degrees/51degrees-php/issues/75).
 - The native code gives each position. The C comment on the Required Property
   Index says the following
   ([src/common/properties.h lines 31 to 38](https://github.com/51Degrees/51degrees-cxx/blob/1a92d51e7c19bc77a9095738d907f665194b4b77/src/common/properties.h#L31-L38)).
