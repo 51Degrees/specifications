@@ -420,7 +420,8 @@ invalid Property reason, until a later data file has it again.
   takes and records, not a run on a developer's machine written up in prose,
   and the implementation MUST record that run in the change that makes the
   read go by name. Each read by name is listed here, with the change that made
-  it and the run that proves it. These implementations read by name.
+  it and, where there is one, the run that proves it. These implementations
+  read by name.
   - Node.js, every read in this Engine and the Device Detection Engine. Its
     timing tests prove a read by name faster, in
     [51degrees-node#68](https://github.com/51Degrees/51degrees-node/pull/68),
