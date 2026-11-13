@@ -143,10 +143,9 @@ are not handled by language garbage collection) has on
 A results cache is not supported for this Engine at present, because of the
 complexity of coordinating the lifetime and thread safety of a result with
 the underlying C code, which owns the memory that the result reads its
-values from. This will be addressed in a future version. Until then, callers
-who need a cache can use the cache implementations that the Pipeline
-provides to maintain their own, storing the values they read rather than
-the result.
+values from. Callers who need a cache can use the cache implementations that
+the Pipeline provides to maintain their own, storing the values they read
+rather than the result.
 
 ### Choosing the IP address
 
