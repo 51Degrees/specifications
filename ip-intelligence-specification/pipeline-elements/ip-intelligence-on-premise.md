@@ -166,10 +166,364 @@ requires, and the data file's order decides between keys under one prefix.
 So `query.client-ip` is used ahead of `server.true-client-ip-51d`. The
 Property values in the result describe that one address.
 
+### Reading the client IP value
+
+The Engine reads one address from each client IP value, and only when it can
+read the whole value. It does not read part of a value and ignore the rest,
+because the part it read could be a different address from the one the sender
+gave.
+
+A value is read only when all of it is one of these:
+
+1. An IPv4 address in dotted-decimal form, such as `203.0.113.1`.
+2. An IPv6 address in any of the text forms of
+   [RFC 4291 section 2.2](https://www.rfc-editor.org/rfc/rfc4291.html#section-2.2),
+   such as `2001:db8::1`, `2001:0DB8:0:0:0:0:0:1` or `::ffff:203.0.113.1`.
+3. An IPv4 address followed by a colon and a port, such as `203.0.113.1:8080`.
+4. An IPv6 address in square brackets, with or without a colon and a port after
+   the closing bracket, such as `[2001:db8::1]` or `[2001:db8::1]:8080`.
+
+In the notation of
+[RFC 3986 section 3.2.2](https://www.rfc-editor.org/rfc/rfc3986.html#section-3.2.2),
+the whole value matches this rule and nothing else does.
+
+```
+value = IPv4address / IPv6address
+      / IPv4address ":" port
+      / "[" IPv6address "]" [ ":" port ]
+port  = 1*DIGIT      ; 0 to 65535
+```
+
+`IPv4address` and `IPv6address` are the rules of RFC 3986 section 3.2.2. Its
+`dec-octet` rule, which builds each part of an `IPv4address`, allows no leading
+zero and a value of 0 to 255. The Engine MUST NOT read an IPv4 address that has
+a leading zero in any part, such as `01.2.3.4`, `1.02.3.4`, `1.2.3.04` or
+`00.0.0.0`, and the value is refused whole and not read with the zero dropped.
+The text `0.0.0.0` is read, as each part is a single digit. RFC 3986 says its
+`IPv6address` rule is "a translation of the text definition of an IPv6 literal
+address" and that rule
+holds each form of RFC 4291 section 2.2, with hexadecimal digits in either
+case and with an IPv4 address only as the last 32 bits. RFC 3986 allows an
+empty port, and this rule does not.
+[RFC 5952 section 4](https://www.rfc-editor.org/rfc/rfc5952.html#section-4)
+says that although systems SHOULD write the canonical form it recommends,
+"all implementations MUST accept and be able to handle any legitimate
+[RFC4291] format", so the Engine does not require the canonical form.
+
+A port is read and then dropped. It does not change the Property values. An
+IPv6 address MUST have brackets when a port is given. Without brackets, the
+text after the last colon is part of the address, as in `2001:db8::1:80`, which
+is the address `2001:db8::1:80` and has no port.
+
+A value that does not match, in whole, is not read. It is not an error and the
+Engine uses no part of it. The Engine tries the next key in the order given in
+[choosing the IP address](#choosing-the-ip-address), so a value that is not read
+under one key does not hide a value under a key that comes later. When no key
+holds a value that is read, the result is the same as when the Evidence holds
+none of the client IP keys. These values are not read:
+
+| **Value**                  | **Why it is not read**                                                                                                                             |
+|----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| `203.0.113.0/24`           | A prefix length. [RFC 4291 section 2.3](https://www.rfc-editor.org/rfc/rfc4291.html#section-2.3) writes an address prefix this way, not an address. |
+| `203.0.113.1 x`            | Text after the address.                                                                                                                            |
+| `203.0.113.1, 198.51.100.7` | Several addresses. A list is not one address, and no entry of it is chosen.                                                                        |
+| `203.0.113.1` and a space  | A space, tab or line ending before or after the address.                                                                                           |
+| `fe80::1%eth0`, `[fe80::1%25eth0]` | A zone index. See below.                                                                                                                   |
+| `[203.0.113.1]`            | Brackets hold only an IPv6 address.                                                                                                                |
+| `[2001:db8::1`             | A bracket that is not closed.                                                                                                                      |
+| `2001:db8::1]:80`          | A closing bracket with no opening one.                                                                                                             |
+| `203.0.113.1:`             | A colon with no port.                                                                                                                              |
+| `203.0.113.1:65536`        | A port above 65535.                                                                                                                                |
+| `256.0.113.1`              | A part above 255.                                                                                                                                  |
+| `01.2.3.4`, `1.2.3.04`, `00.0.0.0` | A leading zero in a part, which some software reads as octal.                                                                       |
+| `203.0.113`                | Fewer than four parts.                                                                                                                             |
+| `2001:db8::1::2`           | More than one `::`.                                                                                                                                |
+| `2001:db8:1:2:3:4:5:6:7`   | More than eight groups.                                                                                                                            |
+| `2001:db8::12345`          | A group of more than four digits.                                                                                                                  |
+| `unknown`                  | Not an address.                                                                                                                                    |
+| An empty value             | Holds no address.                                                                                                                                  |
+
+#### Zone indexes
+
+An IPv6 address can carry a zone index after a percent sign, such as
+`fe80::1%eth0`, to say which network interface of one machine an address
+belongs to. The Engine MUST NOT read a value that holds a zone index, in any
+form, with or without brackets or a port. `fe80::1%eth0`, `fe80::1%1`,
+`[fe80::1%eth0]:80` and the percent-encoded form `[fe80::1%25eth0]` are all
+refused whole. The reasons are:
+
+- RFC 3986 section 3.2.2 says of its IPv6 rule, "This syntax does not support
+  IPv6 scoped addressing zone identifiers."
+- [RFC 9844 section 6](https://www.rfc-editor.org/rfc/rfc9844.html#section-6),
+  which obsoletes RFC 6874 (the RFC that put a zone index into a URI), says
+  "zone identifiers are of local significance only and must not be sent on the
+  wire". A zone index in Evidence therefore names an interface of a machine
+  that is not the one reading it.
+- RFC 9844 section 1 says a zone identifier is "meaningful only when attached
+  to link-local unicast and scoped multicast addresses". Neither is a global
+  address, so the zone index adds nothing that a lookup of a client on the
+  internet could use.
+
+The Engine MUST NOT strip the zone index and read the rest, because that reads
+part of a value and drops the remainder, which this section rules out.
+
+### Address forms
+
+One IP address can be written in more than one form, and the form decides which
+address it is. An IPv4 address and an ordinary IPv6 address are looked up as
+written. The Engine MUST look up the three forms that hold an IPv4 address as
+the following table says, so that one address gets the same Property values in
+every language.
+
+| **Form**             | **Example**        | **Defined by**                                                                          | **Looked up as**           |
+|----------------------|--------------------|-----------------------------------------------------------------------------------------|----------------------------|
+| IPv4-mapped IPv6     | `::ffff:8.8.8.8`   | [RFC 4291 section 2.5.5.2](https://www.rfc-editor.org/rfc/rfc4291.html#section-2.5.5.2) | The IPv4 address `8.8.8.8` |
+| IPv4-compatible IPv6 | `::8.8.8.8`        | [RFC 4291 section 2.5.5.1](https://www.rfc-editor.org/rfc/rfc4291.html#section-2.5.5.1) | An IPv6 address            |
+| IPv4-embedded IPv6   | `64:ff9b::8.8.8.8` | [RFC 6052](https://www.rfc-editor.org/rfc/rfc6052.html)                                 | An IPv6 address            |
+
+#### IPv4-mapped addresses
+
+[RFC 4291 section 2.5.5.2](https://www.rfc-editor.org/rfc/rfc4291.html#section-2.5.5.2)
+says this form "is used to represent the addresses of IPv4 nodes as IPv6
+addresses".
+[RFC 4038 section 4.2](https://www.rfc-editor.org/rfc/rfc4038.html#section-4.2),
+which RFC 4291 names as the background on its use, says "the IPv6 address
+::FFFF:x.y.z.w represents the IPv4 address x.y.z.w." Servers report this form
+because, under
+[RFC 3493 section 3.7](https://www.rfc-editor.org/rfc/rfc3493.html#section-3.7),
+an IPv6 socket that accepts a connection from an IPv4 node returns the address
+of that node encoded this way.
+[RFC 6890 section 2.2.3](https://www.rfc-editor.org/rfc/rfc6890.html#section-2.2.3)
+and the current
+[IANA registry](https://www.iana.org/assignments/iana-ipv6-special-registry/iana-ipv6-special-registry.xhtml)
+list `::ffff:0:0/96` as not globally reachable, so the block is not a network
+with Property values of its own.
+
+So an IPv4-mapped address is its IPv4 address. Every way of giving the address,
+such as `::ffff:808:808`, `0:0:0:0:0:ffff:808:808` and its 16 bytes, MUST get
+the same Property values as `8.8.8.8`, including the Properties that report an
+IP range. The native code does this on every lookup, so an implementation does
+not need to change the address before passing it on.
+
+Where an implementation reports the address of the client in the `Ip` and
+`IpV6` Properties, `Ip` MUST report `8.8.8.8` and `IpV6` MUST have no value.
+
+Language runtimes recognize this form, and an implementation that reads an
+address for itself SHOULD use what its runtime provides rather than comparing
+text.
+
+| **Language** | **What the runtime does with `::ffff:8.8.8.8`**                                                                                                                             |
+|--------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| .NET         | `IPAddress.IsIPv4MappedToIPv6` is true and `MapToIPv4()` gives `8.8.8.8`. Check `IsIPv4MappedToIPv6` first, as `MapToIPv4()` takes the last four bytes of any IPv6 address. |
+| Java         | `InetAddress.getByName` returns an `Inet4Address` for `8.8.8.8`.                                                                                                            |
+| Go           | `net.IP.To4()` and `netip.Addr.Unmap()` give `8.8.8.8`.                                                                                                                     |
+| Rust         | `Ipv6Addr::to_ipv4_mapped()` and `IpAddr::to_canonical()` give `8.8.8.8`.                                                                                                   |
+| Python       | `ipaddress.IPv6Address.ipv4_mapped` gives `8.8.8.8`.                                                                                                                        |
+| Node.js      | `net.BlockList` matches the address against a rule for `8.8.8.8`.                                                                                                           |
+| PHP          | `inet_pton` gives the 16 bytes and there is no call for the IPv4 address, so compare the first 12 bytes.                                                                    |
+
+Used as the table above says, none of these treats `::8.8.8.8` or
+`64:ff9b::8.8.8.8` as an IPv4 address. The table below says what each does
+with those two forms. Its .NET and Rust rows each name a call that turns one
+or both of them into `8.8.8.8` when it is used alone.
+
+| **Language** | **What the runtime does with `::8.8.8.8` and `64:ff9b::8.8.8.8`**                                                                                                                          |
+|--------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| .NET         | `IsIPv4MappedToIPv6` is false for both. `MapToIPv4()` still gives `8.8.8.8` for both, which is why the check comes first.                                                                  |
+| Java         | `InetAddress.getByName` returns an `Inet6Address` for both.                                                                                                                                |
+| Go           | `net.IP.To4()` gives nil and `netip.Addr.Unmap()` leaves both as IPv6 addresses.                                                                                                           |
+| Rust         | `Ipv6Addr::to_ipv4_mapped()` gives `None` and `IpAddr::to_canonical()` leaves both as IPv6 addresses. `Ipv6Addr::to_ipv4()` gives `8.8.8.8` for `::8.8.8.8`, so it is not the call to use. |
+| Python       | `ipaddress.IPv6Address.ipv4_mapped` is `None` for both.                                                                                                                                    |
+| Node.js      | `net.BlockList` does not match either against a rule for `8.8.8.8`.                                                                                                                        |
+| PHP          | The first 12 bytes from `inet_pton` are not those of `::ffff:0:0/96`, so the comparison finds no IPv4 address.                                                                             |
+
+#### IPv4-compatible addresses
+
+[RFC 4291 section 2.5.5.1](https://www.rfc-editor.org/rfc/rfc4291.html#section-2.5.5.1)
+deprecates this form and says "New or updated implementations are not required
+to support this address type". The Engine MUST NOT look up such an address as
+the IPv4 address it holds.
+
+#### IPv4-embedded addresses
+
+[RFC 6052](https://www.rfc-editor.org/rfc/rfc6052.html) defines this form, and
+the Engine follows RFC 6052 by treating these as IPv6 addresses.
+[Section 1.3](https://www.rfc-editor.org/rfc/rfc6052.html#section-1.3) defines
+an address translator as "any entity that has to derive an IPv4 address from an
+IPv6 address or vice versa". The Engine has no need to derive one, so it is not
+an address translator. The prefix can also be one that an organization chose for
+itself, in any of the lengths that
+[section 2.2](https://www.rfc-editor.org/rfc/rfc6052.html#section-2.2) allows,
+so the form cannot in general be recognized from the address alone. The Engine
+MUST NOT look up such an address as the IPv4 address it holds. The address gets
+what the data file holds for that IPv6 address, which is no value where the file
+holds nothing for it.
+
+#### Addresses below the lowest key
+
+An address below the lowest key in a graph has no profile for the component of
+that graph, rather than the profile of an unrelated address. This is decided for
+each graph, so an address can be below the lowest key of one graph and have a
+profile in another. The result is what any address gets when the data file holds
+nothing for it. A Property that is mandatory with a default value reads as that
+default, any other Property has no value, with the null profile reason, and the
+lookup raises no error.
+
+A data file SHOULD hold a key at the bottom of each graph that leads to a
+profile with no values, so that this case does not arise. The Property values
+are the same with or without that key.
+
 ### Value Retrieval
 
 When retrieving values from the IPI native code, values always come with an
 associated weighting. This should be reflected in the `Element Data` implementation returned by the implementation. For more details, see [data model](../data-model.md).
+
+### Finding Properties
+
+The Engine is created with the names of the Properties an implementation reads,
+or with none to have every Property of the first data file it loads. The
+position of a Property is the index of its name in the names the Engine was
+created with. That list is fixed when the Engine is created, so the position
+does not depend on the data file, and the same position names the same Property
+after any [data refresh](#refresh-data). A Property the new data file lacks
+keeps its position and reads as a Property the data set does not have, with the
+invalid Property reason, until a later data file has it again.
+
+- An Engine created with no names takes as its names those of every Property of
+  the first data file it loads, sorted by name, which is the order of that data
+  set's list of available Properties. It keeps them across every data refresh,
+  so its positions are fixed too. The native code does this. An implementation
+  configured with no names MUST create the Engine with no names, and MUST NOT
+  pass the data set's names itself, because an Engine created with names walks
+  graphs during `process`, as [reading graphs](#reading-graphs) describes,
+  where one created with no names walks a graph only when a Property of it is
+  first read.
+- A Property that only a later data file has gets no position until the Engine
+  is created again, so a read of it, by position or by name, gives no value,
+  with the invalid Property reason. Its
+  [Property metadata](../../pipeline-specification/features/properties.md#property-metadata)
+  reports it as not available, with `Available` false. For an Engine created
+  with no names, its configuration is the names of its first data file, so such
+  a Property counts as excluded from the Engine's configuration. Its missing
+  Property reason is therefore `PropertyExcludedFromEngineConfiguration`, as
+  step 3.1 of
+  [deciding the reason](../../pipeline-specification/features/properties.md#deciding-the-reason)
+  gives, and creating the Engine again includes it.
+- Every read SHOULD use the position. The next item gives the exception, which
+  is a read an implementation's tests prove is faster by name. A typed
+  accessor, such as `IpRangeStart`, resolves its position once, when the
+  Engine is created or when its data object is first made, and reads by
+  position from then on. A read by name looks the name up in a table from the
+  names the Engine was created with to their positions, and then reads by
+  position. That table is built once, when the Engine is created, from the
+  names the native code gives, for example through the Engine's
+  `getRequiredProperties`, and MUST NOT be built again from a later data set.
+- An implementation MAY read by name where its own tests prove that a read by
+  name is faster than a read by position, as the fastest approach is the one
+  used. The proof MUST be a measurement a test or a continuous integration run
+  takes and records, not a run on a developer's machine written up in prose,
+  and the implementation MUST record that run in the change that makes the
+  read go by name. Each read by name is listed here, with the change that made
+  it and, where there is one, the run that proves it. These implementations
+  read by name.
+  - Node.js, every read in this Engine and the Device Detection Engine. Its
+    timing tests prove a read by name faster, in
+    [51degrees-node#68](https://github.com/51Degrees/51degrees-node/pull/68),
+    where they ran against the Device Detection Engine. Each getter in its
+    SWIG wrapper, this Engine's weighted getters among them, tries the form
+    that takes a name before the form that takes a position, so a read by
+    position first fails and makes a JavaScript error, which costs more than
+    the native code's lookup of the name. In
+    [job 130437032538](https://github.com/51Degrees/51degrees-node/actions/runs/42995016804/job/130437032538)
+    a read of the Device Detection Property `IsMobile` took 711 ns by name and
+    2,797 ns by position. That job is red because the only two tests that
+    failed in it are timing assertions, and a read by position being slower is
+    what made them fail. Timing this Engine on its own is
+    [51degrees-node#81](https://github.com/51Degrees/51degrees-node/issues/81).
+  - PHP, every read in this Engine and the Device Detection Engine. Its
+    request timing run proves a read by name faster, in
+    [51degrees-php#72](https://github.com/51Degrees/51degrees-php/pull/72),
+    where it ran against the Device Detection Engine, as the change made both
+    Engines read in the same way. Finding a position in PHP costs more than
+    the native code's lookup of the name. In
+    [run 43089315389](https://github.com/51Degrees/51degrees-php/actions/runs/43089315389),
+    with the Device Detection TAC file, the median request reading 1, 5 and 15
+    Properties took 60.9, 101.8 and 196.3 µs by name against 63.5, 108.7 and
+    214.3 µs by position, and reading by position was faster in none of its
+    30 rounds. Timing this Engine on its own is
+    [51degrees-php#75](https://github.com/51Degrees/51degrees-php/issues/75).
+- The native code gives each position. The C comment on the Required Property
+  Index says the following
+  ([src/common/properties.h lines 31 to 38](https://github.com/51Degrees/51degrees-cxx/blob/1a92d51e7c19bc77a9095738d907f665194b4b77/src/common/properties.h#L31-L38)).
+
+  > **Required Property Index** : the 0 based index of the property in the
+  > names the caller gave when the data set was created, which is the index
+  > every read by position takes. A reload does not change it. A name the data
+  > does not have keeps its index, and reads as a property the data set does
+  > not have. When the caller named no property, the names are those of the
+  > first data set loaded, in the order of its list of available properties,
+  > and a reload keeps them, so a property that only a later data set holds
+  > gets no index.
+
+  On a reload, C copies those names into the list for the new data set
+  ([src/common/properties.c lines 553 to 572](https://github.com/51Degrees/51degrees-cxx/blob/1a92d51e7c19bc77a9095738d907f665194b4b77/src/common/properties.c#L553-L572))
+  and works each index out again from them
+  ([lines 508 to 536](https://github.com/51Degrees/51degrees-cxx/blob/1a92d51e7c19bc77a9095738d907f665194b4b77/src/common/properties.c#L508-L536)), so position
+  *i* names the *i*th name whatever order the new data set holds.
+- Read through the C++ `ResultsIpi` class, the methods that take a position
+  read by it whether or not the Engine was created with names, and
+  `getPropertyName` gives the name at a position. The methods that take a
+  name find the name's position first, from the names the Engine was created
+  with.
+- `getAvailableProperties`, `getPropertyName` and the Engine's
+  `getRequiredProperties` follow the names the Engine was created with, in
+  that order. `getProperties` lists the Properties the data set has, sorted by
+  name, so its order need not be the order of the positions. After a data
+  refresh it can list a Property that has no position, being one that only
+  the new data file has, and a read of that Property gives no value, with the
+  invalid Property reason.
+- `copyValueAsUTF8String` takes only a position, as it is for the fastest
+  read, and no form of it takes a Property name. The position is the index of
+  the Property in the names the Engine was created with.
+- An Engine created with only the Properties an implementation reads lets the
+  Balanced configuration hold what they read in memory, so an implementation
+  SHOULD create the Engine with only those Properties.
+
+### Reading graphs
+
+When the Engine was created with names, `process` walks the graph of each
+component a named Property belongs to, and no other, so no later read walks a
+graph. A failure to read one of those graphs from the data file is reported by
+`process`, which throws in C++ and the languages built on it.
+
+When the Engine was created with no names, `process` walks no graph, before or
+after a data refresh. The native
+code walks the graph of a component when a Property of that component is first
+read from a `ResultsIpi` instance, against the data set that instance holds,
+and walks it once for that instance, so a lookup that reads the Properties of
+one component walks one graph. A failure to read a graph from the data file is
+reported by the read that walked it, which throws in C++ and the languages
+built on it. That component is not walked again for the instance, so its
+Properties then read as if it had no profile.
+
+Either way the values are the same whatever is read first, and a data refresh
+between `process` and a read does not change the answer, as the instance keeps
+the data set it was populated from.
+
+### Results and threads
+
+A `ResultsIpi` instance is used by one thread at a time, because reading a
+value writes into it, and when the Engine was created with no names the first
+read of a Property of a component walks the component's graph. Different
+`ResultsIpi` instances can be used on different threads at once, and the
+Engine can be shared.
+
+Finished Element Data MUST be safe to read from several threads at once, as
+[thread safety](../../pipeline-specification/features/thread-safety.md#element-data)
+describes, so Aspect Data that reads its values from a `ResultsIpi` instance
+MUST let only one thread at a time read from its results, for example by
+holding a lock for each read, unless the Aspect Data is a type the language
+does not let several threads share.
 
 ### Performance Guidance
 
@@ -194,6 +548,9 @@ As such, steps SHOULD be taken to minimize this as much as possible:
   values that will only change after a [data refresh](#refresh-data) can
   be stored in the Engine instance to avoid native calls for that value until
   a refresh occurs. Note the possible clean-up consequences that this implies.
+  Positions need no such store, as each is the index of a Property in the
+  names the Engine was created with, as
+  [finding Properties](#finding-properties) describes.
 
 ## Refresh Data
 

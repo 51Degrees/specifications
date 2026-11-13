@@ -55,7 +55,8 @@ places, as [rounding of Azimuth and Declination
 values](../pipeline-specification/features/value-types.md#rounding-of-azimuth-and-declination-values)
 describes.
 
-The `WktString` type is defined in `pipeline-core`, see [WKT Type](#wkt-type).
+The `WktString` type is defined in `pipeline-core`, see
+[WKT](../pipeline-specification/features/value-types.md#wkt).
 
 ### Example
 

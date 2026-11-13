@@ -14,7 +14,7 @@ The Translation Engine translates values from one source Flow Element using a tr
 ## Components
 - `ITranslationEngine` | `TranslationEngine`: Provides the main logic, performing a translation based on the translation provided.
 - `TranslationEngineBuilder`: Provides methods to build a TranslationEngine through code.
-- `ITranslationElementData` | `TranslationElementData`: The Element data for the `TranslationEngine`. This holds the translated values. 
+- `ITranslationData` | `TranslationData`: The Element data for the `TranslationEngine`. This holds the translated values. 
 
 ## Translation Element Responsibilities and Behavior
 
@@ -92,7 +92,7 @@ The support for the above formats are influenced by the `accept-language` [stand
 
 ## Element Data
 
-Translated values are stored in the `TranslationElementData`.
+Translated values are stored in the `TranslationData`.
 
 The ElementData can be retrieved from the Flow Data like so: 
 - `flowdata.Get<ITranslationData>()`

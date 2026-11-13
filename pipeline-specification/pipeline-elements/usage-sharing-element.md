@@ -19,8 +19,9 @@ It shares instead what it finds, from two places:
 
 - every Evidence value in the Flow Data, and
 - every header other than Cookie, every cookie, query string parameter and
-  session value of the web request, with its client IP address, its protocol and the method and path
-  of its request line, when the web integration supplies the request as
+  session value of the web request, with its client IP address, its protocol
+  and the method and path of its request line, when the web integration
+  supplies the request as
   `server.http-request` (see
   [Populating Evidence](../features/web-integration.md#populating-evidence)).
   This is how a header that no other Flow Element accepts is still shared.
@@ -72,6 +73,22 @@ Unless all Evidence is shared, it MUST also return false for any key where:
 
 Anything else MUST return true. (i.e. it will be shared)
 
+A Pipeline that authenticates the requests it serves with a Resource Key or a
+License Key MUST hold them as the Evidence `fiftyone.resource-key` and
+`fiftyone.license-key`, and the filter function MUST return true for both,
+whatever the configuration, because usage is counted against them.
+
+The element accepts no Evidence, so it does not accept the session cookie
+either. When the [track session](#configuration-options) option is on, the
+element MUST read the cookie named by the
+[session cookie name](#configuration-options) option from the same two places
+as the values it shares, being the Evidence in the Flow Data and the web
+request supplied as `server.http-request` (see
+[Accepted Evidence](#accepted-evidence)), so that the
+[session tracking](#session-tracking) can compare it. A cookie found in both
+places is read once, with the value from the Evidence. The session cookie
+MUST NOT be shared unless all Evidence is shared.
+
 See [configuration options](#configuration-options) for more detail on the
 configuration parameters that can affect this filter function.
 
@@ -106,15 +123,31 @@ We recommend implementing a producer/consumer approach where the process
 function just adds the raw data to a shared queue.
 
 A background thread can then be used to consume items from this queue,
-adding them to the XML payload and sending it once it contains the
-configured quantity of data.
+adding them to the XML payload and sending it once the queue holds the
+configured quantity of data, as described below.
 
 The complete XML document MUST contain a `<Devices>` root element with
 each `<Device>` element containing the details related to a request.
 
 Multiple `<Device>` elements will be batched up as part of each message.
-The number of items per batch is configurable using the
-[minimum entries per message](#configuration-options) setting.
+The size of each batch is set by the
+[minimum entries per message and take timeout](#configuration-options)
+settings, as follows.
+
+1. Unless sending is paused by the [back-off](#back-off-after-failed-sends), a
+   message is started once the queue holds the minimum entries per message.
+2. Entries are taken from the queue for it, waiting up to the take timeout for
+   each one, until a wait ends with no entry or the message holds twice the
+   minimum entries per message.
+3. The message is sent.
+
+A message therefore holds from the minimum entries per message to twice that
+number. The one exception is disposal, when the data remaining in the queue is
+sent even if it is fewer than the minimum entries per message (see
+[Cleanup](#cleanup)).
+With a take timeout of zero, a message takes only the entries already queued.
+The take timeout only applies while a message is being filled, so an element
+with an empty queue does not wake up to check it.
 
 In the snippet below:
 
@@ -136,7 +169,7 @@ In the snippet below:
   <ServerIP>IP_ADDRESS</ServerIP> 
   <Platform>PLATFORM PLATFORM_VER SERVICE_PACK</Platform> 
   <!--Each evidence value is represented as an entry in the form:--> 
-  <PREFIX [escaped=true] [truncated=true] Name="FIELD">VALUE</PREFIX> 
+  <PREFIX [escaped="true"] [truncated="true"] Name="FIELD">VALUE</PREFIX> 
   <!--For example:--> 
   <Header Name="user-agent">USER_AGENT</Header> 
   <Header Name="host">HOST</Header>
@@ -185,6 +218,18 @@ Currently, the defined attributes are:
 - truncated - Indicates that the original evidence value was too long. The
   value in the XML does not include all characters from the original.
 
+A character that XML 1.0 does not allow is replaced by the text `\x` followed
+by the code of the character as four lower-case hexadecimal digits, for
+example `\x001f`, and the element for that Evidence entry is marked
+`escaped="true"`.
+
+A value longer than 10,000 characters is cut to 10,000 characters and the
+element for that Evidence entry is marked `truncated="true"`. The limit counts
+Unicode code points, and the cut never splits a character, so a character that
+UTF-16 stores as two units (a surrogate pair, such as most emoji) is never
+divided. The limit applies to the value as it was supplied, before any
+character is replaced, so the `\x` escapes do not count towards it.
+
 See the [ReplacedString](https://github.com/51Degrees/51degrees-java/blob/main/pipeline/pipeline.engines.fiftyone/src/main/java/fiftyone/pipeline/engines/fiftyone/flowelements/ShareUsageElement.java#L485)
 function in Java for an example of this.
 
@@ -219,26 +264,52 @@ We have no need for this duplicate data, so it MUST be discarded as
 early as possible.
 
 This can be achieved by maintaining a data structure containing
-recently shared Evidence values. If the data entry being processed
-already has a matching entry in this data structure, it MUST NOT
-be shared. For example, the C# implementation generates a hash of the
-Evidence values using the same logic as the [caching](../features/caching.md)
+recently shared Evidence values, each with the time it was last shared.
+For example, the C# implementation generates a hash of the Evidence
+values using the same logic as the [caching](../features/caching.md)
 feature.
 
-Entries will have a configurable lifetime within this data structure.
-This is reset each time an entry with matching Evidence values is
-processed.
+The [repeat Evidence interval](#configuration-options) is a window that
+starts when Evidence is shared and starts again only when the same Evidence is
+next shared.
 
-See [configuration options](#configuration-options) for more detail
-on customizing this lifetime.
+- Evidence with no matching entry MUST be shared, and an entry MUST be
+  stored with the time it is shared.
+- Evidence matching an entry shared less than the interval ago MUST NOT
+  be shared, and the entry's time MUST NOT change.
+- Evidence matching an entry shared the interval or more ago MUST be
+  shared, and the entry's time MUST be set to the time it is shared.
+
+So identical Evidence is shared at most once in each interval, however
+often it is seen. The time MUST NOT be reset when matching Evidence is
+seen but not shared, because Evidence seen continuously would then never
+be shared again.
+
+Entries MAY be removed once the interval has passed since they were
+shared, and MAY be removed sooner to limit memory. Evidence matching no
+entry is then shared as new.
 
 The hash is of the values that would be shared, as the element accepts no
-Evidence of its own for the caching logic to read.
+Evidence of its own for the caching logic to read, and also of the session
+cookie when track session is on (see below).
 
 Note that certain Evidence values MUST NOT be included in the generation
 of this hash code as they are designed to make a request unique.
 For example, the sequence number generated by the
 [Sequence Element](sequence-element.md).
+
+Unless all Evidence is shared, the session cookie is not compared, so
+identical Evidence matches the same entry whichever session it comes from. When the [track session](#configuration-options)
+option is on, the value of the session cookie named by the
+[session cookie name](#configuration-options) option is compared as well.
+Identical Evidence from a new session then makes a new entry and is shared,
+while a repeat within the same session matches the existing entry and is not.
+The session cookie itself is not shared.
+
+The session cookie name has no effect unless track session is on. Track
+session has no effect when all Evidence is shared, because every cookie is
+then both shared and compared. In .NET the session cookie name defaults to
+`asp.net_sessionid`, the ASP.NET session cookie.
 
 We also include various [configuration options](#configuration-options)
 for users to exclude any keys that might be identified to cause
@@ -254,7 +325,54 @@ For example, the queue of data to be sent has limited size. If this
 becomes full, additional data can simply be discarded until there
 is room to add entries again.
 However, it is important that these actions are logged so that users
-can identify potential issues with their usage sharing.
+can identify potential issues with their usage sharing. A message MUST
+NOT be logged for each entry discarded, as a busy server would flood its
+log.
+
+### Back-off after failed sends
+
+Repeated failed sends MUST pause sending, so that a service that is down
+or overloaded is not sent a message for every batch, and so that usage
+data waits in the queue rather than being sent and lost. Only sending
+pauses. Processing MUST NOT wait for, or be stopped by, the back-off.
+
+A send fails when the request cannot be made, has no answer within the
+time the implementation allows, or is answered with anything other than
+200.
+The batch that failed is dropped. It is not put back on the queue.
+
+1. When the [failures to enter recovery](#configuration-options) number
+   of sends have failed within the last
+   [failures window seconds](#configuration-options), sending MUST pause
+   for the [initial recovery delay](#configuration-options). Failures
+   older than the window MUST NOT be counted. Successful sends between the
+   failures do not reset the count, so a high rate of failures pauses
+   sending even when some sends succeed.
+2. The first send after a pause ends is a trial. If it fails, the delay
+   MUST be multiplied by the [recovery multiplier](#configuration-options),
+   up to the [maximum recovery delay](#configuration-options), and sending
+   MUST pause again for the new delay. One failed trial is enough.
+3. A successful send MUST end the back-off. The count of failures starts
+   again from zero, and the next pause starts again from the initial
+   delay.
+4. During a pause, Evidence MUST still be added to the queue. New
+   Evidence is discarded only when the queue is full.
+5. When a pause ends and at least the
+   [minimum entries per message](#configuration-options) are queued,
+   sending MUST start again without waiting for more requests to be
+   processed, and MUST continue until fewer than the minimum entries per
+   message are queued, so a queue that filled during the pause drains at
+   once.
+6. A message SHOULD be logged as a warning when sending pauses or a pause
+   is lengthened, giving the delay, and as information when sending
+   resumes.
+
+With the defaults, ten failed sends within 100 seconds pause sending for
+2 seconds. While the trials keep failing the pauses grow to 4, 8, 16
+seconds and so on, up to 300 seconds.
+
+One message is sent at a time, so that while backing off a failing
+service is sent one trial when each pause ends.
 
 ## Cleanup
 
@@ -266,6 +384,16 @@ it will need to handle cleanup a little more carefully than other elements.
    less than the configured minimum batch size)
 3. Free any resources associated with the queue and background processing.
 
+Cleanup SHOULD complete within 5 seconds, so that closing the element does not
+hold up the process that closes it. If the data waiting in the queue has not
+all been sent after 5 seconds, the element SHOULD stop sending, discard the
+data remaining in the queue and log a warning.
+
+While sending is paused by the [back-off](#back-off-after-failed-sends),
+cleanup MUST NOT wait for the pause to end and MUST NOT send. The data
+remaining in the queue is discarded, and the number of entries discarded
+SHOULD be logged.
+
 ## Configuration options
 
 | **Parameter**                     | **User configurable** | **Optional** | **Default**                                                                  | **Notes**                                                                                                                    |
@@ -276,9 +404,20 @@ it will need to handle cleanup a little more carefully than other elements.
 | Blocked HTTP headers              | yes                   | yes          | All HTTP headers are shared except `Cookie`                                  | Allows the user to exclude specific HTTP headers that they do not want to share.                                             |
 | Ignore Flow Data Evidence filter  | yes                   | yes          | not set                                                                      | Allows the user to block a request from being shared if the specified criteria are met.                                      |
 | Share percentage                  | yes                   | yes          | 1.0                                                                          | Used to set the approximate proportion of requests that will be shared. A value of 1 means that 100% of requests are shared. |
-| Minimum entries per message       | yes                   | yes          | 50                                                                           | The number of requests that will be added to a usage sharing payload before it is sent.                                      |
-| Maximum queue size                | yes                   | yes          | 1000                                                                         | The size of the queue that is used to buffer requests to be added to a usage sharing payload.                                |
+| Minimum entries per message       | yes                   | yes          | 50                                                                           | The number of requests that must be queued before a message is started. A message holds from this to twice this number.        |
+| Maximum queue size                | yes                   | yes          | 1000, or ten times the minimum entries per message if that is larger         | The size of the queue that is used to buffer requests to be added to a usage sharing payload.                                |
 | Add timeout milliseconds          | yes                   | yes          | 5                                                                            | The timeout to use when trying to add items to the usage sharing queue. If the request times out, the data will be discarded |
-| Take timeout milliseconds         | yes                   | yes          | 100                                                                          | The timeout to use when getting items from the usage sharing queue to add to the next payload.                               |
+| Take timeout milliseconds         | yes                   | yes          | 100                                                                          | How long to wait for each entry when filling a message.                                                                      |
 | Share usage URL                   | yes                   | yes          | <https://devices-v4.51degrees.com/new.ashx>                                  | The URL to send data to                                                                                                      |
-| Repeat Evidence interval minutes  | yes                   | yes          | 20                                                                           | The size of the sliding window during which identical usage data will not be sent if it is seen second or subsequent times.  |
+| Repeat Evidence interval minutes  | yes                   | yes          | 20                                                                           | How long after Evidence is shared it is not shared again. A repeat after that is shared and starts a new interval.           |
+| Track session                     | yes                   | yes          | false                                                                        | If this flag is set, the session cookie is compared along with the Evidence, so a repeat from a new session is shared.       |
+| Session cookie name               | yes                   | yes          | `asp.net_sessionid` in .NET                                                  | The name of the cookie that holds the session id. It has no effect unless track session is on.                               |
+| Failures to enter recovery        | yes                   | yes          | 10                                                                           | The number of failed sends within the failures window that pauses sending. From 1 to 100.                                    |
+| Failures window seconds           | yes                   | yes          | 100                                                                          | The time over which failed sends are counted. 1 or more.                                                                     |
+| Initial recovery delay seconds    | yes                   | yes          | 2.0                                                                          | The length of the first pause after failed sends. More than 0.                                                               |
+| Maximum recovery delay seconds    | yes                   | yes          | 300.0                                                                        | The longest a pause can be. More than 0.                                                                                     |
+| Recovery multiplier               | yes                   | yes          | 2.0                                                                          | What a pause is multiplied by each time the trial send when it ends fails. 1 or more.                                        |
+
+The five recovery options set the
+[back-off after failed sends](#back-off-after-failed-sends). An
+implementation MUST reject a value outside the range given.
