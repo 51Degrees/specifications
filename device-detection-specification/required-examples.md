@@ -127,7 +127,7 @@ find the production date of the file.
 ### Cloud Device Detection
 
 Reference implementation examples illustrate use of Resource Keys to access
-the cloud service. A predefined link such as [this one](https://configure.51degrees.com/jqz435Nc?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=device-detection-specification-required-examples.md&utm_term=cloud-device-detection)
+the cloud service. A predefined link such as [this one](https://51degrees.com/configure/jqz435Nc?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=device-detection-specification-required-examples.md&utm_term=cloud-device-detection)
 can be created to create a Resource Key to provide access to the Properties
 used in the examples. For simplicity, it might be convenient for such a link to
 provide access to all free Properties.
