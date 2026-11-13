@@ -96,17 +96,21 @@ options are chosen.
 
 ### Automatic update master switch
 
-The **autoUpdate** option is the master switch for all *automatic* update
-activity. When it is disabled, none of the ongoing automatic update mechanisms
-run, regardless of how they are individually configured:
+The **autoUpdate** option is the master switch for *Automatic update via
+HTTP* (polling). When it is disabled, polling does not take place, however it
+is configured.
 
-- *Automatic update via HTTP* (polling) does not take place.
-- *Automatic update from File* (file system watching) does not take place, even
-  if a file system watcher is otherwise configured.
+*Automatic update from File* (file system watching) does not depend on
+autoUpdate. The file system watcher runs on its own setting, whether autoUpdate
+is enabled or disabled, because watching a file downloads nothing.
 
-This master switch only governs *automatic* activity - it does not
-disable *Programmatic update*, which remains available for triggering an update
-manually (see [Programmatic update](#programmatic-update)).
+A License Key is needed only for the two mechanisms that download, which are
+polling and the [update on start-up](#update-on-start-up). The file system
+watcher needs no License Key.
+
+This master switch does not disable *Programmatic update*, which remains
+available for triggering an update manually (see
+[Programmatic update](#programmatic-update)).
 
 Configuration Groups:
 
@@ -175,10 +179,11 @@ This option allows users to obtain new data files by whatever means they choose,
 and have the Aspect Engine refresh by detection of a new file in the file system
 at the location configured for the data file.
 
-This is an automatic update mechanism, so it only operates when the
-[autoUpdate master switch](#automatic-update-master-switch) is enabled. With
-autoUpdate disabled, no file system watcher is created and changes to the data
-file on disk are not detected automatically.
+The file system watcher runs on its own setting, whether the
+[autoUpdate master switch](#automatic-update-master-switch) is enabled or
+disabled. Watching a file downloads nothing, so the watcher needs no License
+Key. An application with no License Key, such as one running the free Lite data
+file, can put a new file in place and the Aspect Engine refreshes from it.
 
 Any timestamp contained in the data source is not taken into consideration,
 operation depends on the operational environment reporting file system changes
@@ -222,11 +227,15 @@ Configuration Groups:
 
 Configuration that governs update activity as a whole:
 
-- **autoUpdate** - master switch for automatic updates. When disabled, neither
-  automatic update via HTTP (polling) nor automatic update from file (file system
-  watching) takes place, regardless of their individual configuration.
-  Programmatic (manual) update is not affected. See
+- **autoUpdate** - master switch for automatic update via HTTP (polling). When
+  disabled, polling does not take place, regardless of its configuration.
+  Automatic update from file (file system watching) and programmatic (manual)
+  update are not affected. See
   [Automatic update master switch](#automatic-update-master-switch).
+- **Automatic update from file** (the file system watcher) - whether the
+  location of the data file is watched for a new file. It is its own setting,
+  independent of autoUpdate. See
+  [Automatic update from File](#automatic-update-from-file).
 
 ### HTTP config
 
@@ -281,8 +290,8 @@ in this configuration is set for memory data source operation.
   - if newer or there is no local file,
     - save new file
   - load file
+- if disk data source, configure file watcher, if requested
 - if autoUpdate is enabled (see [master switch](#automatic-update-master-switch)):
-  - if disk data source, configure file watcher, if requested
   - configure HTTP update polling, if requested
 - continue
 
@@ -290,8 +299,8 @@ in this configuration is set for memory data source operation.
 
 - check operational data configuration consistency
 - load data from memory or file
+- if disk data source, configure file watcher, if requested
 - if autoUpdate is enabled (see [master switch](#automatic-update-master-switch)):
-  - if disk data source, configure file watcher, if requested
   - configure HTTP update polling, if requested
 - continue
 
@@ -380,10 +389,11 @@ keeps that file current without further configuration:
 | pollingInterval | 30 minutes |
 | randomization | up to 10 minutes |
 | dataUpdateUrl | `https://distributor.51degrees.com/api/v2/download`, with the URL formatter adding `LicenseKeys`, `Download=True` and `Type`, where the type is `HashV41` for a Device Detection Hash data file and `IPIV41` for an IP Intelligence data file |
-| License key | required before the Engine builds with autoUpdate or updateOnStartup on, because the Distributor serves nothing without one. The build fails with a configuration error that names the option to turn off. A configuration may say that no key is required, for an update source that serves the file without one |
+| License key | required before the Engine builds with autoUpdate or updateOnStartup on, because the Distributor serves nothing without one. The build fails with a configuration error that names the option to turn off. A configuration may say that no key is required, for an update source that serves the file without one. The file system watcher downloads nothing and needs no key |
 
 An application that cannot supply a license key, such as one running the free
-Lite data file, turns autoUpdate off before it builds the Engine.
+Lite data file, turns autoUpdate off before it builds the Engine. Its file
+system watcher still runs, because the watcher needs no License Key.
 
 ## Update polling
 
