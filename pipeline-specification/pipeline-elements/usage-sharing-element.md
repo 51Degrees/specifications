@@ -107,6 +107,7 @@ are:
 - Version
 - Product
 - Flow Elements
+- Packages
 - Language
 - LanguageVersion
 - ServerIP
@@ -163,6 +164,8 @@ In the snippet below:
   <Product>API_NAME</Product>  
   <FlowElement>ELEMENT1</FlowElement> 
   <FlowElement>ELEMENT2</FlowElement>  
+  <Package Name="PACKAGE1">PACKAGE1_VERSION</Package>
+  <Package Name="PACKAGE2">PACKAGE2_VERSION</Package>
   <Language>LANG</Language> 
   <LanguageVersion>LANG_VERSION</LanguageVersion> 
   <ClientIP>IP_ADDRESS</ClientIP> 
@@ -187,11 +190,21 @@ In the snippet below:
 - **DateSent** - The date that the xml was constructed in UTC and formatted
   as: yyyy-mm-ddThh:nn:ss
 - **Version** - The version of the Pipeline that is being used to generate
-  the xml. E.g. “4.0”
+  the xml. E.g. “4.0”. The Package elements give the version of every
+  package in use.
 - **Product** - The name of the product that is generating the xml. For
   example, “Pipeline”
 - **FlowElement** – An xml element exists for each FlowElement in the
   Pipeline. The text contains the fully qualified class name of the FlowElement.
+- **Package** - An xml element MUST be written for every 51Degrees package in
+  use, being the package that holds the Pipeline, the package that holds each
+  FlowElement in the Pipeline, and every 51Degrees package those depend on.
+  Each package is written once. The `Name` attribute is the name the package
+  is published under, as its language's package manager knows it (for example
+  a NuGet package id, an npm package name, a Maven group and artifact id, a Go
+  module path or a crate name), and the text is the version of that package
+  in use, as that package manager gives it. Each package is released at its own version, so these elements say which
+  release of each package is running, and so how far each release has spread.
 - **Language** - The name of the language/framework within which the
   Pipeline is running.
 - **LanguageVersion** - The version number of the language/framework
