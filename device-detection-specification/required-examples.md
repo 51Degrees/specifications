@@ -137,6 +137,18 @@ for it to be set as an environment variable, rather than passing as a command
 argument, especially given the need for examples to be executed in
 a test environment.
 
+A cloud example run with no Resource Key MUST end without an error, name the
+environment variable to set, give a link to where a Resource Key is created,
+such as the
+[configurator](https://51degrees.com/configure?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=device-detection-specification-required-examples.md&utm_term=cloud-device-detection),
+and exit successfully, so that its test runs it with no arguments or settings
+(see [Execution](#execution)). The link the example writes is tagged as the
+link to the contact page is (see
+[On-Premise Device Detection](#on-premise-device-detection)), with
+`utm_source=code`, `utm_medium=example`, the language repository's name as
+`utm_campaign` and the example's file as `utm_content`. This applies to every
+example that uses the cloud service, whatever its engines.
+
 ### Fluent Builders
 
 Reference implementation examples demonstrate the use of a simplified
