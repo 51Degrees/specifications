@@ -238,6 +238,10 @@ Examples MUST be provided that illustrate basic usage of the API for
 both Cloud and On-Prem, using fluent builder and options file configuration,
 when executed as a console (command line) application.
 
+This is met when the console examples between them show both the fluent
+builder and an options file. Four separate examples, one for each of Cloud and
+On-Prem with each way of configuring, are not required.
+
 Detailed inline comments in these examples introduce the use of Evidence and
 retrieval of Properties resulting from detection, as well as illustrating
 correct [lifecycle management](#pipeline-and-flow-data-lifecycle) of Pipeline
