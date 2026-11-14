@@ -407,14 +407,15 @@ using (var flowData = pipeline.CreateFlowData())
 }
 ```
 
-The `HumanConfidence` script used above reads `device.IsCrawler`,
-`device.BrowserReleaseYear`, `device.BrowserReleaseAge` and
-`ip.HumanProbability`, and returns one of `High`, `Medium` or `Low`.
-Naming a Property in a script makes the Property necessary, so a script
-names only Properties that are in the data. The device detection Engine
-supplies the Properties under `device` and the IP intelligence Engine
-supplies the Property under `ip`, so both Engines are added to the
-Pipeline ahead of the Derived Property Element.
+The `HumanConfidence` script used above reads Properties under `device`
+and under `ip`, and returns one of `High`, `Medium`, `Low` or `Unknown`.
+The script names each Property it reads, and the shared script repository
+under [Sources](#sources) holds the script. Naming a Property in a script
+makes the Property necessary, so a script names only Properties that are
+in the data. The device detection Engine supplies the Properties under
+`device` and the IP intelligence Engine supplies the Properties under
+`ip`, so both Engines are added to the Pipeline ahead of the Derived
+Property Element.
 
 ## The cloud
 

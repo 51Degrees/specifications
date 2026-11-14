@@ -2,7 +2,7 @@
 
 This feature is specific to Properties populated by Engines (rather than all
 Flow Elements).
-It is currently only implemented in .NET and Java.
+It is currently implemented in .NET, Java and Go.
 
 There are several execution strategies one might consider for the Process function.
 For example:
@@ -19,6 +19,13 @@ the time being, in order to be consistent, it will be called 'lazy loading'.
 This means that 'process' will return immediately. When the user attempts to access
 the value of a Property that is populated by this Engine, the call will block until
 the background task is complete.
+
+The builder takes a timeout, being how long the call waits for the value before
+it fails with an error saying that the value was not ready in time. Where a
+language takes the timeout as a number, the number MUST be
+in milliseconds. Where a language has a type for a length of time, such as
+`TimeSpan` in .NET or `time.Duration` in Go, it MAY take that type instead, which
+carries its own unit.
 
 Some languages have async/await features that might appear to be a good fit for
 handling this type of execution in a neater way. There is no rule in this
