@@ -295,7 +295,10 @@ cookie when track session is on (see below).
 
 The session id and sequence, `query.session-id` and `query.sequence`, MUST
 NOT be included in the generation of this hash code, whatever the other
-options say, and MUST still be written to the record. The
+options say, and MUST still be written to the record. Both keys are matched
+ignoring letter case, as every Evidence key is (see
+[Evidence](../features/evidence.md)), so `query.Sequence` is left out of the
+hash and written to the record just as `query.sequence` is. The
 [Sequence Element](sequence-element.md) adds both to Evidence for every
 request, giving a request that arrives without a session id a new one, so
 including either would make every request unique and nothing would be
