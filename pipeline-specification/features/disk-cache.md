@@ -36,8 +36,12 @@ folder only when it first needs one.
 
 The secret matters because Evidence is chosen by the sender of a request.
 With a plain hash, a sender could try keys until every entry landed in one
-folder. Without the secret, the sender cannot tell which folder a key lands
-in.
+folder. Because the sender does not know the secret, it cannot tell which
+folder a key lands in.
+
+When the secret file is missing, unreadable or not 32 bytes long, the store
+MUST create a new secret and remove every file it recognizes as its own,
+because none of them can be found by name again.
 
 The store MUST write each file under a temporary name in the same leaf
 folder, with a suffix of its own that marks it as temporary, and then rename
@@ -127,6 +131,10 @@ The store MUST stay correct when more than one process uses the same folder
 at once. Renaming each file into place makes that work for readers, provided
 a reader allows for a file vanishing between listing it and opening it.
 
+A failure to read or write a file, a full disk included, MUST NOT fail the
+request. The store answers that the entry is absent or drops the write, and
+logs a warning.
+
 ## Values created for one request
 
 The rule in
@@ -148,7 +156,7 @@ them, and they survive a restart.
 The implementor MUST provide tests that show each of the following. Linux
 MUST run these tests in CI, not only compile them.
 
-- With no folder named, nothing MUST be created on disk.
+- With no folder named, the store MUST NOT create anything on disk.
 - Every file MUST sit at the two-level path its key gives, with none in the
   folder root other than the secret.
 - Times. Between operations, the tests set every file's modified, accessed and
@@ -164,5 +172,7 @@ MUST run these tests in CI, not only compile them.
 - Corrupt and truncated files MUST be removed.
 - A file the store did not write MUST be left untouched.
 - Two stores MUST work on one folder at once.
+- A folder that is full or cannot be written MUST NOT fail a request.
+- A missing secret MUST lead to a new secret and an empty store.
 - A result that holds a 51Did MUST never be written.
 - Benefit. A disk hit MUST answer with no call to the source.
