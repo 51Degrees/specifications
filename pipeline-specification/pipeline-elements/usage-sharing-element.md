@@ -20,9 +20,8 @@ It shares instead what it finds, from two places:
 - every Evidence value in the Flow Data, and
 - every header other than Cookie, every cookie whose name starts with `51D_`,
   and every query string parameter and session value of the web request, with
-  its client IP address, its protocol
-  and the method and path of its request line, when the web integration
-  supplies the request as
+  its client IP address, its protocol and the method and path of its request
+  line, when the web integration supplies the request as
   `server.http-request` (see
   [Populating Evidence](../features/web-integration.md#populating-evidence)).
   This is how a header that no other Flow Element accepts is still shared.
