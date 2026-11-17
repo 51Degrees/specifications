@@ -29,10 +29,11 @@ applies to it, so a relative path MUST work.
 ## Folder structure
 
 The store names each file by the lowercase hexadecimal form of an HMAC
-([RFC 2104](https://www.rfc-editor.org/rfc/rfc2104)) with SHA-256 of the key. The HMAC key is a 32-byte random secret. The store
-MUST create the secret in a file in the folder root the first time it uses
-the folder, and MUST read it back every time it opens the folder. The secret
-file is the only file the store keeps in the folder root.
+([RFC 2104](https://www.rfc-editor.org/rfc/rfc2104)) with SHA-256 of the key.
+The HMAC key is a 32-byte random secret. The store MUST create the secret in a
+file in the folder root the first time it uses the folder, and MUST read it
+back every time it opens the folder. The secret file is the only file the
+store keeps in the folder root.
 
 The first two hexadecimal characters of the name give the first folder, and
 the next two give the second folder inside it. A file whose name starts
@@ -73,6 +74,8 @@ Each file holds the following, in order.
 | 8         | Renewed                                                  |
 | 8         | Expires, when bit 0 is set                               |
 | 8         | Drop time, when bit 1 is set                             |
+| 8         | Data published                                           |
+| 2         | Value format version, a little-endian `u16`              |
 | Rest      | The value, as its codec wrote it                         |
 
 In the flags, bit 0 is set when an expiry follows and bit 1 when a drop time
@@ -92,6 +95,15 @@ the entry has no such limit. The time to idle is a setting of the store. An
 entry whose Renewed is the time to idle or more in the past MUST answer
 absent. When no time to idle is set, an entry never answers absent for being
 idle.
+
+Data published is the published date of the data that produced the value,
+such as a data file or the cloud service's data, written as the epoch when
+the source has none. Value format version is the version of the format its
+codec writes the value in. The cache above the store gives the store the
+published date of the data its source uses now and the version its codec
+writes now. An entry whose Data published or Value format version differs
+from those MUST answer absent, and the store MUST remove it, so that a data
+update or an upgrade never serves values from older data or an older format.
 
 The store MUST compare the key in the file with the key it was asked for on
 every read. When they differ, the store MUST answer that the entry is absent.
@@ -153,10 +165,11 @@ characters and which starts with the marker, and a file in a leaf folder with
 the store's temporary suffix. A folder setting pointed at the wrong place then
 never deletes a user's files.
 
-The store MUST create the folder readable only by the user the process runs
-as. When the named folder already exists and users other than the one the
-process runs as can read it, the store MUST refuse it, log a warning saying
-why, and carry on without the disk store.
+The store's configuration names the folder. A store that lacks the
+permissions it needs on the named folder, to create it or to read, write and
+remove files in it, MUST fail with an error that names the folder. Whether
+other users of the machine can reach the folder is for whoever deploys the
+package to decide, and is outside this page.
 
 A disk store's folder MUST NOT be used by more than one store at the same
 time, whether the stores are in one process or in several. Each store names a
@@ -245,9 +258,10 @@ tests MUST run in CI on Linux, not only compile.
   has open, log a warning and carry on without the disk store.
 - A store that refuses a folder MUST leave every file in it untouched,
   including the secret.
-- On Linux, a folder the store creates MUST be readable only by its user.
-- A named folder that already exists and that other users can read MUST be
-  refused, with a warning, and the store MUST carry on without the disk store.
+- A store that lacks the permissions it needs on the named folder MUST fail
+  with an error that names the folder.
+- An entry whose Data published or Value format version differs from the
+  current one MUST answer absent and be removed.
 - A folder that is full or cannot be written MUST NOT fail a request.
 - A missing secret MUST lead to a new secret and an empty store.
 - A secret file that is not 32 bytes long MUST lead to a new secret and an
