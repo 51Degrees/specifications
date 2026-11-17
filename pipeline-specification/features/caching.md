@@ -106,6 +106,8 @@ describes the internals of such a cache. You can also review the
 and [C](https://github.com/51Degrees/51degrees-cxx/blob/main/src/common/cache.c)
 reference implementations.
 
+A cache MAY also keep its entries on disk, as [disk cache](disk-cache.md) says.
+
 ## Data lifetime and concurrency issues
 
 The cache stores the instance of Aspect Data that was generated based
