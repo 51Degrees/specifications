@@ -51,7 +51,9 @@ MUST create a new secret and remove every file it recognizes as its own,
 because none of them can be found by name again. A secret file that another
 store has open does not count as unreadable. In that case the store MUST
 refuse the folder as [safety](#safety) says, and MUST NOT create a secret or
-remove anything.
+remove anything. A secret file that the store lacks the permission to read
+does not count as unreadable either, and the store MUST fail as
+[safety](#safety) says.
 
 The store MUST write each file under a temporary name in the same leaf
 folder, with a suffix of its own that marks it as temporary, and then rename
@@ -119,7 +121,8 @@ Every time in a file is a little-endian unsigned 64-bit count of nanoseconds
 since the Unix epoch, in UTC. A time before the epoch is written as the epoch,
 and one later than the largest count can hold (July 2554) as the largest
 count. Both keep their order against any real time, so freshness checks still
-come out right. Times come from the system clock in UTC.
+come out right. Written, Renewed, Expires and the drop time come from the
+system clock in UTC, and Data published comes from the source.
 
 The store MUST NOT read or write a file system time, whether modified,
 accessed or created, for any decision. That includes the order in which the
@@ -165,9 +168,10 @@ characters and which starts with the marker, and a file in a leaf folder with
 the store's temporary suffix. A folder setting pointed at the wrong place then
 never deletes a user's files.
 
-The store's configuration names the folder. A store that lacks the
-permissions it needs on the named folder, to create it or to read, write and
-remove files in it, MUST fail with an error that names the folder. Whether
+The store's configuration names the folder. When the store opens, a store
+that lacks the permissions it needs on the named folder, to create it or to
+read, write and remove files in it, MUST fail with an error that names the
+folder. Whether
 other users of the machine can reach the folder is for whoever deploys the
 package to decide, and is outside this page.
 
@@ -193,8 +197,8 @@ warning saying that each store needs a folder of its own, MUST leave every file
 in the folder untouched, and MUST carry on without the disk store, so that no
 request fails.
 
-A failure to read or write a file, a full disk included, MUST NOT fail the
-request. The store answers that the entry is absent or drops the write, and
+Once the store is open, a failure to read or write a file, a full disk
+included, MUST NOT fail the request. The store answers that the entry is absent or drops the write, and
 logs a warning.
 
 ## Values created for one request
@@ -212,8 +216,9 @@ The files hold the key in full. For a results cache, the key is made of
 Evidence values, for example a User-Agent or an IP address.
 
 The files stay on the machine's disk across restarts until the store removes
-them, after their drop time or time to idle, in a trim, or when it creates a
-new secret.
+them, after their drop time or time to idle, in a trim, when a read finds them
+made from other data or in another value format, or when it creates a new
+secret.
 
 ## Tests
 
@@ -223,7 +228,8 @@ tests MUST run in CI on Linux, not only compile.
 - With no folder named, the store MUST NOT create anything on disk.
 - Every file MUST sit at the two-level path its key gives, with none in the
   folder root other than the secret.
-- Format. A file written for a known key and value at fixed times MUST match
+- Format. A file written for a known key, value and value format version at
+  fixed times MUST match
   the layout in [file contents](#file-contents) byte for byte, and a file
   built from that layout MUST read back.
 - Times. Between operations, the tests set every file's modified and accessed
@@ -258,11 +264,13 @@ tests MUST run in CI on Linux, not only compile.
   has open, log a warning and carry on without the disk store.
 - A store that refuses a folder MUST leave every file in it untouched,
   including the secret.
-- A store that lacks the permissions it needs on the named folder MUST fail
-  with an error that names the folder.
-- An entry whose Data published or Value format version differs from the
-  current one MUST answer absent and be removed.
-- A folder that is full or cannot be written MUST NOT fail a request.
+- A store that lacks the permissions it needs on the named folder when it
+  opens MUST fail with an error that names the folder.
+- An entry whose Data published differs from the current published date, and
+  one whose Value format version differs from the current version, MUST each
+  answer absent and be removed.
+- A folder that fills up, or that a file cannot be written to, after the store
+  opens MUST NOT fail a request.
 - A missing secret MUST lead to a new secret and an empty store.
 - A secret file that is not 32 bytes long MUST lead to a new secret and an
   empty store.
