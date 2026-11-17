@@ -47,12 +47,13 @@ Element Data instances are not thread-safe. An instance is written only by
 the Flow Element that creates it, while that Flow Element processes, and it is
 almost always read on the thread that processed the Flow Data.
 
-Implementations SHOULD NOT take a lock on every read of an Element Data
-instance to make it safe for several threads. The caller can almost always
-keep its reads on one thread, and a lock on every read would cost every
-request to protect the few that share an instance. A caller that needs to
-read an instance from several threads at once MUST coordinate those reads
-itself, for example by wrapping its calls in a lock of its own.
+Implementations MUST NOT lock reads or writes of an Element Data instance,
+or of the native results it holds, to make it safe for several threads. The
+caller can almost always keep its use of an instance on one thread, and a
+lock would cost every request to protect the few that share an instance. The
+caller is responsible for thread-safe access. A caller that needs to use an
+instance from several threads at once MUST coordinate that itself, for
+example by wrapping its calls in a lock of its own.
 
 This matters most for Element Data that reads native results when its values
 are read, such as an on-premise Engine's Aspect Data, where two reads at once
