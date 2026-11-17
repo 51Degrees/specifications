@@ -151,11 +151,11 @@ AspectEngine:
   on the calling thread and gives the same values
 - check that a lazy property's task runs once, that every reader waits for
   it, and that a failed task gives every waiting reader its error
-- check, where the language supports the lazy task pattern, that the Cloud
+- check, where the package can run a task in the background, that the Cloud
   Request Engine's process function returns before the HTTP response
   arrives, that every reader of `json-response` waits for it, and that the
-  request's task does not read the Flow Data, and where it does not, that the
-  response has arrived when the process function returns
+  request's task does not read the Flow Data, and, where the package cannot,
+  that the response has arrived when the process function returns
 - check that a failed Cloud Request Engine request met by Cloud Aspect
   Engines during processing is recorded once, as the Cloud Request Engine's
   error, and that one met after processing reaches only the reader, as an

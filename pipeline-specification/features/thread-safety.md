@@ -43,7 +43,8 @@ faults.
 7. Element Data MUST NOT be written while no Flow Element that writes it is
    processing, except by a lazy property's task, and such a write MUST fail,
    as [Element Data](#element-data) describes.
-8. A results instance is never locked, as
+8. An Engine and its Element Data never lock a results instance, and a caller
+   that shares one is responsible for any locking, as
    [results instances](#results-instances) describes.
 9. A data refresh never affects a Flow Data created before it, as
    [data updates](data-updates.md) describes.
@@ -60,9 +61,10 @@ faults.
 
 What thread safety a package needs also depends on how its language is used.
 
-- Where a package's supported setups run each request on one thread, with no
-  other thread able to reach its Flow Data, such as PHP, no thread-safety
-  strategy is needed, and the package does not offer
+- Where a package cannot run a task in the background, because its supported
+  setups run each request on one thread with nothing else able to reach its
+  Flow Data, such as PHP, no thread-safety strategy is needed, and the
+  package does not offer
   [parallel processing](../advanced-features/parallel-processing.md).
 - Where a package offers parallel processing, the rules for
   [parallel groups](../advanced-features/parallel-processing.md#how-a-group-uses-the-flow-data)
@@ -186,10 +188,10 @@ while it processes, starts the task, and adds the task to its own Element
 Data. The task never reads the Flow Data.
 
 The task is the Flow Element's own guard on its own value, not a lock on the
-Flow Data. Where a package's setups run each request on one thread, as PHP's
-do, there is no task. Work that another language starts as a lazy task runs
-while the Flow Element processes, as it does today, so its value is ready
-once processing has finished.
+Flow Data. Where a package cannot run a task in the background, as PHP
+cannot, there is no task. Work that other packages start as a lazy task runs
+while the Flow Element processes, so its value is ready once processing has
+finished.
 
 ## Results instances
 
@@ -201,13 +203,13 @@ it, so it is not safe to use from several threads at once, and neither is
 Element Data that reads its values from one.
 
 An Engine, its results instances and the Element Data that reads from them
-MUST NOT take a lock to make those reads safe for several threads. The caller can
-almost always keep its use of a results instance on one thread, and a lock
-would cost every request to protect the few that share one. The caller is
-responsible for thread-safe access. A caller that needs to use a results
-instance, or Element Data that reads from one, from several threads at once
-MUST coordinate that itself, for example by wrapping its calls in a lock of
-its own.
+MUST NOT take a lock to make those reads safe for several threads. The
+caller can almost always keep its use of a results instance on one thread,
+and a lock would cost every request to protect the few that share one. The
+caller is responsible for thread-safe access. A caller that needs to use a
+results instance, or Element Data that reads from one, from several threads
+at once MUST coordinate that itself, for example by wrapping its calls in a
+lock of its own.
 
 A member of a parallel group that reads Element Data that reads from a
 results instance is responsible for the thread safety of those reads. For
@@ -220,13 +222,14 @@ once, and that the caller is responsible for thread-safe access.
 
 ## Aspect data
 
-Aspect Data is Element Data, so it is not written once its Engine has
-finished, as [Element Data](#element-data) requires. The [caching](caching.md)
-feature adds the same Aspect Data instance to the Flow Data of different
-requests, which may run on different threads at once. Data that is not
-written, apart from lazy properties handled as lazy tasks, is safe to share in
-that way, except where it reads from a results instance. So an Engine whose
-Aspect Data reads from a results instance MUST NOT allow a cache to be added.
+Aspect Data is Element Data, so it is not written while no Flow Element that
+writes it is processing, as [Element Data](#element-data) requires. The
+[caching](caching.md) feature adds the same Aspect Data instance to the Flow
+Data of different requests, which may run on different threads at once. Data
+that is not written, apart from lazy properties handled as lazy tasks, is
+safe to share in that way, except where it reads from a results instance. So
+an Engine whose Aspect Data reads from a results instance MUST NOT allow a
+cache to be added.
 
 An Engine whose Element Data another Flow Element also writes, as two Flow
 Elements that share one instance do, MUST NOT allow a cache to be added

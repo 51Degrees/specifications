@@ -365,12 +365,7 @@ The Engine builds the request from the Evidence while it processes, on the
 thread that processes the Flow Data. It then starts the HTTP request, adds its
 Element Data with `json-response` as a
 [lazy property](../features/thread-safety.md#lazy-properties) whose task is
-that request, and returns without waiting for the response. Where a
-package's setups run each request on one thread, as PHP's do, the Engine
-instead makes the request and waits for the response while it processes, as
-it does today, as
-[lazy properties](../features/thread-safety.md#lazy-properties) describes.
-Every reader of
+that request, and returns without waiting for the response. Every reader of
 `json-response`, including the
 [Cloud Aspect Engines](cloud-aspect-engine.md#processing), waits on that task.
 The task holds only the request it was given, and never reads the Flow Data.
@@ -385,6 +380,14 @@ treats it as a failure of the Cloud Request Engine's processing. A failure
 met once processing has finished cannot be recorded, because writes to a
 finished Flow Data fail, so it reaches only the reader, as an error from the
 read.
+
+Where a package cannot run a task in the background, as PHP cannot, there is
+no task. The Engine makes the request and waits for the response while it
+processes, as [lazy properties](../features/thread-safety.md#lazy-properties)
+describes, so a failed request is recorded as the Cloud Request Engine's own
+error, as
+[exception handling](../features/exception-handling.md#process-function)
+describes.
 
 The Engine does not limit the request to the
 [accepted Evidence](#accepted-evidence) that the `evidencekeys` request

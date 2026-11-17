@@ -28,10 +28,10 @@ The web integration creates one Flow Data for each request, and disposes of
 it when the request ends. An application MUST NOT use a Flow Data from two
 threads at once, as
 [thread safety](thread-safety.md#general-rules-for-parallel-operation)
-describes. Most web frameworks run each
-request's code one step at a time, so an application only puts a Flow Data
-on two threads at once when it hands work from a request to other threads
-or tasks, or keeps the Flow Data after the request has ended.
+describes. Most web frameworks run each request's code one step at a time,
+so an application only puts a Flow Data on two threads at once when it hands
+work from a request to other threads or tasks, or keeps the Flow Data after
+the request has ended.
 
 Every web integration example, and the documentation of every web
 integration, MUST say that a Flow Data cannot be used by two threads at once,
