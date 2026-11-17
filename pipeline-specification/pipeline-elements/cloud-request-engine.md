@@ -197,6 +197,10 @@ output by that key.
 |---------------|----------|---------------------------------------------------|
 | json-response | string   | The raw JSON response body from the HTTP request. |
 
+`json-response` is a [lazy property](../features/thread-safety.md#lazy-properties)
+whose task is the HTTP request the Engine starts while it processes, as
+[processing](#processing) describes.
+
 An example of the JSON response received from the server:
 
 ```json
@@ -356,6 +360,17 @@ The Engine processes Flow Data by making an HTTP request to the server with
 every Evidence value in the Flow Data, apart from the reserved names and the
 web request view below. The HTTP API used for access to 51Degrees servers is
 defined at <https://cloud.51degrees.com/api-docs/index.html>.
+
+The Engine builds the request from the Evidence while it processes, on the
+thread that processes the Flow Data. It then starts the HTTP request, adds its
+Element Data with `json-response` as a
+[lazy property](../features/thread-safety.md#lazy-properties) whose task is
+that request, and returns without waiting for the response. Every reader of
+`json-response`, including the
+[Cloud Aspect Engines](cloud-aspect-engine.md#processing), waits on that task.
+The task holds only the request it was given, and never reads the Flow Data.
+Where the request fails, every reader waiting on the task gets the failure,
+as [lazy properties](../features/thread-safety.md#lazy-properties) describes.
 
 The Engine does not limit the request to the
 [accepted Evidence](#accepted-evidence) that the `evidencekeys` request

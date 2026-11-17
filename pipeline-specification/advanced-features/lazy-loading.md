@@ -1,5 +1,15 @@
 # Lazy loading
 
+Lazy loading is deprecated. The preferred route for long-running work in a
+Flow Element is a [lazy property](../features/thread-safety.md#lazy-properties)
+whose task the Flow Element starts while it processes, as the
+[Cloud Request Engine](../pipeline-elements/cloud-request-engine.md#processing)
+does with its HTTP request. An Engine does not run its processing in a
+background task. An implementation that offers the lazy loading option keeps
+it as a deprecated public name, and its code comments and documentation MUST
+say that it is deprecated and point to lazy properties. The rest of this page
+describes the option for implementations that still offer it.
+
 This feature is specific to Properties populated by Engines (rather than all
 Flow Elements).
 It is currently implemented in .NET, Java and Go.
@@ -22,9 +32,9 @@ the background task is complete.
 
 The background task follows the lazy task pattern that
 [thread safety](../features/thread-safety.md#lazy-properties) describes. Every
-access to a Property populated by the task waits for the task before it reads
-the value, never after, and the task runs once however many callers wait for
-it. The Engine MUST copy the Evidence the task needs before it starts the
+access to a Property populated by the task waits for the task to finish and
+only then reads the value, and the task runs once however many callers wait
+for it. The Engine MUST copy the Evidence the task needs before it starts the
 task, and the task MUST NOT read the Flow Data, because the caller may be
 using the Flow Data on another thread at the same time.
 

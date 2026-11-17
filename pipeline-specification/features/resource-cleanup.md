@@ -32,9 +32,10 @@ comments and documentation around the use of this option.
 
 ### Disposal while requests are running
 
-Disposing an Engine or a Pipeline MUST wait for every call to process and
-every [data refresh](data-updates.md) already running on it to finish before
-it frees anything they use. A results instance that a finished Flow Data
+Disposing an Engine or a Pipeline MUST wait for every call to process, every
+[lazy task](thread-safety.md#lazy-properties) and every
+[data refresh](data-updates.md) already running on it to finish before it
+frees anything they use. A results instance that a finished Flow Data
 still holds keeps the data set it was made from until it is released, as it
 does across a refresh.
 
@@ -88,9 +89,11 @@ garbage collection will achieve.
 Where the language supports it, implementations SHOULD reuse Element Data
 instances through an object pool, to avoid the memory overhead of creating
 them for every request. An instance goes back to its pool only when the Flow
-Data that holds it is disposed, and an instance held by a
+Data that holds it is disposed and any lazy task writing it has finished, and
+an instance held by a
 [cache](caching.md) never goes back to a pool, because the cache shares it
-with other requests.
+with other requests. An instance taken from a pool starts with no values and
+open for writing.
 
 Keeping a reference to Element Data after the Flow Data that holds it is
 disposed is not supported, because a pool may give the instance to another
@@ -103,8 +106,10 @@ Cleanup of Flow Data might include any resources that it holds. However,
 the primary concern is to ensure that any Element Data instances that
 require cleanup are taken care of.
 
-Element Data instances that do not require cleanup MUST be left alone
-in order for [result caching](caching.md) to work correctly.
+Element Data instances that do not require cleanup MUST be left alone, apart
+from going back to an object pool as
+[reusing Element Data](#reusing-element-data) describes, in order for
+[result caching](caching.md) to work correctly.
 
 Note that Flow Data holds a reference to the Pipeline that created
 it. However, Flow Data instances are not cleaned up when the Pipeline

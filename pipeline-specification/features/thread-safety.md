@@ -9,8 +9,8 @@ faults.
 
 1. A Pipeline and its Flow Elements MUST be able to process many Flow Data at
    once, one for each request, as [Flow Elements](#flow-elements) describes.
-2. A Flow Data is used by one thread at a time. It MAY pass from one thread to
-   another, as an asynchronous continuation does, but it MUST NOT be used by
+2. Outside a parallel group, which rule 4 covers, a Flow Data is used by one
+   thread at a time. It MAY pass from one thread to another, as an asynchronous continuation does, but it MUST NOT be used by
    two threads at once. A caller that shares a Flow Data across threads is
    responsible for any locking.
 3. Once processing has finished, a Flow Data is read only, except for
@@ -25,10 +25,14 @@ faults.
    own Element Data, and changes nothing else in the Flow Data apart from
    adding its own Element Data, errors and warnings.
 5. Flow Elements MUST handle any multi-threaded or asynchronous work of their
-   own internally, such as loading results in the background, lazy properties
-   and sending usage data. A Flow Element that hands data to another thread
-   MUST copy it during processing, and MUST NOT read the Flow Data from that
-   thread afterwards.
+   own internally, such as a call to another resource, lazy properties and
+   sending usage data. Long-running work, such as a call to another resource,
+   is a [lazy property](#lazy-properties) of the Flow Element's own Element
+   Data, and an Engine does not run its processing in a background task,
+   apart from the deprecated
+   [lazy loading](../advanced-features/lazy-loading.md) option. A Flow Element
+   that hands data to another thread MUST copy it during processing, and MUST
+   NOT read the Flow Data from that thread afterwards.
 6. A lazy property uses the lazy task pattern, as
    [lazy properties](#lazy-properties) describes.
 7. Element Data MUST NOT be written once the Flow Element that provides it has
@@ -38,8 +42,9 @@ faults.
    [results instances](#results-instances) describes.
 9. A data refresh never affects a Flow Data created before it, as
    [data updates](data-updates.md) describes.
-10. Disposing an Engine or a Pipeline waits for every call to process and every
-    data refresh already running before it frees anything they use, as
+10. Disposing an Engine or a Pipeline waits for every call to process, every
+    lazy task and every data refresh already running before it frees anything
+    they use, as
     [resource cleanup](resource-cleanup.md#disposal-while-requests-are-running)
     describes.
 11. Web integration examples and documentation say that a Flow Data cannot be
@@ -78,20 +83,25 @@ for that use.
 A Flow Data is created by the Pipeline that processes it, for one request.
 
 A Flow Data MUST keep its Element Data in a linked list, not in a dictionary.
-A Flow Element adds its Element Data when it is ready, as a new node that
+A Flow Element adds its Element Data while it processes, as a new node that
 points at the current head of the list. Where a parallel group can add Element
 Data at the same time, the new node MUST be put in place with one atomic
-compare and swap of the head, and the add tries again if another member added
-a node first, checking the new nodes for its key before it does. Where no
-parallel group can add at the same time, a plain write is enough. A node never
-changes once it is in the list, so a reader follows the links with no lock and
-always sees a whole list. Finding Element Data by its key is a search along the
-list, which is short because a Flow Data holds one Element Data for each Flow
-Element. Anything that lists the Element Data in Pipeline order sorts it first,
-because the list holds the newest first.
+compare and swap of the head, being a single operation that replaces the head
+only if it is still the node the add read. If another member added a node
+first, the add points the new node at the new head and tries again. Readers
+then read the head with the language's atomic or volatile read, so that they
+see each node in full. Where no parallel group can add at the same time, a
+plain write is enough. A node never changes once it is in the list, so a
+reader follows the links with no lock and always sees a whole list. Finding
+Element Data by its key is a search along the list, which is short because a
+Flow Data holds one Element Data for each Flow Element. Anything that lists
+the Element Data in Pipeline order, being the order the Flow Elements were
+added to the Pipeline with the members of a parallel group in the order they
+were added to the group, sorts it first, because the list holds the newest
+first.
 
 Errors and warnings that members of a parallel group add while the group runs
-are added under a lock. They are rare, so the lock costs nothing in the normal
+MUST be added under a lock. They are rare, so the lock costs nothing in the normal
 case. At every other time, errors and warnings are added with no lock.
 
 Once processing has finished, a Flow Data is read only, except for
@@ -116,7 +126,7 @@ A Flow Element that runs in a
 [parallel](../advanced-features/parallel-processing.md) group MUST NOT add
 values to the Evidence, because the other members of the group read the
 Evidence at the same time. That is the Flow Element's responsibility, and
-implementations are not required to check for it. A Flow Element that adds
+implementations do not check for it. A Flow Element that adds
 Evidence for later Flow Elements to read runs outside any parallel group,
 before the Flow Elements that read the value.
 
@@ -124,9 +134,11 @@ before the Flow Elements that read the value.
 
 An Element Data instance is written only by the Flow Element that provides it,
 or by the Flow Elements that share it, and only while they process. Each
-Element Data records when the Flow Element that provides it has finished. A
-write through its write methods after that MUST fail with an error, except by
-a [lazy property's](#lazy-properties) task.
+Element Data records when a Flow Element that writes it finishes, and a Flow
+Element that shares the instance opens it for writing again when it starts to
+process. A write through its write methods while the instance is recorded as
+finished MUST fail with an error, except by a
+[lazy property's](#lazy-properties) task.
 
 Values that Element Data reads from a [results instance](#results-instances),
 and values it keeps once it has read them, are not writes for this rule. The
@@ -138,13 +150,16 @@ processes every Flow Element in the repository, then writes to its Element
 Data and expects the error. See [automated testing](../automated-testing.md).
 
 Code comments and documentation MUST be clear that Element Data is written
-only by the Flow Element that provides it, and only while it processes.
+only by the Flow Element that provides it, or the Flow Elements that share it,
+and only while they process.
 
 ## Lazy properties
 
 A lazy property is one whose value is worked out when it is first asked for,
-or by a task that runs after the Flow Element's process function has
-returned, as in [lazy loading](../advanced-features/lazy-loading.md). Lazy
+or by a task that the Flow Element starts while it processes, such as the
+call to another resource that the
+[Cloud Request Engine](../pipeline-elements/cloud-request-engine.md#processing)
+starts. Apart from the reads from a results instance described below, lazy
 properties are the only part of a Flow Data that changes once processing has
 finished. Values that Element Data reads from a
 [results instance](#results-instances) when they are asked for are not lazy
@@ -152,10 +167,15 @@ properties, and the rules for results instances cover them.
 
 Where the language supports it, a lazy property MUST use the lazy task
 pattern. One task works the value out, started by the first request for it,
-or by processing in the case of lazy loading. Every caller for the value,
+or by the Flow Element while it processes. Every caller for the value,
 including the first, waits for that task to finish and then reads its result.
 No caller reads the value before the task has finished, and the work is never
 done twice. If the task fails, every caller waiting for it gets its error.
+
+Long-running work in a Flow Element, such as a call to another resource, is a
+lazy property. The Flow Element builds what the work needs from the Flow Data
+while it processes, starts the task, and adds the task to its own Element
+Data. The task never reads the Flow Data.
 
 The task is the Flow Element's own guard on its own value, not a lock on the
 Flow Data. Where a package's setups run each request on one thread, as PHP's

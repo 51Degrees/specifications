@@ -13,18 +13,23 @@ setups has a second thread to run an Element on.
 
 ## How a group uses the Flow Data
 
-A parallel group shares one Flow Data between its members. These rules keep
-that safe with no lock, apart from the errors and warnings members add, as
+The parallel group's process function simply runs all the Flow Elements in the
+group in parallel, and only finishes when they have all completed. It does
+nothing else, so it adds no Element Data, errors or warnings for its members.
+
+The members share one Flow Data. These rules keep that safe with no lock,
+apart from the errors and warnings members add, as
 [thread safety](../features/thread-safety.md#flow-data) describes.
 
-1. Each member MUST add its Element Data to the Flow Data when it is ready,
+1. Each member MUST add its Element Data to the Flow Data while it processes,
    through the Flow Data's linked list, which puts each new node in place
    with one atomic compare and swap, so no lock is taken.
 2. Each member MUST write only its own Element Data instance, and MUST NOT
    change anything else in the Flow Data apart from adding its own Element
    Data, errors and warnings.
-3. A member's errors and warnings are added to the Flow Data under a lock
-   while the group runs, in the order the members add them.
+3. Each member MUST add its own errors and warnings to the Flow Data under a
+   lock while the group runs, so they appear in the order the members add
+   them.
 4. A member MAY read any Element Data in the Flow Data, but is responsible
    for making sure that the Element Data does not belong to another member of
    the same group, which may still be writing it.
@@ -37,9 +42,9 @@ that safe with no lock, apart from the errors and warnings members add, as
    [Derived Property Elements](../pipeline-elements/derived-property-element.md),
    MUST NOT be members of the same group, because both would write that
    instance at once. Whoever builds the Pipeline keeps them apart.
-   Implementations are not required to check for it.
-7. The group finishes only when every member has finished. Waiting for them
-   makes every member's writes visible to the thread that carries on.
+   Implementations do not check for it.
+7. Waiting for every member to complete makes every member's writes visible
+   to the thread that carries on.
 
 A member MUST NOT add values to the Evidence, as
 [thread safety](../features/thread-safety.md#evidence) describes. The

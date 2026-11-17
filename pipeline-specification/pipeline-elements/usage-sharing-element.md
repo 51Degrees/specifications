@@ -106,10 +106,13 @@ configuration parameters that can affect this filter function.
 The Usage Sharing Element MUST be the last Flow Element in a Pipeline, and
 MUST NOT be a member of a
 [parallel group](../advanced-features/parallel-processing.md). A builder that
-adds it adds it after every other Flow Element.
+adds it adds it after every other Flow Element. A builder MUST refuse, with an
+error saying that the usage sharing element must be the last Flow Element and
+outside any parallel group, a Pipeline that puts it anywhere else, whether the
+Pipeline is built in code or from a configuration.
 
-It reads the Flow Data and changes nothing in it, and it reads only the
-Evidence, including the web request supplied as `server.http-request`.
+It reads only the Evidence in the Flow Data, including the web request
+supplied as `server.http-request`, and changes nothing in the Flow Data.
 Flow Elements can add values to the Evidence as they process, so running
 last means it shares what every other Flow Element has added, and running
 outside any parallel group means no other Flow Element changes the Evidence

@@ -76,9 +76,10 @@ The precise processing that occurs depends on the Aspect this
 Engine relates to. In essence though, it simply needs to filter and
 deserialize the raw JSON from the Cloud Request Engine:
 
-1. Get the portion of the raw JSON (provided by the Cloud Request Engine in its
-   Element Data) that relates to this Aspect by using the appropriate
-   string Data Key. (For example, `device` for Device Detection)
+1. Get the raw JSON from the Cloud Request Engine's Element Data, waiting on
+   its [lazy property's](../features/thread-safety.md#lazy-properties) task if
+   the response has not yet arrived, then take the portion that relates to
+   this Aspect by using the appropriate string Data Key. (For example, `device` for Device Detection)
 2. Deserialize that portion of the raw JSON to construct the Element Data result.
 
 Where the response JSON has no portion for the Engine's Data Key, the Cloud

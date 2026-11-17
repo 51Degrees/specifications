@@ -64,9 +64,9 @@ set HTTP response headers.
   which is always last.
 
 Note that Set Headers Element does not interact with JavaScript Builder Element,
-etc. Consequently, it doesn't matter which one is actually the last element,
-they just need to be added after any non-core Elements and before the Usage
-Sharing Element.
+etc. Consequently, it doesn't matter which of the two comes later, as long as
+both are added after any non-core Elements and before the Usage Sharing
+Element.
 
 For all of these elements, there MUST be configuration options to allow
 users to prevent them being added (or disable them) if they wish to do so.

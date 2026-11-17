@@ -143,11 +143,17 @@ reasonable bound for the cases:
 AspectEngine:
 
 - check Aspect Engine uses cache correctly
-- if lazy loading is implemented, check that it fires only at the right
-  time and only once, that every access to a Property waits for it
-  before reading the value, and that the task does not read the Flow Data
-- check that disposing an Engine while process calls and a refresh are
-  running waits for them, with no crash and every value read intact
+- if the deprecated lazy loading is still offered, check that it fires only
+  at the right time and only once, that every access to a Property waits for
+  it before reading the value, and that the task does not read the Flow Data
+- check that a lazy property's task runs once, that every reader waits for
+  it, and that a failed task gives every waiting reader its error
+- check that the Cloud Request Engine's process function returns before the
+  HTTP response arrives, that every reader of `json-response` waits for it,
+  and that the request's task does not read the Flow Data
+- check that disposing an Engine while process calls, lazy tasks and a
+  refresh are running waits for them, with no crash and every value read
+  intact
 
 DataUpdateService:
 
@@ -190,6 +196,8 @@ ShareUsage:
 - check that ShareUsage does not impose an undue burden on performance
 - check that every Pipeline a builder makes has the usage sharing element
   last, outside any parallel group
+- check that a builder refuses, with an error, a Pipeline that puts the usage
+  sharing element anywhere but last, or in a parallel group
 
 SetHeaders
 
