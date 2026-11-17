@@ -5,6 +5,12 @@ execute Elements in parallel.
 For example, C# enables this by using an additional Element called
 [ParallelElements](https://github.com/51Degrees/51degrees-dotnet/blob/main/pipeline/Core/FlowElements/ParallelElements.cs).
 
+A package whose supported setups run each request on one thread, with no
+other thread in the process, such as PHP under php-fpm or Apache in prefork
+mode, MUST NOT offer parallel processing. It would add the cost of
+thread-safe Flow Data and give nothing back, because no request in those
+setups has a second thread to run an Element on.
+
 ## Benefits
 
 The intention is that this would allow a user to reduce the end-to-end time
