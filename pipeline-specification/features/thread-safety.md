@@ -28,9 +28,9 @@ faults.
    own internally, such as a call to another resource, lazy properties and
    sending usage data. Long-running work, such as a call to another resource,
    is a [lazy property](#lazy-properties) of the Flow Element's own Element
-   Data, and an Engine does not run its processing in a background task,
-   apart from the deprecated
-   [lazy loading](../advanced-features/lazy-loading.md) option. A Flow Element
+   Data, and an Engine does not run its processing in a background task. The
+   deprecated [lazy loading](../advanced-features/lazy-loading.md) option has
+   no effect. A Flow Element
    that hands data to another thread MUST copy it during processing, and MUST
    NOT read the Flow Data from that thread afterwards.
 6. A lazy property uses the lazy task pattern, as

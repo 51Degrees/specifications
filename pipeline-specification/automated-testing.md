@@ -143,14 +143,18 @@ reasonable bound for the cases:
 AspectEngine:
 
 - check Aspect Engine uses cache correctly
-- if the deprecated lazy loading is still offered, check that it fires only
-  at the right time and only once, that every access to a Property waits for
-  it before reading the value, and that the task does not read the Flow Data
+- if the deprecated lazy loading option is still offered, check that setting
+  it, with or without a timeout, changes nothing, so that the Engine processes
+  on the calling thread and gives the same values
 - check that a lazy property's task runs once, that every reader waits for
   it, and that a failed task gives every waiting reader its error
 - check that the Cloud Request Engine's process function returns before the
   HTTP response arrives, that every reader of `json-response` waits for it,
   and that the request's task does not read the Flow Data
+- check that a failed Cloud Request Engine request met by Cloud Aspect
+  Engines during processing is recorded once, as the Cloud Request Engine's
+  error, and that one met after processing reaches only the reader, as an
+  error from the read
 - check that disposing an Engine while process calls, lazy tasks and a
   refresh are running waits for them, with no crash and every value read
   intact

@@ -371,6 +371,14 @@ that request, and returns without waiting for the response. Every reader of
 The task holds only the request it was given, and never reads the Flow Data.
 Where the request fails, every reader waiting on the task gets the failure,
 as [lazy properties](../features/thread-safety.md#lazy-properties) describes.
+The first reader to meet the failure while the Flow Data is still being
+processed MUST record it once in the Flow Data's errors, as an error of the
+Cloud Request Engine and not of the reader, so that
+[exception handling](../features/exception-handling.md#lazy-properties)
+treats it as a failure of the Cloud Request Engine's processing. A failure
+met once processing has finished cannot be recorded, because writes to a
+finished Flow Data fail, so it reaches only the reader, as an error from the
+read.
 
 The Engine does not limit the request to the
 [accepted Evidence](#accepted-evidence) that the `evidencekeys` request

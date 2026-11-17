@@ -50,6 +50,18 @@ sense for an Element to handle a specific error internally.
 In general, it is the responsibility of the Pipeline to handle these for
 the user as described above.
 
+### Lazy properties
+
+Work that a Flow Element starts as a
+[lazy property](thread-safety.md#lazy-properties) can fail after that Flow
+Element's process function has returned. The first reader to meet the
+failure while the Flow Data is still being processed records it once in the
+Flow Data's errors, as an error of the Flow Element that started the work,
+and the Pipeline then handles it as described above. A failure met once
+processing has finished reaches only the reader, as an error from the read,
+because writes to a finished Flow Data fail, as
+[thread safety](thread-safety.md#flow-data) describes.
+
 ## Flow Data and derived accessors
 
 Apart from the 'Process' function, almost all user interaction is handled
