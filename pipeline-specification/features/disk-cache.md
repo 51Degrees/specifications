@@ -14,8 +14,8 @@ supplied configuration names a default folder has the disk store on until
 the user changes that configuration.
 
 A package MAY also put the disk store behind a build option that is off by
-default, for example a Cargo feature in Rust. A package that builds for
-WebAssembly MUST leave the disk store out of its WebAssembly targets.
+default, for example an optional feature of its build. A package that builds
+for WebAssembly MUST leave the disk store out of its WebAssembly targets.
 
 The folder is a file system path, and [file system paths](file-system-paths.md)
 applies to it, so a relative path MUST work.
