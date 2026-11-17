@@ -127,9 +127,12 @@ user's files.
 The store MUST create the folder readable only by the user the process runs
 as.
 
-The store MUST stay correct when more than one process uses the same folder
-at once. Renaming each file into place makes that work for readers, provided
-a reader allows for a file vanishing between listing it and opening it.
+A disk store's folder MUST NOT be shared by more than one process. Each
+process names a folder of its own. A store MUST refuse a folder that another
+process's store has open, for example by holding an exclusive lock on the
+secret file while it is open. It then logs a warning saying that each process
+needs a folder of its own, and carries on without the disk store, so that no
+request fails.
 
 A failure to read or write a file, a full disk included, MUST NOT fail the
 request. The store answers that the entry is absent or drops the write, and
@@ -171,7 +174,8 @@ MUST run these tests in CI, not only compile them.
 - Temporary files left behind MUST be cleared when the store opens.
 - Corrupt and truncated files MUST be removed.
 - A file the store did not write MUST be left untouched.
-- Two stores MUST work on one folder at once.
+- A store in a second process MUST refuse a folder that a store in another
+  process has open, log a warning and carry on without the disk store.
 - A folder that is full or cannot be written MUST NOT fail a request.
 - A missing secret MUST lead to a new secret and an empty store.
 - A result that holds a 51Did MUST never be written.
