@@ -149,8 +149,11 @@ once.
 
 The invariant values MUST be written to the first record the element writes.
 They MUST be written again to the first record the element writes once an hour
-or more has passed since it last wrote them. They MUST NOT be written to any
-other record. A service that shares millions of records learns nothing more
+or more has passed since it last wrote them. When one of them is not yet known
+as the first record is written, for example a server address still being
+looked up, the element MUST write all of them again to the first record it
+writes once that value is known. They MUST NOT be written to any other record.
+A service that shares millions of records learns nothing more
 from the same values in each one, and leaving them out makes every other record
 smaller.
 
@@ -339,8 +342,9 @@ after it. So a reader MUST match records to invariant values by the process
 identifier across messages, in whichever order it reads them, and MUST NOT rely
 on a record's place in a message or on the order the messages arrive in.
 
-The values written again each hour are the same values, so a reader that meets
-them more than once for one process identifier can keep any of them. A reader
+The values written again are the same values, apart from one that was not yet
+known the time before, so a reader that meets them more than once for one
+process identifier keeps the latest it has read. A reader
 that works through records as they arrive keeps each process's values for at
 least an hour after it last read them, and longer to allow for the time a
 record waits to be sent, because that is how long a process goes on writing
