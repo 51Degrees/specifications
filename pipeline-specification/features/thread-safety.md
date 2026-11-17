@@ -1,5 +1,19 @@
 # Thread safety
 
+What thread safety a package needs depends on how its language is used.
+
+- Where a package's supported setups run each request on one thread, with no
+  other thread able to reach its Flow Data, such as PHP, no thread-safety
+  strategy is needed, and the package does not offer
+  [parallel processing](../advanced-features/parallel-processing.md).
+- Where several threads can use the same Flow Data at once, Flow Data and the
+  Element Data it holds MUST have a thread-safety strategy that keeps that use
+  safe. Locking is one such strategy. Others include data that does not change
+  once written, and collections built for concurrent use.
+- Where the data is held in unmanaged memory, as an on-premise Engine's
+  [results instance](#results-instances) is, multi-threaded access is not
+  supported, for performance. That is a hard rule in every language.
+
 ## Flow Elements
 
 The Pipeline API is designed to be used in highly concurrent environments
@@ -10,10 +24,9 @@ capable of handling multiple concurrent requests to the `Process` function.
 
 ## Flow Data
 
-In general user-facing data structures linked to Flow Data do not need to be
-thread-safe as the most common use-case is that they will be accessed and
-updated only on the current thread.
-This ensures users get the best performance by default.
+The most common use is that a Flow Data is used only on the thread that
+processes it, so a thread-safety strategy SHOULD cost nothing when no second
+thread is involved.
 
 Where the Pipeline contains elements running in
 [parallel](../advanced-features/parallel-processing.md), Element Data instances
@@ -70,7 +83,8 @@ they are being written.
 
 A results instance is the object an on-premise Engine's native code fills for
 one request, which references unmanaged memory, such as the Device Detection
-results. Reading a value from it writes into it, so it is not safe to use from
+and IP Intelligence results. Multi-threaded access to a results instance is not
+supported, for performance reasons. Reading a value from it writes into it, so it is not safe to use from
 several threads at once, and neither is Element Data that reads its values
 from one.
 
