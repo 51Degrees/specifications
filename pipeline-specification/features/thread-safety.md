@@ -109,8 +109,8 @@ before the Flow Elements that read the value.
 ## Element Data
 
 An Element Data instance is written only by the Flow Element that provides it,
-while that Flow Element processes. Once that Flow Element has finished, the
-instance MUST be read only, except for [lazy properties](#lazy-properties)
+or by the Engines that share it, while they process. Once they have finished,
+the instance MUST be read only, except for [lazy properties](#lazy-properties)
 handled as lazy tasks.
 
 Element Data that reads a [results instance](#results-instances) counts as

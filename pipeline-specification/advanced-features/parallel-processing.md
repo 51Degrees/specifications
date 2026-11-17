@@ -34,7 +34,12 @@ no lock, as [thread safety](../features/thread-safety.md) requires.
    [results instance](../features/thread-safety.md#results-instances) is
    responsible for the thread safety of those reads, because other members
    may read the same results at the same time.
-6. The group finishes only when every member has finished. Waiting for them
+6. Two Engines that share one Element Data instance, because the second
+   finds the instance the first added under the same key and writes into it,
+   MUST NOT be members of the same group, because both would write that
+   instance at once. Whoever builds the Pipeline keeps them apart.
+   Implementations are not required to check for it.
+7. The group finishes only when every member has finished. Waiting for them
    makes every member's writes visible to the thread that carries on.
 
 A member MUST NOT add values to the Evidence, as
