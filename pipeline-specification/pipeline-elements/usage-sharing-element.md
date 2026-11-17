@@ -107,8 +107,8 @@ This Flow Element does not add an Element Data instance to Flow Data.
 
 ## Start-up activity
 
-When the element is built it creates a process identifier, and it gathers the
-values that do not change while it lives.
+When the element is built it creates a process identifier and starts
+gathering the invariant values, some of which can become known only later.
 
 ### Process identifier
 
@@ -133,7 +133,7 @@ invariant values can differ between them.
 ### Invariant values
 
 From the list of parameters in the processing section below, the ones that do
-not change while the element lives are:
+not change while the element lives, once they are known, are:
 
 - Version
 - Product
@@ -145,14 +145,27 @@ not change while the element lives are:
 - Platform
 
 These are the invariant values. A static XML snippet can be generated for them
-once.
+once they are all known.
+
+A value that is not yet known when the element is built, such as a server
+address still being looked up, becomes known at most once. Until then it MUST
+be written as an empty element, as
+[XML 1.0 section 3.1](https://www.w3.org/TR/xml/#sec-starttags) defines one,
+for example `<ServerIP/>` or `<ServerIP></ServerIP>`, and a reader MUST
+accept either form. Once such a value is known, the element MUST NOT change
+it. The values written as repeated elements, Flow Elements and Packages, are
+always known by the first record, because the first record is written after
+the Pipeline is built.
 
 The invariant values MUST be written to the first record the element writes.
 They MUST be written again to the first record the element writes once an hour
-or more has passed since it last wrote them. They MUST NOT be written to any
+or more has passed since it last wrote them. When one or more of them is not
+yet known as the first record is written, for example a server address still
+being looked up, the element MUST write all of them again to the first record
+it writes after each such value becomes known. They MUST NOT be written to any
 other record. A service that shares millions of records learns nothing more
-from the same values in each one, and leaving them out makes every other record
-smaller.
+from the same values in each one, and leaving them out makes every other
+record smaller.
 
 The values are written again each hour because a record can be lost, for
 example when the message that holds it cannot be sent. The hour is measured
@@ -160,7 +173,8 @@ from when the values were last written to a record, whether or not that record
 arrived.
 
 Any value added to the record in future that cannot change while the element
-lives is an invariant value too, and is written under the same rule.
+lives, once it is known, is an invariant value too, and is written under the
+same rule.
 
 [Reading the records](#reading-the-records) says what this means for whatever
 reads the records after they are sent.
@@ -270,7 +284,8 @@ Platform element, and is otherwise the same.
   within which the Pipeline is running.
 - **ClientIP** - Public IP address of the client that sent the request to
   this server.
-- **ServerIP** - IP address of the server where the xml is being generated.
+- **ServerIP** - IP address of the server where the xml is being generated, or
+  an empty element while it is not yet known.
 - **Platform** - The platform name, version and service pack if available.
 - **Evidence** – The Evidence that is shared is what the element finds, as
   [accepted Evidence](#accepted-evidence) describes, less what the
@@ -339,12 +354,14 @@ after it. So a reader MUST match records to invariant values by the process
 identifier across messages, in whichever order it reads them, and MUST NOT rely
 on a record's place in a message or on the order the messages arrive in.
 
-The values written again each hour are the same values, so a reader that meets
-them more than once for one process identifier can keep any of them. A reader
-that works through records as they arrive keeps each process's values for at
-least an hour after it last read them, and longer to allow for the time a
-record waits to be sent, because that is how long a process goes on writing
-records without them.
+The values written again are the same values, except that one written empty
+before can now be known. A reader that meets them more than once for one
+process identifier MUST keep the latest it has read, except that it MUST NOT
+replace a known value with an empty one, because it can read a later record
+before an earlier one. A reader that works through records as they arrive
+keeps each process's values for at least an hour after it last read them, and
+longer to allow for the time a record waits to be sent, because that is how
+long a process goes on writing records without them.
 
 A process identifier that is never read with the invariant values, because the
 record that carried them was lost and the process ended within the hour, has
