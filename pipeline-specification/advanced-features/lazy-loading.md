@@ -24,7 +24,9 @@ The background task follows the lazy task pattern that
 [thread safety](../features/thread-safety.md#lazy-properties) describes. Every
 access to a Property populated by the task waits for the task before it reads
 the value, never after, and the task runs once however many callers wait for
-it.
+it. The Engine MUST copy the Evidence the task needs before it starts the
+task, and the task MUST NOT read the Flow Data, because the caller may be
+using the Flow Data on another thread at the same time.
 
 The builder takes a timeout, being how long the call waits for the value before
 it fails with an error saying that the value was not ready in time. Where a

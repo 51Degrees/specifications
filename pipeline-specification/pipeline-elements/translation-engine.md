@@ -127,8 +127,9 @@ If translation is not available for the word or language, the configured `Missin
 ## Behavior of Multiple Engines
 
 Pipelines can support multiple simultaneous translation contexts by using
-multiple Translation Engine instances. Both write to the same Element Data, meaning it
-must be thread safe.
+multiple Translation Engine instances. Both write to the same Element Data, so
+two of them MUST NOT be members of the same
+[parallel group](../advanced-features/parallel-processing.md#how-a-group-uses-the-flow-data).
 
 ## Configuration
 A configuration file can set the options that take a single value:

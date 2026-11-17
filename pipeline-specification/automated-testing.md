@@ -76,9 +76,11 @@ those implementations can be consulted for more details.
 
 ### FiftyOne.Pipeline.Core
 
-TypedKeyMap :
+Flow Data Element Data list:
 
-- (ThreadSafe and non-ThreadSafe) test each of the methods.
+- test adding, finding and listing Element Data, including adds from the
+  members of a parallel group at the same time, with every member's Element
+  Data present afterwards and listed in Pipeline order
 
 Pipeline:
 
@@ -106,6 +108,8 @@ Flow Data:
 - check that access to Flow Data results before processing fails
 - check that adding Evidence, Element Data, errors or warnings after
   processing fails
+- check that the members of a parallel group can add errors and warnings at
+  the same time, with all of them present afterwards
 
 Flow Element:
 
@@ -114,9 +118,8 @@ Create a Test Element and associated data
 - check correct process() logic
 - check for correct creation of associated data type
 - check for correct access following processing
-- check, for every Flow Element in the repository, that its Element Data is
-  read only once the Flow Element has finished processing, except for lazy
-  properties handled as lazy tasks, as
+- check, for every Flow Element in the repository, that a write to its
+  Element Data after the Flow Element has finished processing fails, as
   [thread safety](features/thread-safety.md#element-data) requires
 
 Java Only:
@@ -141,8 +144,10 @@ AspectEngine:
 
 - check Aspect Engine uses cache correctly
 - if lazy loading is implemented, check that it fires only at the right
-  time and only once, and that every access to a Property waits for it
-  before reading the value
+  time and only once, that every access to a Property waits for it
+  before reading the value, and that the task does not read the Flow Data
+- check that disposing an Engine while process calls and a refresh are
+  running waits for them, with no crash and every value read intact
 
 DataUpdateService:
 
@@ -158,6 +163,9 @@ DataUpdate is a complex process with many options.
 - check that Engine refreshes with correct data and that any data associated
   with earlier copy is freed correctly
 - carry out a repeated refresh test to look for memory leaks
+- check that refreshing from several threads at once, while Flow Data
+  created before and during the refreshes are processed and read on other
+  threads, leaves every value read intact
 
 MissingPropertyService:
 
@@ -180,6 +188,8 @@ ShareUsage:
 - check operation of SessionID
 - check operation on shut down
 - check that ShareUsage does not impose an undue burden on performance
+- check that every Pipeline a builder makes has the usage sharing element
+  last, outside any parallel group
 
 SetHeaders
 

@@ -520,10 +520,9 @@ Engine can be shared.
 Aspect Data that reads its values from a `ResultsIpi` instance MUST NOT
 lock it, and is not safe to use from several threads at once, as
 [thread safety](../../pipeline-specification/features/thread-safety.md#results-instances)
-describes. The caller is responsible for thread-safe access. The Aspect Data
-counts as read only for the
-[Element Data rule](../../pipeline-specification/features/thread-safety.md#element-data),
-because it offers no way to change a value.
+describes. The caller is responsible for thread-safe access. Its reads, which
+write into native memory or keep values once read, are not writes for the
+[Element Data rule](../../pipeline-specification/features/thread-safety.md#element-data).
 
 ### Performance Guidance
 

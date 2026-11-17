@@ -6,27 +6,25 @@ For example, C# enables this by using an additional Element called
 [ParallelElements](https://github.com/51Degrees/51degrees-dotnet/blob/main/pipeline/Core/FlowElements/ParallelElements.cs).
 
 A package whose supported setups run each request on one thread, with no
-other thread in the process, such as PHP under php-fpm or Apache in prefork
+other thread able to reach its Flow Data, such as PHP under php-fpm or Apache in prefork
 mode, MUST NOT offer parallel processing. It would add the cost of
-thread-safe Flow Data and give nothing back, because no request in those
+running a group and give nothing back, because no request in those
 setups has a second thread to run an Element on.
 
 ## How a group uses the Flow Data
 
-A parallel group shares one Flow Data between its members. These rules mean
-that no member changes anything another member uses, so the Flow Data needs
-no lock, as [thread safety](../features/thread-safety.md) requires.
+A parallel group shares one Flow Data between its members. These rules keep
+that safe with no lock, apart from the errors and warnings members add, as
+[thread safety](../features/thread-safety.md#flow-data) describes.
 
-1. Before any member runs, the Element Data of every member is added to the
-   Flow Data, in Pipeline order, on the thread that runs the group. A member
-   whose Element Data comes from a [cache](../features/caching.md) looks the
-   cache up at that point.
-2. Each member then writes only its own Element Data instance, and changes
-   nothing else in the Flow Data. It adds no Evidence, no Element Data and no
-   errors or warnings to the Flow Data.
-3. The errors and warnings of each member are added to the Flow Data by the
-   group once every member has finished, on the thread that runs the group,
-   in Pipeline order.
+1. Each member MUST add its Element Data to the Flow Data when it is ready,
+   through the Flow Data's linked list, which puts each new node in place
+   with one atomic compare and swap, so no lock is taken.
+2. Each member MUST write only its own Element Data instance, and MUST NOT
+   change anything else in the Flow Data apart from adding its own Element
+   Data, errors and warnings.
+3. A member's errors and warnings are added to the Flow Data under a lock
+   while the group runs, in the order the members add them.
 4. A member MAY read any Element Data in the Flow Data, but is responsible
    for making sure that the Element Data does not belong to another member of
    the same group, which may still be writing it.
@@ -34,8 +32,9 @@ no lock, as [thread safety](../features/thread-safety.md) requires.
    [results instance](../features/thread-safety.md#results-instances) is
    responsible for the thread safety of those reads, because other members
    may read the same results at the same time.
-6. Two Engines that share one Element Data instance, because the second
-   finds the instance the first added under the same key and writes into it,
+6. Two Flow Elements that write one Element Data instance, such as two
+   Engines with the same key or two
+   [Derived Property Elements](../pipeline-elements/derived-property-element.md),
    MUST NOT be members of the same group, because both would write that
    instance at once. Whoever builds the Pipeline keeps them apart.
    Implementations are not required to check for it.

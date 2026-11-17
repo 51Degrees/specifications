@@ -48,8 +48,8 @@ A refresh MUST NOT affect a Flow Data, or a results instance it holds, that
 was created before the refresh. Each keeps using the data source it was made
 from until it is released, however many refreshes happen meanwhile, and the
 Engine MUST NOT free that data source while any of them still uses it. A
-crash, a corrupted value or a threading fault in a Flow Data while a refresh
-runs is a defect in the Engine, not a use the caller has to avoid.
+crash, a corrupted value or a threading fault that a refresh causes in a Flow
+Data is a defect in the Engine, not a use the caller has to avoid.
 
 ## Data refresh availability
 

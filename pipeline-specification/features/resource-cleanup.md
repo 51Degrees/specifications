@@ -32,9 +32,11 @@ comments and documentation around the use of this option.
 
 ### Disposal while requests are running
 
-Disposing an Engine or a Pipeline MUST wait for every request and every
-[data refresh](data-updates.md) already running on it before it frees
-anything they use.
+Disposing an Engine or a Pipeline MUST wait for every call to process and
+every [data refresh](data-updates.md) already running on it to finish before
+it frees anything they use. A results instance that a finished Flow Data
+still holds keeps the data set it was made from until it is released, as it
+does across a refresh.
 
 ### Flow Element
 
@@ -89,6 +91,11 @@ them for every request. An instance goes back to its pool only when the Flow
 Data that holds it is disposed, and an instance held by a
 [cache](caching.md) never goes back to a pool, because the cache shares it
 with other requests.
+
+Keeping a reference to Element Data after the Flow Data that holds it is
+disposed is not supported, because a pool may give the instance to another
+request. Code comments and documentation MUST say so, and implementations do
+not check for it when the Element Data is read.
 
 ### Flow Data
 
