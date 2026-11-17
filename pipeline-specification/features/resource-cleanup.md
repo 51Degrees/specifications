@@ -30,6 +30,12 @@ this behavior. In this case, the user will take responsibility
 for cleanup of Flow Element resources. This can be made clear in
 comments and documentation around the use of this option.
 
+### Disposal while requests are running
+
+Disposing an Engine or a Pipeline MUST wait for every request and every
+[data refresh](data-updates.md) already running on it before it frees
+anything they use.
+
 ### Flow Element
 
 Flow Elements might be very light-weight, but might also maintain
@@ -74,6 +80,15 @@ the cache become useless.
 Consequently, the system MUST NOT allow a cache to be added to Engines
 where the Element Data they produce requires cleanup beyond what normal
 garbage collection will achieve.
+
+#### Reusing Element Data
+
+Where the language supports it, implementations SHOULD reuse Element Data
+instances through an object pool, to avoid the memory overhead of creating
+them for every request. An instance goes back to its pool only when the Flow
+Data that holds it is disposed, and an instance held by a
+[cache](caching.md) never goes back to a pool, because the cache shares it
+with other requests.
 
 ### Flow Data
 

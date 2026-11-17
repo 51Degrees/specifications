@@ -22,6 +22,21 @@ Some common tasks that the web integration performs are:
 - Handling requests for [client-side](#client-side-features) functionality.
 - Set HTTP response headers to request additional information if needed.
 
+## Flow Data and threads
+
+The web integration creates one Flow Data for each request, and disposes of
+it when the request ends. A Flow Data MUST NOT be shared across threads, as
+[thread safety](thread-safety.md) describes. Most web frameworks run each
+request's code one step at a time, so an application only shares a Flow Data
+across threads when it hands work from a request to other threads or tasks,
+or keeps the Flow Data after the request has ended.
+
+Every web integration example, and the documentation of every web
+integration, MUST say that a Flow Data cannot be shared across threads, and
+MUST show it. For example, an example that hands work to another thread or
+task reads the values it needs from the Flow Data into its own variables
+first, and passes those values rather than the Flow Data.
+
 ## Pipeline configuration
 
 The web integration makes use of several Flow Elements in order to support

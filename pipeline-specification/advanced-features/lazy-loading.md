@@ -20,6 +20,12 @@ This means that 'process' will return immediately. When the user attempts to acc
 the value of a Property that is populated by this Engine, the call will block until
 the background task is complete.
 
+The background task follows the lazy task pattern that
+[thread safety](../features/thread-safety.md#lazy-properties) describes. Every
+access to a Property populated by the task waits for the task before it reads
+the value, never after, and the task runs once however many callers wait for
+it.
+
 The builder takes a timeout, being how long the call waits for the value before
 it fails with an error saying that the value was not ready in time. Where a
 language takes the timeout as a number, the number MUST be

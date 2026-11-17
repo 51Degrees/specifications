@@ -104,6 +104,8 @@ Flow Data:
 - check that attempt to process twice fails
 - check that access to Flow Data when Pipeline closed fails
 - check that access to Flow Data results before processing fails
+- check that adding Evidence, Element Data, errors or warnings after
+  processing fails
 
 Flow Element:
 
@@ -112,6 +114,10 @@ Create a Test Element and associated data
 - check correct process() logic
 - check for correct creation of associated data type
 - check for correct access following processing
+- check, for every Flow Element in the repository, that its Element Data is
+  read only once the Flow Element has finished processing, except for lazy
+  properties handled as lazy tasks, as
+  [thread safety](features/thread-safety.md#element-data) requires
 
 Java Only:
 
@@ -135,7 +141,8 @@ AspectEngine:
 
 - check Aspect Engine uses cache correctly
 - if lazy loading is implemented, check that it fires only at the right
-  time and only once
+  time and only once, and that every access to a Property waits for it
+  before reading the value
 
 DataUpdateService:
 
