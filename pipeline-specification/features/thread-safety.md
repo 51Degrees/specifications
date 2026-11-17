@@ -10,9 +10,10 @@ faults.
 1. A Pipeline and its Flow Elements MUST be able to process many Flow Data at
    once, one for each request, as [Flow Elements](#flow-elements) describes.
 2. Outside a parallel group, which rule 4 covers, a Flow Data is used by one
-   thread at a time. It MAY pass from one thread to another, as an asynchronous continuation does, but it MUST NOT be used by
-   two threads at once. A caller that shares a Flow Data across threads is
-   responsible for any locking.
+   thread at a time. It MAY pass from one thread to another, as an
+   asynchronous continuation does, but it MUST NOT be used by two threads at
+   once. A caller that shares a Flow Data across threads is responsible for
+   any locking.
 3. Once processing has finished, a Flow Data is read only, except for
    [lazy properties](#lazy-properties), and its implementation MUST NOT take a
    lock. Being read only does not make a Flow Data safe to use from several
@@ -23,21 +24,25 @@ faults.
    [parallel group](../advanced-features/parallel-processing.md#how-a-group-uses-the-flow-data)
    puts more than one thread on it. Each member of the group writes only its
    own Element Data, and changes nothing else in the Flow Data apart from
-   adding its own Element Data, errors and warnings.
+   adding its own Element Data, errors and warnings, and recording a failed
+   lazy property it meets, as
+   [exception handling](exception-handling.md#lazy-properties) describes.
+   Exceptions a member throws are added by the parallel element once every
+   member has stopped.
 5. Flow Elements MUST handle any multi-threaded or asynchronous work of their
-   own internally, such as a call to another resource, lazy properties and
-   sending usage data. Long-running work, such as a call to another resource,
-   is a [lazy property](#lazy-properties) of the Flow Element's own Element
-   Data, and an Engine does not run its processing in a background task. The
+   own internally, such as lazy properties and sending usage data.
+   Long-running work, such as a call to another resource, is a
+   [lazy property](#lazy-properties) of the Flow Element's own Element Data,
+   and an Engine does not run its processing in a background task. The
    deprecated [lazy loading](../advanced-features/lazy-loading.md) option has
-   no effect. A Flow Element
-   that hands data to another thread MUST copy it during processing, and MUST
-   NOT read the Flow Data from that thread afterwards.
+   no effect. A Flow Element that hands data to another thread MUST copy it
+   during processing, and MUST NOT read the Flow Data from that thread
+   afterwards.
 6. A lazy property uses the lazy task pattern, as
    [lazy properties](#lazy-properties) describes.
-7. Element Data MUST NOT be written once the Flow Element that provides it has
-   finished processing, except by a lazy property's task, and a later write
-   MUST fail, as [Element Data](#element-data) describes.
+7. Element Data MUST NOT be written while no Flow Element that writes it is
+   processing, except by a lazy property's task, and such a write MUST fail,
+   as [Element Data](#element-data) describes.
 8. A results instance is never locked, as
    [results instances](#results-instances) describes.
 9. A data refresh never affects a Flow Data created before it, as
@@ -96,13 +101,16 @@ reader follows the links with no lock and always sees a whole list. Finding
 Element Data by its key is a search along the list, which is short because a
 Flow Data holds one Element Data for each Flow Element. Anything that lists
 the Element Data in Pipeline order, being the order the Flow Elements were
-added to the Pipeline with the members of a parallel group in the order they
-were added to the group, sorts it first, because the list holds the newest
-first.
+added to the Pipeline, with the members of a parallel group in the group's
+place and in the order they were added to the group, sorts it first, because
+the list holds the newest first.
 
-Errors and warnings that members of a parallel group add while the group runs
-MUST be added under a lock. They are rare, so the lock costs nothing in the normal
-case. At every other time, errors and warnings are added with no lock.
+Errors and warnings that members of a parallel group record while the group
+runs MUST be added under a lock. They are rare, so the lock costs nothing in
+the normal case. Exceptions a member throws are added by the parallel element
+once every member has stopped, as
+[exception handling](exception-handling.md#parallel-groups) describes. At
+every other time, errors and warnings are added with no lock.
 
 Once processing has finished, a Flow Data is read only, except for
 [lazy properties](#lazy-properties), and its implementation MUST NOT take a
@@ -179,7 +187,9 @@ Data. The task never reads the Flow Data.
 
 The task is the Flow Element's own guard on its own value, not a lock on the
 Flow Data. Where a package's setups run each request on one thread, as PHP's
-do, the value is worked out on the first request for it.
+do, there is no task. Work that another language starts as a lazy task runs
+while the Flow Element processes, as it does today, so its value is ready
+once processing has finished.
 
 ## Results instances
 
@@ -190,8 +200,8 @@ not supported, for performance reasons. Reading a value from it writes into
 it, so it is not safe to use from several threads at once, and neither is
 Element Data that reads its values from one.
 
-Implementations MUST NOT lock a results instance, or the reads that Element
-Data makes from one, to make it safe for several threads. The caller can
+An Engine, its results instances and the Element Data that reads from them
+MUST NOT take a lock to make those reads safe for several threads. The caller can
 almost always keep its use of a results instance on one thread, and a lock
 would cost every request to protect the few that share one. The caller is
 responsible for thread-safe access. A caller that needs to use a results
@@ -217,3 +227,8 @@ requests, which may run on different threads at once. Data that is not
 written, apart from lazy properties handled as lazy tasks, is safe to share in
 that way, except where it reads from a results instance. So an Engine whose
 Aspect Data reads from a results instance MUST NOT allow a cache to be added.
+
+An Engine whose Element Data another Flow Element also writes, as two Flow
+Elements that share one instance do, MUST NOT allow a cache to be added
+either, because the other Flow Element would write into an instance that
+other requests are reading.

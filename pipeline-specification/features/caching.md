@@ -127,6 +127,11 @@ If access to the properties of an Aspect Data implementation cannot be
 guaranteed to be thread-safe, then the corresponding Engine MUST NOT
 allow a cache to be added.
 
+An Engine whose Element Data another Flow Element also writes MUST NOT
+allow a cache to be added either, because the other Flow Element would
+write into an instance that other requests are reading, as
+[thread safety](thread-safety.md#aspect-data) describes.
+
 Design note - There are various routes that could potentially be explored
 to allow caches to still work in the scenarios described above. (Creating
 a duplicate of the instance, reference counting to ensure cleanup happens,

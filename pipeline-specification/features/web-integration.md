@@ -25,8 +25,10 @@ Some common tasks that the web integration performs are:
 ## Flow Data and threads
 
 The web integration creates one Flow Data for each request, and disposes of
-it when the request ends. A Flow Data MUST NOT be used by two threads at once, as
-[thread safety](thread-safety.md) describes. Most web frameworks run each
+it when the request ends. An application MUST NOT use a Flow Data from two
+threads at once, as
+[thread safety](thread-safety.md#general-rules-for-parallel-operation)
+describes. Most web frameworks run each
 request's code one step at a time, so an application only puts a Flow Data
 on two threads at once when it hands work from a request to other threads
 or tasks, or keeps the Flow Data after the request has ended.

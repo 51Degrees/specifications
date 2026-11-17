@@ -78,11 +78,11 @@ deserialize the raw JSON from the Cloud Request Engine:
 
 1. Get the raw JSON from the Cloud Request Engine's Element Data, waiting on
    its [lazy property's](../features/thread-safety.md#lazy-properties) task if
-   the response has not yet arrived. If the request failed, the failure is
-   recorded as the Cloud Request Engine's error, as its
+   the response has not yet arrived. If the request failed, record the
+   failure once, as the Cloud Request Engine's error, as its
    [processing](cloud-request-engine.md#processing) describes. Otherwise take
-   the portion that relates to
-   this Aspect by using the appropriate string Data Key. (For example, `device` for Device Detection)
+   the portion that relates to this Aspect by using the appropriate string
+   Data Key. (For example, `device` for Device Detection)
 2. Deserialize that portion of the raw JSON to construct the Element Data result.
 
 Where the response JSON has no portion for the Engine's Data Key, the Cloud

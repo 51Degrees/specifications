@@ -110,6 +110,9 @@ Flow Data:
   processing fails
 - check that the members of a parallel group can add errors and warnings at
   the same time, with all of them present afterwards
+- check that exceptions thrown by members of a parallel group are added to
+  the Flow Data's errors by the parallel element once every member has
+  stopped
 
 Flow Element:
 
@@ -148,13 +151,17 @@ AspectEngine:
   on the calling thread and gives the same values
 - check that a lazy property's task runs once, that every reader waits for
   it, and that a failed task gives every waiting reader its error
-- check that the Cloud Request Engine's process function returns before the
-  HTTP response arrives, that every reader of `json-response` waits for it,
-  and that the request's task does not read the Flow Data
+- check, where the language supports the lazy task pattern, that the Cloud
+  Request Engine's process function returns before the HTTP response
+  arrives, that every reader of `json-response` waits for it, and that the
+  request's task does not read the Flow Data, and where it does not, that the
+  response has arrived when the process function returns
 - check that a failed Cloud Request Engine request met by Cloud Aspect
   Engines during processing is recorded once, as the Cloud Request Engine's
   error, and that one met after processing reaches only the reader, as an
   error from the read
+- check that an Engine whose Element Data another Flow Element also writes
+  does not allow a cache to be added
 - check that disposing an Engine while process calls, lazy tasks and a
   refresh are running waits for them, with no crash and every value read
   intact

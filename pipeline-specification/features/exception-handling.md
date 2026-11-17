@@ -50,13 +50,26 @@ sense for an Element to handle a specific error internally.
 In general, it is the responsibility of the Pipeline to handle these for
 the user as described above.
 
+### Parallel groups
+
+A member of a
+[parallel group](../advanced-features/parallel-processing.md#how-a-group-uses-the-flow-data)
+adds the errors and warnings it records itself to the Flow Data under a lock
+while the group runs, as [thread safety](thread-safety.md#flow-data)
+describes. An exception or error that a member throws is not added by the
+member. The parallel element sees it once every member has stopped, adds it
+to the Flow Data's errors, and the Pipeline then handles it as described
+above.
+
 ### Lazy properties
 
 Work that a Flow Element starts as a
 [lazy property](thread-safety.md#lazy-properties) can fail after that Flow
 Element's process function has returned. The first reader to meet the
 failure while the Flow Data is still being processed records it once in the
-Flow Data's errors, as an error of the Flow Element that started the work,
+Flow Data's errors, as an error of the Flow Element whose Element Data holds
+the lazy property, under the errors lock where the reader is a member of a
+parallel group,
 and the Pipeline then handles it as described above. A failure met once
 processing has finished reaches only the reader, as an error from the read,
 because writes to a finished Flow Data fail, as

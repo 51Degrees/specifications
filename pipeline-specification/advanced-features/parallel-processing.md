@@ -6,16 +6,20 @@ For example, C# enables this by using an additional Element called
 [ParallelElements](https://github.com/51Degrees/51degrees-dotnet/blob/main/pipeline/Core/FlowElements/ParallelElements.cs).
 
 A package whose supported setups run each request on one thread, with no
-other thread able to reach its Flow Data, such as PHP under php-fpm or Apache in prefork
-mode, MUST NOT offer parallel processing. It would add the cost of
-running a group and give nothing back, because no request in those
-setups has a second thread to run an Element on.
+other thread able to reach its Flow Data, such as PHP under php-fpm or
+Apache in prefork mode, MUST NOT offer parallel processing. It would add
+the cost of running a group and give nothing back, because no request in
+those setups has a second thread to run an Element on.
 
 ## How a group uses the Flow Data
 
 The parallel group's process function simply runs all the Flow Elements in the
-group in parallel, and only finishes when they have all completed. It does
-nothing else, so it adds no Element Data, errors or warnings for its members.
+group in parallel, and only finishes when they have all completed. It adds no
+Element Data, errors or warnings for its members while they run. Once every
+member has stopped, it adds any exceptions the members threw to the Flow
+Data's errors, as
+[exception handling](../features/exception-handling.md#parallel-groups)
+describes.
 
 The members share one Flow Data. These rules keep that safe with no lock,
 apart from the errors and warnings members add, as
@@ -26,10 +30,13 @@ apart from the errors and warnings members add, as
    with one atomic compare and swap, so no lock is taken.
 2. Each member MUST write only its own Element Data instance, and MUST NOT
    change anything else in the Flow Data apart from adding its own Element
-   Data, errors and warnings.
-3. Each member MUST add its own errors and warnings to the Flow Data under a
-   lock while the group runs, so they appear in the order the members add
-   them.
+   Data, errors and warnings, and recording a failed lazy property it meets,
+   as [exception handling](../features/exception-handling.md#lazy-properties)
+   describes.
+3. Each member MUST add the errors and warnings it records itself to the
+   Flow Data under a lock while the group runs, so they appear in the order
+   the members add them. A member does not add an exception it throws. The
+   parallel element adds it once every member has stopped.
 4. A member MAY read any Element Data in the Flow Data, but is responsible
    for making sure that the Element Data does not belong to another member of
    the same group, which may still be writing it.
