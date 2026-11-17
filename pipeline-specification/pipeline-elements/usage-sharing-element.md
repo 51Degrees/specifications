@@ -58,7 +58,8 @@ when all Evidence is shared:
   header.
 
 So `query.id.email`, `server.request-path` and `header.cookie` are never shared, while
-`query.valid.email` is an ordinary query string parameter. The
+`query.valid.email` is an ordinary query string parameter, which the rule for
+parameters below decides like any other. The
 `server.http-request` value itself is never shared, only the values read from
 it.
 
@@ -68,19 +69,39 @@ not start with `51D_`. The `51D_` cookies carry the values the 51Degrees
 JavaScript sends, and they are the only cookies shared. A cookie a site sets
 for itself, such as its session cookie, is never shared.
 
+Query string and form parameters follow the same rule as cookies, with one
+addition. It MUST also return false, whatever the configuration and even when
+all Evidence is shared, for any key whose prefix is `query.`, unless its field
+starts with `51D_` or the key is Evidence the Pipeline uses. A key is Evidence
+the Pipeline uses when a Flow Element in the Pipeline accepts it, as that Flow
+Element's list of keys or its filter function says
+([Advertise accepted Evidence](../features/advertize-accepted-evidence.md#flow-elements)).
+The Usage Sharing Element accepts no Evidence, so it adds no key of its own.
+
+The `query.` prefix carries both the parameters of the query string and the
+form parameters of a POST request body
+([Populating Evidence](../features/web-integration.md#populating-evidence)).
+Both are `query.` keys whether the element finds them in the Evidence or in
+the `server.http-request` view, which carries the form parameters of a POST
+request as well as the query string. So the rule is the same for GET and POST
+requests. For example, `query.51D_ScreenPixelsWidth` is shared because of its
+name, and `query.user-agent` and `query.session-id` are shared because the
+Device Detection Engines and the [Sequence Element](sequence-element.md)
+accept them. A parameter such as `password` that no Flow Element in the
+Pipeline accepts is never shared.
+
 Unless all Evidence is shared, it MUST also return false for any key where:
 
 - Prefix = `header.` and field is in a user-configurable block list.
 - Prefix = `session.` and field does not start with `51D_`
-- Prefix = `query.`, the
-  [share all query string parameters](#configuration-options) option is off,
-  and field does not start with `51D_` and is not in a user-configurable allow
-  list of query string parameters that will be shared.
-
-Share all query string parameters is on by default, so every query string and
-HTTP form parameter is shared unless a user turns it off.
 
 Anything else MUST return true. (i.e. it will be shared)
+
+The [included query string parameters](#configuration-options) and
+[share all query string parameters](#configuration-options) options are
+deprecated and have no effect. An implementation that already offers either
+one keeps it as a deprecated name, so that existing code and configuration
+still build, and setting it MUST NOT change which parameters are shared.
 
 A Pipeline that authenticates the requests it serves with a Resource Key or a
 License Key MUST hold them as the Evidence `fiftyone.resource-key` and
@@ -415,8 +436,10 @@ cookie when track session is on (see below).
 
 The session id and sequence, `query.session-id` and `query.sequence`, MUST
 NOT be included in the generation of this hash code, whatever the other
-options say, and MUST still be written to the record. Both keys are matched
-ignoring letter case, as every Evidence key is (see
+options say. They are still written to the record, because the Sequence
+Element accepts both and so the [shared Evidence](#shared-evidence) rules
+share them. Both keys are matched ignoring letter case, as every Evidence key
+is (see
 [Evidence](../features/evidence.md)), so `query.Sequence` is left out of the
 hash and written to the record just as `query.sequence` is. The
 [Sequence Element](sequence-element.md) adds both to Evidence for every
@@ -532,9 +555,9 @@ SHOULD be logged.
 
 | **Parameter**                     | **User configurable** | **Optional** | **Default**                                                                  | **Notes**                                                                                                                    |
 |-----------------------------------|-----------------------|--------------|------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------|
-| Included query string parameters  | yes                   | yes          | All query string and HTTP form parameters starting with `51D_` are shared.   | Allows the user to include specific query string or HTTP form parameters in the usage data that is shared. Has an effect only when share all query string parameters is off. |
-| Share all query string parameters | yes                   | yes          | true                                                                         | If this flag is set, all query string and HTTP form parameters will be shared. When it is off, only those starting `51D_` and the included query string parameters are shared. |
-| Share all Evidence                | yes                   | yes          | false                                                                        | If this flag is set, all Evidence values will be shared, apart from the keys that are never shared, which include every cookie whose name does not start with `51D_`. |
+| Included query string parameters  | yes                   | yes          | none, as it has no effect                                                    | Deprecated, and has no effect. A query string or HTTP form parameter is shared only when its name starts with `51D_` or the Pipeline uses it (see [shared Evidence](#shared-evidence)). |
+| Share all query string parameters | yes                   | yes          | none, as it has no effect                                                    | Deprecated, and has no effect. Setting it shares no query string or HTTP form parameter that would not otherwise be shared. |
+| Share all Evidence                | yes                   | yes          | false                                                                        | If this flag is set, all Evidence values will be shared, apart from the keys that are never shared, which include every cookie whose name does not start with `51D_` and every query string or HTTP form parameter whose name does not start with `51D_` and which the Pipeline does not use. |
 | Blocked HTTP headers              | yes                   | yes          | All HTTP headers are shared except `Cookie`                                  | Allows the user to exclude specific HTTP headers that they do not want to share.                                             |
 | Ignore Flow Data Evidence filter  | yes                   | yes          | not set                                                                      | Allows the user to block a request from being shared if the specified criteria are met.                                      |
 | Share percentage                  | yes                   | yes          | 1.0                                                                          | Used to set the approximate proportion of requests that will be shared. A value of 1 means that 100% of requests are shared. |
