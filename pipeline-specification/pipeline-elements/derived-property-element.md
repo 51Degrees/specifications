@@ -234,11 +234,15 @@ field.
    script that records, without a lock, that the error under
    [Logging and exposed metadata](#logging-and-exposed-metadata) has been
    logged,
-5. The compiled model is immutable, so parallel Elements and concurrent
-   `Process` calls need nothing further,
+5. The compiled model is immutable, so it needs nothing further for
+   parallel Elements and concurrent `Process` calls, although an Element in
+   a parallel group that reads values backed by a
+   [results instance](../features/thread-safety.md#results-instances) is
+   responsible for the thread safety of those reads,
 6. Multiple Derived Property Elements can exist in one Pipeline and each
-   one writes into the same Element Data, meaning the Element Data must
-   be thread safe,
+   one writes into the same Element Data, so two of them MUST NOT be
+   members of the same
+   [parallel group](../advanced-features/parallel-processing.md#how-a-group-uses-the-flow-data),
 7. The Element reads Properties from other Elements, so a Derived
    Property Element on its own in a Pipeline produces nothing.
 

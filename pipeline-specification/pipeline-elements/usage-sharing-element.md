@@ -101,6 +101,28 @@ MUST NOT be shared unless its name starts with `51D_`, as no other cookie is.
 See [configuration options](#configuration-options) for more detail on the
 configuration parameters that can affect this filter function.
 
+## Position in the Pipeline
+
+The Usage Sharing Element MUST be the last Flow Element in a Pipeline, and
+MUST NOT be a member of a
+[parallel group](../advanced-features/parallel-processing.md). A builder that
+adds it adds it after every other Flow Element. A builder MUST refuse, with an
+error saying that the usage sharing element must be the last Flow Element and
+outside any parallel group, a Pipeline that puts it anywhere else, whether the
+Pipeline is built in code or from a configuration.
+
+It reads only the Evidence in the Flow Data, including the web request
+supplied as `server.http-request`, and changes nothing in the Flow Data.
+Flow Elements can add values to the Evidence as they process, so running
+last means it shares what every other Flow Element has added, and running
+outside any parallel group means no other Flow Element changes the Evidence
+while it reads it.
+
+It copies the values it shares during processing, on the thread that
+processes the Flow Data, and the background thread that sends them never
+reads the Flow Data, as [thread safety](../features/thread-safety.md)
+requires.
+
 ## Element Data
 
 This Flow Element does not add an Element Data instance to Flow Data.
