@@ -202,6 +202,13 @@ ShareUsage:
 - check minimum batch size and maximum batch size
 - check operation of tracker (i.e. not sending duplicated data)
 - check operation of filtering of headers
+- check, for parameters in a query string and in the form body of a POST
+  request, that a `password` parameter no Flow Element accepts is never
+  shared, even when all Evidence is shared, that a parameter whose name starts
+  with `51D_` is shared, and that a parameter a Flow Element in the Pipeline
+  accepts is shared
+- check that setting the deprecated included query string parameters or share
+  all query string parameters option changes nothing that is shared
 - check operation of SessionID
 - check operation on shut down
 - check that ShareUsage does not impose an undue burden on performance
