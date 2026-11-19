@@ -22,7 +22,7 @@ It shares instead what it finds, from two places:
   every query string or form parameter whose name starts with `51D_` or that a
   Flow Element in the Pipeline accepts, and every session value whose name
   starts with `51D_`, of the web request, with its client IP address, its
-  protocol and the method and path of its request line, when the web
+  protocol and the method of its request line, when the web
   integration supplies the request as
   `server.http-request` (see
   [Populating Evidence](../features/web-integration.md#populating-evidence)).
