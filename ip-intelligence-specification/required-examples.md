@@ -151,6 +151,12 @@ Demonstrates:
 - Cloud service property access
 - Error handling for cloud connectivity
 
+Run with no Resource Key, the example ends without an error, names the
+environment variable to set, gives a link to where a Resource Key is created
+and exits successfully, as
+[Cloud Device Detection](../device-detection-specification/required-examples.md#cloud-device-detection)
+requires of every cloud example.
+
 ### Getting Started Web
 
 Web application demonstrating:

@@ -1,5 +1,79 @@
 # Thread safety
 
+These rules decide how Pipelines, Flow Elements, Flow Data and Element Data
+behave when more than one thread is involved. They aim to make every request
+as fast as possible, and to leave as few ways as possible for threads to cause
+faults.
+
+## General rules for parallel operation
+
+1. A Pipeline and its Flow Elements MUST be able to process many Flow Data at
+   once, one for each request, as [Flow Elements](#flow-elements) describes.
+2. Outside a parallel group, which rule 4 covers, a Flow Data is used by one
+   thread at a time. It MAY pass from one thread to another, as an
+   asynchronous continuation does, but it MUST NOT be used by two threads at
+   once. A caller that shares a Flow Data across threads is responsible for
+   any locking.
+3. Once processing has finished, a Flow Data is read only, except for
+   [lazy properties](#lazy-properties), and its implementation MUST NOT take a
+   lock. Being read only does not make a Flow Data safe to use from several
+   threads at once, because the Element Data it holds may change when it is
+   read, as Element Data that reads a [results instance](#results-instances)
+   does, and the Flow Data cannot guard against that.
+4. While a Flow Data is processed, only a
+   [parallel group](../advanced-features/parallel-processing.md#how-a-group-uses-the-flow-data)
+   puts more than one thread on it. Each member of the group writes only its
+   own Element Data, and changes nothing else in the Flow Data apart from
+   adding its own Element Data, errors and warnings, and recording a failed
+   lazy property it meets, as
+   [exception handling](exception-handling.md#lazy-properties) describes.
+   Exceptions a member throws are added by the parallel element once every
+   member has stopped.
+5. Flow Elements MUST handle any multi-threaded or asynchronous work of their
+   own internally, such as lazy properties and sending usage data.
+   Long-running work, such as a call to another resource, is a
+   [lazy property](#lazy-properties) of the Flow Element's own Element Data,
+   and an Engine does not run its processing in a background task. The
+   deprecated [lazy loading](../advanced-features/lazy-loading.md) option has
+   no effect. A Flow Element that hands data to another thread MUST copy it
+   during processing, and MUST NOT read the Flow Data from that thread
+   afterwards.
+6. A lazy property uses the lazy task pattern, as
+   [lazy properties](#lazy-properties) describes.
+7. Element Data MUST NOT be written while no Flow Element that writes it is
+   processing, except by a lazy property's task, and such a write MUST fail,
+   as [Element Data](#element-data) describes.
+8. An Engine and its Element Data never lock a results instance, and a caller
+   that shares one is responsible for any locking, as
+   [results instances](#results-instances) describes.
+9. A data refresh never affects a Flow Data created before it, as
+   [data updates](data-updates.md) describes.
+10. Disposing an Engine or a Pipeline waits for every call to process, every
+    lazy task and every data refresh already running before it frees anything
+    they use, as
+    [resource cleanup](resource-cleanup.md#disposal-while-requests-are-running)
+    describes.
+11. Web integration examples and documentation say that a Flow Data cannot be
+    used by two threads at once, and show it, as
+    [web integration](web-integration.md#flow-data-and-threads) describes.
+
+## How the language is used
+
+What thread safety a package needs also depends on how its language is used.
+
+- Where a package cannot run a task in the background, because its supported
+  setups run each request on one thread with nothing else able to reach its
+  Flow Data, such as PHP, no thread-safety strategy is needed, and the
+  package does not offer
+  [parallel processing](../advanced-features/parallel-processing.md).
+- Where a package offers parallel processing, the rules for
+  [parallel groups](../advanced-features/parallel-processing.md#how-a-group-uses-the-flow-data)
+  and for [Flow Data](#flow-data) keep its Flow Data safe, with a lock only for
+  the errors and warnings that members add.
+- Where the data is held in unmanaged memory, as an on-premise Engine's
+  [results instance](#results-instances) is, multi-threaded access is not
+  supported, for performance. That is a hard rule in every language.
+
 ## Flow Elements
 
 The Pipeline API is designed to be used in highly concurrent environments
@@ -7,78 +81,157 @@ such as high traffic web servers.
 
 Consequently, Pipeline and Flow Element implementations MUST be
 capable of handling multiple concurrent requests to the `Process` function.
+Each request has its own Flow Data. State that a Flow Element shares between
+requests, such as a cache, a queue or the data source it reads, MUST be safe
+for that use.
 
 ## Flow Data
 
-In general user-facing data structures linked to Flow Data do not need to be
-thread-safe as the most common use-case is that they will be accessed and
-updated only on the current thread.
-This ensures users get the best performance by default.
+A Flow Data is created by the Pipeline that processes it, for one request.
 
-Where the Pipeline contains elements running in
-[parallel](../advanced-features/parallel-processing.md), Element Data instances
-will be added to the Flow Data in parallel. However, it is a useful optimization
-to allow Flow Data to be non-thread safe in contexts where no parallel execution
-is needed.
+A Flow Data MUST keep its Element Data in a linked list, not in a dictionary.
+A Flow Element adds its Element Data while it processes, as a new node that
+points at the current head of the list. Where a parallel group can add Element
+Data at the same time, the new node MUST be put in place with one atomic
+compare and swap of the head, being a single operation that replaces the head
+only if it is still the node the add read. If another member added a node
+first, the add points the new node at the new head and tries again. Readers
+then read the head with the language's atomic or volatile read, so that they
+see each node in full. Where no parallel group can add at the same time, a
+plain write is enough. A node never changes once it is in the list, so a
+reader follows the links with no lock and always sees a whole list. Finding
+Element Data by its key is a search along the list, which is short because a
+Flow Data holds one Element Data for each Flow Element. Anything that lists
+the Element Data in Pipeline order, being the order the Flow Elements were
+added to the Pipeline, with the members of a parallel group in the group's
+place and in the order they were added to the group, sorts it first, because
+the list holds the newest first.
 
-Flow Data instances are created by the Pipeline instance on which they
-will be processed. The Pipeline can determine whether any Flow Elements are
-to be processed in parallel and thus can determine whether to create thread-safe
-Flow Data or not.
+Errors and warnings that members of a parallel group record while the group
+runs MUST be added under a lock. They are rare, so the lock costs nothing in
+the normal case. Exceptions a member throws are added by the parallel element
+once every member has stopped, as
+[exception handling](exception-handling.md#parallel-groups) describes. At
+every other time, errors and warnings are added with no lock.
+
+Once processing has finished, a Flow Data is read only, except for
+[lazy properties](#lazy-properties), and its implementation MUST NOT take a
+lock. Adding Evidence, Element Data, errors or warnings to a Flow Data that has
+finished processing MUST fail with an error.
+
+A Flow Data is used by one thread at a time. A caller that needs to use one
+from several threads at once is responsible for coordinating that, for
+example by wrapping its calls in a lock of its own.
+
+Code comments and documentation MUST say that a Flow Data is not safe to use
+from several threads at once, and that the caller is responsible for any
+locking.
 
 ### Evidence
 
-Evidence collection stored within Flow Data needs to be thread safe for
-concurrent read access. Flow Elements MAY add values to the Evidence during
-processing, as described in
-[adding Evidence values](evidence.md#adding-evidence-values).
+Flow Elements MAY add values to the Evidence during processing, as described
+in [adding Evidence values](evidence.md#adding-evidence-values).
 
 A Flow Element that runs in a
 [parallel](../advanced-features/parallel-processing.md) group MUST NOT add
-values to the Evidence. The other members of the group read the Evidence at
-the same time, and the Evidence only needs to be safe for reading from several
-threads at once, not for a write during those reads. A Flow Element that adds
+values to the Evidence, because the other members of the group read the
+Evidence at the same time. That is the Flow Element's responsibility, and
+implementations do not check for it. A Flow Element that adds
 Evidence for later Flow Elements to read runs outside any parallel group,
 before the Flow Elements that read the value.
 
 ## Element Data
 
-Element Data instances do not need to be safe for writing from several
-threads at once, because an instance is written only by the Flow Element
-that creates it, while that Flow Element processes.
+An Element Data instance is written only by the Flow Element that provides it,
+or by the Flow Elements that share it, and only while they process. Each
+Element Data records when a Flow Element that writes it finishes, and a Flow
+Element that shares the instance opens it for writing again when it starts to
+process. A write through its write methods while the instance is recorded as
+finished MUST fail with an error, except by a
+[lazy property's](#lazy-properties) task.
 
-They are read from several threads at once where the Pipeline contains
-elements running in [parallel](../advanced-features/parallel-processing.md).
-Every member of a parallel group processes the same Flow Data at the same
-time, so Element Data written before the group is read by all of them
-together, as the reference implementation's
-[`ParallelElements`](https://github.com/51Degrees/51degrees-dotnet/blob/main/pipeline/Core/FlowElements/ParallelElements.cs)
-does. Reading an Element Data instance once the Flow Element that writes it
-has finished MUST therefore be safe from several threads at once.
+Values that Element Data reads from a [results instance](#results-instances),
+and values it keeps once it has read them, are not writes for this rule. The
+writes those reads make, into native memory or into the values kept, are
+covered by the rules for results instances.
 
-Some Element Data writes into something it holds when it is read, such as an
-on-premise Engine's Aspect Data, which reads its values from native results
-that each read writes into. Such Element Data MUST let only one thread at a
-time read from its results, for example by holding a lock for each read, as
-the reference implementation's
-[`DeviceDataBaseOnPremise`](https://github.com/51Degrees/51degrees-dotnet/blob/5b4d06e99b1751b4c36ec6c554bc0ece4664a781/device-detection/Shared/Data/DeviceDataBaseOnPremise.cs#L546-L589)
-does, unless the Element Data is a type the language does not let several
-threads share.
+Each implementation MUST include a check, run by its automated tests, that
+processes every Flow Element in the repository, then writes to its Element
+Data and expects the error. See [automated testing](../automated-testing.md).
 
-It is possible for a user to engineer a scenario where an instance is
-written from several threads, or read while another thread writes it. It is
-not worthwhile to cater for that scenario, given the decreased performance
-and increased complexity that it would require.
+Code comments and documentation MUST be clear that Element Data is written
+only by the Flow Element that provides it, or the Flow Elements that share it,
+and only while they process.
 
-Code comments and documentation MUST be clear that these instances are not
-intended to be written from multiple threads simultaneously, nor read while
-they are being written.
+## Lazy properties
+
+A lazy property is one whose value is worked out when it is first asked for,
+or by a task that the Flow Element starts while it processes, such as the
+call to another resource that the
+[Cloud Request Engine](../pipeline-elements/cloud-request-engine.md#processing)
+starts. Apart from the reads from a results instance described below, lazy
+properties are the only part of a Flow Data that changes once processing has
+finished. Values that Element Data reads from a
+[results instance](#results-instances) when they are asked for are not lazy
+properties, and the rules for results instances cover them.
+
+Where the language supports it, a lazy property MUST use the lazy task
+pattern. One task works the value out, started by the first request for it,
+or by the Flow Element while it processes. Every caller for the value,
+including the first, waits for that task to finish and then reads its result.
+No caller reads the value before the task has finished, and the work is never
+done twice. If the task fails, every caller waiting for it gets its error.
+
+Long-running work in a Flow Element, such as a call to another resource, is a
+lazy property. The Flow Element builds what the work needs from the Flow Data
+while it processes, starts the task, and adds the task to its own Element
+Data. The task never reads the Flow Data.
+
+The task is the Flow Element's own guard on its own value, not a lock on the
+Flow Data. Where a package cannot run a task in the background, as PHP
+cannot, there is no task. Work that other packages start as a lazy task runs
+while the Flow Element processes, so its value is ready once processing has
+finished.
+
+## Results instances
+
+A results instance is the object an on-premise Engine's native code fills for
+one request, which references unmanaged memory, such as the Device Detection
+and IP Intelligence results. Multi-threaded access to a results instance is
+not supported, for performance reasons. Reading a value from it writes into
+it, so it is not safe to use from several threads at once, and neither is
+Element Data that reads its values from one.
+
+An Engine, its results instances and the Element Data that reads from them
+MUST NOT take a lock to make those reads safe for several threads. The
+caller can almost always keep its use of a results instance on one thread,
+and a lock would cost every request to protect the few that share one. The
+caller is responsible for thread-safe access. A caller that needs to use a
+results instance, or Element Data that reads from one, from several threads
+at once MUST coordinate that itself, for example by wrapping its calls in a
+lock of its own.
+
+A member of a parallel group that reads Element Data that reads from a
+results instance is responsible for the thread safety of those reads. For
+example, where a Device Detection Engine runs before a parallel group, more
+than one member of the group can read its values at the same time.
+
+Code comments and documentation MUST say plainly that a results instance, and
+Element Data that reads from one, is not safe to use from several threads at
+once, and that the caller is responsible for thread-safe access.
 
 ## Aspect data
 
-Aspect Data is Element Data, so reading it once its Engine has finished is
-safe from several threads at once, as [Element Data](#element-data) requires.
-That also covers the [caching](caching.md) feature, where the same instance
-might be added to multiple different Flow Data from different calls to
-`Process`. An Engine whose Aspect Data is a type the language does not let
-several threads share MUST NOT allow a cache to be added.
+Aspect Data is Element Data, so it is not written while no Flow Element that
+writes it is processing, as [Element Data](#element-data) requires. The
+[caching](caching.md) feature adds the same Aspect Data instance to the Flow
+Data of different requests, which may run on different threads at once. Data
+that is not written, apart from lazy properties handled as lazy tasks, is
+safe to share in that way, except where it reads from a results instance. So
+an Engine whose Aspect Data reads from a results instance MUST NOT allow a
+cache to be added.
+
+An Engine whose Element Data another Flow Element also writes, as two Flow
+Elements that share one instance do, MUST NOT allow a cache to be added
+either, because the other Flow Element would write into an instance that
+other requests are reading.

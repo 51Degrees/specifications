@@ -76,9 +76,11 @@ those implementations can be consulted for more details.
 
 ### FiftyOne.Pipeline.Core
 
-TypedKeyMap :
+Flow Data Element Data list:
 
-- (ThreadSafe and non-ThreadSafe) test each of the methods.
+- test adding, finding and listing Element Data, including adds from the
+  members of a parallel group at the same time, with every member's Element
+  Data present afterwards and listed in Pipeline order
 
 Pipeline:
 
@@ -104,6 +106,13 @@ Flow Data:
 - check that attempt to process twice fails
 - check that access to Flow Data when Pipeline closed fails
 - check that access to Flow Data results before processing fails
+- check that adding Evidence, Element Data, errors or warnings after
+  processing fails
+- check that the members of a parallel group can add errors and warnings at
+  the same time, with all of them present afterwards
+- check that exceptions thrown by members of a parallel group are added to
+  the Flow Data's errors by the parallel element once every member has
+  stopped
 
 Flow Element:
 
@@ -112,6 +121,9 @@ Create a Test Element and associated data
 - check correct process() logic
 - check for correct creation of associated data type
 - check for correct access following processing
+- check, for every Flow Element in the repository, that a write to its
+  Element Data after the Flow Element has finished processing fails, as
+  [thread safety](features/thread-safety.md#element-data) requires
 
 Java Only:
 
@@ -134,8 +146,25 @@ reasonable bound for the cases:
 AspectEngine:
 
 - check Aspect Engine uses cache correctly
-- if lazy loading is implemented, check that it fires only at the right
-  time and only once
+- if the deprecated lazy loading option is still offered, check that setting
+  it, with or without a timeout, changes nothing, so that the Engine processes
+  on the calling thread and gives the same values
+- check that a lazy property's task runs once, that every reader waits for
+  it, and that a failed task gives every waiting reader its error
+- check, where the package can run a task in the background, that the Cloud
+  Request Engine's process function returns before the HTTP response
+  arrives, that every reader of `json-response` waits for it, and that the
+  request's task does not read the Flow Data, and, where the package cannot,
+  that the response has arrived when the process function returns
+- check that a failed Cloud Request Engine request met by Cloud Aspect
+  Engines during processing is recorded once, as the Cloud Request Engine's
+  error, and that one met after processing reaches only the reader, as an
+  error from the read
+- check that an Engine whose Element Data another Flow Element also writes
+  does not allow a cache to be added
+- check that disposing an Engine while process calls, lazy tasks and a
+  refresh are running waits for them, with no crash and every value read
+  intact
 
 DataUpdateService:
 
@@ -151,6 +180,9 @@ DataUpdate is a complex process with many options.
 - check that Engine refreshes with correct data and that any data associated
   with earlier copy is freed correctly
 - carry out a repeated refresh test to look for memory leaks
+- check that refreshing from several threads at once, while Flow Data
+  created before and during the refreshes are processed and read on other
+  threads, leaves every value read intact
 
 MissingPropertyService:
 
@@ -170,9 +202,20 @@ ShareUsage:
 - check minimum batch size and maximum batch size
 - check operation of tracker (i.e. not sending duplicated data)
 - check operation of filtering of headers
+- check, for parameters in a query string and in the form body of a POST
+  request, that a `password` parameter no Flow Element accepts is never
+  shared, even when all Evidence is shared, that a parameter whose name starts
+  with `51D_` is shared, and that a parameter a Flow Element in the Pipeline
+  accepts is shared
+- check that setting the deprecated included query string parameters or share
+  all query string parameters option changes nothing that is shared
 - check operation of SessionID
 - check operation on shut down
 - check that ShareUsage does not impose an undue burden on performance
+- check that every Pipeline a builder makes has the usage sharing element
+  last, outside any parallel group
+- check that a builder refuses, with an error, a Pipeline that puts the usage
+  sharing element anywhere but last, or in a parallel group
 
 SetHeaders
 

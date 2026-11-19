@@ -127,7 +127,7 @@ find the production date of the file.
 ### Cloud Device Detection
 
 Reference implementation examples illustrate use of Resource Keys to access
-the cloud service. A predefined link such as [this one](https://configure.51degrees.com/jqz435Nc?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=device-detection-specification-required-examples.md&utm_term=cloud-device-detection)
+the cloud service. A predefined link such as [this one](https://51degrees.com/configure/jqz435Nc?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=device-detection-specification-required-examples.md&utm_term=cloud-device-detection)
 can be created to create a Resource Key to provide access to the Properties
 used in the examples. For simplicity, it might be convenient for such a link to
 provide access to all free Properties.
@@ -136,6 +136,18 @@ Since the Resource Key is shared between several examples, it might be convenien
 for it to be set as an environment variable, rather than passing as a command
 argument, especially given the need for examples to be executed in
 a test environment.
+
+A cloud example run with no Resource Key MUST end without an error, name the
+environment variable to set, give a link to where a Resource Key is created,
+such as the
+[configurator](https://51degrees.com/configure?utm_source=github&utm_medium=docs&utm_campaign=specifications&utm_content=device-detection-specification-required-examples.md&utm_term=cloud-device-detection),
+and exit successfully, so that its test runs it with no arguments or settings
+(see [Execution](#execution)). The link the example writes is tagged as the
+link to the contact page is (see
+[On-Premise Device Detection](#on-premise-device-detection)), with
+`utm_source=code`, `utm_medium=example`, the language repository's name as
+`utm_campaign` and the example's file as `utm_content`. This applies to every
+example that uses the cloud service, whatever its engines.
 
 ### Fluent Builders
 
@@ -225,6 +237,10 @@ the following features:
 Examples MUST be provided that illustrate basic usage of the API for
 both Cloud and On-Prem, using fluent builder and options file configuration,
 when executed as a console (command line) application.
+
+This is met when the console examples between them show both the fluent
+builder and an options file. Four separate examples, one for each of Cloud and
+On-Prem with each way of configuring, are not required.
 
 Detailed inline comments in these examples introduce the use of Evidence and
 retrieval of Properties resulting from detection, as well as illustrating

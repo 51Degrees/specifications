@@ -234,11 +234,15 @@ field.
    script that records, without a lock, that the error under
    [Logging and exposed metadata](#logging-and-exposed-metadata) has been
    logged,
-5. The compiled model is immutable, so parallel Elements and concurrent
-   `Process` calls need nothing further,
+5. The compiled model is immutable, so it needs nothing further for
+   parallel Elements and concurrent `Process` calls, although an Element in
+   a parallel group that reads values backed by a
+   [results instance](../features/thread-safety.md#results-instances) is
+   responsible for the thread safety of those reads,
 6. Multiple Derived Property Elements can exist in one Pipeline and each
-   one writes into the same Element Data, meaning the Element Data must
-   be thread safe,
+   one writes into the same Element Data, so two of them MUST NOT be
+   members of the same
+   [parallel group](../advanced-features/parallel-processing.md#how-a-group-uses-the-flow-data),
 7. The Element reads Properties from other Elements, so a Derived
    Property Element on its own in a Pipeline produces nothing.
 
@@ -407,14 +411,15 @@ using (var flowData = pipeline.CreateFlowData())
 }
 ```
 
-The `HumanConfidence` script used above reads `device.IsCrawler`,
-`device.BrowserReleaseYear`, `device.BrowserReleaseAge` and
-`ip.HumanProbability`, and returns one of `High`, `Medium` or `Low`.
-Naming a Property in a script makes the Property necessary, so a script
-names only Properties that are in the data. The device detection Engine
-supplies the Properties under `device` and the IP intelligence Engine
-supplies the Property under `ip`, so both Engines are added to the
-Pipeline ahead of the Derived Property Element.
+The `HumanConfidence` script used above reads Properties under `device`
+and under `ip`, and returns one of `High`, `Medium`, `Low` or `Unknown`.
+The script names each Property it reads, and the shared script repository
+under [Sources](#sources) holds the script. Naming a Property in a script
+makes the Property necessary, so a script names only Properties that are
+in the data. The device detection Engine supplies the Properties under
+`device` and the IP intelligence Engine supplies the Properties under
+`ip`, so both Engines are added to the Pipeline ahead of the Derived
+Property Element.
 
 ## The cloud
 

@@ -1,7 +1,7 @@
 # Cloud Aspect Engine
 
 A Cloud Aspect Engine is a type of Engine that works with the
-[Cloud Request Engine](cloud-request-engine.md#overview) to enable users
+[Cloud Request Engine](cloud-request-engine.md) to enable users
 to refer processing of Evidence to a remote server.
 
 See the link above for an overview of how these Engines work together.
@@ -76,9 +76,13 @@ The precise processing that occurs depends on the Aspect this
 Engine relates to. In essence though, it simply needs to filter and
 deserialize the raw JSON from the Cloud Request Engine:
 
-1. Get the portion of the raw JSON (provided by the Cloud Request Engine in its
-   Element Data) that relates to this Aspect by using the appropriate
-   string Data Key. (For example, `device` for Device Detection)
+1. Get the raw JSON from the Cloud Request Engine's Element Data, waiting on
+   its [lazy property's](../features/thread-safety.md#lazy-properties) task if
+   the response has not yet arrived. If the request failed, record the
+   failure once, as the Cloud Request Engine's error, as its
+   [processing](cloud-request-engine.md#processing) describes. Otherwise take
+   the portion that relates to this Aspect by using the appropriate string
+   Data Key. (For example, `device` for Device Detection)
 2. Deserialize that portion of the raw JSON to construct the Element Data result.
 
 Where the response JSON has no portion for the Engine's Data Key, the Cloud
