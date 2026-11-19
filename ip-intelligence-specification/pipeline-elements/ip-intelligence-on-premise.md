@@ -517,12 +517,12 @@ read of a Property of a component walks the component's graph. Different
 `ResultsIpi` instances can be used on different threads at once, and the
 Engine can be shared.
 
-Finished Element Data MUST be safe to read from several threads at once, as
-[thread safety](../../pipeline-specification/features/thread-safety.md#element-data)
-describes, so Aspect Data that reads its values from a `ResultsIpi` instance
-MUST let only one thread at a time read from its results, for example by
-holding a lock for each read, unless the Aspect Data is a type the language
-does not let several threads share.
+Aspect Data that reads its values from a `ResultsIpi` instance MUST NOT
+lock it, and is not safe to use from several threads at once, as
+[thread safety](../../pipeline-specification/features/thread-safety.md#results-instances)
+describes. The caller is responsible for thread-safe access. Its reads, which
+write into native memory or keep values once read, are not writes for the
+[Element Data rule](../../pipeline-specification/features/thread-safety.md#element-data).
 
 ### Performance Guidance
 

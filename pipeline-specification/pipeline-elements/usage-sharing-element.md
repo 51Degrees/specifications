@@ -58,7 +58,8 @@ when all Evidence is shared:
   header.
 
 So `query.id.email`, `server.request-path` and `header.cookie` are never shared, while
-`query.valid.email` is an ordinary query string parameter. The
+`query.valid.email` is an ordinary query string parameter, which the rule for
+parameters below decides like any other. The
 `server.http-request` value itself is never shared, only the values read from
 it.
 
@@ -68,19 +69,39 @@ not start with `51D_`. The `51D_` cookies carry the values the 51Degrees
 JavaScript sends, and they are the only cookies shared. A cookie a site sets
 for itself, such as its session cookie, is never shared.
 
+Query string and form parameters follow the same rule as cookies, with one
+addition. It MUST also return false, whatever the configuration and even when
+all Evidence is shared, for any key whose prefix is `query.`, unless its field
+starts with `51D_` or the key is Evidence the Pipeline uses. A key is Evidence
+the Pipeline uses when a Flow Element in the Pipeline accepts it, as that Flow
+Element's list of keys or its filter function says
+([Advertise accepted Evidence](../features/advertize-accepted-evidence.md#flow-elements)).
+The Usage Sharing Element accepts no Evidence, so it adds no key of its own.
+
+The `query.` prefix carries both the parameters of the query string and the
+form parameters of a POST request body
+([Populating Evidence](../features/web-integration.md#populating-evidence)).
+Both are `query.` keys whether the element finds them in the Evidence or in
+the `server.http-request` view, which carries the form parameters of a POST
+request as well as the query string. So the rule is the same for GET and POST
+requests. For example, `query.51D_ScreenPixelsWidth` is shared because of its
+name, and `query.user-agent` and `query.session-id` are shared because the
+Device Detection Engines and the [Sequence Element](sequence-element.md)
+accept them. A parameter such as `password` that no Flow Element in the
+Pipeline accepts is never shared.
+
 Unless all Evidence is shared, it MUST also return false for any key where:
 
 - Prefix = `header.` and field is in a user-configurable block list.
 - Prefix = `session.` and field does not start with `51D_`
-- Prefix = `query.`, the
-  [share all query string parameters](#configuration-options) option is off,
-  and field does not start with `51D_` and is not in a user-configurable allow
-  list of query string parameters that will be shared.
-
-Share all query string parameters is on by default, so every query string and
-HTTP form parameter is shared unless a user turns it off.
 
 Anything else MUST return true. (i.e. it will be shared)
+
+The [included query string parameters](#configuration-options) and
+[share all query string parameters](#configuration-options) options are
+deprecated and have no effect. An implementation that already offers either
+one keeps it as a deprecated name, so that existing code and configuration
+still build, and setting it MUST NOT change which parameters are shared.
 
 A Pipeline that authenticates the requests it serves with a Resource Key or a
 License Key MUST hold them as the Evidence `fiftyone.resource-key` and
@@ -101,17 +122,61 @@ MUST NOT be shared unless its name starts with `51D_`, as no other cookie is.
 See [configuration options](#configuration-options) for more detail on the
 configuration parameters that can affect this filter function.
 
+## Position in the Pipeline
+
+The Usage Sharing Element MUST be the last Flow Element in a Pipeline, and
+MUST NOT be a member of a
+[parallel group](../advanced-features/parallel-processing.md). A builder that
+adds it adds it after every other Flow Element. A builder MUST refuse, with an
+error saying that the usage sharing element must be the last Flow Element and
+outside any parallel group, a Pipeline that puts it anywhere else, whether the
+Pipeline is built in code or from a configuration.
+
+It reads only the Evidence in the Flow Data, including the web request
+supplied as `server.http-request`, and changes nothing in the Flow Data.
+Flow Elements can add values to the Evidence as they process, so running
+last means it shares what every other Flow Element has added, and running
+outside any parallel group means no other Flow Element changes the Evidence
+while it reads it.
+
+It copies the values it shares during processing, on the thread that
+processes the Flow Data, and the background thread that sends them never
+reads the Flow Data, as [thread safety](../features/thread-safety.md)
+requires.
+
 ## Element Data
 
 This Flow Element does not add an Element Data instance to Flow Data.
 
 ## Start-up activity
 
-A static XML snippet can be generated for values that will be invariant
-for the lifetime of the current Pipeline.
+When the element is built it creates a process identifier and starts
+gathering the invariant values, some of which can become known only later.
 
-From the list of parameters in the processing section below, the invariant ones
-are:
+### Process identifier
+
+The element MUST create a process identifier when it is built, and MUST write
+it to every record as the `ProcessId` element. A record that leaves out the
+invariant values below is tied to them by this identifier.
+
+The identifier is a version 4 UUID, as
+[RFC 9562 section 5.4](https://www.rfc-editor.org/rfc/rfc9562#section-5.4)
+defines it, "meant for generating UUIDs from truly random or pseudorandom
+numbers". It MUST be written in the string format of
+[section 4](https://www.rfc-editor.org/rfc/rfc9562#section-4) of that document,
+which is 32 hexadecimal digits in groups of 8, 4, 4, 4 and 12 separated by
+hyphens, for example `2f1b7c4e-9a53-4d0e-8c61-5b7e0a94d3f2`. The letters MAY be
+in either case, and a reader MUST compare identifiers ignoring letter case.
+
+The identifier is never stored, so a process that starts again creates a new
+one. A process that builds more than one Usage Sharing Element, for example one
+for each of two Pipelines, creates an identifier for each, because the
+invariant values can differ between them.
+
+### Invariant values
+
+From the list of parameters in the processing section below, the ones that do
+not change while the element lives, once they are known, are:
 
 - Version
 - Product
@@ -122,8 +187,40 @@ are:
 - ServerIP
 - Platform
 
-Note that there is a [proposal](../future-features/usage-sharing-header.md) to
-avoid duplicating these values on every record.
+These are the invariant values. A static XML snippet can be generated for them
+once they are all known.
+
+A value that is not yet known when the element is built, such as a server
+address still being looked up, becomes known at most once. Until then it MUST
+be written as an empty element, as
+[XML 1.0 section 3.1](https://www.w3.org/TR/xml/#sec-starttags) defines one,
+for example `<ServerIP/>` or `<ServerIP></ServerIP>`, and a reader MUST
+accept either form. Once such a value is known, the element MUST NOT change
+it. The values written as repeated elements, Flow Elements and Packages, are
+always known by the first record, because the first record is written after
+the Pipeline is built.
+
+The invariant values MUST be written to the first record the element writes.
+They MUST be written again to the first record the element writes once an hour
+or more has passed since it last wrote them. When one or more of them is not
+yet known as the first record is written, for example a server address still
+being looked up, the element MUST write all of them again to the first record
+it writes after each such value becomes known. They MUST NOT be written to any
+other record. A service that shares millions of records learns nothing more
+from the same values in each one, and leaving them out makes every other
+record smaller.
+
+The values are written again each hour because a record can be lost, for
+example when the message that holds it cannot be sent. The hour is measured
+from when the values were last written to a record, whether or not that record
+arrived.
+
+Any value added to the record in future that cannot change while the element
+lives, once it is known, is an invariant value too, and is written under the
+same rule.
+
+[Reading the records](#reading-the-records) says what this means for whatever
+reads the records after they are sent.
 
 ## Processing
 
@@ -164,8 +261,14 @@ In the snippet below:
 - Text in CAPS represent variable values.
 - Things in [square brackets] are optional
 
+The snippet shows a record that carries the
+[invariant values](#invariant-values). A record that leaves them out has no
+Version, Product, FlowElement, Package, Language, LanguageVersion, ServerIP or
+Platform element, and is otherwise the same.
+
 ```xml
 <Device>
+  <ProcessId>PROCESS_ID</ProcessId>
   <SessionId>SESSION_ID</SessionId> 
   <Sequence>SEQUENCE</Sequence> 
   <DateSent>DATE_SENT</DateSent> 
@@ -189,6 +292,8 @@ In the snippet below:
 </Device> 
 ```
 
+- **ProcessId** - The [process identifier](#process-identifier), the same in
+  every record the element writes.
 - **SessionId** – A GUID generated by the [Sequence Element](sequence-element.md)
   used to identify a set of Evidence originating from the same source where
   multiple requests are initiated to resolve the JSON payload for
@@ -205,22 +310,25 @@ In the snippet below:
   example, “Pipeline”
 - **FlowElement** – An xml element exists for each FlowElement in the
   Pipeline. The text contains the fully qualified class name of the FlowElement.
-- **Package** - An xml element MUST be written for every 51Degrees package in
-  use, being the package that holds the Pipeline, the package that holds each
-  FlowElement in the Pipeline, and every 51Degrees package those depend on.
-  Each package is written once. The `Name` attribute is the name the package
-  is published under, as its language's package manager knows it (for example
-  a NuGet package id, an npm package name, a Maven group and artifact id, a Go
-  module path or a crate name), and the text is the version of that package
-  in use, as that package manager gives it. Each package is released at its own version, so these elements say which
-  release of each package is running, and so how far each release has spread.
+- **Package** - In a record that carries the invariant values, an xml element
+  MUST be written for every 51Degrees package in use, being the package that
+  holds the Pipeline, the package that holds each FlowElement in the Pipeline,
+  and every 51Degrees package those depend on. Each package is written once.
+  The `Name` attribute is the name the package is published under, as its
+  language's package manager knows it (for example a NuGet package id, an npm
+  package name, a Maven group and artifact id, a Go module path or a crate
+  name), and the text is the version of that package in use, as that package
+  manager gives it. Each package is released at its own version, so these
+  elements say which release of each package is running, and so how far each
+  release has spread.
 - **Language** - The name of the language/framework within which the
   Pipeline is running.
 - **LanguageVersion** - The version number of the language/framework
   within which the Pipeline is running.
 - **ClientIP** - Public IP address of the client that sent the request to
   this server.
-- **ServerIP** - IP address of the server where the xml is being generated.
+- **ServerIP** - IP address of the server where the xml is being generated, or
+  an empty element while it is not yet known.
 - **Platform** - The platform name, version and service pack if available.
 - **Evidence** – The Evidence that is shared is what the element finds, as
   [accepted Evidence](#accepted-evidence) describes, less what the
@@ -272,6 +380,39 @@ to aid troubleshooting.
 
 See the [BuildAndSendXml](https://github.com/51Degrees/51degrees-dotnet/blob/main/pipeline/Engines.FiftyOne/FlowElements/ShareUsageElement.cs#L117) method in C# for an example of this.
 
+### Reading the records
+
+This section is for whatever reads the records after they are sent.
+
+A record either carries the [invariant values](#invariant-values) or leaves
+them out, and both are complete records. A reader MUST NOT expect the invariant
+values in every record. It ties a record that leaves them out to the values of
+its process by the [process identifier](#process-identifier), which every
+record carries.
+
+The records of one process arrive in many messages, and a reader may come to
+those messages in any order. The record that carries the invariant values can
+be in a different message from a record that leaves them out, and can be read
+after it. So a reader MUST match records to invariant values by the process
+identifier across messages, in whichever order it reads them, and MUST NOT rely
+on a record's place in a message or on the order the messages arrive in.
+
+The values written again are the same values, except that one written empty
+before can now be known. A reader that meets them more than once for one
+process identifier MUST keep the latest it has read, except that it MUST NOT
+replace a known value with an empty one, because it can read a later record
+before an earlier one. A reader that works through records as they arrive
+keeps each process's values for at least an hour after it last read them, and
+longer to allow for the time a record waits to be sent, because that is how
+long a process goes on writing records without them.
+
+A process identifier that is never read with the invariant values, because the
+record that carried them was lost and the process ended within the hour, has
+none. Its records are still complete and their invariant values are unknown.
+
+A record with no `ProcessId` element was written by a package from before this
+rule, which writes the invariant values to every record.
+
 ## Session tracking
 
 Note that this section is not concerned with actually identifying
@@ -317,8 +458,10 @@ cookie when track session is on (see below).
 
 The session id and sequence, `query.session-id` and `query.sequence`, MUST
 NOT be included in the generation of this hash code, whatever the other
-options say, and MUST still be written to the record. Both keys are matched
-ignoring letter case, as every Evidence key is (see
+options say. They are still written to the record, because the Sequence
+Element accepts both and so the [shared Evidence](#shared-evidence) rules
+share them. Both keys are matched ignoring letter case, as every Evidence key
+is (see
 [Evidence](../features/evidence.md)), so `query.Sequence` is left out of the
 hash and written to the record just as `query.sequence` is. The
 [Sequence Element](sequence-element.md) adds both to Evidence for every
@@ -434,9 +577,9 @@ SHOULD be logged.
 
 | **Parameter**                     | **User configurable** | **Optional** | **Default**                                                                  | **Notes**                                                                                                                    |
 |-----------------------------------|-----------------------|--------------|------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------|
-| Included query string parameters  | yes                   | yes          | All query string and HTTP form parameters starting with `51D_` are shared.   | Allows the user to include specific query string or HTTP form parameters in the usage data that is shared. Has an effect only when share all query string parameters is off. |
-| Share all query string parameters | yes                   | yes          | true                                                                         | If this flag is set, all query string and HTTP form parameters will be shared. When it is off, only those starting `51D_` and the included query string parameters are shared. |
-| Share all Evidence                | yes                   | yes          | false                                                                        | If this flag is set, all Evidence values will be shared, apart from the keys that are never shared, which include every cookie whose name does not start with `51D_`. |
+| Included query string parameters  | yes                   | yes          | none, as it has no effect                                                    | Deprecated, and has no effect. A query string or HTTP form parameter is shared only when its name starts with `51D_` or the Pipeline uses it (see [shared Evidence](#shared-evidence)). |
+| Share all query string parameters | yes                   | yes          | none, as it has no effect                                                    | Deprecated, and has no effect. Setting it shares no query string or HTTP form parameter that would not otherwise be shared. |
+| Share all Evidence                | yes                   | yes          | false                                                                        | If this flag is set, all Evidence values will be shared, apart from the keys that are never shared, which include every cookie whose name does not start with `51D_` and every query string or HTTP form parameter whose name does not start with `51D_` and which the Pipeline does not use. |
 | Blocked HTTP headers              | yes                   | yes          | All HTTP headers are shared except `Cookie`                                  | Allows the user to exclude specific HTTP headers that they do not want to share.                                             |
 | Ignore Flow Data Evidence filter  | yes                   | yes          | not set                                                                      | Allows the user to block a request from being shared if the specified criteria are met.                                      |
 | Share percentage                  | yes                   | yes          | 1.0                                                                          | Used to set the approximate proportion of requests that will be shared. A value of 1 means that 100% of requests are shared. |

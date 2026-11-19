@@ -22,6 +22,23 @@ Some common tasks that the web integration performs are:
 - Handling requests for [client-side](#client-side-features) functionality.
 - Set HTTP response headers to request additional information if needed.
 
+## Flow Data and threads
+
+The web integration creates one Flow Data for each request, and disposes of
+it when the request ends. An application MUST NOT use a Flow Data from two
+threads at once, as
+[thread safety](thread-safety.md#general-rules-for-parallel-operation)
+describes. Most web frameworks run each request's code one step at a time,
+so an application only puts a Flow Data on two threads at once when it hands
+work from a request to other threads or tasks, or keeps the Flow Data after
+the request has ended.
+
+Every web integration example, and the documentation of every web
+integration, MUST say that a Flow Data cannot be used by two threads at once,
+and MUST show it. For example, an example that hands work to another thread or
+task reads the values it needs from the Flow Data into its own variables
+first, and passes those values rather than the Flow Data.
+
 ## Pipeline configuration
 
 The web integration makes use of several Flow Elements in order to support
@@ -33,20 +50,25 @@ will also need to ensure that these additional Flow Elements are present.
 - The [Sequence Element](../pipeline-elements/sequence-element.md) MUST be
   present. If not, it MUST be added as the first element in the Pipeline.
 - The [JSON Builder Element](../pipeline-elements/json-builder.md) MUST be
-  present. If not, it MUST be added as the penultimate element.
-  (Immediately before the JavaScript Builder Element).
+  present. If not, it MUST be added immediately before the JavaScript Builder
+  Element.
 - The [JavaScript Builder Element](../pipeline-elements/javascript-builder.md)
-  MUST be present. If not, it MUST be added after all other elements.
+  MUST be present. If not, it MUST be added after all other elements except
+  the [Usage Sharing Element](../pipeline-elements/usage-sharing-element.md#position-in-the-pipeline),
+  which is always last.
 
 Another Flow Element is needed to allow the web integration to automatically
 set HTTP response headers.
 
 - The [Set Headers Element](../pipeline-elements/set-headers-element.md) MUST
-  be present. If not, it MUST be added after all other elements.
+  be present. If not, it MUST be added after all other elements except the
+  [Usage Sharing Element](../pipeline-elements/usage-sharing-element.md#position-in-the-pipeline),
+  which is always last.
 
 Note that Set Headers Element does not interact with JavaScript Builder Element,
-etc. Consequently, it doesn't matter which one is actually the last element,
-they just need to be added after any non-core Elements.
+etc. Consequently, it doesn't matter which of the two comes later, as long as
+both are added after any non-core Elements and before the Usage Sharing
+Element.
 
 For all of these elements, there MUST be configuration options to allow
 users to prevent them being added (or disable them) if they wish to do so.

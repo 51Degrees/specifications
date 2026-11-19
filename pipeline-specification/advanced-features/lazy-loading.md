@@ -1,47 +1,16 @@
 # Lazy loading
 
-This feature is specific to Properties populated by Engines (rather than all
-Flow Elements).
-It is currently implemented in .NET, Java and Go.
+Lazy loading is deprecated, and setting it has no effect. Every Engine
+processes on the thread that processes the Flow Data, whether the option is
+set or not. An implementation that offers the lazy loading option keeps
+accepting it, with its timeout, as a deprecated public name, so that existing
+code and configuration still build and run. Its code comments and
+documentation MUST say that it is deprecated and has no effect, and point to
+lazy properties.
 
-There are several execution strategies one might consider for the Process function.
-For example:
-
-- Eager blocking, standard execution
-- Eager non-blocking, but then request to get the result value blocks
-- Lazy non-blocking, the computation starts at the point of requesting the result value
-- Eager asynchronous, that is awaited (allowing the thread do run loop execution)
-
-This feature, as currently implemented, corresponds with the eager, non-blocking
-strategy from the list above. This might lead to renaming the feature in future. For
-the time being, in order to be consistent, it will be called 'lazy loading'.
-
-This means that 'process' will return immediately. When the user attempts to access
-the value of a Property that is populated by this Engine, the call will block until
-the background task is complete.
-
-The builder takes a timeout, being how long the call waits for the value before
-it fails with an error saying that the value was not ready in time. Where a
-language takes the timeout as a number, the number MUST be
-in milliseconds. Where a language has a type for a length of time, such as
-`TimeSpan` in .NET or `time.Duration` in Go, it MAY take that type instead, which
-carries its own unit.
-
-Some languages have async/await features that might appear to be a good fit for
-handling this type of execution in a neater way. There is no rule in this
-specification against using such features. However, the implementation will need
-to be carefully considered in order to avoid falling into the trap of adding
-complexity for little real-world benefit.
-
-There are many scenarios where lazy loading as described here will be
-ineffective. This is because several core Flow Elements make use of Properties
-populated by previous elements. (For example,
-[Cloud Aspect Engines](../pipeline-elements/cloud-aspect-engine.md),
-[JSON builder](../pipeline-elements/json-builder.md) and
-[set response headers](../pipeline-elements/set-headers-element.md).)
-If one of these Elements is in a Pipeline and the Engine that is populating the
-value used by the Element is configured for lazy loading, then the Engine's
-process function will return immediately, but the element that makes use of its
-Property value will just need to wait for the background task to finish anyway.
-Consequently, the overall process function will not return any faster than it
-would without lazy loading enabled.
+The route for long-running work in a Flow Element is a
+[lazy property](../features/thread-safety.md#lazy-properties) whose task the
+Flow Element starts while it processes, as the
+[Cloud Request Engine](../pipeline-elements/cloud-request-engine.md#processing)
+does with its HTTP request. An Engine does not run its processing in a
+background task.
