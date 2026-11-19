@@ -18,13 +18,17 @@ or an ETag.
 It shares instead what it finds, from two places:
 
 - every Evidence value in the Flow Data, and
-- every header other than Cookie, every cookie, query string parameter and
-  session value of the web request, with its client IP address, its protocol
-  and the method and path of its request line, when the web integration
-  supplies the request as
+- every header other than Cookie, every cookie whose name starts with `51D_`,
+  every query string or form parameter whose name starts with `51D_` or that a
+  Flow Element in the Pipeline accepts, and every session value whose name
+  starts with `51D_`, of the web request, with its client IP address, its
+  protocol and the method of its request line, when the web
+  integration supplies the request as
   `server.http-request` (see
   [Populating Evidence](../features/web-integration.md#populating-evidence)).
   This is how a header that no other Flow Element accepts is still shared.
+  [Shared Evidence](#shared-evidence) gives the rules in full, including the
+  block list for headers and the option to share all Evidence.
 
 A key found in both places is shared once, with the value from the Evidence.
 
