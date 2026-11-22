@@ -135,7 +135,9 @@ provide access to all free Properties.
 Since the Resource Key is shared between several examples, it might be convenient
 for it to be set as an environment variable, rather than passing as a command
 argument, especially given the need for examples to be executed in
-a test environment.
+a test environment. The variable is `_51DEGREES_RESOURCE_KEY`, as
+[Environment variables](../pipeline-specification/features/environment-variables.md)
+lists.
 
 A cloud example run with no Resource Key MUST end without an error, name the
 environment variable to set, give a link to where a Resource Key is created,
