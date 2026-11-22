@@ -34,5 +34,4 @@ jobs:
       org-name: ${{ github.event.repository.owner.login }}
       dryrun: ${{ inputs.dryrun || false }}
       skip-compare-performance: true
-    secrets:
-      token: ${{ secrets.ACCESS_TOKEN }}
+    secrets: inherit
