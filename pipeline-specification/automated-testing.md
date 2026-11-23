@@ -212,10 +212,10 @@ ShareUsage:
   [Sequence Element](pipeline-elements/sequence-element.md), once with the
   default options, once with all Evidence shared and once with track session
   on and the same session cookie in both requests, that two requests that
-  differ only in `query.session-id` or
-  `query.sequence`, with either key in any letter case, are shared once within
-  the repeat Evidence interval, and that the record carries both as Evidence
-  entries and in its `SessionId` and `Sequence` elements
+  differ only in `query.session-id` or `query.sequence`, with either key in
+  any letter case, are shared once within the repeat Evidence interval, and
+  that the record carries both as Evidence entries and in its `SessionId` and
+  `Sequence` elements
 - check operation of filtering of headers
 - check, for parameters in a query string and in the form body of a POST
   request, that a `password` parameter no Flow Element accepts is never
@@ -228,8 +228,9 @@ ShareUsage:
   web request supplied as `server.http-request`, that a cookie whose name does
   not start with `51D_`, the session cookie included when track session is on
   and its name does not start with `51D_`, and the Cookie header are never
-  shared, even when all Evidence is shared, and that a cookie whose name
-  starts with `51D_`, in any letter case, is shared
+  shared, even when all Evidence is shared and with a blocked HTTP headers
+  list that leaves out Cookie, and that a cookie whose name starts with
+  `51D_`, in any letter case, is shared
 - check operation of SessionID
 - check operation on shut down
 - check that ShareUsage does not impose an undue burden on performance
@@ -256,15 +257,18 @@ ShareUsage:
   written within the hour after the record in the failed message that carried
   them still leave them out, and the first record written once that hour has
   passed carries them
-- check, holding back a lookup such as the server address in the test so
-  that its value is not yet known as the first record is written, that the
-  value is written as an empty element, as
+- check, in a package that can write a record before an invariant value is
+  known, such as one that looks up the server address in the background,
+  holding back that lookup in the test, that the value is written as an empty
+  element, as
   [XML 1.0 section 3.1](https://www.w3.org/TR/xml/#sec-starttags) defines
   one, checked by reading the record as XML, in each record that carries the
   invariant values until it is known, that all the invariant values are
   written again to the first record written after each such value becomes
-  known and left out of the records after that until the next such value
-  becomes known, and that a value does not change once known
+  known and left out of the records after that, within the hour, until the
+  next such value becomes known, and that a value does not change once known.
+  A package that knows every invariant value before it writes the first
+  record leaves this test out
 - check that a record carrying the invariant values has one
   [`Package`](pipeline-elements/usage-sharing-element.md#processing) element
   for every 51Degrees package in use, being the package that holds the
