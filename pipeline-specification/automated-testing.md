@@ -201,6 +201,10 @@ ShareUsage:
 - check that all data in the queue is sent
 - check minimum batch size and maximum batch size
 - check operation of tracker (i.e. not sending duplicated data)
+- check that two requests whose shared values differ only in
+  `query.session-id` or `query.sequence`, with either key in any letter case,
+  are shared once within the repeat Evidence interval, and that the record
+  carries the session id and the sequence
 - check operation of filtering of headers
 - check, for parameters in a query string and in the form body of a POST
   request, that a `password` parameter no Flow Element accepts is never
@@ -209,6 +213,9 @@ ShareUsage:
   accepts is shared
 - check that setting the deprecated included query string parameters or share
   all query string parameters option changes nothing that is shared
+- check that a cookie whose name does not start with `51D_`, the session
+  cookie included, and the Cookie header are never shared, even when all
+  Evidence is shared, and that a cookie whose name starts with `51D_` is shared
 - check operation of SessionID
 - check operation on shut down
 - check that ShareUsage does not impose an undue burden on performance
@@ -216,6 +223,25 @@ ShareUsage:
   last, outside any parallel group
 - check that a builder refuses, with an error, a Pipeline that puts the usage
   sharing element anywhere but last, or in a parallel group
+- check that every record carries a `ProcessId` element holding a version 4
+  UUID in the string format that
+  [process identifier](pipeline-elements/usage-sharing-element.md#process-identifier)
+  gives, that it is the same in every record one element writes, and that two
+  elements built in one process write different identifiers
+- check, moving time on in the test rather than waiting, that the
+  [invariant values](pipeline-elements/usage-sharing-element.md#invariant-values)
+  are written to the first record, are left out of the records after it, and
+  are written again to the first record written once an hour or more has
+  passed since they were last written, including when the message that last
+  carried them failed to send
+- check that an invariant value not known when the element is built, such as
+  the server address, is written as an empty element until it is known, that
+  all the invariant values are written again to the first record written after
+  it becomes known, and that the value does not change after that
+- check that a record carrying the invariant values has one `Package` element
+  for every 51Degrees package in use, each written once, named as its package
+  manager knows it and giving the version in use, and that a record leaving
+  out the invariant values has none
 
 SetHeaders
 
