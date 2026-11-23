@@ -267,12 +267,12 @@ ShareUsage:
   [XML 1.0 section 3.1](https://www.w3.org/TR/xml/#sec-starttags) defines
   one, checked by reading the record as XML, that the records after it leave
   the invariant values out, within the hour, until that value or another such
-  value becomes known, that all the invariant
-  values are written again to the first record written after each such value
-  becomes known and left out of the records after that, within the hour,
-  until the next such value becomes known, and that a value does not change
-  once known. A package that knows every invariant value before it writes the
-  first record leaves this test out
+  value becomes known, that all the invariant values are written again to the
+  first record written after each such value becomes known and left out of
+  the records after that, within the hour, until the next such value becomes
+  known, and that a value does not change once known. A package that knows
+  every invariant value before it writes the first record leaves this test
+  out
 - check that a record carrying the invariant values has one
   [`Package`](pipeline-elements/usage-sharing-element.md#processing) element
   for every 51Degrees package in use, being the package that holds the
