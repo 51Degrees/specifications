@@ -196,15 +196,18 @@ MissingPropertyService:
 ShareUsage:
 
 - check that ShareUsage substitutes illegal XML characters correctly and truncates values
-- check that ShareUsage operates correctly, retrying failed data etc.
+- check that ShareUsage operates correctly, dropping a batch whose send failed
+  rather than putting it back on the queue
 - check that adding more data stops when queue is full and resumes when it is no longer so
 - check that all data in the queue is sent
 - check minimum batch size and maximum batch size
 - check operation of tracker (i.e. not sending duplicated data)
-- check that two requests whose shared values differ only in
-  `query.session-id` or `query.sequence`, with either key in any letter case,
-  are shared once within the repeat Evidence interval, and that the record
-  carries the session id and the sequence
+- check, in a Pipeline with the
+  [Sequence Element](pipeline-elements/sequence-element.md), and with the
+  default options, with all Evidence shared and with track session on, that
+  two requests that differ only in `query.session-id` or `query.sequence`,
+  with either key in any letter case, are shared once within the repeat
+  Evidence interval, and that the record carries both as Evidence entries
 - check operation of filtering of headers
 - check, for parameters in a query string and in the form body of a POST
   request, that a `password` parameter no Flow Element accepts is never
@@ -213,9 +216,11 @@ ShareUsage:
   accepts is shared
 - check that setting the deprecated included query string parameters or share
   all query string parameters option changes nothing that is shared
-- check that a cookie whose name does not start with `51D_`, the session
-  cookie included, and the Cookie header are never shared, even when all
-  Evidence is shared, and that a cookie whose name starts with `51D_` is shared
+- check, for cookies found in the Evidence and in the web request supplied as
+  `server.http-request`, that a cookie whose name does not start with `51D_`,
+  the session cookie included when track session is on, and the Cookie header
+  are never shared, even when all Evidence is shared, and that a cookie whose
+  name starts with `51D_` is shared
 - check operation of SessionID
 - check operation on shut down
 - check that ShareUsage does not impose an undue burden on performance
@@ -226,22 +231,34 @@ ShareUsage:
 - check that every record carries a `ProcessId` element holding a version 4
   UUID in the string format that
   [process identifier](pipeline-elements/usage-sharing-element.md#process-identifier)
-  gives, that it is the same in every record one element writes, and that two
-  elements built in one process write different identifiers
-- check, moving time on in the test rather than waiting, that the
+  gives, with its letters in either case, that it is the same in every record
+  one usage sharing element writes, and that two usage sharing elements built
+  in one process write different identifiers
+- check, with every invariant value known before the first record, and with
+  the test moving time on rather than waiting, that the
   [invariant values](pipeline-elements/usage-sharing-element.md#invariant-values)
-  are written to the first record, are left out of the records after it, and
-  are written again to the first record written once an hour or more has
-  passed since they were last written, including when the message that last
-  carried them failed to send
-- check that an invariant value not known when the element is built, such as
-  the server address, is written as an empty element until it is known, that
-  all the invariant values are written again to the first record written after
-  it becomes known, and that the value does not change after that
-- check that a record carrying the invariant values has one `Package` element
-  for every 51Degrees package in use, each written once, named as its package
-  manager knows it and giving the version in use, and that a record leaving
-  out the invariant values has none
+  are written to the first record and left out of the records after it, that
+  a record written just under an hour after they were last written still
+  leaves them out, and that the first record written once an hour or more has
+  passed carries them and the records after it leave them out again
+- check, in the same way, that when the message carrying the invariant values
+  fails to send, the records written within the hour after the record that
+  carried them still leave them out, and the first record written once that
+  hour has passed carries them
+- check that an invariant value that is not yet known as the first record is
+  written, such as the server address, is written as an empty element, in
+  either of the two forms the usage sharing element page allows, in each
+  record that carries the invariant values until it is known, that all the
+  invariant values are written again to the first record written after each
+  such value becomes known and left out of the records after that, and that a
+  value does not change once known
+- check that a record carrying the invariant values has one
+  [`Package`](pipeline-elements/usage-sharing-element.md#processing) element
+  for every 51Degrees package in use, being the package that holds the
+  Pipeline, the package that holds each Flow Element and every 51Degrees
+  package those depend on, each written once, with the name its package
+  manager knows it by in the `Name` attribute and the version in use as its
+  text, and that a record leaving out the invariant values has none
 
 SetHeaders
 
