@@ -83,9 +83,16 @@ deserialize the raw JSON from the Cloud Request Engine:
    [processing](cloud-request-engine.md#processing) describes, and add no
    error of this Engine's own for it, neither recording one nor throwing one,
    as [exception handling](../features/exception-handling.md#lazy-properties)
-   requires. Otherwise take
-   the portion that relates to this Aspect by using the appropriate string
-   Data Key. (For example, `device` for Device Detection)
+   requires. That holds whether the Engine meets the failure through the
+   task, or, in a package that cannot run a task in the background, finds the
+   Cloud Request Engine's own error for the request already in this Flow
+   Data's errors. The Engine then adds its Element Data holding no Property
+   values, skips step 2 and returns without an error, so that each of its
+   Properties is missing and a read of one gives the `CloudRequestFailed`
+   reason that [properties](../features/properties.md#deciding-the-reason)
+   describes.
+   Otherwise take the portion that relates to this Aspect by using the
+   appropriate string Data Key. (For example, `device` for Device Detection)
 2. Deserialize that portion of the raw JSON to construct the Element Data result.
 
 Where the response JSON has no portion for the Engine's Data Key, the Cloud
