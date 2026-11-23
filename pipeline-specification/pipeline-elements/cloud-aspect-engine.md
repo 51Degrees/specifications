@@ -80,7 +80,10 @@ deserialize the raw JSON from the Cloud Request Engine:
    its [lazy property's](../features/thread-safety.md#lazy-properties) task if
    the response has not yet arrived. If the request failed, record the
    failure once, as the Cloud Request Engine's error, as its
-   [processing](cloud-request-engine.md#processing) describes. Otherwise take
+   [processing](cloud-request-engine.md#processing) describes, and add no
+   error of this Engine's own for it, neither recording one nor throwing one,
+   as [exception handling](../features/exception-handling.md#lazy-properties)
+   requires. Otherwise take
    the portion that relates to this Aspect by using the appropriate string
    Data Key. (For example, `device` for Device Detection)
 2. Deserialize that portion of the raw JSON to construct the Element Data result.
