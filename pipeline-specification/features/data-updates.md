@@ -135,7 +135,8 @@ recent than the current data.
 
 This option can be used to bootstrap an Aspect Engine that does not yet have
 any local data. In the case of file data source, the data is stored once
-obtained via HTTP.
+obtained via HTTP. With License Keys that hold several products, it needs a
+[configured product](#configured-product) to do so.
 
 Configuration Groups:
 
@@ -454,7 +455,8 @@ product, unless one is [configured](#configured-product), so the Distributor
 cannot tell which data file is wanted. It answers
 300 (Multiple choices) with a JSON body that lists one URI for each product
 the License Keys hold. Each URI names its product in a `Product` query
-parameter.
+parameter. The example below is shortened to the parts the data update
+service reads.
 
 ```json
 {
@@ -466,6 +468,16 @@ parameter.
 }
 ```
 
+The answer also has a `Location` header that names the first URI in the
+list. The data update service MUST NOT follow it, and its HTTP client MUST
+NOT follow it either, because the first URI can be for another product than
+the one the Engine needs. A client that follows a 300 by itself is set not
+to.
+
+The first request can be redirected by a 301, 302, 307, or 308 response
+before the 300 arrives. The URL of the first request, in the steps and the
+messages, is then the address that answered 300.
+
 Where no product is configured, the data update service MUST then ask for
 the product of the data file the Engine has loaded, as follows.
 
@@ -474,8 +486,8 @@ the product of the data file the Engine has loaded, as follows.
    or a 304 (Not modified), so nothing changes for them.
 2. On a 300 response whose body is JSON with an `AvailableUris` list, read
    the `Product` query parameter of each URI in the list. The name of the
-   parameter is matched ignoring case. A URI with no `Product` parameter is
-   ignored.
+   parameter is matched ignoring case. A URI with no `Product` parameter, or
+   whose `Product` value is empty, is ignored.
 3. Find the product name of the data file the Engine has loaded, as
    [product names](#product-names) says.
 4. Choose the URI whose `Product` value is that product name. The comparison
@@ -488,17 +500,21 @@ the product of the data file the Engine has loaded, as follows.
 6. Handle the response to the second request as the response to a first
    request is handled. Another 300 is not followed, and is an error as any
    other response is. The second request is logged as a request is, so
-   `Checking for update from` is logged again, and each message after it
-   names the URL of the second request.
-7. If no URI is chosen, the check fails with an error that names the product
-   needed and the products offered, as [errors](#errors) lists. This is also
-   the case when no product name is known, as [product names](#product-names)
-   says.
+   `Checking for update from` is logged again, naming the URL of the second
+   request, as each message after it does.
+7. If the list gives at least one `Product` value and no URI is chosen, the
+   check fails with an error that names the product needed and the products
+   offered, as [errors](#errors) lists. This is also the case when no
+   product name is known, as [product names](#product-names) says.
 
 The two requests are one check, which is reported once, as
 [reporting each check](#reporting-each-check) says. A 300 response whose body
-is not JSON with an `AvailableUris` list, or whose list gives no `Product`
-value, is an error as any other response is.
+is not JSON with an `AvailableUris` list, or whose list is empty or gives no
+`Product` value, is an error as any other response is. It is not the error
+of step 7.
+
+The steps apply to every data update URL, the Distributor's or the caller's
+own, and whether or not a URL formatter is used.
 
 A request that names a product the License Keys do not hold gets a 403
 (Forbidden) response, whose body is
@@ -510,21 +526,31 @@ configured product can.
 #### Configured product
 
 A configuration MAY name the product to ask for, as **dataUpdateProduct**.
-It is a product name as the Distributor spells it, for example `V4TAC`. No
-product is configured by default.
+The option takes each language's usual form of the name. An option of
+another name that a package already has for this MAY be kept, and so MAY a
+URL formatter that is given the product when it is created.
 
-When a product is configured:
+The value is a product name as the Distributor spells it, for example
+`V4TAC`, and is sent as given. An empty value is no product. No product is
+configured by default.
 
-1. Every request carries `Product=<the configured product>`, the first
-   request included. The URL formatter adds it with `LicenseKeys`,
-   `Download=True` and `Type`.
-2. The configured product is used in place of the product name of the loaded
-   data file, which is not looked up.
-3. A 300 response is not followed, and no product is chosen from it. It is
-   an error as any other response is.
-4. A 403 response is the 403 error that [errors](#errors) lists. It is what
-   the Distributor answers when the License Keys do not hold the configured
-   product.
+A `Product` parameter with a value in the caller's own data update URL also
+counts as a configured product. The URL is then requested as it is, and no
+second `Product` is added to it, whatever dataUpdateProduct says.
+
+When a product is configured, the data update service:
+
+1. MUST send `Product=<the configured product>` in every request, the
+   first request included. The URL formatter adds it with `LicenseKeys`,
+   `Download=True`, and `Type`. Where no URL formatter is used, the service
+   adds it to the query of the data update URL itself.
+2. MUST use the configured product in place of the product name of the
+   loaded data file, and MUST NOT look that name up.
+3. MUST NOT follow a 300 response or choose a product from it. A 300 is an
+   error as any other response is.
+4. MUST treat a 403 response as the 403 error that [errors](#errors) lists.
+   It is what the Distributor answers when the License Keys do not hold the
+   configured product.
 
 When no product is configured, the first request names no product, and the
 steps for a 300 response above apply.
@@ -540,7 +566,7 @@ License Keys that hold one product need no configured product. License Keys
 that hold several need one in two cases, where the check otherwise fails as
 step 7 says:
 
-- The [update on start-up](#update-on-start-up), which checks before the
+- The [update on start-up](#update-on-start-up), where it checks before the
   Engine has loaded a data file, so no product name is known.
 - An Engine whose loaded data file is of a product the License Keys do not
   hold, such as the free Lite data file, or a data file of another tier than
@@ -550,8 +576,8 @@ step 7 says:
 
 The product name of a data file is made from its tier. The tier is the
 product value held in the data file, which the Engine reads when it loads
-the file and gives as its data source tier (`getProduct()` in the native
-Engine of the reference implementations). The product name is a prefix for
+the file (`getProduct()` in the native Engine of the reference
+implementations). The product name is a prefix for
 the kind of data file, followed by the tier. A tier that already starts with
 the prefix, ignoring case, is the product name as it is.
 
@@ -643,7 +669,7 @@ after the second request names the URL of the second request.
 | The request to the data update URL ended with no response and no error                        | Error                            | `AUTO_UPDATE_HTTPS_ERR`                 | No response from data update service at '\<url\>' for engine '\<Engine type name\>'                                                                                                           |
 | A 429 (Too many requests) response                                                            | Error                            | `AUTO_UPDATE_ERR_429_TOO_MANY_ATTEMPTS` | Too many requests to '\<url\>' for engine '\<Engine type name\>'                                                                                                                              |
 | A 403 (Forbidden) response                                                                    | Error                            | `AUTO_UPDATE_ERR_403_FORBIDDEN`         | Access denied to data update service at '\<url\>' for engine '\<Engine type name\>'                                                                                                           |
-| A 300 (Multiple choices) response that does not offer the product of the loaded data file | Error | `AUTO_UPDATE_HTTPS_ERR` | Product '\<product\>' is not offered by data update service at '\<url\>' for engine '\<Engine type name\>'. Products offered: '\<products offered\>' |
+| A 300 (Multiple choices) response that lists at least one product and does not offer the product of the loaded data file | Error | `AUTO_UPDATE_HTTPS_ERR` | Product '\<product\>' is not offered by data update service at '\<url\>' for engine '\<Engine type name\>'. Products offered: '\<products offered\>' |
 | Any other response that is not a success and not a 304 (Not modified)                         | Error                            | `AUTO_UPDATE_HTTPS_ERR`                 | HTTP status code '\<status code\>' from data update service at '\<url\>' for engine '\<Engine type name\>'                                                                                    |
 | The response has no `Content-MD5` header                                                      | Warning                          | None, the check goes on                 | No MD5 hash included in data update response for '\<url\>'. Unable to verify data integrity                                                                                                   |
 | The integrity check of the downloaded data failed                                             | Error                            | `AUTO_UPDATE_ERR_MD5_VALIDATION_FAILED` | Integrity check failed. MD5 hash in HTTP response '\<hash in response\>' for '\<Engine type name\>'data update does not match calculated hash for the downloaded file '\<calculated hash\>'.  |
