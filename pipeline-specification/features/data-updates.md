@@ -250,6 +250,8 @@ Configuration of the remote endpoint for download:
 
 - **dataUpdateUrl** - the remote URL
 - **urlFormatter** - URL customization
+- **dataUpdateProduct** - the product to ask for, see
+  [configured product](#configured-product)
 - **useIfModifiedSince** - request data using `If-Modified-Since` HTTP header
 - **decompressContent** - deprecated - always decompress content if it is compressed
 - **verifyMD5** - deprecated - always verify MD5 if an MD5 value is provided
@@ -395,7 +397,8 @@ keeps that file current without further configuration:
 | updateOnStartup | off |
 | pollingInterval | 30 minutes |
 | randomization | up to 10 minutes |
-| dataUpdateUrl | `https://distributor.51degrees.com/api/v2/download`, with the URL formatter adding `LicenseKeys`, `Download=True` and `Type`, where the type is `HashV41` for a Device Detection Hash data file and `IPIV41` for an IP Intelligence data file. `Product` is added only when the License Keys hold several products, as [License Keys with several products](#license-keys-with-several-products) says |
+| dataUpdateUrl | `https://distributor.51degrees.com/api/v2/download`, with the URL formatter adding `LicenseKeys`, `Download=True` and `Type`, where the type is `HashV41` for a Device Detection Hash data file and `IPIV41` for an IP Intelligence data file. `Product` is added to every request when a product is configured, and otherwise only when the License Keys hold several products, as [License Keys with several products](#license-keys-with-several-products) says |
+| dataUpdateProduct | none, so the first request names no product |
 | License key | required before the Engine builds with autoUpdate or updateOnStartup on, because the Distributor serves nothing without one. The build fails with a configuration error that names the option to turn off. A configuration may say that no key is required, for an update source that serves the file without one. The file system watcher downloads nothing and needs no key |
 
 An application that cannot supply a license key, such as one running the free
@@ -447,7 +450,8 @@ to repeat the same checks after the *polling interval* + a random time based on
 
 A License Key can hold more than one product, for example a Device Detection
 data file and an IP Intelligence data file. The first request names no
-product, so the Distributor cannot tell which data file is wanted. It answers
+product, unless one is [configured](#configured-product), so the Distributor
+cannot tell which data file is wanted. It answers
 300 (Multiple choices) with a JSON body that lists one URI for each product
 the License Keys hold. Each URI names its product in a `Product` query
 parameter.
@@ -462,15 +466,16 @@ parameter.
 }
 ```
 
-The data update service MUST then ask for the product of the data file the
-Engine has loaded, as follows.
+Where no product is configured, the data update service MUST then ask for
+the product of the data file the Engine has loaded, as follows.
 
 1. Send the first request as the rest of this section describes, with no
    `Product` parameter. License Keys that hold one product get the data file
    or a 304 (Not modified), so nothing changes for them.
 2. On a 300 response whose body is JSON with an `AvailableUris` list, read
-   the `Product` query parameter of each URI in the list. A URI with no
-   `Product` parameter is ignored.
+   the `Product` query parameter of each URI in the list. The name of the
+   parameter is matched ignoring case. A URI with no `Product` parameter is
+   ignored.
 3. Find the product name of the data file the Engine has loaded, as
    [product names](#product-names) says.
 4. Choose the URI whose `Product` value is that product name. The comparison
@@ -482,28 +487,71 @@ Engine has loaded, as follows.
    request keeps `Download=True` and goes to the configured data update URL.
 6. Handle the response to the second request as the response to a first
    request is handled. Another 300 is not followed, and is an error as any
-   other response is.
+   other response is. The second request is logged as a request is, so
+   `Checking for update from` is logged again, and each message after it
+   names the URL of the second request.
 7. If no URI is chosen, the check fails with an error that names the product
    needed and the products offered, as [errors](#errors) lists. This is also
-   the case when the Engine has no data file loaded, as no product name is
-   known then.
+   the case when no product name is known, as [product names](#product-names)
+   says.
 
 The two requests are one check, which is reported once, as
 [reporting each check](#reporting-each-check) says. A 300 response whose body
-is not JSON with an `AvailableUris` list is an error as any other response
-is.
+is not JSON with an `AvailableUris` list, or whose list gives no `Product`
+value, is an error as any other response is.
 
 A request that names a product the License Keys do not hold gets a 403
 (Forbidden) response, whose body is
 `{"Error":"The license key provided does not contain the requested product."}`.
 It is the 403 error that [errors](#errors) lists. The steps above never
-cause it, because they only name a product that the Distributor offered.
+cause it, because they only name a product that the Distributor offered. A
+configured product can.
+
+#### Configured product
+
+A configuration MAY name the product to ask for, as **dataUpdateProduct**.
+It is a product name as the Distributor spells it, for example `V4TAC`. No
+product is configured by default.
+
+When a product is configured:
+
+1. Every request carries `Product=<the configured product>`, the first
+   request included. The URL formatter adds it with `LicenseKeys`,
+   `Download=True` and `Type`.
+2. The configured product is used in place of the product name of the loaded
+   data file, which is not looked up.
+3. A 300 response is not followed, and no product is chosen from it. It is
+   an error as any other response is.
+4. A 403 response is the 403 error that [errors](#errors) lists. It is what
+   the Distributor answers when the License Keys do not hold the configured
+   product.
+
+When no product is configured, the first request names no product, and the
+steps for a 300 response above apply.
+
+An update example that reads its settings from the environment reads the
+product to configure from `_51DEGREES_DD_PRODUCT` for Device Detection and
+from `_51DEGREES_IPI_PRODUCT` for IP Intelligence, as
+[environment variables](environment-variables.md) lists. The example
+configures a product only when the variable is set. When it is not set, the
+example sends no product.
+
+License Keys that hold one product need no configured product. License Keys
+that hold several need one in two cases, where the check otherwise fails as
+step 7 says:
+
+- The [update on start-up](#update-on-start-up), which checks before the
+  Engine has loaded a data file, so no product name is known.
+- An Engine whose loaded data file is of a product the License Keys do not
+  hold, such as the free Lite data file, or a data file of another tier than
+  the one licensed. Its own product is not offered.
 
 #### Product names
 
 The product name of a data file is made from its tier. The tier is the
 product value held in the data file, which the Engine reads when it loads
-the file and gives as its data source tier. The product name is a prefix for
+the file and gives as its data source tier (`getProduct()` in the native
+Engine of the reference implementations). The product name is a prefix for
 the kind of data file, followed by the tier. A tier that already starts with
 the prefix, ignoring case, is the product name as it is.
 
@@ -515,6 +563,10 @@ the prefix, ignoring case, is the product name as it is.
 
 A data file of another tier takes its product name in the same way. An
 Engine for another kind of data file names its own prefix.
+
+No product name is known when no data file is loaded, when the tier of the
+loaded data file is empty, or when the kind of data file has no prefix. A
+prefix alone is never a product name.
 
 ## Logging
 
@@ -561,7 +613,8 @@ caller instead of logging it.
 
 These messages MUST also be consistent across languages to make life easier
 for 51Degrees support. They are the messages and levels of the .NET data
-update service, and each status is the one .NET reports.
+update service, and each status is the one .NET reports. The rows for a 300
+response are set here for every language.
 
 A row at Error level is an error that carries the message shown. Where the
 service logs it, the entry is at Error, reads `Error during check for data
@@ -576,11 +629,13 @@ called, and on update polling any reports of the check not yet made are not
 made. A row at Warning level is logged with the message shown, and the check
 goes on.
 
-In the row for a 300 response, \<product\> is the product name of the loaded
-data file, which is empty when no data file is loaded. The
-\<products offered\> are the `Product` values the response listed, in its
-order, joined with a comma and no space, for example `IPIV4Enterprise,V4TAC`.
-The \<url\> in that row is the URL of the first request.
+In the row for a 300 response that does not offer the product, \<product\>
+is the product name of the loaded data file, which is empty when no product
+name is known. The \<products offered\> are the `Product` values the
+response listed, in its order, joined with a comma and no space, for example
+`IPIV4Enterprise,V4TAC`. The \<url\> in that row, and in the
+`Requesting product` message, is the URL of the first request. Each message
+after the second request names the URL of the second request.
 
 | **Error**                                                                                     | **Log level**                    | **Status**                              | **Message**                                                                                                                                                                                   |
 |-----------------------------------------------------------------------------------------------|----------------------------------|-----------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
