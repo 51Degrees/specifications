@@ -14,6 +14,7 @@ products.
 | [IP Intelligence Specification](ip-intelligence-specification/README.md) | Specification for the IP Intelligence service. This builds on the concepts and features defined in the Pipeline specification. |
 | [Data Model Specification](data-model-specification/README.md)             | Details of the data model used by Device Detection and by other services in the future.                                         |
 | [51Did Specification](did-specification/README.md)                         | The 51Degrees identifier, its byte structure and the surface every 51Did package exposes.                                        |
+| [Redeem Specification](redeem-specification/README.md)                     | How a server redeems a sealed 51Did context result or human confidence level, and what every package that redeems one does.      |
 
 ## Notes for implementers
 

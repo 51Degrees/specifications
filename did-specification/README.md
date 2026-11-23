@@ -26,6 +26,7 @@ distinct because callers make different decisions at each one.
 |----------------------------------------------|--------------------------------------------------------------------------------------------------------------------|
 | [Identifier layout](identifier-layout.md)    | The byte structure of the Envelope and of the 51Did payload, including the flags byte, the Usage and the Match Key. |
 | [Package surface](package-surface.md)        | What a 51Did package exposes to a caller in every language, and what it MUST NOT expose.                            |
+| [Redeem](../redeem-specification/README.md)  | How a server redeems a sealed creator context result, in the Redeem specification shared with human confidence.     |
 
 ## Notes for implementers
 
