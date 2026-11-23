@@ -35,6 +35,12 @@ Defined element specifications include:
 - [Translation Engine](pipeline-elements/translation-engine.md)
 - [Usage Sharing Element](pipeline-elements/usage-sharing-element.md)
 
+## Feature specifications
+
+Defined feature specifications include:
+
+- [Human Confidence](features/human-confidence.md)
+
 ## What is the Pipeline API?
 
 51Degrees Pipeline provides a framework within which input data is transformed

@@ -109,6 +109,31 @@ collapse the block into a single verdict of its own, because the point of
 answering per factor is that a caller weighs an address change differently
 from a changed device.
 
+### A sealed creator context result
+
+The remote server can return the creator context check sealed, meaning the
+browser can carry the result but cannot read or change it, for the caller's
+server to redeem. A package redeems the sealed result with the 51Did, the
+License Key and, where the check was asked for with one, the challenge, being
+a value used for one page only that the result is bound to. The remote server
+redeems it as it redeems every sealed result, as set out in
+[Human Confidence](../pipeline-specification/features/human-confidence.md#what-the-service-guarantees).
+
+A redeemed result gives the Signature outcome, the Context outcome and,
+where the server sent one, the Factor block, as above. Where the result
+could not be redeemed, the Context outcome alone answers, with one of these
+values as the reason the check could not be completed.
+
+| **Context outcome** | **Meaning**                                                         |
+|---------------------|---------------------------------------------------------------------|
+| Expired             | The result was not redeemed in time.                                |
+| Replayed            | The result had already been redeemed.                               |
+| Unreadable          | The remote server could not read the result with the inputs given.  |
+| Unconfirmed         | The remote server could not complete the redemption.                |
+
+The server sends these as the lower case words `expired`, `replayed`,
+`unreadable` and `unconfirmed`.
+
 ### An outcome a package does not know
 
 The set of outcomes grows, so a package will meet a word that its own version
