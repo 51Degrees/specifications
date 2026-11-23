@@ -215,8 +215,8 @@ ShareUsage:
   differ only in `query.session-id` or `query.sequence`, with either key in
   any letter case, are shared once within the repeat Evidence interval, and
   that the record carries both, as they are in the Evidence after the
-  Sequence Element has run, as Evidence entries and in its `SessionId` and
-  `Sequence` elements
+  Sequence Element has run, as Evidence entries, matching their names
+  ignoring letter case, and in its `SessionId` and `Sequence` elements
 - check operation of filtering of headers
 - check, for parameters in a query string and in the form body of a POST
   request, that a `password` parameter no Flow Element accepts is never
@@ -227,9 +227,9 @@ ShareUsage:
   all query string parameters option changes nothing that is shared
 - check, for cookies and the Cookie header found in the Evidence and in the
   web request supplied as `server.http-request`, that a cookie whose name does
-  not start with `51D_`, the session cookie included when track session is on
-  and its name does not start with `51D_`, and the Cookie header are never
-  shared, in one run with all Evidence shared and in another with all
+  not start with `51D_`, the session cookie included when its name does not
+  start with `51D_`, and the Cookie header are never shared, with track
+  session on, in one run with all Evidence shared and in another with all
   Evidence not shared and a blocked HTTP headers list that leaves out Cookie,
   and that a cookie whose name starts with `51D_`, in any letter case, is
   shared
@@ -266,7 +266,8 @@ ShareUsage:
   element, as
   [XML 1.0 section 3.1](https://www.w3.org/TR/xml/#sec-starttags) defines
   one, checked by reading the record as XML, that the records after it leave
-  the invariant values out until the value is known, that all the invariant
+  the invariant values out, within the hour, until that value or another such
+  value becomes known, that all the invariant
   values are written again to the first record written after each such value
   becomes known and left out of the records after that, within the hour,
   until the next such value becomes known, and that a value does not change
