@@ -211,7 +211,8 @@ ShareUsage:
 - check, in a Pipeline with the
   [Sequence Element](pipeline-elements/sequence-element.md), once with the
   default options, once with all Evidence shared and once with track session
-  on, that two requests that differ only in `query.session-id` or
+  on and the same session cookie in both requests, that two requests that
+  differ only in `query.session-id` or
   `query.sequence`, with either key in any letter case, are shared once within
   the repeat Evidence interval, and that the record carries both as Evidence
   entries and in its `SessionId` and `Sequence` elements
@@ -223,11 +224,12 @@ ShareUsage:
   accepts is shared
 - check that setting the deprecated included query string parameters or share
   all query string parameters option changes nothing that is shared
-- check, for cookies found in the Evidence and in the web request supplied as
-  `server.http-request`, that a cookie whose name does not start with `51D_`,
-  the session cookie included when track session is on, and the Cookie header
-  are never shared, even when all Evidence is shared, and that a cookie whose
-  name starts with `51D_`, in any letter case, is shared
+- check, for cookies and the Cookie header found in the Evidence and in the
+  web request supplied as `server.http-request`, that a cookie whose name does
+  not start with `51D_`, the session cookie included when track session is on
+  and its name does not start with `51D_`, and the Cookie header are never
+  shared, even when all Evidence is shared, and that a cookie whose name
+  starts with `51D_`, in any letter case, is shared
 - check operation of SessionID
 - check operation on shut down
 - check that ShareUsage does not impose an undue burden on performance
@@ -238,10 +240,10 @@ ShareUsage:
 - check that every record carries a `ProcessId` element holding a version 4
   UUID in the string format that
   [process identifier](pipeline-elements/usage-sharing-element.md#process-identifier)
-  gives, with its letters in either case, that it is the same in every record
-  one usage sharing element writes, and that two usage sharing elements built
-  in one process write different identifiers, comparing identifiers ignoring
-  letter case
+  gives, with its letters in either case, and, comparing identifiers ignoring
+  letter case, that it is the same in every record one usage sharing element
+  writes, and that two usage sharing elements built in one process write
+  different identifiers
 - check, with every invariant value known before the first record, and with
   the test moving time on rather than waiting, that the
   [invariant values](pipeline-elements/usage-sharing-element.md#invariant-values)
@@ -251,17 +253,18 @@ ShareUsage:
   passed carries them and the records after it leave them out again
 - check, in the same way, that when a message carrying the invariant values
   fails to send, after an earlier message carrying them was sent, the records
-  written within the hour after the record in the failed message still leave
-  them out, and the first record written once that hour has passed carries
-  them
-- check that an invariant value that is not yet known as the first record is
-  written, such as the server address, is written as an empty element, as
+  written within the hour after the record in the failed message that carried
+  them still leave them out, and the first record written once that hour has
+  passed carries them
+- check, holding back a lookup such as the server address in the test so
+  that its value is not yet known as the first record is written, that the
+  value is written as an empty element, as
   [XML 1.0 section 3.1](https://www.w3.org/TR/xml/#sec-starttags) defines
   one, checked by reading the record as XML, in each record that carries the
   invariant values until it is known, that all the invariant values are
   written again to the first record written after each such value becomes
-  known and left out of the records after that, and that a value does not
-  change once known
+  known and left out of the records after that until the next such value
+  becomes known, and that a value does not change once known
 - check that a record carrying the invariant values has one
   [`Package`](pipeline-elements/usage-sharing-element.md#processing) element
   for every 51Degrees package in use, being the package that holds the
