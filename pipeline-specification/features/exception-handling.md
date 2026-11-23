@@ -70,7 +70,11 @@ failure while the Flow Data is still being processed records it once in the
 Flow Data's errors, as an error of the Flow Element whose Element Data holds
 the lazy property, under the errors lock where the reader is a member of a
 parallel group, and the Pipeline then handles it as described above. A
-failure met once processing has finished reaches only the reader, as an
+reader that meets the failure while the Flow Data is still being processed,
+whether it records the failure or finds it already recorded, MUST NOT add an
+error of its own for it or throw it, because the Pipeline, or the parallel
+element, would then add the failure to the Flow Data's errors a second time.
+A failure met once processing has finished reaches only the reader, as an
 error from the read, because writes to a finished Flow Data fail, as
 [thread safety](thread-safety.md#flow-data) describes.
 
