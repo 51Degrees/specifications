@@ -25,8 +25,8 @@ Names that GitHub, an operating system or another tool defines, such as `GITHUB_
 | `_51DEGREES_CLOUD_ENDPOINT` | The address of the cloud service to use. When it isn't set, the public service is used. |
 | `_51DEGREES_DD_PATH` | The path of a Device Detection data file. |
 | `_51DEGREES_IPI_PATH` | The path of an IP Intelligence data file. |
-| `_51DEGREES_DD_PRODUCT` | The product the Device Detection update example asks the Distributor for, such as `V4TAC`. The example names a product only when this is set. When it isn't set, the example sends no product. |
-| `_51DEGREES_IPI_PRODUCT` | The product the IP Intelligence update example asks the Distributor for, such as `IPIV4Enterprise`. The example names a product only when this is set. When it isn't set, the example sends no product. |
+| `_51DEGREES_DD_PRODUCT` | The product the Device Detection update example asks the Distributor for, such as `V4TAC`. The example names a product only when this is set or an argument to the example gives one. Otherwise the example sends no product. |
+| `_51DEGREES_IPI_PRODUCT` | The product the IP Intelligence update example asks the Distributor for, such as `IPIV4Enterprise`. The example names a product only when this is set or an argument to the example gives one. Otherwise the example sends no product. |
 | `_51DEGREES_EVIDENCE_YAML` | The path of a YAML evidence file. When it isn't set, `20000 Evidence Records.yml` is used. |
 | `_51DEGREES_EXAMPLE_HTTP_PORTS` | The port, or ports, a web example listens on. |
 | `_51DEGREES_EXAMPLE_URL` | The address of a running example for the browser tests to open. |

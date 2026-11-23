@@ -184,6 +184,64 @@ DataUpdate is a complex process with many options.
   created before and during the refreshes are processed and read on other
   threads, leaves every value read intact
 
+The checks below are for
+[License Keys with several products](features/data-updates.md#license-keys-with-several-products),
+and are the same in every language. Each runs one check for an update
+against a local HTTP server in place of the Distributor. The loaded data
+file has the product name `V4TAC` and no product is configured, unless the
+check says otherwise. The messages and statuses are those that
+[data updates](features/data-updates.md#logging) lists.
+
+- check that a first response with the data file gives one request with no
+  `Product`, one `Checking for update from` message, and
+  `AUTO_UPDATE_SUCCESS`
+- check that a 300 that offers `IPIV4Enterprise` and `V4TAC`, with a
+  `Location` header that names a second server, gives a second request to
+  the first server with `Product=V4TAC` as the last parameter and the rest
+  of the query unchanged, no request to the second server,
+  `Requesting product` and then `Checking for update from` at Information
+  level, and `AUTO_UPDATE_SUCCESS`
+- check that a 300 whose only matching URI has `product=v4tac` gives a
+  second request with `Product=v4tac`, and `AUTO_UPDATE_SUCCESS`
+- check that a first request with an `If-Modified-Since` header, answered
+  with a 300 that offers `V4TAC`, gives a second request with the same
+  `If-Modified-Since` value
+- check that a 300 in answer to the second request gives two requests and
+  no third, the `HTTP status code '300'` message naming the URL of the
+  second request, and `AUTO_UPDATE_HTTPS_ERR`
+- check that a 300 that offers only `IPIV4Enterprise` gives one request,
+  the message `Product 'V4TAC' is not offered` with
+  `Products offered: 'IPIV4Enterprise'`, and `AUTO_UPDATE_HTTPS_ERR`
+- check that a 300 that offers `V4TAC`, where no product name is known,
+  gives one request, the message `Product '' is not offered` with
+  `Products offered: 'V4TAC'`, and `AUTO_UPDATE_HTTPS_ERR`
+- check that a 300 whose body is not JSON, one with no `AvailableUris`
+  list, one with an empty list, and one whose list gives no `Product`
+  value, each gives one request, the `HTTP status code '300'` message, and
+  `AUTO_UPDATE_HTTPS_ERR`
+- check that a configured product of `V4TAC`, answered with a 300 that
+  offers `V4TAC`, gives one request with `Product=V4TAC`, the
+  `HTTP status code '300'` message, and `AUTO_UPDATE_HTTPS_ERR`
+- check that a configured product of `V4TAC`, answered with a 403, gives
+  one request with `Product=V4TAC`, the `Access denied` message, and
+  `AUTO_UPDATE_ERR_403_FORBIDDEN`
+- check that a data update URL of the caller's with `product=V4TAC` in its
+  query, and another product in dataUpdateProduct, gives one request whose
+  query has that parameter unchanged and no other `Product`, and that a 300
+  in answer is the `HTTP status code '300'` message and
+  `AUTO_UPDATE_HTTPS_ERR`
+- check that a data update URL of the caller's with `Product=` in its
+  query, answered with a 300 that offers `V4TAC`, gives a second request
+  whose query has `Product=V4TAC` once, as the last parameter
+- check that a 300 that offers `V4TAC`, followed by a 304 to the second
+  request, gives the `No data newer than` message naming the URL of the
+  second request, and `AUTO_UPDATE_NOT_NEEDED`
+- check that a 307 from the first server to a second server, which answers
+  with a 300 that offers `V4TAC`, gives a second request to the second
+  server with `Product=V4TAC`, no request to a URI from the list, the
+  `Requesting product` message naming the second server, and
+  `AUTO_UPDATE_SUCCESS`
+
 MissingPropertyService:
 
 - check that "upgrade needed" is returned for a Property that is available in a different tier
