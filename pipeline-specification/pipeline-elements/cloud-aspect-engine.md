@@ -89,8 +89,8 @@ deserialize the raw JSON from the Cloud Request Engine:
    Data's errors. The Engine then adds its Element Data holding no Property
    values, skips step 2 and returns without an error, so that each of its
    Properties is missing and a read of one gives the `CloudRequestFailed`
-   reason that
-   [properties](../features/properties.md#deciding-the-reason) describes.
+   reason that [properties](../features/properties.md#deciding-the-reason)
+   describes.
    Otherwise take the portion that relates to this Aspect by using the
    appropriate string Data Key. (For example, `device` for Device Detection)
 2. Deserialize that portion of the raw JSON to construct the Element Data result.

@@ -73,7 +73,8 @@ Flow Data's errors, as an error of the Flow Element whose Element Data holds
 the lazy property, under the errors lock where the reader is a member of a
 parallel group, and the Pipeline then handles it as described above. A
 reader finds whether the failure is already recorded by looking in this Flow
-Data's errors. Where the readers are members of a parallel group, finding
+Data's errors for an error of the Flow Element whose Element Data holds the
+lazy property. Where the readers are members of a parallel group, finding
 whether the failure is already recorded and recording it are one step under
 the errors lock, so two members never both record it. A reader that meets
 the failure while the Flow Data is still being processed, whether it records

@@ -161,16 +161,16 @@ AspectEngine:
   error, and that one met after processing reaches only the reader, as an
   error from the read
 - check, for a failed Cloud Request Engine request, that the Flow Data's
-  errors hold the Cloud Request Engine's error once and no error from any
-  Cloud Aspect Engine, and that a read of a Property of each Cloud Aspect
-  Engine gives the `CloudRequestFailed` reason, using the package's own Cloud
-  Aspect Engines rather than stand-ins
+  errors hold one error, the Cloud Request Engine's, and that a read of a
+  Property of each Cloud Aspect Engine gives the `CloudRequestFailed` reason,
+  using the package's own Cloud Aspect Engines rather than stand-ins
   - with every one of the package's Cloud Aspect Engines, one after the
     other in one Pipeline
-  - where the package offers parallel processing, with two Cloud Aspect
-    Engines that have different Data Keys as members of one parallel group.
-    A package with only one Cloud Aspect Engine of its own adds a second,
-    built on the same Cloud Aspect Engine code with another Data Key
+  - where the package offers parallel processing, with the Cloud Request
+    Engine before the group and two Cloud Aspect Engines that have different
+    Data Keys as members of one parallel group. A package with only one
+    Cloud Aspect Engine of its own adds a second, built on the same Cloud
+    Aspect Engine code with another Data Key
 - check that an Engine whose Element Data another Flow Element also writes
   does not allow a cache to be added
 - check that disposing an Engine while process calls, lazy tasks and a
