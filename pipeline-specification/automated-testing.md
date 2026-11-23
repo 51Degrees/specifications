@@ -196,18 +196,20 @@ MissingPropertyService:
 ShareUsage:
 
 - check that ShareUsage substitutes illegal XML characters correctly and truncates values
-- check that ShareUsage operates correctly, dropping a batch whose send failed
-  rather than putting it back on the queue
+- check that a batch whose send failed, because the request could not be
+  made, had no answer in time or was answered with anything other than 200,
+  is dropped rather than put back on the queue
 - check that adding more data stops when queue is full and resumes when it is no longer so
 - check that all data in the queue is sent
 - check minimum batch size and maximum batch size
 - check operation of tracker (i.e. not sending duplicated data)
 - check, in a Pipeline with the
-  [Sequence Element](pipeline-elements/sequence-element.md), and with the
-  default options, with all Evidence shared and with track session on, that
-  two requests that differ only in `query.session-id` or `query.sequence`,
-  with either key in any letter case, are shared once within the repeat
-  Evidence interval, and that the record carries both as Evidence entries
+  [Sequence Element](pipeline-elements/sequence-element.md), once with the
+  default options, once with all Evidence shared and once with track session
+  on, that two requests that differ only in `query.session-id` or
+  `query.sequence`, with either key in any letter case, are shared once within
+  the repeat Evidence interval, and that the record carries both as Evidence
+  entries and in its `SessionId` and `Sequence` elements
 - check operation of filtering of headers
 - check, for parameters in a query string and in the form body of a POST
   request, that a `password` parameter no Flow Element accepts is never
@@ -220,7 +222,7 @@ ShareUsage:
   `server.http-request`, that a cookie whose name does not start with `51D_`,
   the session cookie included when track session is on, and the Cookie header
   are never shared, even when all Evidence is shared, and that a cookie whose
-  name starts with `51D_` is shared
+  name starts with `51D_`, in any letter case, is shared
 - check operation of SessionID
 - check operation on shut down
 - check that ShareUsage does not impose an undue burden on performance
@@ -233,7 +235,8 @@ ShareUsage:
   [process identifier](pipeline-elements/usage-sharing-element.md#process-identifier)
   gives, with its letters in either case, that it is the same in every record
   one usage sharing element writes, and that two usage sharing elements built
-  in one process write different identifiers
+  in one process write different identifiers, comparing identifiers ignoring
+  letter case
 - check, with every invariant value known before the first record, and with
   the test moving time on rather than waiting, that the
   [invariant values](pipeline-elements/usage-sharing-element.md#invariant-values)
@@ -241,24 +244,27 @@ ShareUsage:
   a record written just under an hour after they were last written still
   leaves them out, and that the first record written once an hour or more has
   passed carries them and the records after it leave them out again
-- check, in the same way, that when the message carrying the invariant values
-  fails to send, the records written within the hour after the record that
-  carried them still leave them out, and the first record written once that
-  hour has passed carries them
+- check, in the same way, that when a message carrying the invariant values
+  fails to send, after an earlier message carrying them was sent, the records
+  written within the hour after the record in the failed message still leave
+  them out, and the first record written once that hour has passed carries
+  them
 - check that an invariant value that is not yet known as the first record is
-  written, such as the server address, is written as an empty element, in
-  either of the two forms the usage sharing element page allows, in each
-  record that carries the invariant values until it is known, that all the
-  invariant values are written again to the first record written after each
-  such value becomes known and left out of the records after that, and that a
-  value does not change once known
+  written, such as the server address, is written as an empty element, as
+  [XML 1.0 section 3.1](https://www.w3.org/TR/xml/#sec-starttags) defines
+  one, checked by reading the record as XML, in each record that carries the
+  invariant values until it is known, that all the invariant values are
+  written again to the first record written after each such value becomes
+  known and left out of the records after that, and that a value does not
+  change once known
 - check that a record carrying the invariant values has one
   [`Package`](pipeline-elements/usage-sharing-element.md#processing) element
   for every 51Degrees package in use, being the package that holds the
   Pipeline, the package that holds each Flow Element and every 51Degrees
   package those depend on, each written once, with the name its package
-  manager knows it by in the `Name` attribute and the version in use as its
-  text, and that a record leaving out the invariant values has none
+  manager knows it by in the `Name` attribute and the version in use, as that
+  package manager gives it, as its text, and that a record leaving out the
+  invariant values has none
 
 SetHeaders
 
