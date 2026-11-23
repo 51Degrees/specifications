@@ -48,7 +48,9 @@ as well to make a decision on whether the exceptions should be suppressed and lo
 Flow Elements can throw exceptions/errors freely, unless it makes
 sense for an Element to handle a specific error internally.
 In general, it is the responsibility of the Pipeline to handle these for
-the user as described above.
+the user as described above. A Flow Element that meets a failed lazy property
+while it processes handles it as [lazy properties](#lazy-properties)
+describes.
 
 ### Parallel groups
 
@@ -69,14 +71,17 @@ Element's process function has returned. The first reader to meet the
 failure while the Flow Data is still being processed records it once in the
 Flow Data's errors, as an error of the Flow Element whose Element Data holds
 the lazy property, under the errors lock where the reader is a member of a
-parallel group, and the Pipeline then handles it as described above. A
-reader that meets the failure while the Flow Data is still being processed,
-whether it records the failure or finds it already recorded, MUST NOT add an
-error of its own for it or throw it, because the Pipeline, or the parallel
-element, would then add the failure to the Flow Data's errors a second time.
-A failure met once processing has finished reaches only the reader, as an
-error from the read, because writes to a finished Flow Data fail, as
-[thread safety](thread-safety.md#flow-data) describes.
+parallel group, and the Pipeline then handles it as described above. Where
+the readers are members of a parallel group, finding whether the failure is
+already recorded and recording it are one step under the errors lock, so two
+members never both record it. A Flow Element that meets the failure while it
+processes, whether it records the failure or finds it already recorded, MUST
+NOT add an error of its own for it, and MUST NOT throw it or let the error
+from the read leave its process function, because the Pipeline, or the
+parallel element, would then add the failure to the Flow Data's errors a
+second time. A failure met once processing has finished reaches only the
+reader, as an error from the read, because writes to a finished Flow Data
+fail, as [thread safety](thread-safety.md#flow-data) describes.
 
 ## Flow Data and derived accessors
 
