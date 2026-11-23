@@ -111,15 +111,35 @@ from a changed device.
 
 ### A sealed creator context result
 
-The remote server can return the creator context check sealed, meaning the
-browser can carry the result but cannot read or change it, for the caller's
-server to redeem. A package redeems the sealed result with the 51Did, the
-License Key and, where the check was asked for with one, the challenge, being
-a value used for one page only that the result is bound to. The remote server
-redeems it as it redeems every sealed result, as set out in
-[Human Confidence](../pipeline-specification/features/human-confidence.md#what-the-service-guarantees).
+The remote server can return the creator context check sealed. A sealed
+result is one the browser carries exactly as the remote server made it, and
+the caller's server redeems it for the outcomes.
 
-A redeemed result gives the Signature outcome, the Context outcome and,
+A package redeems a sealed result with one POST request to `id/redeem` under
+its configured endpoint. Every input goes in the form body, and none in the
+URL.
+
+| **Input**   | **Value**                                                                                   |
+|-------------|---------------------------------------------------------------------------------------------|
+| `51did`     | The 51Did the result was made for, as base64.                                               |
+| `result`    | The sealed result, exactly as the caller received it.                                       |
+| `challenge` | The challenge the check was asked for with, or empty where it was asked for with none.      |
+| `resource`  | The Resource Key the package was given.                                                     |
+| `license`   | The License Key, where the package was given one.                                           |
+
+The challenge is a value used for one page only that the result is bound
+to. The caller issues it and gives it to the package, and a challenge is
+OPTIONAL. A package MUST send the challenge it was given exactly as it was
+given, and MUST NOT make one of its own.
+
+The remote server answers with a JSON object. Its `context` member holds the
+Context outcome, its `signature` member the Signature outcome, and its
+`factors` member, where the server sent one, the Factor block. The status is
+200 for every outcome but Unconfirmed, which has the status 503. The remote
+server redeems the result as it redeems every sealed result, as set out in
+[Human Confidence](../pipeline-specification/features/human-confidence.md#how-the-remote-server-redeems-a-sealed-result).
+
+A redeemed result gives the Signature outcome, the Context outcome, and,
 where the server sent one, the Factor block, as above. Where the result
 could not be redeemed, the Context outcome alone answers, with one of these
 values as the reason the check could not be completed.
@@ -132,7 +152,13 @@ values as the reason the check could not be completed.
 | Unconfirmed         | The remote server could not complete the redemption.                |
 
 The server sends these as the lower case words `expired`, `replayed`,
-`unreadable` and `unconfirmed`.
+`unreadable`, and `unconfirmed`.
+
+The answer for a result that could not be redeemed holds no `signature`. A
+package MUST then report the Signature outcome as unknown, being the value
+it gives whenever the answer holds no Signature outcome, and MUST NOT report
+it as verified or as invalid. That value is read from the answer and not
+from the Context outcome, so the two stay independent.
 
 ### An outcome a package does not know
 
@@ -149,7 +175,9 @@ reading a value it cannot interpret as a pass.
 
 A Context word a package does not know is reported as Unreadable, and the
 Context outcome carries the word as the server sent it beside that value, so a
-caller can still act on a Context outcome the package predates.
+caller can still act on a Context outcome the package predates. Where the
+remote server itself answers `unreadable`, the word carried is `unreadable`,
+so a caller tells the two cases apart by the word carried.
 
 ## What a package does not expose
 

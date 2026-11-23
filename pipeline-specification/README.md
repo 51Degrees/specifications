@@ -35,11 +35,10 @@ Defined element specifications include:
 - [Translation Engine](pipeline-elements/translation-engine.md)
 - [Usage Sharing Element](pipeline-elements/usage-sharing-element.md)
 
-## Feature specifications
+## Human Confidence
 
-Defined feature specifications include:
-
-- [Human Confidence](features/human-confidence.md)
+[Human Confidence](features/human-confidence.md) says what a consumer reads,
+and how a language package redeems a level that arrives sealed.
 
 ## What is the Pipeline API?
 
