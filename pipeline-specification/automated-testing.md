@@ -160,6 +160,11 @@ AspectEngine:
   Engines during processing is recorded once, as the Cloud Request Engine's
   error, and that one met after processing reaches only the reader, as an
   error from the read
+- check, with the real Cloud Aspect Engines of the package reading a failed
+  request during processing, one at a time and, where the package offers
+  parallel processing, as two members of one parallel group, that the Flow
+  Data's errors hold the Cloud Request Engine's error once and no error from
+  any Cloud Aspect Engine
 - check that an Engine whose Element Data another Flow Element also writes
   does not allow a cache to be added
 - check that disposing an Engine while process calls, lazy tasks and a
