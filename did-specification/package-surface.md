@@ -116,8 +116,11 @@ result is one the browser carries exactly as the remote server made it, and
 the caller's server redeems it for the outcomes.
 
 A package redeems a sealed result with one POST request to `id/redeem` under
-its configured endpoint. Every input goes in the form body, and none in the
-URL.
+the cloud endpoint it was given. Where it was given none, it uses the address
+in `_51DEGREES_CLOUD_ENDPOINT`, as
+[Environment variables](../pipeline-specification/features/environment-variables.md#settings)
+sets out, and where that is not set, `https://cloud.51degrees.com/api/v4/`.
+Every input goes in the form body, and none in the URL.
 
 | **Input**   | **Value**                                                                                   |
 |-------------|---------------------------------------------------------------------------------------------|
@@ -139,6 +142,35 @@ Context outcome, its `signature` member the Signature outcome, and its
 server redeems the result as it redeems every sealed result, as set out in
 [Human Confidence](../pipeline-specification/features/human-confidence.md#how-the-remote-server-redeems-a-sealed-result).
 
+A package MUST read the answer where the status is 200 or 503, and MUST
+report a 503 as Unconfirmed whatever its body holds. Where the body of a 200
+is not a JSON object, or holds no `context`, the package MUST report the
+Context outcome as Unreadable and the Signature outcome as Unknown. A
+package makes one request for each sealed result and MUST NOT repeat it,
+because a sealed result redeems once.
+
+For any other status a package MUST raise an error and report no outcome.
+
+| **Status** | **The error**                                                                                                   |
+|------------|-----------------------------------------------------------------------------------------------------------------|
+| 400        | Says that an input was refused, with the remote server's message from its `errors` member, or else the body.    |
+| 404        | Says that the remote server at the endpoint does not offer the creator context, and names the endpoint.        |
+| Any other  | Names the status and holds the body, cut short where the body is long.                                          |
+
+Where the request does not complete, as on a connection failure or a
+timeout, a package MUST raise an error and report no outcome.
+
+The Signature outcome has these values.
+
+| **Signature outcome** | **Meaning**                                                                       |
+|-----------------------|-----------------------------------------------------------------------------------|
+| Verified              | The identifier is one the issuer made, and nothing has altered it.                |
+| Invalid               | The identifier is not one the issuer made, or something has altered it.           |
+| Unknown               | The answer holds no Signature outcome, or a word the package does not know.       |
+
+The server sends the first two as the lower case words `verified` and
+`invalid`.
+
 A redeemed result gives the Signature outcome, the Context outcome, and,
 where the server sent one, the Factor block, as above. Where the result
 could not be redeemed, the Context outcome alone answers, with one of these
@@ -155,9 +187,9 @@ The server sends these as the lower case words `expired`, `replayed`,
 `unreadable`, and `unconfirmed`.
 
 The answer for a result that could not be redeemed holds no `signature`. A
-package MUST then report the Signature outcome as unknown, being the value
+package MUST then report the Signature outcome as Unknown, being the value
 it gives whenever the answer holds no Signature outcome, and MUST NOT report
-it as verified or as invalid. That value is read from the answer and not
+it as Verified or as Invalid. That value is read from the answer and not
 from the Context outcome, so the two stay independent.
 
 ### An outcome a package does not know

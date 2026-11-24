@@ -10,7 +10,8 @@ it, and the publisher's server redeems it for the level.
 
 A consumer reads two Properties of the `derived` Element Data, as set out in
 [Derived Property Element](../pipeline-elements/derived-property-element.md),
-and nothing more. A consumer never handles a sealed value.
+and nothing more. A consumer never reads a level from a sealed value and
+never redeems one, because the package does both.
 
 | **Property**            | **Values**                 |
 |-------------------------|----------------------------|
@@ -20,6 +21,28 @@ and nothing more. A consumer never handles a sealed value.
 HumanConfidence can also be `Unknown`, which the built-in script in
 [Derived Property Element](../pipeline-elements/derived-property-element.md)
 returns. A sealed value is always `High`, `Medium`, or `Low`.
+
+HumanConfidenceSource says how HumanConfidence was worked out for the
+request. `Passive` means HumanConfidence was worked out from the request
+alone. `Active` means the browser also ran the 51Degrees browser tests, and
+HumanConfidence then reaches the publisher's server sealed, as
+[When HumanConfidence arrives sealed](#when-humanconfidence-arrives-sealed)
+sets out. On a request that carries no sealed value, the two Properties are
+the ones the Pipeline gives without this page, which where the Pipeline uses
+the cloud are the ones in the `derived` member of the remote server's
+response.
+
+Where the credential does not carry HumanConfidence or HumanConfidenceSource,
+and the request carries no sealed value, that Property has no value, and a
+read of it gives a message that says why, as for any other Property the
+credential does not carry. The message is the remote server's null reason
+where the response holds the Property as null, as the
+[Cloud Aspect Engine](../pipeline-elements/cloud-aspect-engine.md#processing)
+describes, and the reason from
+[Missing Properties](properties.md#missing-properties) where the response
+leaves the Property out. A test that reads either Property with such a
+credential MUST expect no value and that message, and an example shows that
+message as it shows any other Property with no value.
 
 ## When HumanConfidence arrives sealed
 
@@ -96,12 +119,13 @@ Evidence.
 | `query.humanconfidence` | The sealed value, exactly as it arrived |
 | `query.challenge`       | The challenge the package kept          |
 
-The challenge the package kept MUST be the only `challenge` in the call.
-Evidence under any prefix whose key strips to `challenge`, in any letter
-case, MUST be left out of the call, as the Engine's
+The challenge the package kept MUST be the only challenge in the call. The
+remote server also reads `transaction` as another name for the challenge.
+Evidence under any prefix whose key strips to `challenge` or `transaction`,
+in any letter case, MUST therefore be left out of the call, as the Engine's
 [processing](../pipeline-elements/cloud-request-engine.md#processing) does
 for `values`, `resource`, `license`, and `licence`, and the package's own
-challenge sent in its place.
+challenge sent as `challenge` in its place.
 
 The call carries the
 [License Key](../pipeline-elements/cloud-request-engine.md#license-key) from
@@ -109,8 +133,12 @@ the package's own configuration, and a package MUST NOT take the License Key
 from Evidence. On a request that carries a sealed value, its
 [Requested Properties](../pipeline-elements/cloud-request-engine.md#requested-properties)
 MUST name `derived.HumanConfidence`, which the package adds where the
-configured list does not hold it. The Engine removes the prefixes as it does
-for all Evidence, so the remote server receives `humanconfidence` and
+configured list does not hold it. A name the package adds MUST be left out
+of the comparison and the report that
+[Properties the remote server did not return](../pipeline-elements/cloud-request-engine.md#properties-the-remote-server-did-not-return)
+describes, so the report is made for the configured list alone and stays
+the same from one request to the next. The Engine removes the prefixes as
+it does for all Evidence, so the remote server receives `humanconfidence` and
 `challenge`, beside `license`.
 
 The call is the Engine's one request for the Flow Data, so the Engine's
@@ -118,7 +146,10 @@ The call is the Engine's one request for the Flow Data, so the Engine's
 
 The response gives the level as `humanconfidence` in its `derived` member,
 being `High`, `Medium`, or `Low`, which the package exposes as
-HumanConfidence. There is no other Property to read.
+HumanConfidence. There is no other Property to read. That member answers
+for the sealed value alone, as
+[How the remote server redeems a sealed result](#how-the-remote-server-redeems-a-sealed-result)
+sets out.
 
 ### Where the sealed value is not redeemed
 
@@ -128,20 +159,28 @@ is true:
 
 - The Pipeline has no Cloud Request Engine
 - The Cloud Request Engine has no License Key
+- The package holds no challenge it kept for the page the request came
+  from, as when the challenge was used before
 - The Cloud Request Engine made no request for the Flow Data, as in a
   [recovery period](../pipeline-elements/cloud-request-engine.md#recovery-mode)
 - The request failed, or did not complete within `TimeoutSeconds`
+- The response's top-level `errors` list says that HumanConfidence is not
+  covered by the credential
 - The `derived` member of the response is absent, or holds no
   `humanconfidence`
 - The `humanconfidence` in the response is null, or is any value other than
   `High`, `Medium`, or `Low`, `Unknown` included
 
 A read of HumanConfidence or HumanConfidenceSource MUST NOT throw for any of
-these, and MUST NOT add an error of its own to the Flow Data. A failed request is still
-recorded once as the Cloud Request Engine's error, as its
+these, and MUST NOT add an error of its own to the Flow Data. A failed
+request is still recorded once as the Cloud Request Engine's error, as its
 [processing](../pipeline-elements/cloud-request-engine.md#processing)
 describes, and [exception handling](exception-handling.md#process-function)
-applies to that error as it does on any other request.
+applies to that error as it does on any other request. A failure met once
+processing has finished would otherwise reach the reader as an error from
+the read, as that processing describes. For these two Properties on a
+request that carries a sealed value, the read gives `Low` and `Active` in
+its place.
 
 ## How the remote server redeems a sealed result
 
@@ -150,11 +189,17 @@ creator context results under the same rules.
 
 - A sealed result redeems once.
 - A sealed result redeems within 10 seconds of being made.
-- A sealed result redeems only for the account it was made for. Where that
-  account holds License Keys, it redeems only with a License Key of that
-  account.
+- A sealed result redeems only for the account it was made for.
 - A sealed result made with a challenge redeems only with that challenge.
 - A response that carries a redeemed result is never cached.
+
+On a call that holds `humanconfidence`, the `humanconfidence` in the
+`derived` member of the response answers for that sealed value alone. It is
+the level where the value redeemed, `Low` where the value did not redeem,
+and null with a `humanconfidencenullreason` where the remote server could
+not complete the redemption. The `humanconfidencesource` beside it is
+`Active`. The remote server never answers such a call with a level worked
+out from the call's other Evidence.
 
 A redeemed level is a value created for one request, so the rule for a
 request that carries a sealed value is in
@@ -192,10 +237,13 @@ There MUST be a test for each of these:
   remote server
 - A request that carries a sealed value is neither stored in nor served from
   a cache
-- The call holds one `challenge`, being the one the package kept, where the
-  request's Evidence also holds one
+- The call holds one challenge, being the one the package kept, sent as
+  `challenge`, where the request's Evidence also holds a `challenge` or a
+  `transaction`
 - No log entry and no error message holds the sealed value, the License Key,
   or the challenge
+- A read of HumanConfidence or HumanConfidenceSource with a credential that
+  does not carry it gives no value and the message that says why
 
 ## Notes for implementers
 
