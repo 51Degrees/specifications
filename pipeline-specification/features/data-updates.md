@@ -135,7 +135,8 @@ recent than the current data.
 
 This option can be used to bootstrap an Aspect Engine that does not yet have
 any local data. In the case of file data source, the data is stored once
-obtained via HTTP.
+obtained via HTTP. With License Keys that hold several products, it needs a
+[configured product](#configured-product) to do so.
 
 Configuration Groups:
 
@@ -250,6 +251,8 @@ Configuration of the remote endpoint for download:
 
 - **dataUpdateUrl** - the remote URL
 - **urlFormatter** - URL customization
+- **dataUpdateProduct** - the product to ask for, see
+  [configured product](#configured-product)
 - **useIfModifiedSince** - request data using `If-Modified-Since` HTTP header
 - **decompressContent** - deprecated - always decompress content if it is compressed
 - **verifyMD5** - deprecated - always verify MD5 if an MD5 value is provided
@@ -395,7 +398,8 @@ keeps that file current without further configuration:
 | updateOnStartup | off |
 | pollingInterval | 30 minutes |
 | randomization | up to 10 minutes |
-| dataUpdateUrl | `https://distributor.51degrees.com/api/v2/download`, with the URL formatter adding `LicenseKeys`, `Download=True` and `Type`, where the type is `HashV41` for a Device Detection Hash data file and `IPIV41` for an IP Intelligence data file |
+| dataUpdateUrl | `https://distributor.51degrees.com/api/v2/download`, with the URL formatter adding `LicenseKeys`, `Download=True`, and `Type`, where the type is `HashV41` for a Device Detection Hash data file and `IPIV41` for an IP Intelligence data file. `Product` is added to every request when a product is configured, and otherwise only when the License Keys hold several products, as [License Keys with several products](#license-keys-with-several-products) says |
+| dataUpdateProduct | none, so the first request names no product |
 | License key | required before the Engine builds with autoUpdate or updateOnStartup on, because the Distributor serves nothing without one. The build fails with a configuration error that names the option to turn off. A configuration may say that no key is required, for an update source that serves the file without one. The file system watcher downloads nothing and needs no key |
 
 An application that cannot supply a license key, such as one running the free
@@ -443,6 +447,171 @@ If no update was found then the check is reported as not needed, as
 to repeat the same checks after the *polling interval* + a random time based on  
 *update time maximum randomization* has passed.
 
+### License Keys with several products
+
+A License Key can hold more than one product, for example a Device Detection
+data file and an IP Intelligence data file. The first request names no
+product, unless one is [configured](#configured-product), so the Distributor
+cannot tell which data file is wanted. It answers
+300 (Multiple choices) with a JSON body that lists one URI for each product
+the License Keys hold. Each URI names its product in a `Product` query
+parameter. The example below is shortened to the parts the data update
+service reads.
+
+```json
+{
+  "AvailableUris": [
+    "https://distributor.51degrees.com/api/v2/download?LicenseKeys=XXXX&Type=HashV41&Product=IPIV4Enterprise",
+    "https://distributor.51degrees.com/api/v2/download?LicenseKeys=XXXX&Type=HashV41&Product=V4TAC"
+  ],
+  "Error": "There are multiple products associated with this license key. Please use the URI returned in the Location header."
+}
+```
+
+The answer also has a `Location` header that names the first URI in the
+list. The data update service MUST NOT follow it, and its HTTP client MUST
+NOT follow it either, because the first URI can be for another product than
+the one the Engine needs. A client that follows a 300 by itself is set not
+to.
+
+The data update service MUST follow a 301, 302, 303, 307, or 308 response
+to the first or the second request, up to 20 times, itself or through its
+HTTP client. It MUST NOT follow one from an `https` address to an `http`
+address. A 300 is never followed.
+
+When the first request is redirected before the 300 arrives, the URL of the
+first request, in the steps and the messages, is the address that answered
+300. An error for that 300 names the same address.
+
+Where no product is configured, the data update service MUST then ask for
+the product of the data file the Engine has loaded, as follows.
+
+1. Send the first request as the rest of this section describes, with no
+   `Product` parameter. License Keys that hold one product get the data file
+   or a 304 (Not modified), so nothing changes for them.
+2. On a 300 response whose body is JSON with an `AvailableUris` list, read
+   the `Product` query parameter of each URI in the list. The name
+   `AvailableUris` is matched by exact case. The name of the `Product`
+   parameter is matched ignoring case. An entry of the list that is not a
+   string is ignored, and so is a URI with no `Product` parameter, or whose
+   `Product` value is empty.
+3. Find the product name of the data file the Engine has loaded, as
+   [product names](#product-names) says.
+4. Choose the URI whose `Product` value is that product name. The comparison
+   ignores case.
+5. Send the request again, to the URL of the first request with
+   `Product=<value>` set in its query, in place of any `Product` parameter
+   with an empty value, where the value is the one read from the chosen URI.
+   It is appended as the last parameter, percent-encoded, with the rest of
+   the query unchanged. A `Product` parameter with an empty value, its name
+   matched ignoring case, is removed, so the query carries `Product` once.
+   The request carries the same `If-Modified-Since` header as the first.
+   Only the `Product` value is taken from the response, so the request keeps
+   `Download=True` and never goes to a URI from the list.
+6. Handle the response to the second request as the response to a first
+   request is handled. Another 300 is not followed, and is an error as any
+   other response is. `Requesting product` is logged first, naming the URL
+   of the first request. The second request is then logged as a request is,
+   so `Checking for update from` is logged again, naming the URL of the
+   second request, as each message after it does. Both messages are logged
+   at Information level.
+7. If the list gives at least one `Product` value and no URI is chosen, the
+   check fails with an error that names the product needed and the products
+   offered, as [errors](#errors) lists. This is also the case when no
+   product name is known, as [product names](#product-names) says.
+
+The two requests are one check, which is reported once, as
+[reporting each check](#reporting-each-check) says. A 300 response whose body
+is not JSON with an `AvailableUris` list, or whose list is empty or gives no
+`Product` value, is an error as any other response is. It is not the error
+of step 7.
+
+The steps apply to every data update URL, the Distributor's or the caller's
+own, and whether or not a URL formatter is used.
+
+A request that names a product the License Keys do not hold gets a 403
+(Forbidden) response, whose body is
+`{"Error":"The license key provided does not contain the requested product."}`.
+It is the 403 error that [errors](#errors) lists. The steps above never
+cause it, because they only name a product that the Distributor offered. A
+configured product can.
+
+#### Configured product
+
+A configuration MAY name the product to ask for, as **dataUpdateProduct**.
+The option takes each language's usual form of the name. An option of
+another name that a package already has for this MAY be kept, and so MAY a
+URL formatter that is given the product when it is created.
+
+The value is a product name as the Distributor spells it, for example
+`V4TAC`, and is sent as given. An empty value is no product. No product is
+configured by default.
+
+A `Product` parameter, its name matched ignoring case, with a value in the
+caller's own data update URL also counts as a configured product. No
+`Product` is added to or changed in that URL, whatever dataUpdateProduct
+says. A URL formatter still adds its other parameters. A `Product`
+parameter with an empty value is not a configured product. The first
+request is sent with that URL as it is, and the steps above apply.
+
+When a product is configured, the data update service:
+
+1. MUST send `Product=<the configured product>` in every request, the
+   first request included. The URL formatter adds it with `LicenseKeys`,
+   `Download=True`, and `Type`. Where no URL formatter is used, the service
+   adds it to the query of the data update URL itself. A URL that already
+   has a `Product` with a value is sent with that one, as above.
+2. MUST use the configured product in place of the product name of the
+   loaded data file, and MUST NOT look that name up.
+3. MUST NOT follow a 300 response or choose a product from it. A 300 is an
+   error as any other response is.
+4. MUST treat a 403 response as the 403 error that [errors](#errors) lists.
+   It is what the Distributor answers when the License Keys do not hold the
+   configured product.
+
+When no product is configured, the first request names no product, and the
+steps for a 300 response above apply.
+
+Each update example reads the product to configure from
+`_51DEGREES_DD_PRODUCT` for Device Detection and from
+`_51DEGREES_IPI_PRODUCT` for IP Intelligence, as
+[environment variables](environment-variables.md) lists. An argument to the
+example MAY also give the product. The example configures a product only
+when the variable is set or an argument gives one. Otherwise the example
+sends no product.
+
+License Keys that hold one product need no configured product. License Keys
+that hold several need one in two cases, where the check otherwise fails as
+step 7 says:
+
+- The [update on start-up](#update-on-start-up), where it checks before the
+  Engine has loaded a data file, so no product name is known.
+- An Engine whose loaded data file is of a product the License Keys do not
+  hold, such as the free Lite data file, or a data file of another tier than
+  the one licensed. Its own product is not offered.
+
+#### Product names
+
+The product name of a data file is made from its tier. The tier is the
+product value held in the data file, which the Engine reads when it loads
+the file (`getProduct()` in the native Engine of the reference
+implementations). The product name is a prefix for
+the kind of data file, followed by the tier. A tier that already starts with
+the prefix, ignoring case, is the product name as it is.
+
+| **Data file**         | **Prefix** | **Tier**   | **Product name**  |
+|-----------------------|------------|------------|-------------------|
+| Device Detection Hash | `V4`       | TAC        | `V4TAC`           |
+| Device Detection Hash | `V4`       | Enterprise | `V4Enterprise`    |
+| IP Intelligence       | `IPIV4`    | Enterprise | `IPIV4Enterprise` |
+
+A data file of another tier takes its product name in the same way. An
+Engine for another kind of data file names its own prefix.
+
+No product name is known when no data file is loaded, when the tier of the
+loaded data file is empty, or when the kind of data file has no prefix. A
+prefix alone is never a product name.
+
 ## Logging
 
 The data update service is a complex process. As such, it is
@@ -474,6 +643,7 @@ appear in full in a log entry or an error message (see
 | Send HTTP request to check for new data file         | Checking for update from '\<url\>' for Engine '\<Engine type\>'                 |
 | Successfully downloaded new data file                | Downloaded new data from '\<url\>' for Engine '\<Engine type\>'                 |
 | 304 (Not modified) response from HTTP request        | No data newer than \<datetime\> found at '\<url\>' for Engine '\<Engine type\>' |
+| 300 (Multiple choices) response that offers the product of the loaded data file | Requesting product '\<product\>' from '\<url\>' for Engine '\<Engine type\>' |
 
 ### Errors
 
@@ -487,7 +657,8 @@ caller instead of logging it.
 
 These messages MUST also be consistent across languages to make life easier
 for 51Degrees support. They are the messages and levels of the .NET data
-update service, and each status is the one .NET reports.
+update service, and each status is the one .NET reports. The rows for a 300
+response are set here for every language.
 
 A row at Error level is an error that carries the message shown. Where the
 service logs it, the entry is at Error, reads `Error during check for data
@@ -502,12 +673,21 @@ called, and on update polling any reports of the check not yet made are not
 made. A row at Warning level is logged with the message shown, and the check
 goes on.
 
+In the row for a 300 response that does not offer the product, \<product\>
+is the product name of the loaded data file, which is empty when no product
+name is known. The \<products offered\> are the `Product` values the
+response listed, in its order, joined with a comma and no space, for example
+`IPIV4Enterprise,V4TAC`. The \<url\> in that row, and in the
+`Requesting product` message, is the URL of the first request. Each message
+after the second request names the URL of the second request.
+
 | **Error**                                                                                     | **Log level**                    | **Status**                              | **Message**                                                                                                                                                                                   |
 |-----------------------------------------------------------------------------------------------|----------------------------------|-----------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Connecting to the data update URL failed, or its response ended before the whole file arrived | Error                            | `AUTO_UPDATE_HTTPS_ERR`                 | Error accessing data update service at '\<url\>' for engine '\<Engine type name\>'                                                                                                            |
 | The request to the data update URL ended with no response and no error                        | Error                            | `AUTO_UPDATE_HTTPS_ERR`                 | No response from data update service at '\<url\>' for engine '\<Engine type name\>'                                                                                                           |
 | A 429 (Too many requests) response                                                            | Error                            | `AUTO_UPDATE_ERR_429_TOO_MANY_ATTEMPTS` | Too many requests to '\<url\>' for engine '\<Engine type name\>'                                                                                                                              |
 | A 403 (Forbidden) response                                                                    | Error                            | `AUTO_UPDATE_ERR_403_FORBIDDEN`         | Access denied to data update service at '\<url\>' for engine '\<Engine type name\>'                                                                                                           |
+| A 300 (Multiple choices) response, where no product is configured, that lists at least one product and does not offer the product of the loaded data file | Error | `AUTO_UPDATE_HTTPS_ERR` | Product '\<product\>' is not offered by data update service at '\<url\>' for engine '\<Engine type name\>'. Products offered: '\<products offered\>' |
 | Any other response that is not a success and not a 304 (Not modified)                         | Error                            | `AUTO_UPDATE_HTTPS_ERR`                 | HTTP status code '\<status code\>' from data update service at '\<url\>' for engine '\<Engine type name\>'                                                                                    |
 | The response has no `Content-MD5` header                                                      | Warning                          | None, the check goes on                 | No MD5 hash included in data update response for '\<url\>'. Unable to verify data integrity                                                                                                   |
 | The integrity check of the downloaded data failed                                             | Error                            | `AUTO_UPDATE_ERR_MD5_VALIDATION_FAILED` | Integrity check failed. MD5 hash in HTTP response '\<hash in response\>' for '\<Engine type name\>'data update does not match calculated hash for the downloaded file '\<calculated hash\>'.  |
