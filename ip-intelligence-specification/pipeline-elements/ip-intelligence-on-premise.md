@@ -581,6 +581,12 @@ mentioned above:
 | `getProduct`             | Get the string type of the data file. This is used by the [data update](../../pipeline-specification/features/data-updates.md) functionality when calling Distributor to check for a new data file |
 | `getDataFileTempPath`    | Get the path to the temporary working copy of the data file (This is the full path to the copy of the data file that the C code makes before reading it.)                                          |
 
+Before the Engine has loaded a data file, the
+[data update](../../pipeline-specification/features/data-updates.md#product-names)
+functionality reads the product value from the header of the data file with
+the static `EngineIpiSwig.getProductFromFile(fileName)`, which does not load
+the file.
+
 ## Events
 
 This Engine implements the following events/callbacks/hooks:

@@ -195,6 +195,11 @@ DataUpdate is a complex process with many options.
   created before and during the refreshes are processed and read on other
   threads, leaves every value read intact
 
+No test reaches the Distributor, as
+[data update tests](features/data-updates.md#tests) says. A test of a data
+update serves a data file the build has already fetched from a local HTTP
+server in place of the Distributor.
+
 The checks below are for
 [License Keys with several products](features/data-updates.md#license-keys-with-several-products),
 and are the same in every language. Each runs one check for an update
@@ -226,6 +231,14 @@ check says otherwise. The messages and statuses are those that
 - check that a 300 that offers `V4TAC`, where no product name is known,
   gives one request, the message `Product '' is not offered` with
   `Products offered: 'V4TAC'`, and `AUTO_UPDATE_HTTPS_ERR`
+- check that an update on start-up, with no Engine loaded and a data file of
+  the product `V4TAC` at the configured location, answered with a 300 that
+  offers `IPIV4Enterprise` and `V4TAC`, gives a second request with
+  `Product=V4TAC`, and `AUTO_UPDATE_SUCCESS`, and the same for an IP
+  Intelligence data file of the product `IPIV4Enterprise`
+- check that an update on start-up, with no data file at the configured
+  location, answered with a 300 that offers `V4TAC`, gives one request, the
+  message `Product '' is not offered`, and `AUTO_UPDATE_HTTPS_ERR`
 - check that a 300 whose body is not JSON, one with no `AvailableUris`
   list, one with an empty list, and one whose list gives no `Product`
   value, each gives one request, the `HTTP status code '300'` message, and
