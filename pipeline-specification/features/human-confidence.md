@@ -200,7 +200,10 @@ in its place.
 The remote server redeems sealed Human Confidence results and sealed 51Did
 creator context results under the same rules.
 
-- A sealed result redeems once.
+- A sealed result redeems once on each instance of the remote server. Each
+  instance keeps its own record of what it has redeemed, so a caller that
+  needs single use across every instance applies its own once-only rule as
+  well.
 - A sealed result redeems within 10 seconds of being made.
 - A sealed result redeems only for the account it was made for.
 - A sealed result made with a transaction redeems only with that

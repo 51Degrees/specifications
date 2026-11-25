@@ -133,7 +133,9 @@ Every input goes in the form body, and none in the URL.
 |----------------|------------------------------------------------------------------------------------------|
 | `51did`        | The 51Did the sealed result was made for, as base64.                                     |
 | `sealedResult` | The sealed result, exactly as the caller received it.                                    |
+| `result`       | The same value as `sealedResult`, under its obsolete name.                               |
 | `transaction`  | The transaction the check was asked for with, or empty where it was asked for with none. |
+| `challenge`    | The same value as `transaction`, under its obsolete name.                                |
 | `resource`     | The Resource Key the package was given.                                                  |
 | `license`      | The License Key, where the package was given one.                                        |
 
@@ -213,9 +215,14 @@ obsolete in favor of the Redemption outcome, in the way its language marks
 a member obsolete.
 
 Where the answer holds no `status`, as from a remote server that predates
-it, a package MUST take the Redemption outcome from `context`. It is the
-word in `context` where that word is one of the four reasons, and Success
-otherwise.
+it, a package MUST take the Redemption outcome from `context`.
+
+- It is Success where `context` holds a verdict the check reached, being
+  `verified`, `mismatch`, `nocontext`, `misconfigured`, or `invaliddate`
+- It is the word in `context` where that word is one of the four reasons,
+  being `expired`, `replayed`, `unreadable`, or `unconfirmed`
+- It is Unreadable where `context` is missing or holds any other word,
+  because a package MUST NOT read a word it does not know as a pass
 
 The answer for a sealed result that was not redeemed holds no `signature`.
 A package MUST then report the Signature outcome as Unknown, being the value
@@ -239,8 +246,14 @@ its JSON answer. It is an array holding a message for each obsolete name the
 call used, and nothing else in the answer changes. Where a call sends both
 names, the remote server uses the current one.
 
-A package MUST send `sealedResult` and `transaction`. A package MUST NOT
-treat an `obsolete` member as an error. Where a package offers a caller a
+A package MUST send each input under both its current name and its obsolete
+name, with the same value under each. It sends `sealedResult` and `result`
+to `id/redeem`. It sends `transaction` and `challenge` to `id/redeem`, and
+to `id/verify-context` and `id/verify-full` where it asks for a check with a
+transaction. So a package keeps working against a remote server that reads
+only the obsolete names. A page that asks for the check itself sends the
+transaction under both names in the same way. A package MUST NOT treat an
+`obsolete` member as an error, and gets one on every such call. Where a package offers a caller a
 member or parameter under an obsolete name, it keeps working, and the
 package SHOULD mark it obsolete with a message naming the replacement.
 
