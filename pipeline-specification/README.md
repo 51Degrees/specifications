@@ -38,7 +38,7 @@ Defined element specifications include:
 ## Human Confidence
 
 [Human Confidence](features/human-confidence.md) says what a consumer reads,
-and how a language package redeems a level that arrives sealed.
+how a language package redeems a sealed result, and what a 51Did carries.
 
 ## What is the Pipeline API?
 

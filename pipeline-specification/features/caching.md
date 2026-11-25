@@ -155,8 +155,8 @@ response whose JSON has a top-level member named `fodid`, in any case, is
 neither stored in nor served from the cache, and the request goes to the
 cloud service instead.
 
-A redeemed [Human Confidence](human-confidence.md) level is another such
-value, because a sealed value redeems once. For the Cloud Request Engine, a
+A redeemed [Human Confidence](human-confidence.md) Value is another such
+value, because a sealed result redeems once. For the Cloud Request Engine, a
 request whose Evidence holds `query.humanconfidence` with a value that is
 not empty is neither stored in nor served from the cache, and the request
 goes to the cloud service instead.
