@@ -347,8 +347,17 @@ on whether the call requested HumanConfidence.
 
 The same is true where the publisher's server makes the call, passing the
 page's script to the browser and the browser's answers back to the remote
-server. A server that presents a valid License Key can supply the visitor's
-IP address, JA4, and H2, and the call is judged on those values.
+server. A call from the server that requested HumanConfidence gets no 51Did
+until a later call carries the browser test answers. So a server that
+requests HumanConfidence has to pass the page's script on to the browser and
+the answers back, or it gets no 51Did on any call. A server that needs a
+51Did on every call and cannot pass the script on should leave
+HumanConfidence out of its request.
+
+A server can also supply the visitor's JA4 and H2. They are used only on a
+call that presents a License Key valid for Human Confidence, and the call is
+then judged on them. On any other call they are not used, and the call is
+judged as if they were not supplied.
 
 A sealed Human Confidence result sent back to the remote server adds nothing
 to a 51Did. A caller can use the 51Did alone, without redeeming any sealed
