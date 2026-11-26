@@ -10,8 +10,10 @@ Note that a Flow Data instance that has had processing cancelled might be
 missing data that would normally have been populated.
 
 The ability to cancel processing implies that the processing takes place
-on some background thread. However, the call to `flowdata.Process` is blocking
-unless a feature such as [lazy loading](../advanced-features/lazy-loading.md) is being used.
+on some background thread. However, the call to `flowdata.Process` is blocking,
+apart from work that a Flow Element starts as a
+[lazy property](../features/thread-safety.md#lazy-properties). The deprecated
+[lazy loading](../advanced-features/lazy-loading.md) option has no effect.
 
 To make it clear that the function is non-blocking when a cancellation token
 is supplied, we suggest considering a differently named function for that scenario.

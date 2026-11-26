@@ -9,7 +9,11 @@ The Translation Engine translates values from one source Flow Element using a tr
 
 ## Features
 
-- Allow one or more translation engines to be added to the same pipeline. e.g. In parallel, one Translation engine could sit after a device detection element and another could sit behind an ip intelligence element. 
+- Allow one or more translation engines to be added to the same pipeline. For
+  example, one Translation Engine could sit after a device detection element
+  and another after an IP Intelligence element. Two of them are never members
+  of the same parallel group, as
+  [Behavior of Multiple Engines](#behavior-of-multiple-engines) says.
 
 ## Components
 - `ITranslationEngine` | `TranslationEngine`: Provides the main logic, performing a translation based on the translation provided.
@@ -127,8 +131,9 @@ If translation is not available for the word or language, the configured `Missin
 ## Behavior of Multiple Engines
 
 Pipelines can support multiple simultaneous translation contexts by using
-multiple Translation Engine instances. Both write to the same Element Data, meaning it
-must be thread safe.
+multiple Translation Engine instances. Both write to the same Element Data, so
+two of them MUST NOT be members of the same
+[parallel group](../advanced-features/parallel-processing.md#how-a-group-uses-the-flow-data).
 
 ## Configuration
 A configuration file can set the options that take a single value:

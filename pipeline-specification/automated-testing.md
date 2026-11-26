@@ -76,9 +76,11 @@ those implementations can be consulted for more details.
 
 ### FiftyOne.Pipeline.Core
 
-TypedKeyMap :
+Flow Data Element Data list:
 
-- (ThreadSafe and non-ThreadSafe) test each of the methods.
+- test adding, finding and listing Element Data, including adds from the
+  members of a parallel group at the same time, with every member's Element
+  Data present afterwards and listed in Pipeline order
 
 Pipeline:
 
@@ -104,6 +106,13 @@ Flow Data:
 - check that attempt to process twice fails
 - check that access to Flow Data when Pipeline closed fails
 - check that access to Flow Data results before processing fails
+- check that adding Evidence, Element Data, errors or warnings after
+  processing fails
+- check that the members of a parallel group can add errors and warnings at
+  the same time, with all of them present afterwards
+- check that exceptions thrown by members of a parallel group are added to
+  the Flow Data's errors by the parallel element once every member has
+  stopped
 
 Flow Element:
 
@@ -112,6 +121,9 @@ Create a Test Element and associated data
 - check correct process() logic
 - check for correct creation of associated data type
 - check for correct access following processing
+- check, for every Flow Element in the repository, that a write to its
+  Element Data after the Flow Element has finished processing fails, as
+  [thread safety](features/thread-safety.md#element-data) requires
 
 Java Only:
 
@@ -134,8 +146,36 @@ reasonable bound for the cases:
 AspectEngine:
 
 - check Aspect Engine uses cache correctly
-- if lazy loading is implemented, check that it fires only at the right
-  time and only once
+- if the deprecated lazy loading option is still offered, check that setting
+  it, with or without a timeout, changes nothing, so that the Engine processes
+  on the calling thread and gives the same values
+- check that a lazy property's task runs once, that every reader waits for
+  it, and that a failed task gives every waiting reader its error
+- check, where the package can run a task in the background, that the Cloud
+  Request Engine's process function returns before the HTTP response
+  arrives, that every reader of `json-response` waits for it, and that the
+  request's task does not read the Flow Data, and, where the package cannot,
+  that the response has arrived when the process function returns
+- check that a failed Cloud Request Engine request met by Cloud Aspect
+  Engines during processing is recorded once, as the Cloud Request Engine's
+  error, and that one met after processing reaches only the reader, as an
+  error from the read
+- check, for a failed Cloud Request Engine request, that the Flow Data's
+  errors hold one error, the Cloud Request Engine's, and that a read of a
+  Property of each Cloud Aspect Engine gives the `CloudRequestFailed` reason,
+  using the package's own Cloud Aspect Engines rather than stand-ins
+  - with every one of the package's Cloud Aspect Engines, one after the
+    other in one Pipeline
+  - where the package offers parallel processing, with the Cloud Request
+    Engine before the group and two Cloud Aspect Engines that have different
+    Data Keys as members of one parallel group. A package with only one
+    Cloud Aspect Engine of its own adds a second, built on the same Cloud
+    Aspect Engine code with another Data Key
+- check that an Engine whose Element Data another Flow Element also writes
+  does not allow a cache to be added
+- check that disposing an Engine while process calls, lazy tasks and a
+  refresh are running waits for them, with no crash and every value read
+  intact
 
 DataUpdateService:
 
@@ -151,6 +191,80 @@ DataUpdate is a complex process with many options.
 - check that Engine refreshes with correct data and that any data associated
   with earlier copy is freed correctly
 - carry out a repeated refresh test to look for memory leaks
+- check that refreshing from several threads at once, while Flow Data
+  created before and during the refreshes are processed and read on other
+  threads, leaves every value read intact
+
+No test reaches the Distributor, as
+[data update tests](features/data-updates.md#tests) says. A test of a data
+update serves a data file the build has already fetched from a local HTTP
+server in place of the Distributor.
+
+The checks below are for
+[License Keys with several products](features/data-updates.md#license-keys-with-several-products),
+and are the same in every language. Each runs one check for an update
+against a local HTTP server in place of the Distributor. The loaded data
+file has the product name `V4TAC` and no product is configured, unless the
+check says otherwise. The messages and statuses are those that
+[data updates](features/data-updates.md#logging) lists.
+
+- check that a first response with the data file gives one request with no
+  `Product`, one `Checking for update from` message, and
+  `AUTO_UPDATE_SUCCESS`
+- check that a 300 that offers `IPIV4Enterprise` and `V4TAC`, with a
+  `Location` header that names a second server, gives a second request to
+  the first server with `Product=V4TAC` as the last parameter and the rest
+  of the query unchanged, no request to the second server,
+  `Requesting product` and then `Checking for update from` at Information
+  level, and `AUTO_UPDATE_SUCCESS`
+- check that a 300 whose only matching URI has `product=v4tac` gives a
+  second request with `Product=v4tac`, and `AUTO_UPDATE_SUCCESS`
+- check that a first request with an `If-Modified-Since` header, answered
+  with a 300 that offers `V4TAC`, gives a second request with the same
+  `If-Modified-Since` value
+- check that a 300 in answer to the second request gives two requests and
+  no third, the `HTTP status code '300'` message naming the URL of the
+  second request, and `AUTO_UPDATE_HTTPS_ERR`
+- check that a 300 that offers only `IPIV4Enterprise` gives one request,
+  the message `Product 'V4TAC' is not offered` with
+  `Products offered: 'IPIV4Enterprise'`, and `AUTO_UPDATE_HTTPS_ERR`
+- check that a 300 that offers `V4TAC`, where no product name is known,
+  gives one request, the message `Product '' is not offered` with
+  `Products offered: 'V4TAC'`, and `AUTO_UPDATE_HTTPS_ERR`
+- check that an update on start-up, with no Engine loaded and a data file of
+  the product `V4TAC` at the configured location, answered with a 300 that
+  offers `IPIV4Enterprise` and `V4TAC`, gives a second request with
+  `Product=V4TAC`, and `AUTO_UPDATE_SUCCESS`, and the same for an IP
+  Intelligence data file of the product `IPIV4Enterprise`
+- check that an update on start-up, with no data file at the configured
+  location, answered with a 300 that offers `V4TAC`, gives one request, the
+  message `Product '' is not offered`, and `AUTO_UPDATE_HTTPS_ERR`
+- check that a 300 whose body is not JSON, one with no `AvailableUris`
+  list, one with an empty list, and one whose list gives no `Product`
+  value, each gives one request, the `HTTP status code '300'` message, and
+  `AUTO_UPDATE_HTTPS_ERR`
+- check that a configured product of `V4TAC`, answered with a 300 that
+  offers `V4TAC`, gives one request with `Product=V4TAC`, the
+  `HTTP status code '300'` message, and `AUTO_UPDATE_HTTPS_ERR`
+- check that a configured product of `V4TAC`, answered with a 403, gives
+  one request with `Product=V4TAC`, the `Access denied` message, and
+  `AUTO_UPDATE_ERR_403_FORBIDDEN`
+- check that a data update URL of the caller's with `product=V4TAC` in its
+  query, and another product in dataUpdateProduct, gives one request whose
+  query has that parameter unchanged and no other `Product`, and that a 300
+  in answer is the `HTTP status code '300'` message and
+  `AUTO_UPDATE_HTTPS_ERR`
+- check that a data update URL of the caller's with `Product=` in its
+  query, answered with a 300 that offers `V4TAC`, gives a second request
+  whose query has `Product=V4TAC` once, as the last parameter
+- check that a 300 that offers `V4TAC`, followed by a 304 to the second
+  request, gives the `No data newer than` message naming the URL of the
+  second request, and `AUTO_UPDATE_NOT_NEEDED`
+- check that a 307 from the first server to a second server, which answers
+  with a 300 that offers `V4TAC`, gives a second request to the second
+  server with `Product=V4TAC`, no request to a URI from the list, the
+  `Requesting product` message naming the second server, and
+  `AUTO_UPDATE_SUCCESS`
 
 MissingPropertyService:
 
@@ -164,15 +278,86 @@ MissingPropertyService:
 ShareUsage:
 
 - check that ShareUsage substitutes illegal XML characters correctly and truncates values
-- check that ShareUsage operates correctly, retrying failed data etc.
+- check that a batch whose send failed, because the request could not be
+  made, had no answer in time or was answered with anything other than 200,
+  is dropped rather than put back on the queue
 - check that adding more data stops when queue is full and resumes when it is no longer so
 - check that all data in the queue is sent
 - check minimum batch size and maximum batch size
 - check operation of tracker (i.e. not sending duplicated data)
+- check, in a Pipeline with the
+  [Sequence Element](pipeline-elements/sequence-element.md), once with the
+  default options, once with all Evidence shared and once with track session
+  on and the same session cookie in both requests, that two requests that
+  differ only in `query.session-id` or `query.sequence`, with either key in
+  any letter case, are shared once within the repeat Evidence interval, and
+  that the record carries both, as they are in the Evidence after the
+  Sequence Element has run, as Evidence entries, matching their names
+  ignoring letter case, and in its `SessionId` and `Sequence` elements
 - check operation of filtering of headers
+- check, for parameters in a query string and in the form body of a POST
+  request, that a `password` parameter no Flow Element accepts is never
+  shared, even when all Evidence is shared, that a parameter whose name starts
+  with `51D_` is shared, and that a parameter a Flow Element in the Pipeline
+  accepts is shared
+- check that setting the deprecated included query string parameters or share
+  all query string parameters option changes nothing that is shared
+- check, for cookies and the Cookie header found in the Evidence and in the
+  web request supplied as `server.http-request`, that a cookie whose name does
+  not start with `51D_`, the session cookie included when its name does not
+  start with `51D_`, and the Cookie header are never shared, with track
+  session on, in one run with all Evidence shared and in another with all
+  Evidence not shared and a blocked HTTP headers list that leaves out Cookie,
+  and that a cookie whose name starts with `51D_`, in any letter case, is
+  shared
 - check operation of SessionID
 - check operation on shut down
 - check that ShareUsage does not impose an undue burden on performance
+- check that every Pipeline a builder makes has the usage sharing element
+  last, outside any parallel group
+- check that a builder refuses, with an error, a Pipeline that puts the usage
+  sharing element anywhere but last, or in a parallel group
+- check that every record carries a `ProcessId` element holding a version 4
+  UUID in the string format that
+  [process identifier](pipeline-elements/usage-sharing-element.md#process-identifier)
+  gives, with its letters in either case, and, comparing identifiers ignoring
+  letter case, that it is the same in every record one usage sharing element
+  writes, and that two usage sharing elements built in one process write
+  different identifiers
+- check, with every invariant value known before the first record, and with
+  the test moving time on rather than waiting, that the
+  [invariant values](pipeline-elements/usage-sharing-element.md#invariant-values)
+  are written to the first record and left out of the records after it, that
+  a record written just under an hour after they were last written still
+  leaves them out, and that the first record written once an hour or more has
+  passed carries them and the records after it leave them out again
+- check, in the same way, that when a message carrying the invariant values
+  fails to send, after an earlier message carrying them was sent, the records
+  written within the hour after the record in the failed message that carried
+  them still leave them out, and the first record written once that hour has
+  passed carries them
+- check, in a package that can write a record before an invariant value is
+  known, such as one that looks up the server address in the background,
+  holding back that lookup in the test until records have been written, that
+  the first record carries the invariant values with that value as an empty
+  element, as
+  [XML 1.0 section 3.1](https://www.w3.org/TR/xml/#sec-starttags) defines
+  one, checked by reading the record as XML, that the records after it leave
+  the invariant values out, within the hour, until that value or another such
+  value becomes known, that all the invariant values are written again to the
+  first record written after each such value becomes known and left out of
+  the records after that, within the hour, until the next such value becomes
+  known, and that a value does not change once known. A package that knows
+  every invariant value before it writes the first record leaves this test
+  out
+- check that a record carrying the invariant values has one
+  [`Package`](pipeline-elements/usage-sharing-element.md#processing) element
+  for every 51Degrees package in use, being the package that holds the
+  Pipeline, the package that holds each Flow Element and every 51Degrees
+  package those depend on, each written once, with the name its package
+  manager knows it by in the `Name` attribute and the version in use, as that
+  package manager gives it, as its text, and that a record leaving out the
+  invariant values has none
 
 SetHeaders
 

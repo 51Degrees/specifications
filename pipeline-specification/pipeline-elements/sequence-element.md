@@ -37,10 +37,13 @@ from Evidence. See
 [adding Evidence values](../features/evidence.md#adding-evidence-values).
 
 A value that cannot be used counts as not present. A `query.session-id` value
-that is not a non-empty string is not present. A `query.sequence` value that is
-not a whole number, or a string made only of the digits 0 to 9 with no sign or
-spaces, from 0 up to 2,147,483,646 is not present, so that adding one stays
-within a 32 bit integer. Leading zeros are allowed. A sequence of 0 gives an
+that is not a non-empty string is not present. A `query.sequence` value counts
+only when it is held in one of the language's integer types, or is a string
+made only of the digits 0 to 9 with no sign or spaces, and only from 0 up to
+2,147,483,646, so that adding one stays within a 32 bit integer. Any other
+value is not present. A floating-point value is not present even when it has
+no fractional part, so 2.0 is absent where 2 is not. Leading zeros are allowed
+in a string. A sequence of 0 gives an
 output of 1, as an absent one does. No error is recorded.
 
 ## Configuration options

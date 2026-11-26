@@ -106,6 +106,8 @@ describes the internals of such a cache. You can also review the
 and [C](https://github.com/51Degrees/51degrees-cxx/blob/main/src/common/cache.c)
 reference implementations.
 
+A cache MAY also keep its entries on disk, as [disk cache](disk-cache.md) says.
+
 ## Data lifetime and concurrency issues
 
 The cache stores the instance of Aspect Data that was generated based
@@ -126,6 +128,11 @@ instance is accessed by multiple threads simultaneously.
 If access to the properties of an Aspect Data implementation cannot be
 guaranteed to be thread-safe, then the corresponding Engine MUST NOT
 allow a cache to be added.
+
+An Engine whose Element Data another Flow Element also writes MUST NOT
+allow a cache to be added either, because the other Flow Element would
+write into an instance that other requests are reading, as
+[thread safety](thread-safety.md#aspect-data) describes.
 
 Design note - There are various routes that could potentially be explored
 to allow caches to still work in the scenarios described above. (Creating
