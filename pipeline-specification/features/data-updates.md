@@ -135,8 +135,11 @@ recent than the current data.
 
 This option can be used to bootstrap an Aspect Engine that does not yet have
 any local data. In the case of file data source, the data is stored once
-obtained via HTTP. With License Keys that hold several products, it needs a
-[configured product](#configured-product) to do so.
+obtained via HTTP. With License Keys that hold several products, the update
+on start-up asks for the product of the local data file, read from the
+file's header before the Engine loads it, as
+[product names](#product-names) says. Only where there is no local data file
+does it need a [configured product](#configured-product).
 
 Configuration Groups:
 
@@ -293,7 +296,10 @@ in this configuration is set for memory data source operation.
 ### Update on start-up
 
 - for disk data source, check operational data configuration consistency
-- check HTTP server for new file
+- check HTTP server for new file, asking for the product of the local file,
+  if any, where no product is configured, as
+  [License Keys with several products](#license-keys-with-several-products)
+  says
   - on fail, fall back to local file if any
     - no local file, fail
 - compare date with local
@@ -484,7 +490,9 @@ first request, in the steps and the messages, is the address that answered
 300. An error for that 300 names the same address.
 
 Where no product is configured, the data update service MUST then ask for
-the product of the data file the Engine has loaded, as follows.
+the product of the data file, as follows. That is the data file the Engine
+has loaded or, before the Engine has loaded one, the data file at the
+configured location, as [product names](#product-names) says.
 
 1. Send the first request as the rest of this section describes, with no
    `Product` parameter. License Keys that hold one product get the data file
@@ -495,7 +503,7 @@ the product of the data file the Engine has loaded, as follows.
    parameter is matched ignoring case. An entry of the list that is not a
    string is ignored, and so is a URI with no `Product` parameter, or whose
    `Product` value is empty.
-3. Find the product name of the data file the Engine has loaded, as
+3. Find the product name of the data file, as
    [product names](#product-names) says.
 4. Choose the URI whose `Product` value is that product name. The comparison
    ignores case.
@@ -562,7 +570,7 @@ When a product is configured, the data update service:
    adds it to the query of the data update URL itself. A URL that already
    has a `Product` with a value is sent with that one, as above.
 2. MUST use the configured product in place of the product name of the
-   loaded data file, and MUST NOT look that name up.
+   data file, and MUST NOT look that name up.
 3. MUST NOT follow a 300 response or choose a product from it. A 300 is an
    error as any other response is.
 4. MUST treat a 403 response as the 403 error that [errors](#errors) lists.
@@ -572,29 +580,30 @@ When a product is configured, the data update service:
 When no product is configured, the first request names no product, and the
 steps for a 300 response above apply.
 
-Each update example reads the product to configure from
-`_51DEGREES_DD_PRODUCT` for Device Detection and from
-`_51DEGREES_IPI_PRODUCT` for IP Intelligence, as
-[environment variables](environment-variables.md) lists. An argument to the
-example MAY also give the product. The example configures a product only
-when the variable is set or an argument gives one. Otherwise the example
-sends no product.
+An update example configures no product of its own, so the data update
+service asks for the product of the data file the example starts from. An
+argument to the example MAY name a product, which the example then
+configures.
 
 License Keys that hold one product need no configured product. License Keys
 that hold several need one in two cases, where the check otherwise fails as
 step 7 says:
 
-- The [update on start-up](#update-on-start-up), where it checks before the
-  Engine has loaded a data file, so no product name is known.
-- An Engine whose loaded data file is of a product the License Keys do not
-  hold, such as the free Lite data file, or a data file of another tier than
-  the one licensed. Its own product is not offered.
+- The [update on start-up](#update-on-start-up) where there is no data file
+  at the configured location, so no product name is known.
+- A data file of a product the License Keys do not hold, such as the free
+  Lite data file, or a data file of another tier than the one licensed. Its
+  own product is not offered.
 
 #### Product names
 
 The product name of a data file is made from its tier. The tier is the
-product value held in the data file, which the Engine reads when it loads
-the file (`getProduct()` in the native Engine of the reference
+product value held in the header of the data file. It is read from the
+Engine once the Engine has loaded the file (`getProduct()` in the native
+Engine of the reference implementations). Before the Engine has loaded a
+file, at start-up or later, the data update service MUST read it from the
+header of the data file at the configured location without loading the file
+(the static `getProductFromFile()` of the native Engine in the reference
 implementations). The product name is a prefix for
 the kind of data file, followed by the tier. A tier that already starts with
 the prefix, ignoring case, is the product name as it is.
@@ -608,9 +617,35 @@ the prefix, ignoring case, is the product name as it is.
 A data file of another tier takes its product name in the same way. An
 Engine for another kind of data file names its own prefix.
 
-No product name is known when no data file is loaded, when the tier of the
-loaded data file is empty, or when the kind of data file has no prefix. A
-prefix alone is never a product name.
+No product name is known in three cases. The first is when no data file is
+loaded and the header of the data file at the configured location cannot be
+read, for example because no file is there. The second is when the tier is
+empty, and the third is when the kind of data file has no prefix. A prefix
+alone is never a product name.
+
+## Tests
+
+No test, and no test of an example, reaches the Distributor. The tests use
+the data files the build has already fetched for them, which in the
+reference implementations are the files that the `fetch-assets` step of
+[common-ci](https://github.com/51Degrees/common-ci) puts in the asset cache.
+
+A test of a data update, the tests of the update examples included, serves
+the fetched data file from a local HTTP server that stands in for the
+Distributor, and points the data update URL at that server. The server
+answers as the Distributor does, so a test of an update example shows:
+
+- that the example asked for the product of the data file it started from,
+  for example `V4TAC` for `TAC-HashV41.hash`
+- that the server answered with a newer data file, being the fetched file
+  with its published date moved on, or with a 304 (Not modified), whichever
+  the example needs to complete
+- that the update completed
+
+Such a test is never skipped or reported as inconclusive to avoid the
+Distributor. It needs no real License Key, as the local server serves the
+file whatever key it is sent. The examples themselves, as a customer runs
+them, still update from the Distributor.
 
 ## Logging
 
@@ -643,7 +678,7 @@ appear in full in a log entry or an error message (see
 | Send HTTP request to check for new data file         | Checking for update from '\<url\>' for Engine '\<Engine type\>'                 |
 | Successfully downloaded new data file                | Downloaded new data from '\<url\>' for Engine '\<Engine type\>'                 |
 | 304 (Not modified) response from HTTP request        | No data newer than \<datetime\> found at '\<url\>' for Engine '\<Engine type\>' |
-| 300 (Multiple choices) response that offers the product of the loaded data file | Requesting product '\<product\>' from '\<url\>' for Engine '\<Engine type\>' |
+| 300 (Multiple choices) response that offers the product of the data file | Requesting product '\<product\>' from '\<url\>' for Engine '\<Engine type\>' |
 
 ### Errors
 
@@ -674,8 +709,8 @@ made. A row at Warning level is logged with the message shown, and the check
 goes on.
 
 In the row for a 300 response that does not offer the product, \<product\>
-is the product name of the loaded data file, which is empty when no product
-name is known. The \<products offered\> are the `Product` values the
+is the product name of the data file, which is empty when no product name is
+known. The \<products offered\> are the `Product` values the
 response listed, in its order, joined with a comma and no space, for example
 `IPIV4Enterprise,V4TAC`. The \<url\> in that row, and in the
 `Requesting product` message, is the URL of the first request. Each message
@@ -687,7 +722,7 @@ after the second request names the URL of the second request.
 | The request to the data update URL ended with no response and no error                        | Error                            | `AUTO_UPDATE_HTTPS_ERR`                 | No response from data update service at '\<url\>' for engine '\<Engine type name\>'                                                                                                           |
 | A 429 (Too many requests) response                                                            | Error                            | `AUTO_UPDATE_ERR_429_TOO_MANY_ATTEMPTS` | Too many requests to '\<url\>' for engine '\<Engine type name\>'                                                                                                                              |
 | A 403 (Forbidden) response                                                                    | Error                            | `AUTO_UPDATE_ERR_403_FORBIDDEN`         | Access denied to data update service at '\<url\>' for engine '\<Engine type name\>'                                                                                                           |
-| A 300 (Multiple choices) response, where no product is configured, that lists at least one product and does not offer the product of the loaded data file | Error | `AUTO_UPDATE_HTTPS_ERR` | Product '\<product\>' is not offered by data update service at '\<url\>' for engine '\<Engine type name\>'. Products offered: '\<products offered\>' |
+| A 300 (Multiple choices) response, where no product is configured, that lists at least one product and does not offer the product of the data file | Error | `AUTO_UPDATE_HTTPS_ERR` | Product '\<product\>' is not offered by data update service at '\<url\>' for engine '\<Engine type name\>'. Products offered: '\<products offered\>' |
 | Any other response that is not a success and not a 304 (Not modified)                         | Error                            | `AUTO_UPDATE_HTTPS_ERR`                 | HTTP status code '\<status code\>' from data update service at '\<url\>' for engine '\<Engine type name\>'                                                                                    |
 | The response has no `Content-MD5` header                                                      | Warning                          | None, the check goes on                 | No MD5 hash included in data update response for '\<url\>'. Unable to verify data integrity                                                                                                   |
 | The integrity check of the downloaded data failed                                             | Error                            | `AUTO_UPDATE_ERR_MD5_VALIDATION_FAILED` | Integrity check failed. MD5 hash in HTTP response '\<hash in response\>' for '\<Engine type name\>'data update does not match calculated hash for the downloaded file '\<calculated hash\>'.  |
