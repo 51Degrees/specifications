@@ -284,6 +284,54 @@ person. Where no Value was worked out, the 51Did carries Absent.
 says who can read it, which values there are, and on which request a 51Did
 arrives when the call requested HumanConfidence.
 
+## When a page's results complete
+
+A request that names HumanConfidence is also given the browser tests, as
+the JavaScript Property `browserderived.BrowserTestsJavaScript`. The
+[JavaScript Builder](../pipeline-elements/javascript-builder.md)'s client
+script runs it like any other JavaScript Property, and sends the answers
+with its next request. So on a page:
+
+- The first response holds every Property the request named.
+  HumanConfidenceSource is `Passive`, and HumanConfidence is the Value.
+- The client script reports complete only after the response to the
+  request that carries the browser test answers. Its complete handlers run
+  later than they would for a request that did not name HumanConfidence,
+  by the time the tests take to run and one more request.
+- The browser tests always call back, after their answers, after a
+  failure, or when their time runs out, so a page is never left waiting
+  for them.
+- The response that carries the answers gives HumanConfidenceSource
+  `Active` and the sealed result where the browser ran the tests, and
+  `Passive` and the Value where it could not.
+
+The remote server holds back only the 51Did, as
+[The Human Confidence Value](../../did-specification/package-surface.md#when-a-51did-carries-the-value)
+describes. Every other Property is in every response. A request that does
+not name HumanConfidence completes exactly as before. A request where the
+remote server hands out no browser tests, such as one from a server that
+does not pass the page's script on, gets a `Passive` Value with no delay.
+
+A package's documentation MUST say that naming HumanConfidence delays the
+client script's complete handlers in this way, and that a page can read
+the first response's Properties sooner through its change handlers.
+
+## What a page's policy must allow
+
+The browser tests run in the visitor's browser. Where a page sets a
+Content Security Policy, it must allow these for the browser tests to run:
+
+| **Directive** | **Must allow**                                 |
+|---------------|------------------------------------------------|
+| `script-src`  | The remote server's host, and `'unsafe-eval'`  |
+| `connect-src` | The remote server's host                       |
+| `worker-src`  | `blob:`                                        |
+
+A page whose policy blocks any of these runs no browser tests. It still
+gets every Property, with HumanConfidenceSource `Passive`, and a 51Did
+made for it carries Absent. A package's documentation MUST list these
+where it documents HumanConfidence for a page.
+
 ## What a package never exposes
 
 The sealed result is the Evidence `query.humanconfidence`, and the page

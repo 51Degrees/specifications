@@ -337,7 +337,11 @@ on whether the call requested HumanConfidence.
 
 - A call that requested HumanConfidence gets its 51Did on the iteration that
   carries the browser test answers, and that 51Did carries the Value. The
-  iterations before it return no 51Did.
+  iterations before it return no 51Did. They return every other Property as
+  usual, so only the 51Did waits. On a page, the client script reports
+  complete after the iteration that returns the 51Did, as
+  [When a page's results complete](../pipeline-specification/features/human-confidence.md#when-a-pages-results-complete)
+  describes.
 - Where the browser tests cannot run, the 51Did comes on the same
   iteration, and its Value is Absent.
 - A page that never sends the browser test answers gets no 51Did, as with
