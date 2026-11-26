@@ -29,3 +29,4 @@ Names that GitHub, an operating system or another tool defines, such as `GITHUB_
 | `_51DEGREES_EXAMPLE_HTTP_PORTS` | The port, or ports, a web example listens on. |
 | `_51DEGREES_EXAMPLE_URL` | The address of a running example for the browser tests to open. |
 | `_51DEGREES_EXAMPLE_LANG` | The language of the example at `_51DEGREES_EXAMPLE_URL`. |
+| `_51DEGREES_WARNINGS_AS_ERRORS` | Whether a build stops on a compiler warning. When it is `true`, ignoring case, the build treats every warning as an error, with `-Werror`, `/WX` or the language's own setting. When it isn't set, or holds anything else, warnings are shown and the build carries on. CI sets it to `true` in every job, so it applies to tests, examples and every build that makes published binaries. A package built on a customer's own machine leaves it unset, so a newer compiler can't stop the install. Every warning is still fixed in the source. |
