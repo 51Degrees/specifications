@@ -109,6 +109,264 @@ collapse the block into a single verdict of its own, because the point of
 answering per factor is that a caller weighs an address change differently
 from a changed device.
 
+### A sealed creator context result
+
+The remote server can return the creator context check sealed. A sealed
+result is one the browser carries exactly as the remote server made it.
+Redemption takes the sealed result and gives the unsealed result, which for
+51Did is the Signature outcome, the Context outcome, and, where the server
+sent one, the Factor block.
+
+`id/verify-context` and `id/verify-full` return the sealed result as
+`sealedResult`. They also return it as `result`, with the same content, for
+packages released before `sealedResult`. A package MUST read `sealedResult`,
+and MUST read `result` only where the answer holds no `sealedResult`.
+
+A package redeems a sealed result with one POST request to `id/redeem` under
+the cloud endpoint it was given. Where it was given none, it uses the address
+in `_51DEGREES_CLOUD_ENDPOINT`, as
+[Environment variables](../pipeline-specification/features/environment-variables.md#settings)
+sets out, and where that is not set, `https://cloud.51degrees.com/api/v4/`.
+Every input goes in the form body, and none in the URL.
+
+| **Input**      | **Value**                                                                                |
+|----------------|------------------------------------------------------------------------------------------|
+| `51did`        | The 51Did the sealed result was made for, as base64.                                     |
+| `sealedResult` | The sealed result, exactly as the caller received it.                                    |
+| `result`       | The same value as `sealedResult`, under its obsolete name.                               |
+| `transaction`  | The transaction the check was asked for with, or empty where it was asked for with none. |
+| `challenge`    | The same value as `transaction`, under its obsolete name.                                |
+| `resource`     | The Resource Key the package was given.                                                  |
+| `license`      | The License Key, where the package was given one.                                        |
+
+The transaction is a value used for one page only that the sealed result is
+bound to. The caller issues it and gives it to the package, and a
+transaction is OPTIONAL. A package MUST send the transaction it was given
+exactly as it was given, and MUST NOT make one of its own.
+
+The remote server answers with a JSON object. Its `status` member says what
+happened, its `context` member holds the Context outcome, its `signature`
+member the Signature outcome, and its `factors` member, where the server
+sent one, the Factor block. A successful answer also holds the Human
+Confidence Value or the reason it is not there, as
+[The Human Confidence Value](#the-human-confidence-value) sets out. The
+status code is 200 for every answer but Unconfirmed, which has the status
+code 503. The remote server redeems the sealed result as it redeems every
+sealed result, and both redeem endpoints answer in the same shape, as set
+out in
+[Human Confidence](../pipeline-specification/features/human-confidence.md#how-the-remote-server-redeems-a-sealed-result).
+
+A package MUST read the answer where the status code is 200 or 503, and MUST
+report a 503 as Unconfirmed whatever its body holds. Where the body of a 200
+is not a JSON object, or holds neither `status` nor `context`, the package
+MUST report the Redemption outcome and the Context outcome as Unreadable and
+the Signature outcome as Unknown. A package makes one request for each
+sealed result and MUST NOT repeat it, because a sealed result redeems once.
+
+For any other status code a package MUST raise an error and report no
+outcome.
+
+| **Status code** | **The error**                                                                                                |
+|-----------------|--------------------------------------------------------------------------------------------------------------|
+| 400             | Says that an input was refused, with the remote server's message from its `errors` member, or else the body. |
+| 404             | Says that the remote server at the endpoint does not offer the creator context, and names the endpoint.     |
+| Any other       | Names the status code and holds the body, cut short where the body is long.                                  |
+
+Where the request does not complete, as on a connection failure or a
+timeout, a package MUST raise an error and report no outcome.
+
+The Signature outcome has these values.
+
+| **Signature outcome** | **Meaning**                                                                       |
+|-----------------------|-----------------------------------------------------------------------------------|
+| Verified              | The identifier is one the issuer made, and nothing has altered it.                |
+| Invalid               | The identifier is not one the issuer made, or something has altered it.           |
+| Unknown               | The answer holds no Signature outcome, or a word the package does not know.       |
+
+The server sends the first two as the lower case words `verified` and
+`invalid`.
+
+#### The Redemption outcome
+
+The Redemption outcome says what happened at redemption. A package reads it
+from `status` and MUST expose it as a named value of its own, beside the
+Signature outcome and the Context outcome.
+
+| **Redemption outcome** | **Meaning**                                                               |
+|------------------------|---------------------------------------------------------------------------|
+| Success                | The sealed result redeemed.                                               |
+| Expired                | The sealed result was not redeemed in time.                               |
+| Replayed               | The sealed result had already been redeemed.                              |
+| Unreadable             | The remote server could not read the sealed result with the inputs given. |
+| Unconfirmed            | The remote server could not complete the redemption.                      |
+
+The server sends these as the lower case words `success`, `expired`,
+`replayed`, `unreadable`, and `unconfirmed`.
+
+Where the Redemption outcome is Success, the answer gives the Signature
+outcome, the Context outcome, and, where the server sent one, the Factor
+block, as above. Where it is anything else, the sealed result was not
+redeemed, and `context` holds the same word as `status`, as it did before
+`status` was added. So the Context outcome also carries Expired, Replayed,
+Unreadable, and Unconfirmed as the reason the check could not be completed.
+A package MUST go on reporting these four Context outcomes, so a caller
+written before the Redemption outcome works as before, and SHOULD mark them
+obsolete in favor of the Redemption outcome, in the way its language marks
+a member obsolete.
+
+Where the answer holds no `status`, as from a remote server that predates
+it, a package MUST take the Redemption outcome from `context`.
+
+- It is Success where `context` holds a verdict the check reached, being
+  `verified`, `mismatch`, `nocontext`, `misconfigured`, or `invaliddate`
+- It is the word in `context` where that word is one of the four reasons,
+  being `expired`, `replayed`, `unreadable`, or `unconfirmed`
+- It is Unreadable where `context` is missing or holds any other word,
+  because a package MUST NOT read a word it does not know as a pass
+
+The answer for a sealed result that was not redeemed holds no `signature`.
+A package MUST then report the Signature outcome as Unknown, being the value
+it gives whenever the answer holds no Signature outcome, and MUST NOT report
+it as Verified or as Invalid. That value is read from the answer and not
+from the Context outcome, so the two stay independent.
+
+### Names that are obsolete
+
+51Did has no breaking change, so every name an endpoint read or wrote before
+keeps working beside its replacement.
+
+| **Obsolete name** | **Endpoints**                                      | **Use instead** | **Message**                               |
+|-------------------|----------------------------------------------------|-----------------|-------------------------------------------|
+| `result` (input)  | `id/redeem`                                        | `sealedResult`  | `result is obsolete. Use sealedResult.`   |
+| `challenge`       | `id/verify-context`, `id/verify-full`, `id/redeem` | `transaction`   | `challenge is obsolete. Use transaction.` |
+| `result` (answer) | `id/verify-context`, `id/verify-full`              | `sealedResult`  | None, because both names are returned     |
+
+A call that sends an obsolete input name gets an added `obsolete` member in
+its JSON answer. It is an array holding a message for each obsolete name the
+call used, and nothing else in the answer changes. Where a call sends both
+names, the remote server uses the current one.
+
+A package MUST send each input under both its current name and its obsolete
+name, with the same value under each. It sends `sealedResult` and `result`
+to `id/redeem`. It sends `transaction` and `challenge` to `id/redeem`, and
+to `id/verify-context` and `id/verify-full` where it asks for a check with a
+transaction. So a package keeps working against a remote server that reads
+only the obsolete names. A page that asks for the check itself sends the
+transaction under both names in the same way. A package MUST NOT treat an
+`obsolete` member as an error, and gets one on every such call. Where a package offers a caller a
+member or parameter under an obsolete name, it keeps working, and the
+package SHOULD mark it obsolete with a message naming the replacement.
+
+### The Human Confidence Value
+
+A 51Did can carry a Human Confidence Value, so that whoever receives the
+51Did can check whether it was made for a person. The Value is the
+HumanConfidence that the 51Degrees browser tests worked out on the call that
+made the 51Did, as
+[Human Confidence](../pipeline-specification/features/human-confidence.md)
+describes.
+
+| **Value** | **Meaning**                                                               |
+|-----------|---------------------------------------------------------------------------|
+| High      | The browser tests worked out High on the call that made the 51Did.        |
+| Medium    | The browser tests worked out Medium on the call that made the 51Did.      |
+| Low       | The browser tests worked out Low on the call that made the 51Did.         |
+| Absent    | No Value was worked out for the 51Did.                                    |
+
+Absent is returned when no Value was determined. A receiver can infer
+nothing from it about who was using the browser. A 51Did is Absent when:
+
+- It predates the remote server adding the Value to 51Dids
+- The call that created it did not request HumanConfidence
+- It was created without creator context
+- The browser tests could not run, or ran and gave no Value
+- HumanConfidence came from the request alone (HumanConfidenceSource
+  `Passive`)
+- The remote server answering cannot read the Value
+
+#### Who can read the Value
+
+Only the remote server reads the Value, and it returns the Value only to a
+call that presents a License Key valid for Human Confidence. Any such
+License Key reads it, whoever holds it, so a receiver further down the chain
+reads the Value of a 51Did it was given with its own License Key. The
+browser, and anyone else who holds the 51Did, cannot read the Value from the
+identifier. The Value is not a field of the Payload, and
+[Identifier layout](identifier-layout.md) does not change for it. A package
+MUST NOT try to read the Value from the identifier's bytes.
+
+The Value can be read any number of times, for as long as the 51Did's
+signature verifies. A receiver judges how old the Value is from the 51Did's
+date. Reading the Value adds no call, and each call is counted as it was
+before.
+
+#### Where the Value is returned
+
+The remote server returns the Value as the member `humanConfidence`, holding
+`High`, `Medium`, `Low`, or `Absent`.
+
+| **Endpoint**                          | **Where `humanConfidence` is**                                                                                                                                                   |
+|---------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `id/verify`                           | Beside `valid`, for a 51Did whose signature verifies.                                                                                                                            |
+| `id/verify-context`, `id/verify-full` | Beside the outcomes, in an answer that holds them openly. Where the answer is a sealed result, the Value is inside it, and `id/redeem` returns it.                              |
+| `id/redeem`                           | Beside `signature` and `context` where the Redemption outcome is Success, whatever the Context outcome is.                                                                       |
+
+The License Key that counts is the one presented on the call that returns
+the Value. Where that call presents a Resource Key alone, or a License Key
+that is not valid for Human Confidence, the answer holds no
+`humanConfidence`. It holds `humanConfidenceNullReason` in its place, a
+message that says why, as the remote server gives for any other Property
+the credential does not carry. Every other member of the answer is the same
+either way.
+
+A package MUST expose the Value from each call that verifies or redeems a
+51Did, as a named value with exactly the four values High, Medium, Low, and
+Absent. Where the answer holds `humanConfidenceNullReason`, the package
+gives no Value and that message. Where the answer holds neither member, as
+from a remote server that predates the Value, the package gives no Value and
+a message that says the remote server did not return one. A word the package
+does not know is reported as Absent, carrying the word as the server sent
+it, so it never reads as High.
+
+#### When a 51Did carries the Value
+
+A page and the remote server go back and forth, and the
+[sequence](../pipeline-specification/pipeline-elements/sequence-element.md)
+goes up by one on each iteration. Which iteration returns the 51Did depends
+on whether the call requested HumanConfidence.
+
+- A call that requested HumanConfidence gets its 51Did on the iteration that
+  carries the browser test answers, and that 51Did carries the Value. The
+  iterations before it return no 51Did. They return every other Property as
+  usual, so only the 51Did waits. On a page, the client script reports
+  complete after the iteration that returns the 51Did, as
+  [When a page's results complete](../pipeline-specification/features/human-confidence.md#when-a-pages-results-complete)
+  describes.
+- Where the browser tests cannot run, the 51Did comes on the same
+  iteration, and its Value is Absent.
+- A page that never sends the browser test answers gets no 51Did, as with
+  any other script whose answers the remote server is waiting for.
+- A call that did not request HumanConfidence gets its 51Did exactly as
+  before, and its Value is Absent.
+
+The same is true where the publisher's server makes the call, passing the
+page's script to the browser and the browser's answers back to the remote
+server. A call from the server that requested HumanConfidence gets no 51Did
+until a later call carries the browser test answers. So a server that
+requests HumanConfidence has to pass the page's script on to the browser and
+the answers back, or it gets no 51Did on any call. A server that needs a
+51Did on every call and cannot pass the script on should leave
+HumanConfidence out of its request.
+
+A server can also supply the visitor's JA4 and H2. They are used only on a
+call that presents a License Key valid for Human Confidence, and the call is
+then judged on them. On any other call they are not used, and the call is
+judged as if they were not supplied.
+
+A sealed Human Confidence result sent back to the remote server adds nothing
+to a 51Did. A caller can use the 51Did alone, without redeeming any sealed
+result.
+
 ### An outcome a package does not know
 
 The set of outcomes grows, so a package will meet a word that its own version
@@ -124,7 +382,14 @@ reading a value it cannot interpret as a pass.
 
 A Context word a package does not know is reported as Unreadable, and the
 Context outcome carries the word as the server sent it beside that value, so a
-caller can still act on a Context outcome the package predates.
+caller can still act on a Context outcome the package predates. Where the
+remote server itself answers `unreadable`, the word carried is `unreadable`,
+so a caller tells the two cases apart by the word carried.
+
+A `status` word a package does not know is reported as the Redemption
+outcome Unreadable in the same way, carrying the word as the server sent it.
+A Human Confidence word a package does not know is reported as Absent, as
+[Where the Value is returned](#where-the-value-is-returned) sets out.
 
 ## What a package does not expose
 
