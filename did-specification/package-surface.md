@@ -273,16 +273,16 @@ describes.
 | Low       | The browser tests worked out Low on the call that made the 51Did.         |
 | Absent    | No Value was worked out for the 51Did.                                    |
 
-Absent means not worked out. It says nothing either way about whether a
-person was using the browser. A 51Did reads as Absent where any of these is
-true:
+Absent is returned when no Value was determined. A receiver can infer
+nothing from it about who was using the browser. A 51Did is Absent when:
 
-- It was made before the remote server added the Value to 51Dids
-- The call that made it did not request HumanConfidence
-- The browser tests could not run
-- HumanConfidence was worked out from the request alone, being a
-  HumanConfidenceSource of `Passive`
-- The remote server that answers cannot read the Value
+- It predates the remote server adding the Value to 51Dids
+- The call that created it did not request HumanConfidence
+- It was created without creator context
+- The browser tests could not run, or ran and gave no Value
+- HumanConfidence came from the request alone (HumanConfidenceSource
+  `Passive`)
+- The remote server answering cannot read the Value
 
 #### Who can read the Value
 

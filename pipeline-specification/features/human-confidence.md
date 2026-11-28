@@ -219,13 +219,13 @@ sets out for a package. `hc/redeem` redeems a sealed Human Confidence result
 for a server that does not use a package. A package redeems through the
 JSON call instead, and makes no request to `hc/redeem`.
 
-Both endpoints take the sealed result as `sealedResult`, the transaction as
-`transaction` where the sealed result was made with one, and the License Key
-of the account the sealed result was made for. `id/redeem` also takes the
-51Did as `51did`. `id/redeem` goes on reading `result` and `challenge`, the
-obsolete names of `sealedResult` and `transaction`, as
-[Package surface](../../did-specification/package-surface.md#names-that-are-obsolete)
-sets out. `hc/redeem` reads neither.
+Both endpoints take the sealed result as `sealedResult` and the License Key
+of the account it was made for, plus `transaction` if the sealed result was
+made with one. `id/redeem` also takes the 51Did as `51did`, and still accepts
+the old names `result` and `challenge` (see
+[Package surface](../../did-specification/package-surface.md#names-that-are-obsolete)).
+`hc/redeem` accepts neither, and ignores `value` too, so a call that sends
+only `value` has no sealed result and gets Unreadable.
 
 Both answer with a JSON object that holds these members.
 
