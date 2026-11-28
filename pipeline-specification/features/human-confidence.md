@@ -36,6 +36,12 @@ the ones the Pipeline gives without this page, which where the Pipeline uses
 the cloud are the ones in the `derived` member of the remote server's
 response.
 
+Where the request has no sealed result, HumanConfidence is High, Medium, Low
+or Unknown and nothing else. If the remote server returns any other string,
+for example a sealed value meant for a server to redeem, the Property has no
+value and the [Missing Properties](properties.md#missing-properties) reason
+applies.
+
 Where the credential does not carry HumanConfidence or HumanConfidenceSource,
 and the request carries no sealed result, that Property has no value, and a
 read of it gives a message that says why, as for any other Property the
@@ -106,12 +112,14 @@ this value. The transaction was once called a challenge, and 51Did keeps
 `challenge` as an obsolete name for it.
 
 1. The package MUST give each page it serves a new transaction, and MUST
-   keep the transaction on the server.
+   keep the transaction on the server, under a page id it puts in the page.
 2. The page sends the transaction to the remote server when it asks for
    Human Confidence, and the remote server binds the sealed result to that
    transaction.
 3. The package MUST send the transaction it kept when it redeems the sealed
    result, so the sealed result redeems only for the page it was made for.
+   It looks the transaction up by the `query.humanconfidencepage` the page
+   sends back, then deletes it, so each page id works once.
 
 A package MUST NOT use one transaction for two pages, and MUST NOT take the
 transaction it redeems with from the request. The package issues and checks
@@ -183,6 +191,12 @@ these is true:
   `humanconfidence`
 - The `humanconfidence` in the response is null, or is any value other than
   `High`, `Medium`, or `Low`, `Unknown` included
+
+With no Cloud Request Engine in the Pipeline, the
+[Cloud Aspect Engine](../pipeline-elements/cloud-aspect-engine.md) for the
+derived Properties still builds. For a request without a sealed result, both
+Properties then have no value, and the message says the Pipeline has no Cloud
+Request Engine.
 
 A read of HumanConfidence or HumanConfidenceSource MUST NOT throw for any of
 these, and MUST NOT add an error of its own to the Flow Data. A failed
