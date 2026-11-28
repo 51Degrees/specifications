@@ -115,7 +115,7 @@ this value. The transaction was once called a challenge, and 51Did keeps
 
 A package MUST NOT use one transaction for two pages, and MUST NOT take the
 transaction it redeems with from the request. The package issues and checks
-the transaction itself, so a consumer never sees it.
+the transaction itself, so a consumer has no need of it.
 
 ## Redeeming through the JSON call
 
@@ -341,8 +341,11 @@ keep to these rules.
 | **Value**         | **A package MUST NOT**                                                                                                                                                               |
 |-------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | The sealed result | Add it to any Element Data, or to the output of the [JSON Builder](../pipeline-elements/json-builder.md) or the [JavaScript Builder](../pipeline-elements/javascript-builder.md)       |
-| The transaction   | Offer the consumer an accessor for it                                                                                                                                                |
 | The License Key   | Put it into anything a page receives, including the output of the JSON Builder and the JavaScript Builder                                                                            |
+
+A package SHOULD NOT offer the consumer an accessor for the transaction. Some
+languages can't keep a value from the consumer in every case, so this is not
+a MUST.
 
 A package MUST NOT write the sealed result, the License Key, or the
 transaction, in whole or in part, to a log entry or an error message. For
